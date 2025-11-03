@@ -1,0 +1,346 @@
+# Windsurf AI Guidelines for Laravel Ecommerce + Blog Project
+
+## Project Overview
+This is a Laravel-based ecommerce and blog platform with stock management, finance tracking, and comprehensive admin features.
+
+## Core Technologies & Stack
+- **Backend**: Laravel 11.x (PHP 8.2+)
+- **Frontend**: Blade Templates (NO separate frontend framework)
+- **Dynamic Components**: Livewire 3.x for search, filters, and interactive elements
+- **CSS**: Tailwind CSS (local, NOT CDN)
+- **JavaScript**: Alpine.js (local, NOT CDN) + Custom JS
+- **Database**: MySQL 8.x
+- **Authentication**: Laravel Breeze + Social login (Google, Facebook)
+- **SMS**: Integration for order status & verification
+
+## Critical Rules - ALWAYS FOLLOW
+
+### 1. NO CDN Usage
+- ❌ NEVER use CDN links for CSS/JS
+- ✅ ALWAYS install packages via npm/composer
+- ✅ Use `npm install` and import in resources/js or resources/css
+- ✅ Compile with Vite: `npm run dev` or `npm run build`
+
+### 2. Project Structure (Module-Based)
+```
+app/
+├── Modules/
+│   ├── Ecommerce/
+│   │   ├── Controllers/
+│   │   ├── Models/
+│   │   ├── Services/
+│   │   ├── Repositories/
+│   │   ├── Requests/
+│   │   └── Resources/
+│   ├── Blog/
+│   ├── Stock/
+│   ├── Finance/
+│   └── Admin/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   └── Requests/
+├── Services/
+│   ├── SmsService.php
+│   ├── PaymentService.php
+│   └── SeoService.php
+└── Traits/
+    ├── HasSeo.php
+    └── Trackable.php
+
+resources/
+├── views/
+│   ├── layouts/
+│   │   ├── app.blade.php
+│   │   ├── admin.blade.php
+│   │   └── components/
+│   ├── frontend/
+│   │   ├── home/
+│   │   ├── shop/
+│   │   ├── product/
+│   │   └── blog/
+│   ├── admin/
+│   │   ├── dashboard/
+│   │   ├── products/
+│   │   ├── orders/
+│   │   ├── stock/
+│   │   └── finance/
+│   └── livewire/
+├── js/
+│   ├── app.js
+│   └── admin.js
+└── css/
+    ├── app.css
+    └── admin.css
+```
+
+### 3. Blade View Rules
+- Use Blade components for reusable UI elements
+- Component location: `resources/views/components/`
+- Example: `<x-product-card :product="$product" />`
+- Always use `@props([])` to define component properties
+- Use slots for flexible content injection
+
+### 4. Livewire Usage (Only Where Needed)
+**Use Livewire for:**
+- Product search with instant results
+- Product filters (category, price, brand)
+- Cart management (add/remove without page reload)
+- Wishlist toggle
+- Stock level updates
+- Real-time notifications
+
+**DO NOT use Livewire for:**
+- Static pages
+- Simple forms
+- Non-interactive lists
+
+**Livewire Component Structure:**
+```php
+app/Livewire/
+├── Product/
+│   ├── SearchProducts.php
+│   ├── ProductFilters.php
+│   └── QuickView.php
+├── Cart/
+│   └── CartManager.php
+└── Admin/
+    └── StockAlert.php
+```
+
+### 5. Service Layer Pattern
+- Business logic MUST be in Service classes
+- Controllers should be thin (max 20 lines per method)
+- Example:
+```php
+// ✅ Good
+public function store(ProductRequest $request)
+{
+    $product = $this->productService->create($request->validated());
+    return redirect()->route('products.show', $product);
+}
+
+// ❌ Bad - Logic in controller
+public function store(Request $request)
+{
+    $product = new Product();
+    $product->name = $request->name;
+    // ... 50 lines of logic
+}
+```
+
+### 6. Repository Pattern
+- Database queries in Repository classes
+- Inject repositories into services
+```php
+app/Repositories/
+├── ProductRepository.php
+├── OrderRepository.php
+└── StockRepository.php
+```
+
+### 7. Documentation Requirements
+**EVERY new file MUST have:**
+```php
+/**
+ * ModuleName: [Module Name]
+ * Purpose: [What this class does]
+ * 
+ * Key Methods:
+ * - methodName(): Description
+ * 
+ * Dependencies:
+ * - ServiceName
+ * - RepositoryName
+ * 
+ * @category [Category]
+ * @package  [Package]
+ * @author   [Your Name]
+ * @created  [Date]
+ * @updated  [Date]
+ */
+```
+
+**Update CHANGELOG.md after every feature:**
+```markdown
+## [Date] - Module: Feature Name
+- Added: [description]
+- Changed: [description]
+- Fixed: [description]
+```
+
+### 8. SEO Management
+- Every page should have SEO meta
+- Use a `HasSeo` trait for models
+```php
+trait HasSeo
+{
+    public function getSeoAttribute()
+    {
+        return [
+            'title' => $this->meta_title ?? $this->title,
+            'description' => $this->meta_description,
+            'keywords' => $this->meta_keywords,
+        ];
+    }
+}
+```
+
+### 9. Image Management
+- Store images in organized folders
+```
+storage/app/public/
+├── products/
+├── categories/
+├── blog/
+└── pages/
+```
+- Always create thumbnails (use Intervention Image)
+- Image naming: `{type}_{id}_{timestamp}.{ext}`
+
+### 10. Database Design
+- Use migrations for ALL database changes
+- Soft deletes for important data
+- Index foreign keys and search columns
+- Use polymorphic relations where appropriate
+
+### 11. Security Rules
+- Always validate user input
+- Use Form Requests for complex validation
+- Sanitize HTML content (blog posts)
+- Implement CSRF protection (Laravel default)
+- Use rate limiting for SMS and authentication
+
+### 12. Code Quality
+- Follow PSR-12 coding standards
+- Use type hints for all methods
+- Use early returns to reduce nesting
+- Maximum cyclomatic complexity: 10
+- Maximum method length: 30 lines
+
+### 13. Testing Requirements
+- Write feature tests for critical flows:
+  - Product purchase flow
+  - Order creation
+  - Stock management
+  - Payment processing
+- Test coverage minimum: 60%
+
+### 14. Social Login Implementation
+```php
+// Use Laravel Socialite
+composer require laravel/socialite
+
+// Providers: Google, Facebook
+// Store social IDs in users table
+```
+
+### 15. SMS Integration
+```php
+// Use a service provider (e.g., Twilio, Nexmo)
+// Implement queue for SMS sending
+// Use for:
+// - Order status updates
+// - Registration verification (OTP)
+// - Password reset
+```
+
+## Feature Modules
+
+### A. Ecommerce Module
+- Product management (CRUD)
+- Category management (nested)
+- Cart & Checkout
+- Order management
+- Payment integration
+- Invoice generation
+
+### B. Blog Module
+- Post management (CRUD)
+- Category & tags
+- Comments system
+- Author management
+- SEO optimization
+
+### C. Stock Module
+- Inventory tracking
+- Stock alerts (low stock)
+- Stock history
+- Supplier management
+
+### D. Finance Module
+- Revenue tracking
+- Expense management
+- Profit/loss reports
+- Payment records
+- Tax calculations
+
+### E. Admin Panel
+- Dashboard with analytics
+- User management
+- Role & permissions
+- Settings management
+- Activity logs
+
+### F. Landing Pages
+- Dynamic page builder
+- Section management (Hero, Features, Testimonials)
+- Call-to-action management
+
+### G. Home Page Management
+- Featured products
+- Banner slider
+- Category showcase
+- Latest blog posts
+- Promotional sections
+
+## When Creating New Features
+
+1. **Plan First**: Outline the feature structure
+2. **Create Migration**: Database schema
+3. **Create Model**: With relationships
+4. **Create Repository**: Database queries
+5. **Create Service**: Business logic
+6. **Create Controller**: HTTP handling
+7. **Create Request**: Validation
+8. **Create Views**: Blade templates (use Livewire if interactive)
+9. **Create Routes**: Named routes
+10. **Write Tests**: Feature tests
+11. **Document**: Add to CHANGELOG.md and inline docs
+
+## File Naming Conventions
+- Controllers: `ProductController.php`
+- Models: `Product.php`
+- Services: `ProductService.php`
+- Repositories: `ProductRepository.php`
+- Livewire: `SearchProducts.php`
+- Blade views: `kebab-case.blade.php`
+- JS files: `camelCase.js`
+
+## Git Commit Messages
+```
+feat(module): Add feature description
+fix(module): Fix bug description
+docs(module): Update documentation
+refactor(module): Refactor code
+test(module): Add tests
+```
+
+## Questions to Ask Before Implementation
+1. Is this feature module-specific or shared?
+2. Does it need Livewire or is Blade sufficient?
+3. What are the database requirements?
+4. Are there security considerations?
+5. Does it need background processing (queues)?
+
+## Reference Screenshots
+When user provides screenshots:
+1. Analyze layout structure
+2. Identify components
+3. Note interactive elements
+4. List required features
+5. Suggest implementation approach
+
+---
+
+**Remember**: This project prioritizes clean, maintainable, and well-documented code. Always think about future developers who will work on this codebase.
