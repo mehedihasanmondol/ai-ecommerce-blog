@@ -14,9 +14,15 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
+            $table->string('mobile')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'customer'])->default('customer');
+            $table->string('google_id')->nullable();
+            $table->string('facebook_id')->nullable();
+            $table->string('apple_id')->nullable();
+            $table->boolean('keep_signed_in')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

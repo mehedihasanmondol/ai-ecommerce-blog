@@ -20,7 +20,14 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'mobile',
         'password',
+        'role',
+        'google_id',
+        'facebook_id',
+        'apple_id',
+        'keep_signed_in',
+        'email_verified_at',
     ];
 
     /**
@@ -43,6 +50,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'keep_signed_in' => 'boolean',
         ];
     }
 }
