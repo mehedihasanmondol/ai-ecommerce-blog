@@ -145,10 +145,13 @@
                     <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
                 </a>
 
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
+                <a href="{{ route('admin.categories.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-tags w-5 mr-3"></i>
                     <span>Categories</span>
-                    <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
+                    @if(request()->routeIs('admin.categories.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
                 </a>
 
                 <!-- Inventory Section (Placeholder) -->
@@ -234,6 +237,16 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shield-alt w-5 mr-3"></i>
                     <span>Roles & Permissions</span>
+                </a>
+
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
+                </div>
+                
+                <a href="{{ route('admin.categories.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-tags w-5 mr-3"></i>
+                    <span>Categories</span>
                 </a>
             </nav>
         </aside>
