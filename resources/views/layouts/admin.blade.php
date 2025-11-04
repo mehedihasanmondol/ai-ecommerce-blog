@@ -154,6 +154,15 @@
                     @endif
                 </a>
 
+                <a href="{{ route('admin.brands.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.brands.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-copyright w-5 mr-3"></i>
+                    <span>Brands</span>
+                    @if(request()->routeIs('admin.brands.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
                 <!-- Inventory Section (Placeholder) -->
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
@@ -247,6 +256,12 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-tags w-5 mr-3"></i>
                     <span>Categories</span>
+                </a>
+
+                <a href="{{ route('admin.brands.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.brands.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-copyright w-5 mr-3"></i>
+                    <span>Brands</span>
                 </a>
             </nav>
         </aside>

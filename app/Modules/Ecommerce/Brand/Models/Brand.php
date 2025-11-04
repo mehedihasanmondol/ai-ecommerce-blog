@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Modules\Ecommerce\Brand\Models;
+
+use App\Traits\HasSeo;
+use App\Traits\HasUniqueSlug;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * ModuleName: E-commerce Brand
+ * Purpose: Product brand management with SEO
+ * 
+ * Key Methods:
+ * - products(): Get products for this brand
+ * - getLogoUrl(): Get logo URL
+ * - getUrl(): Get brand URL
+ * 
+ * Dependencies:
+ * - HasSeo trait for SEO functionality
+ * - HasUniqueSlug trait for auto-slug generation
+ * 
+ * @author AI Assistant
+ * @date 2025-11-04
+ */
+class Brand extends Model
+{
+    use HasFactory, SoftDeletes, HasSeo, HasUniqueSlug;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'logo',
+        'website',
+        'email',
+        'phone',
+        'sort_order',
+        'is_active',
+        'is_featured',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'og_title',
+        'og_description',
+        'og_image',
+        'canonical_url',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'sort_order' => 'integer',
+    ];
+
+    /**
+     * Get products for this brand
+     * Note: Will be implemented when Product model is created
+     */
+    // public function products()
+    // {
+    //     return $this->hasMany(Product::class);
+    // }
+
+    /**
+     * Scope: Get only active brands
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope: Get only featured brands
+     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
+    /**
+     * Scope: Order by sort order
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    /**
+     * Scope: Search brands
+     */
+    public function scopeSearch($query, string $search)
+    {
+        return $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%")
+              ->orWhere('slug', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * Get URL for this brand
+     */
+    public function getUrl(): string
+    {
+        return route('brands.show', $this->slug);
+    }
+
+    /**
+     * Get logo URL
+     */
+    public function getLogoUrl(): ?string
+    {
+        return $this->logo ? asset('storage/' . $this->logo) : null;
+    }
+
+    /**
+     * Get website URL with protocol
+     */
+    public function getWebsiteUrl(): ?string
+    {
+        if (!$this->website) {
+            return null;
+        }
+
+        // Add https:// if no protocol specified
+        if (!preg_match("~^(?:f|ht)tps?://~i", $this->website)) {
+            return 'https://' . $this->website;
+        }
+
+        return $this->website;
+    }
+}
