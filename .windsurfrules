@@ -17,15 +17,35 @@ This is a Laravel-based ecommerce and blog platform with stock management, finan
 
 ---
 
-## AI work process
-Whenever the code editor creates or modifies any feature, it should divide the work into multiple steps. It must track which steps have been completed and which are still pending.
 
-The process flow — what tasks to perform, in what order, and how to perform them — should be documented in a specific file named editor-task-management.md.
+## Task Management System (Editor Workflow)
 
-Before starting any new task, the editor must first check this file.
-If there are any pending tasks listed, the editor should request permission to complete them first.
-Once a task is completed, it should be removed from the file, and any future or follow-up tasks should be added accordingly.
----
+- File Name: editor-task-management.md
+
+- Purpose: To manage and document all feature creation or modification tasks performed by the code editor.
+
+# Workflow Rules
+
+- Task Division:
+  - Every new feature or modification must be broken down into multiple clear steps.
+  - Each step should include what needs to be done and how it should be implemented.
+
+- Progress Tracking:
+  - The editor must record which steps are completed and which are pending.
+  - All progress updates must be reflected in editor-task-management.md.
+
+- Pre-Execution Check:
+  - Before starting any new task, the editor must check the file for existing pending tasks.
+  - If pending tasks exist, the editor should request permission to complete them first.
+
+- Task Updates:
+  - Once a step is completed, it should be removed from the file.
+  - Any upcoming or dependent tasks should be added immediately.
+
+- Documentation Consistency:
+  - The file must always represent the current and accurate state of all ongoing and upcoming tasks.
+  - No task should be performed without being logged or updated in this file.
+
 
 ## Critical Rules - ALWAYS FOLLOW
 
