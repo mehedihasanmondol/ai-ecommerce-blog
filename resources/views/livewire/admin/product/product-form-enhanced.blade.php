@@ -800,7 +800,17 @@
 
                 {{-- Categories --}}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Categories</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Product Categories</h3>
+                        <button type="button" 
+                                wire:click="openCategoryModal"
+                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add New
+                        </button>
+                    </div>
                     <p class="text-sm text-gray-600 mb-3">Select one or more categories</p>
                     
                     <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3">
@@ -815,34 +825,22 @@
                         @endforeach
                     </div>
                     
-                    @if(count($category_ids) > 0)
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        @foreach($category_ids as $categoryId)
-                            @php
-                                $selectedCategory = $categories->firstWhere('id', $categoryId);
-                            @endphp
-                            @if($selectedCategory)
-                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
-                                {{ $selectedCategory->name }}
-                                <button type="button" 
-                                        wire:click="$set('category_ids', {{ json_encode(array_values(array_diff($category_ids, [$categoryId]))) }})"
-                                        class="hover:text-blue-900">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </span>
-                            @endif
-                        @endforeach
-                    </div>
-                    @endif
-                    
                     @error('category_ids') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- Brands --}}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Brand</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Product Brand</h3>
+                        <button type="button" 
+                                wire:click="openBrandModal"
+                                class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add New
+                        </button>
+                    </div>
                     
                     <select wire:model="brand_id" 
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -856,4 +854,116 @@
             </div>
         </div>
     </div>
+    
+    {{-- Add Category Modal --}}
+    @if($showCategoryModal)
+    <div class="fixed inset-0 overflow-y-auto" style="z-index: 9999;">
+        {{-- Background overlay --}}
+        <div class="fixed inset-0 transition-opacity" 
+             style="background-color: rgba(0, 0, 0, 0.3);"
+             wire:click="closeCategoryModal"></div>
+        
+        {{-- Modal container --}}
+        <div class="flex items-center justify-center min-h-screen p-4">
+            {{-- Modal panel --}}
+            <div class="relative bg-white rounded-lg shadow-2xl max-w-lg w-full z-50 transform transition-all">
+                <div class="bg-white px-6 pt-5 pb-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Add New Category</h3>
+                        <button type="button" 
+                                wire:click="closeCategoryModal"
+                                class="text-gray-400 hover:text-gray-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category Name *</label>
+                        <input type="text" 
+                               wire:model="newCategoryName"
+                               wire:keydown.enter="saveCategory"
+                               wire:keydown.escape="closeCategoryModal"
+                               autofocus
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter category name">
+                        @error('newCategoryName') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-end gap-3">
+                    <button type="button" 
+                            wire:click="closeCategoryModal"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            wire:click="saveCategory"
+                            wire:loading.attr="disabled"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                        <span wire:loading.remove wire:target="saveCategory">Create Category</span>
+                        <span wire:loading wire:target="saveCategory">Creating...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    
+    {{-- Add Brand Modal --}}
+    @if($showBrandModal)
+    <div class="fixed inset-0 overflow-y-auto" style="z-index: 9999;">
+        {{-- Background overlay --}}
+        <div class="fixed inset-0 transition-opacity" 
+             style="background-color: rgba(0, 0, 0, 0.3);"
+             wire:click="closeBrandModal"></div>
+        
+        {{-- Modal container --}}
+        <div class="flex items-center justify-center min-h-screen p-4">
+            {{-- Modal panel --}}
+            <div class="relative bg-white rounded-lg shadow-2xl max-w-lg w-full z-50 transform transition-all">
+                <div class="bg-white px-6 pt-5 pb-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Add New Brand</h3>
+                        <button type="button" 
+                                wire:click="closeBrandModal"
+                                class="text-gray-400 hover:text-gray-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Brand Name *</label>
+                        <input type="text" 
+                               wire:model="newBrandName"
+                               wire:keydown.enter="saveBrand"
+                               wire:keydown.escape="closeBrandModal"
+                               autofocus
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="Enter brand name">
+                        @error('newBrandName') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 px-6 py-3 flex items-center justify-end gap-3">
+                    <button type="button" 
+                            wire:click="closeBrandModal"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            wire:click="saveBrand"
+                            wire:loading.attr="disabled"
+                            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                        <span wire:loading.remove wire:target="saveBrand">Create Brand</span>
+                        <span wire:loading wire:target="saveBrand">Creating...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

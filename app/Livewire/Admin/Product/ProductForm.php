@@ -69,6 +69,12 @@ class ProductForm extends Component
     // UI State
     public $currentStep = 1;
     public $showVariantSection = false;
+    
+    // Quick Add Modals
+    public $showCategoryModal = false;
+    public $showBrandModal = false;
+    public $newCategoryName = '';
+    public $newBrandName = '';
 
     protected $listeners = [
         'variationAdded' => 'addTempVariation',
@@ -401,12 +407,77 @@ class ProductForm extends Component
     {
         $this->primaryImageIndex = $index;
     }
+    
+    // Quick Add Category
+    public function openCategoryModal()
+    {
+        $this->showCategoryModal = true;
+        $this->newCategoryName = '';
+    }
+    
+    public function closeCategoryModal()
+    {
+        $this->showCategoryModal = false;
+        $this->newCategoryName = '';
+    }
+    
+    public function saveCategory()
+    {
+        $this->validate([
+            'newCategoryName' => 'required|string|max:255|unique:categories,name',
+        ]);
+        
+        $category = Category::create([
+            'name' => $this->newCategoryName,
+            'slug' => \Str::slug($this->newCategoryName),
+            'is_active' => true,
+        ]);
+        
+        // Add to selected categories
+        $this->category_ids[] = $category->id;
+        
+        $this->closeCategoryModal();
+        session()->flash('success', 'Category created successfully!');
+    }
+    
+    // Quick Add Brand
+    public function openBrandModal()
+    {
+        $this->showBrandModal = true;
+        $this->newBrandName = '';
+    }
+    
+    public function closeBrandModal()
+    {
+        $this->showBrandModal = false;
+        $this->newBrandName = '';
+    }
+    
+    public function saveBrand()
+    {
+        $this->validate([
+            'newBrandName' => 'required|string|max:255|unique:brands,name',
+        ]);
+        
+        $brand = Brand::create([
+            'name' => $this->newBrandName,
+            'slug' => \Str::slug($this->newBrandName),
+            'is_active' => true,
+        ]);
+        
+        // Select the new brand
+        $this->brand_id = $brand->id;
+        
+        $this->closeBrandModal();
+        session()->flash('success', 'Brand created successfully!');
+    }
 
     public function render()
     {
-        return view('livewire.admin.product.product-form-enhanced', [
-            'categories' => Category::orderBy('name')->get(),
-            'brands' => Brand::orderBy('name')->get(),
-        ]);
+        $categories = Category::all();
+        $brands = Brand::all();
+        $products = Product::where('id', '!=', $this->product?->id)->get();
+
+        return view('livewire.admin.product.product-form-enhanced', compact('categories', 'brands', 'products'));
     }
 }
