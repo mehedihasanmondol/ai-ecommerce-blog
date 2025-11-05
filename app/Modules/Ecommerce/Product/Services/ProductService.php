@@ -25,8 +25,8 @@ class ProductService
             // Create product
             $product = $this->repository->create($data);
 
-            // Create default variant for simple products
-            if ($product->product_type === 'simple' && !empty($data['variant'])) {
+            // Create default variant for simple and grouped products
+            if (($product->product_type === 'simple' || $product->product_type === 'grouped') && !empty($data['variant'])) {
                 $this->createDefaultVariant($product, $data['variant']);
             }
 
@@ -50,8 +50,8 @@ class ProductService
             // Update product
             $this->repository->update($product, $data);
 
-            // Update variant for simple products
-            if ($product->product_type === 'simple' && !empty($data['variant'])) {
+            // Update variant for simple and grouped products
+            if (($product->product_type === 'simple' || $product->product_type === 'grouped') && !empty($data['variant'])) {
                 $this->updateDefaultVariant($product, $data['variant']);
             }
 
@@ -122,10 +122,19 @@ class ProductService
         $syncData = [];
         
         foreach ($childProducts as $index => $childData) {
-            $syncData[$childData['id']] = [
-                'quantity' => $childData['quantity'] ?? 1,
-                'sort_order' => $index,
-            ];
+            // Handle both array format and simple ID format
+            if (is_array($childData)) {
+                $syncData[$childData['id']] = [
+                    'quantity' => $childData['quantity'] ?? 1,
+                    'sort_order' => $index,
+                ];
+            } else {
+                // Simple product ID
+                $syncData[$childData] = [
+                    'quantity' => 1,
+                    'sort_order' => $index,
+                ];
+            }
         }
 
         $product->childProducts()->sync($syncData);

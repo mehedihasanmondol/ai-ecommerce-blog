@@ -57,10 +57,11 @@ class ProductForm extends Component
 
     // Grouped Products
     public $selectedChildProducts = [];
+    public $childProductSearch = '';
 
     // UI State
     public $currentStep = 1;
-    public $showVariantSection = true;
+    public $showVariantSection = false;
 
     protected function rules()
     {
@@ -76,7 +77,7 @@ class ProductForm extends Component
             'is_active' => 'boolean',
         ];
 
-        if ($this->product_type === 'simple') {
+        if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
             $rules['variant.price'] = 'required|numeric|min:0';
             $rules['variant.sale_price'] = 'nullable|numeric|min:0|lt:variant.price';
             $rules['variant.stock_quantity'] = 'required|integer|min:0';
@@ -185,8 +186,12 @@ class ProductForm extends Component
                 'meta_keywords' => $this->meta_keywords,
             ];
 
-            if ($this->product_type === 'simple') {
+            if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
                 $data['variant'] = $this->variant;
+            }
+
+            if ($this->product_type === 'grouped') {
+                $data['child_products'] = $this->selectedChildProducts;
             }
 
             if ($this->isEdit) {
@@ -218,6 +223,20 @@ class ProductForm extends Component
     public function previousStep()
     {
         $this->currentStep--;
+    }
+
+    public function addChildProduct($productId)
+    {
+        if (!in_array($productId, $this->selectedChildProducts)) {
+            $this->selectedChildProducts[] = $productId;
+            $this->childProductSearch = '';
+        }
+    }
+
+    public function removeChildProduct($index)
+    {
+        unset($this->selectedChildProducts[$index]);
+        $this->selectedChildProducts = array_values($this->selectedChildProducts);
     }
 
     public function render()

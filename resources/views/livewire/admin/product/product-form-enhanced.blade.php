@@ -1,4 +1,4 @@
-<div class="p-6" x-data="{ activeTab: 'general' }">
+<div class="p-6" x-data="{ activeTab: 'general' }" wire:ignore.self>
     <div class="max-w-7xl mx-auto">
         {{-- Flash Messages --}}
         @if (session()->has('success'))
@@ -67,24 +67,31 @@
                                     class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
                                 General
                             </button>
+                            
+                            @if($product_type === 'simple' || $product_type === 'affiliate' || $product_type === 'grouped')
                             <button @click="activeTab = 'pricing'" 
                                     :class="activeTab === 'pricing' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors"
-                                    x-show="product_type === 'simple' || product_type === 'affiliate'">
-                                Pricing & Stock
+                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
+                                {{ $product_type === 'grouped' ? 'Grouped Products' : 'Pricing & Stock' }}
                             </button>
+                            @endif
+                            
+                            @if($product_type === 'variable')
                             <button @click="activeTab = 'variations'" 
                                     :class="activeTab === 'variations' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors"
-                                    x-show="product_type === 'variable'">
+                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
                                 Variations
                             </button>
+                            @endif
+                            
+                            @if($product_type === 'simple' || $product_type === 'grouped')
                             <button @click="activeTab = 'shipping'" 
                                     :class="activeTab === 'shipping' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors"
-                                    x-show="product_type === 'simple'">
+                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
                                 Shipping
                             </button>
+                            @endif
+                            
                             <button @click="activeTab = 'seo'" 
                                     :class="activeTab === 'seo' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                     class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
@@ -142,9 +149,24 @@
                             </div>
                         </div>
 
-                        {{-- Pricing & Stock Tab (Simple/Affiliate) --}}
+                        {{-- Pricing & Stock Tab (Simple/Affiliate/Grouped) --}}
                         <div x-show="activeTab === 'pricing'" class="space-y-6">
-                            @if($product_type === 'simple')
+                            @if($product_type === 'simple' || $product_type === 'grouped')
+                            
+                            @if($product_type === 'grouped')
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <div>
+                                        <h4 class="font-semibold text-amber-900 mb-1">Grouped Product Pricing</h4>
+                                        <p class="text-sm text-amber-800">Set the base price and stock for the grouped product package. Individual child products maintain their own pricing. The displayed price will show as a range based on child products.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <div class="grid grid-cols-2 gap-6">
                                 {{-- Regular Price --}}
                                 <div>
@@ -211,6 +233,138 @@
                             </div>
                             @endif
 
+                            @if($product_type === 'grouped')
+                            {{-- Divider --}}
+                            <div class="relative">
+                                <div class="absolute inset-0 flex items-center">
+                                    <div class="w-full border-t border-gray-300"></div>
+                                </div>
+                                <div class="relative flex justify-center text-sm">
+                                    <span class="px-4 bg-white text-gray-500 font-medium">Child Products Selection</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                {{-- Info Box --}}
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <div>
+                                            <h4 class="font-semibold text-blue-900 mb-1">About Child Products</h4>
+                                            <p class="text-sm text-blue-800">Select simple products to include in this group. Each child product maintains its own price and stock. Customers can purchase individual items or the entire group.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Product Selection --}}
+                                <div>
+                                    <div class="flex items-center justify-between mb-4">
+                                        <label class="block text-sm font-semibold text-gray-700">Select Child Products</label>
+                                        <span class="text-sm text-gray-500">{{ count($selectedChildProducts) }} products selected</span>
+                                    </div>
+
+                                    {{-- Search Products --}}
+                                    <div class="mb-4">
+                                        <input type="text" 
+                                               wire:model.live.debounce.300ms="childProductSearch"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                               placeholder="Search products to add...">
+                                    </div>
+
+                                    {{-- Selected Products List --}}
+                                    @if(count($selectedChildProducts) > 0)
+                                    <div class="mb-4 space-y-2">
+                                        <h5 class="text-sm font-medium text-gray-700 mb-2">Selected Products:</h5>
+                                        @foreach($selectedChildProducts as $index => $childId)
+                                            @php
+                                                $childProduct = \App\Modules\Ecommerce\Product\Models\Product::find($childId);
+                                            @endphp
+                                            @if($childProduct)
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="font-medium text-gray-900">{{ $childProduct->name }}</h6>
+                                                        <p class="text-sm text-gray-600">
+                                                            SKU: {{ $childProduct->variants->first()?->sku ?? 'N/A' }} | 
+                                                            Price: ${{ number_format($childProduct->variants->first()?->price ?? 0, 2) }} |
+                                                            Stock: {{ $childProduct->variants->first()?->stock_quantity ?? 0 }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button wire:click="removeChildProduct({{ $index }})" 
+                                                        class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    @endif
+
+                                    {{-- Available Products to Add --}}
+                                    @if(!empty($childProductSearch))
+                                    <div class="border border-gray-200 rounded-lg max-h-64 overflow-y-auto">
+                                        @php
+                                            $availableProducts = \App\Modules\Ecommerce\Product\Models\Product::where('product_type', 'simple')
+                                                ->where('name', 'like', '%' . $childProductSearch . '%')
+                                                ->whereNotIn('id', $selectedChildProducts)
+                                                ->limit(10)
+                                                ->get();
+                                        @endphp
+                                        
+                                        @if($availableProducts->count() > 0)
+                                            @foreach($availableProducts as $product)
+                                            <div class="flex items-center justify-between p-3 hover:bg-gray-50 border-b border-gray-200 last:border-b-0">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="font-medium text-gray-900 text-sm">{{ $product->name }}</h6>
+                                                        <p class="text-xs text-gray-600">
+                                                            ${{ number_format($product->variants->first()?->price ?? 0, 2) }} | 
+                                                            Stock: {{ $product->variants->first()?->stock_quantity ?? 0 }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button wire:click="addChildProduct({{ $product->id }})" 
+                                                        class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                    + Add
+                                                </button>
+                                            </div>
+                                            @endforeach
+                                        @else
+                                            <div class="p-4 text-center text-gray-500 text-sm">
+                                                No products found
+                                            </div>
+                                        @endif
+                                    </div>
+                                    @endif
+
+                                    @if(count($selectedChildProducts) == 0 && empty($childProductSearch))
+                                    <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                        <p class="text-gray-600 mb-1">No child products selected</p>
+                                        <p class="text-sm text-gray-500">Search and add simple products to this group</p>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
                             @if($product_type === 'affiliate')
                             <div class="space-y-4">
                                 <div>
@@ -234,8 +388,45 @@
                             @endif
                         </div>
 
+                        {{-- Variations Tab --}}
+                        <div x-show="activeTab === 'variations'" class="space-y-6">
+                            @if($product_type === 'variable')
+                                {{-- Attribute Manager --}}
+                                <div class="mb-6">
+                                    @livewire('admin.product.attribute-manager')
+                                </div>
+
+                                {{-- Variation Generator --}}
+                                <div>
+                                    @livewire('admin.product.variation-generator', ['productId' => $product?->id])
+                                </div>
+                            @else
+                                <div class="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                                    <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                    <p class="text-gray-600">Variations are only available for Variable Products</p>
+                                    <p class="text-sm text-gray-500 mt-1">Change product type to "Variable Product" to enable variations</p>
+                                </div>
+                            @endif
+                        </div>
+
                         {{-- Shipping Tab --}}
                         <div x-show="activeTab === 'shipping'" class="space-y-6">
+                            @if($product_type === 'grouped')
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div>
+                                        <h4 class="font-semibold text-blue-900 mb-1">Grouped Product Shipping</h4>
+                                        <p class="text-sm text-blue-800">Set shipping dimensions for the entire grouped package. Individual child products may have their own shipping details, but these values apply when the group is purchased together.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <div class="grid grid-cols-4 gap-6">
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Weight (kg)</label>
