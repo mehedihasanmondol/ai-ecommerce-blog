@@ -58,7 +58,12 @@ class UserRepository
             $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
-        return $query->latest()->paginate($perPage);
+        // Apply sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        return $query->paginate($perPage);
     }
 
     /**
