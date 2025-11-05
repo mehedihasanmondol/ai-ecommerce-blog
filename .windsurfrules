@@ -418,6 +418,7 @@ public function destroy(Product $product)
 - Maintain consistent component naming:
   - `ButtonPrimary.blade.php`, `CardBase.blade.php`, `ModalConfirm.blade.php`
 - show an toast notification for admin panel crud actions
+- bulk action on every list data shown on admin panel. like: delete, export etc. as per data facility.
 ### 21. Social Login Implementation
 ```php
 // Use Laravel Socialite

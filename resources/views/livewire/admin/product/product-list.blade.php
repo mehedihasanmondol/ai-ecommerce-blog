@@ -194,10 +194,6 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
-                                <a href="{{ route('admin.products.images', $product) }}" 
-                                   class="text-purple-600 hover:text-purple-900" title="Manage Images">
-                                    <i class="fas fa-images text-lg"></i>
-                                </a>
                                 <a href="{{ route('admin.products.edit', $product) }}" 
                                    class="text-blue-600 hover:text-blue-900" title="Edit Product">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
