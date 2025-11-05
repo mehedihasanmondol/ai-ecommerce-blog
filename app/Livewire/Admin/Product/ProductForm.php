@@ -190,8 +190,35 @@ class ProductForm extends Component
 
     public function updatedName($value)
     {
-        // Always update slug when name changes
-        $this->slug = \Illuminate\Support\Str::slug($value);
+        // Only auto-update slug for new products
+        if ($this->isNewProduct) {
+            $this->slug = \Illuminate\Support\Str::slug($value);
+        }
+    }
+    
+    public function generatePermalink()
+    {
+        if (empty($this->name)) {
+            session()->flash('error', 'Please enter a product name first.');
+            return;
+        }
+        
+        $baseSlug = \Illuminate\Support\Str::slug($this->name);
+        $slug = $baseSlug;
+        $counter = 1;
+        
+        // Check for uniqueness
+        while (Product::where('slug', $slug)
+            ->when($this->product, function($query) {
+                return $query->where('id', '!=', $this->product->id);
+            })
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        $this->slug = $slug;
+        session()->flash('success', 'Permalink generated successfully!');
     }
 
     public function updatedProductType($value)

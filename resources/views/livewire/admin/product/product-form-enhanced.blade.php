@@ -118,13 +118,32 @@
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Permalink</label>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-gray-500 text-sm">{{ url('/') }}/product/</span>
+                                    <span class="text-gray-500 text-sm whitespace-nowrap">{{ url('/') }}/product/</span>
                                     <input type="text" 
                                            wire:model="slug" 
                                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                            placeholder="product-slug">
+                                    @if(!$isNewProduct)
+                                    <button type="button"
+                                            wire:click="generatePermalink"
+                                            wire:loading.attr="disabled"
+                                            class="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center gap-2">
+                                        <svg wire:loading.remove wire:target="generatePermalink" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        <svg wire:loading wire:target="generatePermalink" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span wire:loading.remove wire:target="generatePermalink">Generate</span>
+                                        <span wire:loading wire:target="generatePermalink">Generating...</span>
+                                    </button>
+                                    @endif
                                 </div>
                                 @error('slug') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                @if(!$isNewProduct)
+                                <p class="text-xs text-gray-500 mt-1">Click "Generate" to create a unique permalink from the product name</p>
+                                @endif
                             </div>
 
                             {{-- Description --}}
