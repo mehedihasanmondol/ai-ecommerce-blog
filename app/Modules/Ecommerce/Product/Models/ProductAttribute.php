@@ -14,22 +14,24 @@ class ProductAttribute extends Model
         'name',
         'slug',
         'type',
-        'is_active',
-        'sort_order',
+        'is_visible',
+        'is_variation',
+        'position',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'sort_order' => 'integer',
+        'is_visible' => 'boolean',
+        'is_variation' => 'boolean',
+        'position' => 'integer',
     ];
 
     public function values(): HasMany
     {
-        return $this->hasMany(ProductAttributeValue::class, 'attribute_id')->orderBy('sort_order');
+        return $this->hasMany(ProductAttributeValue::class, 'product_attribute_id')->orderBy('position');
     }
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_visible', true);
     }
 }

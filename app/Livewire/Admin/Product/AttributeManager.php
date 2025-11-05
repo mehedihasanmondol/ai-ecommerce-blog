@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class AttributeManager extends Component
 {
-    public $attributes = [];
+    public $productAttributes = [];
     public $showAddAttribute = false;
     public $editingAttributeId = null;
     
@@ -34,8 +34,8 @@ class AttributeManager extends Component
 
     public function loadAttributes()
     {
-        $this->attributes = ProductAttribute::with('values')
-            ->orderBy('sort_order')
+        $this->productAttributes = ProductAttribute::with('values')
+            ->orderBy('position')
             ->get()
             ->toArray();
     }
@@ -59,16 +59,18 @@ class AttributeManager extends Component
             'name' => $this->newAttribute['name'],
             'slug' => Str::slug($this->newAttribute['name']),
             'type' => $this->newAttribute['type'],
-            'is_active' => true,
-            'sort_order' => ProductAttribute::max('sort_order') + 1,
+            'is_visible' => true,
+            'is_variation' => true,
+            'position' => ProductAttribute::max('position') + 1,
         ]);
 
         // Create attribute values
         foreach (array_filter($this->newAttribute['values']) as $index => $value) {
             ProductAttributeValue::create([
-                'attribute_id' => $attribute->id,
+                'product_attribute_id' => $attribute->id,
                 'value' => $value,
-                'sort_order' => $index,
+                'slug' => Str::slug($value),
+                'position' => $index,
             ]);
         }
 

@@ -26,6 +26,7 @@ class ProductForm extends Component
     public $product_type = 'simple';
     public $is_featured = false;
     public $is_active = true;
+    public $status = 'draft';
 
     // Affiliate
     public $external_url = '';
@@ -59,9 +60,18 @@ class ProductForm extends Component
     public $selectedChildProducts = [];
     public $childProductSearch = '';
 
+    // Variable Products - Temporary Variations
+    public $tempVariations = [];
+
     // UI State
     public $currentStep = 1;
     public $showVariantSection = false;
+
+    protected $listeners = [
+        'variationAdded' => 'addTempVariation',
+        'variationUpdated' => 'updateTempVariation',
+        'variationDeleted' => 'deleteTempVariation',
+    ];
 
     protected function rules()
     {
@@ -129,7 +139,7 @@ class ProductForm extends Component
                 'meta_keywords' => $product->meta_keywords,
             ]);
 
-            if ($product->product_type === 'simple') {
+            if ($product->product_type === 'simple' || $product->product_type === 'grouped') {
                 $defaultVariant = $product->variants->where('is_default', true)->first();
                 if ($defaultVariant) {
                     $this->variant = [
@@ -147,16 +157,39 @@ class ProductForm extends Component
                     ];
                 }
             }
+            
+            // Load grouped product child products
+            if ($product->product_type === 'grouped') {
+                $this->selectedChildProducts = $product->childProducts->pluck('id')->toArray();
+            }
 
             $this->existingImages = $product->images->pluck('image_path')->toArray();
+            $this->status = $product->status ?? 'draft';
+        } else {
+            // Create draft product for new products
+            $this->createDraftProduct();
         }
+    }
+
+    protected function createDraftProduct()
+    {
+        $draftProduct = Product::create([
+            'name' => 'Draft Product - ' . now()->format('Y-m-d H:i:s'),
+            'slug' => 'draft-product-' . uniqid(),
+            'product_type' => 'simple',
+            'status' => 'draft',
+            'is_active' => false,
+            'is_featured' => false,
+        ]);
+
+        $this->product = $draftProduct;
+        $this->isEdit = true;
     }
 
     public function updatedName($value)
     {
-        if (!$this->isEdit) {
-            $this->slug = \Illuminate\Support\Str::slug($value);
-        }
+        // Always update slug when name changes
+        $this->slug = \Illuminate\Support\Str::slug($value);
     }
 
     public function updatedProductType($value)
@@ -179,6 +212,7 @@ class ProductForm extends Component
                 'product_type' => $this->product_type,
                 'is_featured' => $this->is_featured,
                 'is_active' => $this->is_active,
+                'status' => $this->status,
                 'external_url' => $this->external_url,
                 'button_text' => $this->button_text,
                 'meta_title' => $this->meta_title,
@@ -194,12 +228,17 @@ class ProductForm extends Component
                 $data['child_products'] = $this->selectedChildProducts;
             }
 
-            if ($this->isEdit) {
-                $product = $service->update($this->product, $data);
-                session()->flash('success', 'Product updated successfully!');
+            if ($this->product_type === 'variable' && !empty($this->tempVariations)) {
+                $data['temp_variations'] = $this->tempVariations;
+            }
+
+            // Always update since we create draft on mount
+            $product = $service->update($this->product, $data);
+            
+            if ($this->status === 'published') {
+                session()->flash('success', 'Product published successfully!');
             } else {
-                $product = $service->create($data);
-                session()->flash('success', 'Product created successfully!');
+                session()->flash('success', 'Product saved as draft!');
             }
 
             return redirect()->route('admin.products.index');
@@ -213,6 +252,18 @@ class ProductForm extends Component
             session()->flash('error', 'Error saving product: ' . $e->getMessage());
             $this->dispatch('error', message: 'Error saving product: ' . $e->getMessage());
         }
+    }
+
+    public function saveAsDraft(ProductService $service)
+    {
+        $this->status = 'draft';
+        return $this->save($service);
+    }
+
+    public function publish(ProductService $service)
+    {
+        $this->status = 'published';
+        return $this->save($service);
     }
 
     public function nextStep()
@@ -237,6 +288,35 @@ class ProductForm extends Component
     {
         unset($this->selectedChildProducts[$index]);
         $this->selectedChildProducts = array_values($this->selectedChildProducts);
+    }
+
+    // Temporary Variation Management
+    public function addTempVariation($variationData)
+    {
+        // If it's an array of variations, merge them
+        if (is_array($variationData) && isset($variationData[0])) {
+            $this->tempVariations = array_merge($this->tempVariations, $variationData);
+        } else {
+            $this->tempVariations[] = $variationData;
+        }
+    }
+
+    public function updateTempVariation($index, $variationData)
+    {
+        if (isset($this->tempVariations[$index])) {
+            $this->tempVariations[$index] = $variationData;
+        }
+    }
+
+    public function deleteTempVariation($index)
+    {
+        unset($this->tempVariations[$index]);
+        $this->tempVariations = array_values($this->tempVariations);
+    }
+
+    public function getTempVariationsProperty()
+    {
+        return $this->tempVariations;
     }
 
     public function render()

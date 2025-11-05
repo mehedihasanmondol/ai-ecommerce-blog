@@ -68,9 +68,9 @@ class ProductVariant extends Model
         return $this->belongsToMany(
             ProductAttributeValue::class,
             'product_variant_attributes',
-            'variant_id',
-            'attribute_value_id'
-        );
+            'product_variant_id',
+            'product_attribute_value_id'
+        )->withPivot('product_attribute_id')->withTimestamps();
     }
 
     // Scopes

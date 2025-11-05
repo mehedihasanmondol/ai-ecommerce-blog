@@ -25,6 +25,7 @@ class Product extends Model
         'category_id',
         'brand_id',
         'product_type',
+        'status',
         'external_url',
         'button_text',
         'is_featured',
@@ -153,6 +154,17 @@ class Product extends Model
         
         $variant = $this->variants->where('is_default', true)->first() ?? $this->variants->first();
         return $variant?->image;
+    }
+
+    // Scopes
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published')->where('is_active', true);
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', 'draft');
     }
 
     // Methods

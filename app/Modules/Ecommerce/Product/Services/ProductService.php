@@ -40,6 +40,11 @@ class ProductService
                 $this->syncGroupedProducts($product, $data['child_products']);
             }
 
+            // Handle temporary variations for variable products
+            if ($product->product_type === 'variable' && !empty($data['temp_variations'])) {
+                $this->createTempVariations($product, $data['temp_variations']);
+            }
+
             return $product->load(['variants', 'images']);
         });
     }
@@ -87,12 +92,28 @@ class ProductService
         if (empty($variantData['sku'])) {
             $variantData['sku'] = $this->generateSku($product);
         }
+        
+        // Convert empty strings to null for nullable fields
+        $nullableFields = ['sale_price', 'cost_price', 'weight', 'length', 'width', 'height', 'shipping_class'];
+        foreach ($nullableFields as $field) {
+            if (isset($variantData[$field]) && $variantData[$field] === '') {
+                $variantData[$field] = null;
+            }
+        }
 
         return $product->variants()->create($variantData);
     }
 
     protected function updateDefaultVariant(Product $product, array $variantData): void
     {
+        // Convert empty strings to null for nullable fields
+        $nullableFields = ['sale_price', 'cost_price', 'weight', 'length', 'width', 'height', 'shipping_class'];
+        foreach ($nullableFields as $field) {
+            if (isset($variantData[$field]) && $variantData[$field] === '') {
+                $variantData[$field] = null;
+            }
+        }
+        
         $variant = $product->defaultVariant->first();
         
         if ($variant) {
@@ -183,5 +204,37 @@ class ProductService
     {
         $product->update(['is_active' => !$product->is_active]);
         return $product->fresh();
+    }
+
+    protected function createTempVariations(Product $product, array $variations): void
+    {
+        foreach ($variations as $index => $variationData) {
+            $variantData = [
+                'sku' => $variationData['sku'] ?? $this->generateSku($product) . '-' . Str::random(4),
+                'price' => $variationData['price'] ?? 0,
+                'sale_price' => $variationData['sale_price'] ?? null,
+                'cost_price' => $variationData['cost_price'] ?? null,
+                'stock_quantity' => $variationData['stock_quantity'] ?? 0,
+                'low_stock_alert' => $variationData['low_stock_alert'] ?? 5,
+                'weight' => $variationData['weight'] ?? null,
+                'length' => $variationData['length'] ?? null,
+                'width' => $variationData['width'] ?? null,
+                'height' => $variationData['height'] ?? null,
+                'is_default' => false,
+            ];
+
+            $variant = $product->variants()->create($variantData);
+
+            // Attach attribute values if provided
+            if (!empty($variationData['attributes'])) {
+                foreach ($variationData['attributes'] as $attribute) {
+                    if (isset($attribute['attribute_id']) && isset($attribute['value_id'])) {
+                        $variant->attributeValues()->attach($attribute['value_id'], [
+                            'product_attribute_id' => $attribute['attribute_id'],
+                        ]);
+                    }
+                }
+            }
+        }
     }
 }

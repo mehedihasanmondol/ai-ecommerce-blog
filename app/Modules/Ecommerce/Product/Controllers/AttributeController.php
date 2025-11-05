@@ -44,12 +44,15 @@ class AttributeController extends Controller
             'type' => $validated['type'],
             'is_visible' => $validated['is_visible'],
             'is_variation' => $validated['is_variation'],
+            'position' => ProductAttribute::max('position') + 1,
         ]);
 
-        foreach ($validated['values'] as $valueData) {
+        foreach ($validated['values'] as $index => $valueData) {
             $attribute->values()->create([
                 'value' => $valueData['value'],
+                'slug' => Str::slug($valueData['value']),
                 'color_code' => $valueData['color_code'] ?? null,
+                'position' => $index,
             ]);
         }
 
@@ -91,14 +94,16 @@ class AttributeController extends Controller
 
         // Sync values
         $existingValueIds = [];
-        foreach ($validated['values'] as $valueData) {
+        foreach ($validated['values'] as $index => $valueData) {
             if (!empty($valueData['id'])) {
                 // Update existing
                 $value = ProductAttributeValue::find($valueData['id']);
-                if ($value && $value->attribute_id === $attribute->id) {
+                if ($value && $value->product_attribute_id === $attribute->id) {
                     $value->update([
                         'value' => $valueData['value'],
+                        'slug' => Str::slug($valueData['value']),
                         'color_code' => $valueData['color_code'] ?? null,
+                        'position' => $index,
                     ]);
                     $existingValueIds[] = $value->id;
                 }
@@ -106,7 +111,9 @@ class AttributeController extends Controller
                 // Create new
                 $value = $attribute->values()->create([
                     'value' => $valueData['value'],
+                    'slug' => Str::slug($valueData['value']),
                     'color_code' => $valueData['color_code'] ?? null,
+                    'position' => $index,
                 ]);
                 $existingValueIds[] = $value->id;
             }

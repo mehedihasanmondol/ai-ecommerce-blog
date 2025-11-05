@@ -1,17 +1,16 @@
 <div class="space-y-4">
     {{-- Success Message --}}
     @if (session()->has('success'))
-    <div class="p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+    <div class="p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
         {{ session('success') }}
     </div>
     @endif
 
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Product Attributes</h3>
+    <div class="flex items-center justify-between">
         <button wire:click="toggleAddAttribute" 
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-            {{ $showAddAttribute ? 'Cancel' : '+ Add Attribute' }}
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            {{ $showAddAttribute ? '✕ Cancel' : '+ Add New Attribute' }}
         </button>
     </div>
 
@@ -87,9 +86,9 @@
     @endif
 
     {{-- Attributes List --}}
-    @if(count($attributes) > 0)
+    @if(count($productAttributes) > 0)
     <div class="space-y-3">
-        @foreach($attributes as $attribute)
+        @foreach($productAttributes as $attribute)
         <div class="bg-white border border-gray-200 rounded-lg p-4">
             <div class="flex items-start justify-between">
                 <div class="flex-1">

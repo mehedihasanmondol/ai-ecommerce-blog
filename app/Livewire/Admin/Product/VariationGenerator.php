@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 class VariationGenerator extends Component
 {
     public $productId;
+    public $tempMode = false;
     public $selectedAttributes = [];
     public $selectedValues = [];
     public $variations = [];
@@ -18,9 +19,10 @@ class VariationGenerator extends Component
 
     protected $listeners = ['variationsGenerated' => 'loadVariations'];
 
-    public function mount($productId = null)
+    public function mount($productId = null, $tempMode = false)
     {
         $this->productId = $productId;
+        $this->tempMode = $tempMode;
         if ($productId) {
             $this->loadVariations();
         }
@@ -75,13 +77,22 @@ class VariationGenerator extends Component
                 'sku' => '',
                 'price' => '',
                 'sale_price' => '',
+                'cost_price' => '',
                 'stock_quantity' => 0,
+                'low_stock_alert' => 5,
+                'weight' => '',
+                'length' => '',
+                'width' => '',
+                'height' => '',
                 'attributes' => $combination,
                 'enabled' => true,
             ];
         }
 
         session()->flash('success', count($this->variations) . ' variations generated!');
+        
+        // Dispatch event to collapse all variations
+        $this->dispatch('variations-generated');
     }
 
     private function generateCombinations()
@@ -123,6 +134,40 @@ class VariationGenerator extends Component
 
     public function saveVariations()
     {
+        // If in temp mode (no product ID), emit to parent component
+        if ($this->tempMode && !$this->productId) {
+            $tempVariations = [];
+            foreach ($this->variations as $variation) {
+                if (!$variation['enabled']) continue;
+                
+                $tempVariations[] = [
+                    'name' => $variation['name'],
+                    'sku' => $variation['sku'] ?: '',
+                    'price' => $variation['price'] ?: 0,
+                    'sale_price' => $variation['sale_price'] ?: null,
+                    'cost_price' => null,
+                    'stock_quantity' => $variation['stock_quantity'] ?: 0,
+                    'low_stock_alert' => 5,
+                    'weight' => null,
+                    'length' => null,
+                    'width' => null,
+                    'height' => null,
+                    'attributes' => $variation['attributes'] ?? [],
+                ];
+            }
+            
+            // Dispatch to parent ProductForm component
+            $this->dispatch('variationAdded', $tempVariations)->to(ProductForm::class);
+            
+            $this->reset('variations', 'selectedAttributes', 'showGenerator');
+            session()->flash('success', 'Variations added! They will be saved when you publish the product.');
+            
+            // Dispatch event to collapse all variations
+            $this->dispatch('variation-saved');
+            return;
+        }
+
+        // Normal mode - save to database
         if (!$this->productId) {
             session()->flash('error', 'Please save the product first before adding variations.');
             return;
@@ -137,17 +182,34 @@ class VariationGenerator extends Component
                 'sku' => $variation['sku'] ?: Str::random(8),
                 'price' => $variation['price'] ?: 0,
                 'sale_price' => $variation['sale_price'] ?: null,
+                'cost_price' => $variation['cost_price'] ?: null,
                 'stock_quantity' => $variation['stock_quantity'] ?: 0,
+                'low_stock_alert' => $variation['low_stock_alert'] ?? 5,
+                'weight' => $variation['weight'] ?: null,
+                'length' => $variation['length'] ?: null,
+                'width' => $variation['width'] ?: null,
+                'height' => $variation['height'] ?: null,
                 'is_default' => false,
             ]);
 
-            // Attach attribute values (you'll need a pivot table for this)
-            // variant_attribute_values table
+            // Attach attribute values if provided
+            if (!empty($variation['attributes'])) {
+                foreach ($variation['attributes'] as $attribute) {
+                    if (isset($attribute['attribute_id']) && isset($attribute['value_id'])) {
+                        $variant->attributeValues()->attach($attribute['value_id'], [
+                            'product_attribute_id' => $attribute['attribute_id'],
+                        ]);
+                    }
+                }
+            }
         }
 
         $this->reset('variations', 'selectedAttributes', 'showGenerator');
         $this->loadVariations();
         session()->flash('success', 'Variations saved successfully!');
+        
+        // Dispatch event to collapse all variations
+        $this->dispatch('variation-saved');
     }
 
     public function deleteVariation($variationId)

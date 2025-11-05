@@ -1,26 +1,22 @@
-<div class="space-y-6">
+<div class="space-y-4">
     {{-- Flash Messages --}}
     @if (session()->has('success'))
-    <div class="p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+    <div class="p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
         {{ session('success') }}
     </div>
     @endif
 
     @if (session()->has('error'))
-    <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+    <div class="p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-sm">
         {{ session('error') }}
     </div>
     @endif
 
     {{-- Header --}}
     <div class="flex items-center justify-between">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-900">Product Variations</h3>
-            <p class="text-sm text-gray-600 mt-1">Generate variations based on attributes like size, color, etc.</p>
-        </div>
         @if(!$showGenerator && count($generatedVariations) == 0)
         <button wire:click="toggleGenerator" 
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
             + Generate Variations
         </button>
         @endif
@@ -120,52 +116,159 @@
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <h5 class="font-medium text-gray-900">Generated Variations ({{ count($variations) }})</h5>
-                <button wire:click="$set('variations', [])" 
-                        class="text-sm text-gray-600 hover:text-gray-800">
-                    Start Over
-                </button>
+                <div class="flex items-center gap-3">
+                    <button wire:click="$set('variations', [])" 
+                            class="text-sm text-gray-600 hover:text-gray-800">
+                        Start Over
+                    </button>
+                </div>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-4" 
+                 x-data="{ expandedIndex: null }" 
+                 @variation-saved.window="expandedIndex = null"
+                 @variations-generated.window="expandedIndex = null">
                 @foreach($variations as $index => $variation)
-                <div class="border border-gray-200 rounded-lg p-4 {{ !$variation['enabled'] ? 'opacity-50' : '' }}">
-                    <div class="flex items-start gap-4">
+                <div class="border border-gray-200 rounded-lg {{ !$variation['enabled'] ? 'opacity-50' : '' }}">
+                    {{-- Header --}}
+                    <div class="p-4 flex items-center gap-4">
                         <input type="checkbox" 
                                wire:model="variations.{{ $index }}.enabled" 
-                               class="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         
-                        <div class="flex-1 grid grid-cols-5 gap-4">
-                            <div class="col-span-2">
-                                <label class="block text-xs text-gray-600 mb-1">Variation Name</label>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900">{{ $variation['name'] }}</div>
+                            <div class="text-sm text-gray-500">
+                                Price: ${{ $variation['price'] ?? '0.00' }} | Stock: {{ $variation['stock_quantity'] ?? '0' }}
+                            </div>
+                        </div>
+
+                        <button @click="expandedIndex = expandedIndex === {{ $index }} ? null : {{ $index }}" 
+                                type="button"
+                                class="px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <span x-show="expandedIndex !== {{ $index }}">Edit Details</span>
+                            <span x-show="expandedIndex === {{ $index }}">Hide Details</span>
+                        </button>
+                    </div>
+
+                    {{-- Expanded Details --}}
+                    <div x-show="expandedIndex === {{ $index }}" 
+                         x-collapse
+                         class="border-t border-gray-200 p-4 bg-gray-50 space-y-4">
+                        
+                        {{-- Basic Info --}}
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Variation Name *</label>
                                 <input type="text" 
                                        wire:model="variations.{{ $index }}.name" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                                       placeholder="Variation name">
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="e.g., Small - Red">
                             </div>
 
                             <div>
-                                <label class="block text-xs text-gray-600 mb-1">SKU</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
                                 <input type="text" 
                                        wire:model="variations.{{ $index }}.sku" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                                       placeholder="Auto">
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="Auto-generated">
                             </div>
 
                             <div>
-                                <label class="block text-xs text-gray-600 mb-1">Price ($)</label>
-                                <input type="number" 
-                                       wire:model="variations.{{ $index }}.price" 
-                                       step="0.01"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                                       placeholder="0.00">
-                            </div>
-
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">Stock</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
                                 <input type="number" 
                                        wire:model="variations.{{ $index }}.stock_quantity" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
                                        placeholder="0">
+                            </div>
+                        </div>
+
+                        {{-- Pricing --}}
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Pricing</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Regular Price ($) *</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.price" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sale Price ($)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.sale_price" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cost Price ($)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.cost_price" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Inventory --}}
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Inventory</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Low Stock Alert</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.low_stock_alert" 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="5">
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Shipping --}}
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">Shipping Information</h4>
+                            <div class="grid grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.weight" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Length (cm)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.length" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Width (cm)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.width" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                                    <input type="number" 
+                                           wire:model="variations.{{ $index }}.height" 
+                                           step="0.01"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                           placeholder="0.00">
+                                </div>
                             </div>
                         </div>
                     </div>

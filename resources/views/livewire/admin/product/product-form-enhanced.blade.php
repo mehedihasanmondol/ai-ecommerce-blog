@@ -35,16 +35,24 @@
                     Cancel
                 </a>
                 <button type="button" 
-                        wire:click="save"
+                        wire:click="saveAsDraft"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
+                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <span wire:loading.remove wire:target="saveAsDraft">Save as Draft</span>
+                    <span wire:loading wire:target="saveAsDraft">Saving...</span>
+                </button>
+                <button type="button" 
+                        wire:click="publish"
                         wire:loading.attr="disabled"
                         wire:loading.class="opacity-50 cursor-not-allowed"
                         class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                    <span wire:loading.remove wire:target="save">
+                    <span wire:loading.remove wire:target="publish">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
                     </span>
-                    <span wire:loading wire:target="save">
+                    <span wire:loading wire:target="publish">
                         <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -391,14 +399,51 @@
                         {{-- Variations Tab --}}
                         <div x-show="activeTab === 'variations'" class="space-y-6">
                             @if($product_type === 'variable')
-                                {{-- Attribute Manager --}}
-                                <div class="mb-6">
-                                    @livewire('admin.product.attribute-manager')
+                                {{-- Info Box --}}
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <div>
+                                            <h4 class="font-semibold text-blue-900 mb-1">Variable Product Variations</h4>
+                                            <p class="text-sm text-blue-800">
+                                                @if(!$product?->id)
+                                                    Create product attributes (like Size, Color), then generate variations. Variations will be saved when you publish the product.
+                                                @else
+                                                    Create product attributes (like Size, Color), then generate variations by selecting which attribute values to use. Each variation can have its own price and stock.
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {{-- Variation Generator --}}
-                                <div>
-                                    @livewire('admin.product.variation-generator', ['productId' => $product?->id])
+                                {{-- Attribute Manager Section --}}
+                                <div class="border border-gray-200 rounded-lg">
+                                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                                        <h3 class="text-base font-semibold text-gray-900">Step 1: Manage Attributes</h3>
+                                        <p class="text-sm text-gray-600 mt-1">Create and manage product attributes like Size, Color, Material, etc.</p>
+                                    </div>
+                                    <div class="p-6">
+                                        @livewire('admin.product.attribute-manager', key('attribute-manager'))
+                                    </div>
+                                </div>
+
+                                {{-- Variation Generator Section --}}
+                                <div class="border border-gray-200 rounded-lg">
+                                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                                        <h3 class="text-base font-semibold text-gray-900">Step 2: Generate & Manage Variations</h3>
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            @if(!$product?->id)
+                                                Create variations here. They will be saved temporarily and stored when you publish the product.
+                                            @else
+                                                Select attributes and generate all possible variations, then set individual prices and stock.
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="p-6">
+                                        @livewire('admin.product.variation-generator', ['productId' => $product?->id, 'tempMode' => !$product?->id], key('variation-generator-' . ($product?->id ?? 'new')))
+                                    </div>
                                 </div>
                             @else
                                 <div class="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">

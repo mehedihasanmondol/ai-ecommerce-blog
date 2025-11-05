@@ -11,19 +11,20 @@ class ProductAttributeValue extends Model
     use HasFactory;
 
     protected $fillable = [
-        'attribute_id',
+        'product_attribute_id',
         'value',
+        'slug',
         'color_code',
         'image',
-        'sort_order',
+        'position',
     ];
 
     protected $casts = [
-        'sort_order' => 'integer',
+        'position' => 'integer',
     ];
 
     public function attribute(): BelongsTo
     {
-        return $this->belongsTo(ProductAttribute::class, 'attribute_id');
+        return $this->belongsTo(ProductAttribute::class, 'product_attribute_id');
     }
 }
