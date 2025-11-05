@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    {{-- Allow Livewire to work in development --}}
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
 
     <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
 
@@ -133,10 +136,13 @@
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
                 
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
+                <a href="{{ route('admin.products.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-box w-5 mr-3"></i>
                     <span>Products</span>
-                    <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
+                    @if(request()->routeIs('admin.products.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
                 </a>
 
                 <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
@@ -159,6 +165,15 @@
                     <i class="fas fa-copyright w-5 mr-3"></i>
                     <span>Brands</span>
                     @if(request()->routeIs('admin.brands.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.attributes.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.attributes.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-sliders-h w-5 mr-3"></i>
+                    <span>Attributes</span>
+                    @if(request()->routeIs('admin.attributes.*'))
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
@@ -252,6 +267,12 @@
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
                 
+                <a href="{{ route('admin.products.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-box w-5 mr-3"></i>
+                    <span>Products</span>
+                </a>
+
                 <a href="{{ route('admin.categories.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-tags w-5 mr-3"></i>
@@ -262,6 +283,12 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.brands.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-copyright w-5 mr-3"></i>
                     <span>Brands</span>
+                </a>
+
+                <a href="{{ route('admin.attributes.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.attributes.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-sliders-h w-5 mr-3"></i>
+                    <span>Attributes</span>
                 </a>
             </nav>
         </aside>
@@ -322,10 +349,6 @@
     </div>
 
     @livewireScripts
-
-    <!-- Alpine.js - Temporary CDN until npm install completes -->
-    <!-- TODO: Replace with local version after running: npm install alpinejs -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Auto-hide flash messages -->
     <script>
