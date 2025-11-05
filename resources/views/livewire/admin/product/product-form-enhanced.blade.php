@@ -801,15 +801,43 @@
                 {{-- Categories --}}
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Categories</h3>
+                    <p class="text-sm text-gray-600 mb-3">Select one or more categories</p>
                     
-                    <select wire:model="category_id" 
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">Select Category</option>
+                    <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3">
                         @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                            <input type="checkbox" 
+                                   wire:model.live="category_ids" 
+                                   value="{{ $category->id }}"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-3 text-sm text-gray-900">{{ $category->name }}</span>
+                        </label>
                         @endforeach
-                    </select>
-                    @error('category_id') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    @if(count($category_ids) > 0)
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        @foreach($category_ids as $categoryId)
+                            @php
+                                $selectedCategory = $categories->firstWhere('id', $categoryId);
+                            @endphp
+                            @if($selectedCategory)
+                            <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                                {{ $selectedCategory->name }}
+                                <button type="button" 
+                                        wire:click="$set('category_ids', {{ json_encode(array_values(array_diff($category_ids, [$categoryId]))) }})"
+                                        class="hover:text-blue-900">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </span>
+                            @endif
+                        @endforeach
+                    </div>
+                    @endif
+                    
+                    @error('category_ids') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- Brands --}}

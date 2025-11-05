@@ -52,6 +52,12 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'category_product')
+                    ->withTimestamps();
+    }
 
     public function brand(): BelongsTo
     {

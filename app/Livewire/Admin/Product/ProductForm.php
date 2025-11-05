@@ -23,6 +23,7 @@ class ProductForm extends Component
     public $description = '';
     public $short_description = '';
     public $category_id = '';
+    public $category_ids = []; // Multiple categories
     public $brand_id = '';
     public $product_type = 'simple';
     public $is_featured = false;
@@ -142,6 +143,9 @@ class ProductForm extends Component
                 'meta_description' => $product->meta_description,
                 'meta_keywords' => $product->meta_keywords,
             ]);
+            
+            // Load existing categories
+            $this->category_ids = $product->categories->pluck('id')->toArray();
 
             if ($product->product_type === 'simple' || $product->product_type === 'grouped') {
                 $defaultVariant = $product->variants->where('is_default', true)->first();
@@ -283,6 +287,13 @@ class ProductForm extends Component
 
             // Always update since we create draft on mount
             $product = $service->update($this->product, $data);
+            
+            // Sync categories
+            if (!empty($this->category_ids)) {
+                $product->categories()->sync($this->category_ids);
+            } else {
+                $product->categories()->detach();
+            }
             
             if ($this->status === 'published') {
                 session()->flash('success', 'Product published successfully!');
