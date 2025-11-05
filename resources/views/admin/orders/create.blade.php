@@ -138,15 +138,19 @@
     <!-- Product Confirmation Modal -->
     <div x-show="showProductModal" 
          x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto" 
-         style="display: none;">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
-             @click="closeProductModal()"></div>
+         class="fixed inset-0 z-50 overflow-y-auto pointer-events-none" 
+         style="display: none;"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
         
-        <!-- Modal Content -->
+        <!-- Modal Content (no backdrop) -->
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+            <div class="relative bg-white rounded-lg shadow-2xl max-w-md w-full p-6 pointer-events-auto border-2 border-gray-200"
+                 @click.outside="closeProductModal()"
                  @click.stop>
                 <!-- Close Button -->
                 <button @click="closeProductModal()" 
@@ -520,7 +524,7 @@
                                 Shipping Address
                             </h3>
                             <label class="flex items-center text-sm cursor-pointer">
-                                <input type="checkbox" name="same_as_billing" id="same_as_billing" value="1" checked
+                                <input type="checkbox" name="same_as_billing" id="same_as_billing" value="1"
                                        @change="toggleShippingAddress()"
                                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
                                 <span class="text-gray-700">Same as customer info</span>
@@ -528,7 +532,7 @@
                         </div>
                     </div>
                     
-                    <div class="p-4 space-y-3" id="shipping-address-fields" style="display: {{ old('same_as_billing') ? 'none' : 'block' }};">
+                    <div class="p-4 space-y-3" id="shipping-address-fields" style="display: block;">
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Name</label>
                             <input type="text" name="shipping_name" id="shipping_name"
