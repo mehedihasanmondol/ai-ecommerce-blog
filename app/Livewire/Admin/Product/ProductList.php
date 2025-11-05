@@ -60,6 +60,11 @@ class ProductList extends Component
         $this->resetPage();
     }
 
+    public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function sortByColumn($column)
     {
         if ($this->sortBy === $column) {
