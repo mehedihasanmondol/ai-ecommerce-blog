@@ -207,47 +207,82 @@
                                     $users = \App\Models\User::orderBy('name')->limit(100)->get();
                                 @endphp
                                 @foreach($users as $user)
+                                    @php
+                                        $nameParts = explode(' ', $user->name, 2);
+                                        $firstName = $nameParts[0] ?? '';
+                                        $lastName = $nameParts[1] ?? '';
+                                    @endphp
                                     <option value="{{ $user->id }}" 
                                             data-name="{{ $user->name }}" 
                                             data-email="{{ $user->email }}" 
-                                            data-phone="{{ $user->phone ?? '' }}">
+                                            data-phone="{{ $user->phone ?? '' }}"
+                                            data-first-name="{{ $firstName }}"
+                                            data-last-name="{{ $lastName }}"
+                                            data-address="{{ $user->address ?? '' }}"
+                                            data-city="{{ $user->city ?? 'Dhaka' }}"
+                                            data-postal="{{ $user->postal_code ?? '' }}"
+                                            data-country="{{ $user->country ?? 'Bangladesh' }}">
                                         {{ $user->name }} ({{ $user->email }})
                                     </option>
                                 @endforeach
                             </select>
                             @if($users->isEmpty())
                                 <p class="text-xs text-gray-500 mt-1">No existing customers - Enter new customer details below</p>
+                            @else
+                                <p class="text-xs text-green-600 mt-1">
+                                    <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Selecting a customer will auto-fill their profile info to billing & shipping
+                                </p>
                             @endif
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="customer_name" id="customer_name" required x-model="customer.name"
+                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <!-- Hidden fields for billing (same as customer) -->
+                            <input type="hidden" name="billing_first_name" id="billing_first_name">
+                            <input type="hidden" name="billing_last_name" id="billing_last_name">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="customer_name" required x-model="customer.name"
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Phone <span class="text-red-500">*</span></label>
+                                <input type="text" name="customer_phone" id="customer_phone" required x-model="customer.phone"
                                        class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <input type="hidden" name="billing_phone" id="billing_phone">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Phone <span class="text-red-500">*</span></label>
-                                <input type="text" name="customer_phone" required x-model="customer.phone"
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                                <input type="email" name="customer_email" id="customer_email" required x-model="customer.email"
                                        class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <input type="hidden" name="billing_email" id="billing_email">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                            <input type="email" name="customer_email" required x-model="customer.email"
-                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Address <span class="text-red-500">*</span></label>
+                            <input type="text" name="customer_address" id="customer_address" required x-model="customer.address"
+                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="House/Flat, Street, Area">
+                            <input type="hidden" name="billing_address_line_1" id="billing_address_line_1">
+                            <input type="hidden" name="billing_city" id="billing_city" value="Dhaka">
+                            <input type="hidden" name="billing_postal_code" id="billing_postal_code">
+                            <input type="hidden" name="billing_country" id="billing_country" value="Bangladesh">
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Customer Notes</label>
                             <textarea name="customer_notes" rows="2"
-                                      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                                      class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                      placeholder="Any special instructions or notes..."></textarea>
                         </div>
                     </div>
                 </div>
 
-                <!-- Address Card -->
+                <!-- Shipping Address Card -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="p-4 border-b border-gray-200 bg-gray-50">
                         <div class="flex items-center justify-between">
@@ -258,63 +293,58 @@
                                 </svg>
                                 Shipping Address
                             </h3>
-                            <label class="flex items-center text-sm">
-                                <input type="checkbox" name="same_as_billing" value="1" checked
+                            <label class="flex items-center text-sm cursor-pointer">
+                                <input type="checkbox" name="same_as_billing" id="same_as_billing" value="1" checked
+                                       @change="toggleShippingAddress()"
                                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                <span class="text-gray-700">Same as billing</span>
+                                <span class="text-gray-700">Same as customer info</span>
                             </label>
                         </div>
                     </div>
                     
-                    <div class="p-4 space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_first_name" required
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_last_name" required
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
+                    <div class="p-4 space-y-3" id="shipping-address-fields" style="display: none;">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                            <input type="text" name="shipping_name" id="shipping_name"
+                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Recipient name">
+                            <!-- Hidden fields to match backend expectations -->
+                            <input type="hidden" name="shipping_first_name" id="shipping_first_name">
+                            <input type="hidden" name="shipping_last_name" id="shipping_last_name">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Phone <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_phone" required
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                                <input type="text" name="shipping_phone" id="shipping_phone"
+                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Recipient phone">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" name="billing_email"
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <input type="email" name="shipping_email" id="shipping_email"
+                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Recipient email">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Address <span class="text-red-500">*</span></label>
-                            <input type="text" name="billing_address_line_1" required
-                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
+                            <input type="text" name="shipping_address_line_1" id="shipping_address_line_1"
+                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="House/Flat, Street, Area">
+                            <input type="hidden" name="shipping_city" id="shipping_city" value="Dhaka">
+                            <input type="hidden" name="shipping_postal_code" id="shipping_postal_code">
+                            <input type="hidden" name="shipping_country" id="shipping_country" value="Bangladesh">
                         </div>
 
-                        <div class="grid grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">City <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_city" required value="Dhaka"
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Postal Code <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_postal_code" required
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Country <span class="text-red-500">*</span></label>
-                                <input type="text" name="billing_country" required value="Bangladesh"
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <p class="text-xs text-blue-700">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Uncheck "Same as customer info" to ship to a different address
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -410,7 +440,26 @@ function orderForm() {
         customer: {
             name: '',
             email: '',
-            phone: ''
+            phone: '',
+            address: ''
+        },
+        
+        init() {
+            // Watch customer fields and sync with billing hidden fields
+            this.$watch('customer.name', value => {
+                const nameParts = value.split(' ', 2);
+                document.getElementById('billing_first_name').value = nameParts[0] || '';
+                document.getElementById('billing_last_name').value = nameParts[1] || '';
+            });
+            this.$watch('customer.phone', value => {
+                document.getElementById('billing_phone').value = value;
+            });
+            this.$watch('customer.email', value => {
+                document.getElementById('billing_email').value = value;
+            });
+            this.$watch('customer.address', value => {
+                document.getElementById('billing_address_line_1').value = value;
+            });
         },
         
         addItem() {
@@ -432,9 +481,29 @@ function orderForm() {
         fillCustomerData(event) {
             const selectedOption = event.target.options[event.target.selectedIndex];
             if (selectedOption.value) {
+                // Fill customer info (will auto-sync with billing via watchers)
                 this.customer.name = selectedOption.dataset.name || '';
                 this.customer.email = selectedOption.dataset.email || '';
                 this.customer.phone = selectedOption.dataset.phone || '';
+                this.customer.address = selectedOption.dataset.address || '';
+                
+                // If shipping is different, also fill shipping fields
+                const sameAsBilling = document.getElementById('same_as_billing');
+                if (!sameAsBilling.checked) {
+                    const nameParts = (selectedOption.dataset.name || '').split(' ', 2);
+                    document.getElementById('shipping_name').value = selectedOption.dataset.name || '';
+                    document.getElementById('shipping_first_name').value = nameParts[0] || '';
+                    document.getElementById('shipping_last_name').value = nameParts[1] || '';
+                    document.getElementById('shipping_phone').value = selectedOption.dataset.phone || '';
+                    document.getElementById('shipping_email').value = selectedOption.dataset.email || '';
+                    document.getElementById('shipping_address_line_1').value = selectedOption.dataset.address || '';
+                }
+            } else {
+                // Clear all fields if "New Customer" is selected
+                this.customer.name = '';
+                this.customer.email = '';
+                this.customer.phone = '';
+                this.customer.address = '';
             }
         },
         
@@ -446,6 +515,17 @@ function orderForm() {
         
         calculateTotal() {
             return this.calculateSubtotal() + this.shipping - this.discount;
+        },
+        
+        toggleShippingAddress() {
+            const checkbox = document.getElementById('same_as_billing');
+            const shippingFields = document.getElementById('shipping-address-fields');
+            
+            if (checkbox.checked) {
+                shippingFields.style.display = 'none';
+            } else {
+                shippingFields.style.display = 'block';
+            }
         }
     }
 }
