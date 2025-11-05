@@ -292,41 +292,171 @@
     </div>
     @endif
 
-    {{-- Existing Variations List --}}
-    @if(count($generatedVariations) > 0)
+    {{-- Existing Variations --}}
+    @if(count($editingVariations) > 0)
     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h4 class="font-semibold text-gray-900">Existing Variations ({{ count($generatedVariations) }})</h4>
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h4 class="font-semibold text-gray-900">Existing Variations ({{ count($editingVariations) }})</h4>
             <button wire:click="toggleGenerator" 
                     class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                 + Add More
             </button>
         </div>
 
-        <div class="divide-y divide-gray-200">
-            @foreach($generatedVariations as $variation)
-            <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div class="flex items-center justify-between">
+        <div class="space-y-4 p-4" x-data="{ expandedIndex: null }">
+            @foreach($editingVariations as $index => $variation)
+            <div class="border border-gray-200 rounded-lg">
+                {{-- Header --}}
+                <div class="p-4 flex items-center gap-4">
                     <div class="flex-1">
-                        <h5 class="font-medium text-gray-900">{{ $variation['name'] }}</h5>
-                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                            <span>SKU: <span class="font-mono">{{ $variation['sku'] }}</span></span>
-                            <span>Price: <span class="font-semibold">${{ number_format($variation['price'], 2) }}</span></span>
-                            <span>Stock: <span class="font-semibold">{{ $variation['stock_quantity'] }}</span></span>
+                        <div class="font-medium text-gray-900">{{ $variation['name'] }}</div>
+                        <div class="text-sm text-gray-500">
+                            Price: ${{ $variation['price'] ?? '0.00' }} | Stock: {{ $variation['stock_quantity'] ?? '0' }}
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button class="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                        </button>
-                        <button wire:click="deleteVariation({{ $variation['id'] }})" 
-                                wire:confirm="Are you sure you want to delete this variation?"
-                                class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
+
+                    <button @click="expandedIndex = expandedIndex === {{ $index }} ? null : {{ $index }}" 
+                            type="button"
+                            class="px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <span x-show="expandedIndex !== {{ $index }}">Edit Details</span>
+                        <span x-show="expandedIndex === {{ $index }}">Hide Details</span>
+                    </button>
+                    
+                    <button wire:click="deleteVariation({{ $variation['id'] }})" 
+                            wire:confirm="Are you sure you want to delete this variation?"
+                            class="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Expanded Details --}}
+                <div x-show="expandedIndex === {{ $index }}" 
+                     x-collapse
+                     class="border-t border-gray-200 p-4 bg-gray-50 space-y-4">
+                    
+                    {{-- Basic Info --}}
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Variation Name *</label>
+                            <input type="text" 
+                                   wire:model="editingVariations.{{ $index }}.name" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="e.g., Small - Red">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">SKU</label>
+                            <input type="text" 
+                                   wire:model="editingVariations.{{ $index }}.sku" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="Auto-generated">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Stock Quantity *</label>
+                            <input type="number" 
+                                   wire:model="editingVariations.{{ $index }}.stock_quantity" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="0">
+                        </div>
+                    </div>
+
+                    {{-- Pricing --}}
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">Pricing</h4>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Regular Price ($) *</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.price" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Sale Price ($)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.sale_price" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cost Price ($)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.cost_price" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Inventory --}}
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">Inventory</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Low Stock Alert</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.low_stock_alert" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="5">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Shipping --}}
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">Shipping Information</h4>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Weight (kg)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.weight" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Length (cm)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.length" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Width (cm)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.width" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Height (cm)</label>
+                                <input type="number" 
+                                       wire:model="editingVariations.{{ $index }}.height" 
+                                       step="0.01"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                       placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Update Button --}}
+                    <div class="flex justify-end pt-4 border-t border-gray-200">
+                        <button wire:click="updateExistingVariation({{ $index }})" 
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            Update Variation
                         </button>
                     </div>
                 </div>

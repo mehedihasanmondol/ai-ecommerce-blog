@@ -16,6 +16,7 @@ class VariationGenerator extends Component
     public $variations = [];
     public $generatedVariations = [];
     public $showGenerator = false;
+    public $editingVariations = [];
 
     protected $listeners = ['variationsGenerated' => 'loadVariations'];
 
@@ -31,11 +32,29 @@ class VariationGenerator extends Component
     public function loadVariations()
     {
         if ($this->productId) {
-            $this->generatedVariations = ProductVariant::where('product_id', $this->productId)
+            $variants = ProductVariant::where('product_id', $this->productId)
                 ->where('is_default', false)
                 ->with('attributeValues.attribute')
-                ->get()
-                ->toArray();
+                ->get();
+            
+            $this->editingVariations = [];
+            foreach ($variants as $variant) {
+                $this->editingVariations[] = [
+                    'id' => $variant->id,
+                    'name' => $variant->name,
+                    'sku' => $variant->sku,
+                    'price' => $variant->price,
+                    'sale_price' => $variant->sale_price,
+                    'cost_price' => $variant->cost_price,
+                    'stock_quantity' => $variant->stock_quantity,
+                    'low_stock_alert' => $variant->low_stock_alert,
+                    'weight' => $variant->weight,
+                    'length' => $variant->length,
+                    'width' => $variant->width,
+                    'height' => $variant->height,
+                    'enabled' => true,
+                ];
+            }
         }
     }
 
@@ -210,6 +229,43 @@ class VariationGenerator extends Component
         
         // Dispatch event to collapse all variations
         $this->dispatch('variation-saved');
+    }
+
+    public function updateExistingVariation($index)
+    {
+        if (!isset($this->editingVariations[$index])) {
+            return;
+        }
+
+        $variationData = $this->editingVariations[$index];
+        $variant = ProductVariant::find($variationData['id']);
+        
+        if ($variant) {
+            // Convert empty strings to null
+            $nullableFields = ['sale_price', 'cost_price', 'weight', 'length', 'width', 'height'];
+            foreach ($nullableFields as $field) {
+                if (isset($variationData[$field]) && $variationData[$field] === '') {
+                    $variationData[$field] = null;
+                }
+            }
+            
+            $variant->update([
+                'name' => $variationData['name'],
+                'sku' => $variationData['sku'],
+                'price' => $variationData['price'] ?: 0,
+                'sale_price' => $variationData['sale_price'],
+                'cost_price' => $variationData['cost_price'],
+                'stock_quantity' => $variationData['stock_quantity'] ?: 0,
+                'low_stock_alert' => $variationData['low_stock_alert'] ?? 5,
+                'weight' => $variationData['weight'],
+                'length' => $variationData['length'],
+                'width' => $variationData['width'],
+                'height' => $variationData['height'],
+            ]);
+            
+            session()->flash('success', 'Variation updated successfully!');
+            $this->loadVariations();
+        }
     }
 
     public function deleteVariation($variationId)

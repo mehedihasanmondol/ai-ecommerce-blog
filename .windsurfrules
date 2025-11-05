@@ -417,7 +417,7 @@ public function destroy(Product $product)
 - Use transition and animation durations consistently (`duration-200`, `ease-in-out`)
 - Maintain consistent component naming:
   - `ButtonPrimary.blade.php`, `CardBase.blade.php`, `ModalConfirm.blade.php`
-
+- show an toast notification for admin panel crud actions
 ### 21. Social Login Implementation
 ```php
 // Use Laravel Socialite
