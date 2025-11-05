@@ -92,6 +92,12 @@
                             </button>
                             @endif
                             
+                            <button @click="activeTab = 'images'" 
+                                    :class="activeTab === 'images' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
+                                Images
+                            </button>
+                            
                             <button @click="activeTab = 'seo'" 
                                     :class="activeTab === 'seo' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                     class="px-6 py-4 border-b-2 font-medium text-sm transition-colors">
@@ -531,6 +537,119 @@
                                     <option value="heavy">Heavy Item</option>
                                 </select>
                             </div>
+                        </div>
+
+                        {{-- Images Tab --}}
+                        <div x-show="activeTab === 'images'" class="space-y-6">
+                            {{-- Upload Area --}}
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Images</label>
+                                <input type="file" 
+                                       wire:model.live="images" 
+                                       multiple 
+                                       accept="image/*"
+                                       id="product-images-upload"
+                                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                @error('images.*') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <strong>Hold Ctrl (Windows) or Cmd (Mac)</strong> to select multiple images at once. Max 2MB per image.
+                                </p>
+                            </div>
+
+                            {{-- Loading Indicator --}}
+                            <div wire:loading wire:target="images" class="text-sm text-blue-600">
+                                <div class="flex items-center gap-2">
+                                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Uploading images...</span>
+                                </div>
+                            </div>
+
+                            {{-- Existing Images --}}
+                            @if(count($existingImages) > 0)
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Current Images</label>
+                                <div class="grid grid-cols-4 gap-4">
+                                    @foreach($existingImages as $index => $image)
+                                    <div class="relative group">
+                                        <img src="{{ asset('storage/' . $image['path']) }}" 
+                                             alt="Product Image" 
+                                             class="w-full h-40 object-cover rounded-lg border-2 {{ $image['is_primary'] ? 'border-blue-500' : 'border-gray-200' }}">
+                                        
+                                        {{-- Primary Badge --}}
+                                        @if($image['is_primary'])
+                                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Primary</span>
+                                        @endif
+
+                                        {{-- Actions --}}
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                                            @if(!$image['is_primary'])
+                                            <button wire:click="setPrimaryImage({{ $index }})" 
+                                                    type="button"
+                                                    class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                                Set Primary
+                                            </button>
+                                            @endif
+                                            <button wire:click="removeExistingImage({{ $index }})" 
+                                                    type="button"
+                                                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
+                            {{-- New Images Preview --}}
+                            @if(count($images) > 0)
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">New Images ({{ count($images) }})</label>
+                                <div class="grid grid-cols-4 gap-4">
+                                    @foreach($images as $index => $image)
+                                    <div class="relative group">
+                                        <img src="{{ $image->temporaryUrl() }}" 
+                                             alt="New Image" 
+                                             class="w-full h-40 object-cover rounded-lg border-2 {{ $primaryImageIndex === $index ? 'border-blue-500' : 'border-gray-200' }}">
+                                        
+                                        {{-- Primary Badge --}}
+                                        @if($primaryImageIndex === $index)
+                                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Primary</span>
+                                        @endif
+
+                                        {{-- Actions --}}
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                                            @if($primaryImageIndex !== $index)
+                                            <button wire:click="setPrimaryImage({{ $index }})" 
+                                                    type="button"
+                                                    class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                                Set Primary
+                                            </button>
+                                            @endif
+                                            <button wire:click="removeImage({{ $index }})" 
+                                                    type="button"
+                                                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
+                            @if(count($existingImages) === 0 && count($images) === 0)
+                            <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-lg font-medium text-gray-900 mb-2">No images uploaded yet</p>
+                                <p class="text-sm text-gray-600">Upload product images to create a gallery</p>
+                            </div>
+                            @endif
                         </div>
 
                         {{-- SEO Tab --}}

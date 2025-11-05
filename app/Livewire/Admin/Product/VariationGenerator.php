@@ -5,10 +5,13 @@ namespace App\Livewire\Admin\Product;
 use App\Modules\Ecommerce\Product\Models\ProductAttribute;
 use App\Modules\Ecommerce\Product\Models\ProductVariant;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 
 class VariationGenerator extends Component
 {
+    use WithFileUploads;
+
     public $productId;
     public $tempMode = false;
     public $selectedAttributes = [];
@@ -17,6 +20,7 @@ class VariationGenerator extends Component
     public $generatedVariations = [];
     public $showGenerator = false;
     public $editingVariations = [];
+    public $variationImages = [];
 
     protected $listeners = ['variationsGenerated' => 'loadVariations'];
 
@@ -52,9 +56,40 @@ class VariationGenerator extends Component
                     'length' => $variant->length,
                     'width' => $variant->width,
                     'height' => $variant->height,
+                    'image' => $variant->image,
                     'enabled' => true,
                 ];
             }
+        }
+    }
+
+    public function removeVariationImage($index)
+    {
+        if (isset($this->editingVariations[$index])) {
+            $this->editingVariations[$index]['image'] = null;
+        }
+    }
+
+    public function updatedVariationImages($value, $key)
+    {
+        // Extract the index from the key (e.g., "0" from "variationImages.0")
+        $index = (int) $key;
+        
+        // Store the uploaded file temporarily
+        if (isset($this->variationImages[$index])) {
+            $this->editingVariations[$index]['new_image'] = $this->variationImages[$index];
+            $this->editingVariations[$index]['preview_url'] = $this->variationImages[$index]->temporaryUrl();
+        }
+    }
+
+    public function removeNewVariationImage($index)
+    {
+        if (isset($this->variationImages[$index])) {
+            unset($this->variationImages[$index]);
+        }
+        if (isset($this->editingVariations[$index])) {
+            unset($this->editingVariations[$index]['new_image']);
+            unset($this->editingVariations[$index]['preview_url']);
         }
     }
 
@@ -249,6 +284,12 @@ class VariationGenerator extends Component
                 }
             }
             
+            // Handle image upload
+            $imagePath = $variationData['image'];
+            if (isset($variationData['new_image']) && $variationData['new_image']) {
+                $imagePath = $variationData['new_image']->store('products/variations', 'public');
+            }
+            
             $variant->update([
                 'name' => $variationData['name'],
                 'sku' => $variationData['sku'],
@@ -261,10 +302,14 @@ class VariationGenerator extends Component
                 'length' => $variationData['length'],
                 'width' => $variationData['width'],
                 'height' => $variationData['height'],
+                'image' => $imagePath,
             ]);
             
             session()->flash('success', 'Variation updated successfully!');
             $this->loadVariations();
+            
+            // Dispatch event to collapse the variation
+            $this->dispatch('variation-updated');
         }
     }
 

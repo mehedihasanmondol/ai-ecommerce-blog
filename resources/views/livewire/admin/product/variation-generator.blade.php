@@ -303,7 +303,9 @@
             </button>
         </div>
 
-        <div class="space-y-4 p-4" x-data="{ expandedIndex: null }">
+        <div class="space-y-4 p-4" 
+             x-data="{ expandedIndex: null }"
+             @variation-updated.window="expandedIndex = null">
             @foreach($editingVariations as $index => $variation)
             <div class="border border-gray-200 rounded-lg">
                 {{-- Header --}}
@@ -449,6 +451,80 @@
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg"
                                        placeholder="0.00">
                             </div>
+                        </div>
+                    </div>
+
+                    {{-- Variation Image --}}
+                    <div>
+                        <h4 class="font-semibold text-gray-900 mb-3">Variation Image</h4>
+                        
+                        {{-- Current/Preview Image --}}
+                        @if(isset($editingVariations[$index]['preview_url']) || (isset($editingVariations[$index]['image']) && $editingVariations[$index]['image']))
+                        <div class="mb-4">
+                            <div class="relative inline-block">
+                                @if(isset($editingVariations[$index]['preview_url']))
+                                    {{-- New Image Preview --}}
+                                    <img src="{{ $editingVariations[$index]['preview_url'] }}" 
+                                         alt="New Variation Image" 
+                                         class="w-40 h-40 object-cover rounded-lg border-2 border-blue-500">
+                                    <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">New</span>
+                                    <button wire:click="removeNewVariationImage({{ $index }})" 
+                                            type="button"
+                                            class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 shadow-lg">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                @elseif(isset($editingVariations[$index]['image']) && $editingVariations[$index]['image'])
+                                    {{-- Existing Image --}}
+                                    <img src="{{ asset('storage/' . $editingVariations[$index]['image']) }}" 
+                                         alt="Current Variation Image" 
+                                         class="w-40 h-40 object-cover rounded-lg border-2 border-gray-300">
+                                    <span class="absolute top-2 left-2 bg-gray-600 text-white text-xs px-2 py-1 rounded">Current</span>
+                                    <button wire:click="removeVariationImage({{ $index }})" 
+                                            type="button"
+                                            class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 shadow-lg">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- Upload Input --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                @if(isset($editingVariations[$index]['preview_url']) || (isset($editingVariations[$index]['image']) && $editingVariations[$index]['image']))
+                                    Replace Image
+                                @else
+                                    Upload Image
+                                @endif
+                            </label>
+                            <input type="file" 
+                                   wire:model="variationImages.{{ $index }}" 
+                                   accept="image/*"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            
+                            {{-- Loading Indicator --}}
+                            <div wire:loading wire:target="variationImages.{{ $index }}" class="mt-2">
+                                <div class="flex items-center gap-2 text-sm text-blue-600">
+                                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span>Uploading...</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-gray-500 mt-1">
+                                @if(isset($editingVariations[$index]['preview_url']) || (isset($editingVariations[$index]['image']) && $editingVariations[$index]['image']))
+                                    Choose a new image to replace the current one
+                                @else
+                                    Upload a specific image for this variation
+                                @endif
+                            </p>
                         </div>
                     </div>
                     

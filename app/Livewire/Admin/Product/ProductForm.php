@@ -56,6 +56,7 @@ class ProductForm extends Component
     // Images
     public $images = [];
     public $existingImages = [];
+    public $primaryImageIndex = null;
 
     // Grouped Products
     public $selectedChildProducts = [];
@@ -86,6 +87,7 @@ class ProductForm extends Component
             'product_type' => 'required|in:simple,grouped,affiliate,variable',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'images.*' => 'nullable|image|max:2048', // Max 2MB per image
         ];
 
         if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
@@ -165,7 +167,19 @@ class ProductForm extends Component
                 $this->selectedChildProducts = $product->childProducts->pluck('id')->toArray();
             }
 
-            $this->existingImages = $product->images->pluck('image_path')->toArray();
+            // Load existing images
+            $images = $product->images;
+            foreach ($images as $index => $image) {
+                $this->existingImages[] = [
+                    'id' => $image->id,
+                    'path' => $image->image_path,
+                    'is_primary' => $image->is_primary,
+                ];
+                if ($image->is_primary) {
+                    $this->primaryImageIndex = $index;
+                }
+            }
+            
             $this->status = $product->status ?? 'draft';
         } else {
             // Create draft product for new products
@@ -261,6 +275,12 @@ class ProductForm extends Component
                 $data['temp_variations'] = $this->tempVariations;
             }
 
+            // Handle images
+            if (!empty($this->images)) {
+                $data['images'] = $this->images;
+                $data['primary_image_index'] = $this->primaryImageIndex;
+            }
+
             // Always update since we create draft on mount
             $product = $service->update($this->product, $data);
             
@@ -340,6 +360,35 @@ class ProductForm extends Component
     public function getTempVariationsProperty()
     {
         return $this->tempVariations;
+    }
+
+    // Image Management Methods
+    public function removeImage($index)
+    {
+        if (isset($this->images[$index])) {
+            unset($this->images[$index]);
+            $this->images = array_values($this->images);
+            
+            // Adjust primary image index if needed
+            if ($this->primaryImageIndex === $index) {
+                $this->primaryImageIndex = null;
+            } elseif ($this->primaryImageIndex > $index) {
+                $this->primaryImageIndex--;
+            }
+        }
+    }
+
+    public function removeExistingImage($index)
+    {
+        if (isset($this->existingImages[$index])) {
+            unset($this->existingImages[$index]);
+            $this->existingImages = array_values($this->existingImages);
+        }
+    }
+
+    public function setPrimaryImage($index)
+    {
+        $this->primaryImageIndex = $index;
     }
 
     public function render()

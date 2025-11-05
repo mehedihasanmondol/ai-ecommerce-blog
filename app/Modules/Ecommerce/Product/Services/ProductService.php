@@ -32,7 +32,7 @@ class ProductService
 
             // Handle images
             if (!empty($data['images'])) {
-                $this->syncImages($product, $data['images']);
+                $this->syncImages($product, $data['images'], $data['primary_image_index'] ?? null);
             }
 
             // Handle grouped products
@@ -62,7 +62,7 @@ class ProductService
 
             // Handle images
             if (isset($data['images'])) {
-                $this->syncImages($product, $data['images']);
+                $this->syncImages($product, $data['images'], $data['primary_image_index'] ?? null);
             }
 
             // Handle grouped products
@@ -123,18 +123,37 @@ class ProductService
         }
     }
 
-    protected function syncImages(Product $product, array $images): void
+    protected function syncImages(Product $product, array $imagesData, ?int $primaryIndex = null): void
     {
-        // Delete existing images
-        $product->images()->delete();
+        if (empty($imagesData)) {
+            return;
+        }
 
-        // Add new images
-        foreach ($images as $index => $imagePath) {
-            $product->images()->create([
-                'image_path' => $imagePath,
-                'is_primary' => $index === 0,
-                'sort_order' => $index,
-            ]);
+        // Handle uploaded files
+        $imagePaths = [];
+        foreach ($imagesData as $index => $image) {
+            if (is_object($image) && method_exists($image, 'store')) {
+                // It's an uploaded file
+                $path = $image->store('products', 'public');
+                $imagePaths[] = $path;
+            } elseif (is_string($image)) {
+                // It's already a path
+                $imagePaths[] = $image;
+            }
+        }
+
+        // Delete existing images if we're replacing them
+        if (!empty($imagePaths)) {
+            $product->images()->delete();
+
+            // Add new images
+            foreach ($imagePaths as $index => $imagePath) {
+                $product->images()->create([
+                    'image_path' => $imagePath,
+                    'is_primary' => $primaryIndex !== null ? ($index === $primaryIndex) : ($index === 0),
+                    'sort_order' => $index,
+                ]);
+            }
         }
     }
 
