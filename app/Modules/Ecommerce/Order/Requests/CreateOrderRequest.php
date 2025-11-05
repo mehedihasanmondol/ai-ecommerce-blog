@@ -11,7 +11,8 @@ class CreateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasRole('admin');
+        // Allow authenticated users (admin middleware is already applied in routes)
+        return auth()->check();
     }
 
     /**
@@ -25,6 +26,7 @@ class CreateOrderRequest extends FormRequest
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_email' => ['required', 'email', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:20'],
+            'customer_address' => ['required', 'string', 'max:500'],
             'customer_notes' => ['nullable', 'string', 'max:1000'],
             
             // Order Items
@@ -34,30 +36,15 @@ class CreateOrderRequest extends FormRequest
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.price' => ['required', 'numeric', 'min:0'],
             
-            // Billing Address
-            'billing_first_name' => ['required', 'string', 'max:255'],
-            'billing_last_name' => ['required', 'string', 'max:255'],
-            'billing_phone' => ['required', 'string', 'max:20'],
-            'billing_email' => ['nullable', 'email', 'max:255'],
-            'billing_address_line_1' => ['required', 'string', 'max:255'],
-            'billing_address_line_2' => ['nullable', 'string', 'max:255'],
-            'billing_city' => ['required', 'string', 'max:100'],
-            'billing_state' => ['nullable', 'string', 'max:100'],
-            'billing_postal_code' => ['required', 'string', 'max:20'],
-            'billing_country' => ['required', 'string', 'max:100'],
+            // Billing Address (not used - kept for backward compatibility)
+            // We use customer_address instead
             
-            // Shipping Address
+            // Shipping Address (simplified)
             'same_as_billing' => ['boolean'],
-            'shipping_first_name' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:255'],
-            'shipping_last_name' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:255'],
+            'shipping_name' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:255'],
             'shipping_phone' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:20'],
             'shipping_email' => ['nullable', 'email', 'max:255'],
-            'shipping_address_line_1' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:255'],
-            'shipping_address_line_2' => ['nullable', 'string', 'max:255'],
-            'shipping_city' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:100'],
-            'shipping_state' => ['nullable', 'string', 'max:100'],
-            'shipping_postal_code' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:20'],
-            'shipping_country' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:100'],
+            'shipping_address_line_1' => ['required_if:same_as_billing,false', 'nullable', 'string', 'max:500'],
             
             // Payment & Pricing
             'payment_method' => ['required', 'string', 'in:cod,bkash,nagad,rocket,card,bank_transfer'],

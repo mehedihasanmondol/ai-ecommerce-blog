@@ -69,9 +69,14 @@ class OrderController extends Controller
                 ];
             }
             
+            // Split customer name into first and last name
+            $nameParts = explode(' ', $validated['customer_name'], 2);
+            $firstName = $nameParts[0] ?? '';
+            $lastName = $nameParts[1] ?? '';
+            
             // Prepare order data
             $orderData = [
-                'user_id' => $validated['user_id'] ?? null,
+                'user_id' => !empty($validated['user_id']) ? $validated['user_id'] : null,
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_phone' => $validated['customer_phone'],
@@ -79,36 +84,39 @@ class OrderController extends Controller
                 'payment_method' => $validated['payment_method'],
                 'items' => $items,
                 'billing_address' => [
-                    'first_name' => $validated['billing_first_name'],
-                    'last_name' => $validated['billing_last_name'],
-                    'phone' => $validated['billing_phone'],
-                    'email' => $validated['billing_email'] ?? null,
-                    'address_line_1' => $validated['billing_address_line_1'],
-                    'address_line_2' => $validated['billing_address_line_2'] ?? null,
-                    'city' => $validated['billing_city'],
-                    'state' => $validated['billing_state'] ?? null,
-                    'postal_code' => $validated['billing_postal_code'],
-                    'country' => $validated['billing_country'],
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'phone' => $validated['customer_phone'],
+                    'email' => $validated['customer_email'],
+                    'address_line_1' => $validated['customer_address'],
+                    'address_line_2' => null,
+                    'city' => 'Dhaka',
+                    'state' => null,
+                    'postal_code' => '',
+                    'country' => 'Bangladesh',
                 ],
-                'shipping_cost' => $validated['shipping_cost'],
+                'shipping_cost' => (float) $validated['shipping_cost'],
                 'coupon_code' => $validated['coupon_code'] ?? null,
             ];
             
             // Add shipping address
             if (!empty($validated['same_as_billing'])) {
+                // Use billing address (customer info) for shipping
                 $orderData['shipping_address'] = $orderData['billing_address'];
             } else {
+                // Use different shipping address if provided
+                $shippingNameParts = explode(' ', $validated['shipping_name'] ?? '', 2);
                 $orderData['shipping_address'] = [
-                    'first_name' => $validated['shipping_first_name'],
-                    'last_name' => $validated['shipping_last_name'],
-                    'phone' => $validated['shipping_phone'],
+                    'first_name' => $shippingNameParts[0] ?? '',
+                    'last_name' => $shippingNameParts[1] ?? '',
+                    'phone' => $validated['shipping_phone'] ?? '',
                     'email' => $validated['shipping_email'] ?? null,
-                    'address_line_1' => $validated['shipping_address_line_1'],
-                    'address_line_2' => $validated['shipping_address_line_2'] ?? null,
-                    'city' => $validated['shipping_city'],
-                    'state' => $validated['shipping_state'] ?? null,
-                    'postal_code' => $validated['shipping_postal_code'],
-                    'country' => $validated['shipping_country'],
+                    'address_line_1' => $validated['shipping_address_line_1'] ?? '',
+                    'address_line_2' => null,
+                    'city' => 'Dhaka',
+                    'state' => null,
+                    'postal_code' => '',
+                    'country' => 'Bangladesh',
                 ];
             }
             

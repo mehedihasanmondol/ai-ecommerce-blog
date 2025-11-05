@@ -6,6 +6,7 @@ use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Category\Controllers\CategoryController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
 use App\Modules\Ecommerce\Order\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\CustomerController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -53,4 +54,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('orders.cancel');
     Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
         ->name('orders.invoice');
+    
+    // Customer Management Routes
+    Route::post('customers/{id}/update-info', [CustomerController::class, 'updateInfo'])
+        ->name('customers.update-info');
 });

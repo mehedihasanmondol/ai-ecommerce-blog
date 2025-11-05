@@ -365,9 +365,12 @@
     <script>
         setTimeout(() => {
             document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"]').forEach(el => {
-                el.style.transition = 'opacity 0.5s';
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 500);
+                // Skip elements with no-auto-hide class
+                if (!el.classList.contains('no-auto-hide')) {
+                    el.style.transition = 'opacity 0.5s';
+                    el.style.opacity = '0';
+                    setTimeout(() => el.remove(), 500);
+                }
             });
         }, 5000);
     </script>

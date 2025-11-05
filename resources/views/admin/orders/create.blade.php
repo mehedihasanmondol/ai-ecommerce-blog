@@ -3,7 +3,86 @@
 @section('title', 'Create Order')
 
 @section('content')
-<div class="space-y-4" x-data="orderForm()" x-cloak>
+<div class="space-y-4" x-data="orderForm()" x-cloak @product-selected.window="addSelectedProduct($event.detail.productData || $event.detail)">
+    <!-- Validation Errors Alert -->
+    @if ($errors->any())
+    <div id="validation-alert" class="no-auto-hide bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="ml-3 flex-1">
+                <h3 class="text-sm font-semibold text-red-800 mb-2">
+                    Please fix the following errors:
+                </h3>
+                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            <div class="ml-3 flex-shrink-0">
+                <button onclick="document.getElementById('validation-alert').style.display='none'" 
+                        class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Success Message Alert -->
+    @if (session('success'))
+    <div id="success-alert" class="no-auto-hide bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-md">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="ml-3 flex-1">
+                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+            </div>
+            <div class="ml-3 flex-shrink-0">
+                <button onclick="document.getElementById('success-alert').style.display='none'" 
+                        class="inline-flex text-green-500 hover:text-green-700 focus:outline-none transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Error Message Alert -->
+    @if (session('error'))
+    <div id="error-alert" class="no-auto-hide bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="ml-3 flex-1">
+                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+            </div>
+            <div class="ml-3 flex-shrink-0">
+                <button onclick="document.getElementById('error-alert').style.display='none'" 
+                        class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Sticky Header with Live Summary & Actions -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg sticky top-16 z-20">
         <div class="px-4 py-4">
@@ -56,7 +135,115 @@
         </div>
     </div>
 
-    <form id="order-form" action="{{ route('admin.orders.store') }}" method="POST">
+    <!-- Product Confirmation Modal -->
+    <div x-show="showProductModal" 
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+             @click="closeProductModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+                 @click.stop>
+                <!-- Close Button -->
+                <button @click="closeProductModal()" 
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <template x-if="tempProduct">
+                    <div>
+                        <!-- Header -->
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Confirm Product Details</h3>
+                        
+                        <!-- Product Info -->
+                        <div class="flex items-start space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                            <template x-if="tempProduct.image">
+                                <img :src="tempProduct.image" :alt="tempProduct.name" 
+                                     class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                            </template>
+                            <template x-if="!tempProduct.image">
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </template>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900" x-text="tempProduct.name"></h4>
+                                <template x-if="tempProduct.variant_name">
+                                    <p class="text-xs text-gray-600" x-text="'Variant: ' + tempProduct.variant_name"></p>
+                                </template>
+                                <p class="text-xs text-gray-500" x-text="'SKU: ' + tempProduct.sku"></p>
+                                <template x-if="tempProduct.stock_quantity !== undefined">
+                                    <p class="text-xs mt-1" :class="tempProduct.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'">
+                                        Stock: <span x-text="tempProduct.stock_quantity"></span>
+                                    </p>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Quantity <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" 
+                                   x-model.number="tempProduct.quantity" 
+                                   min="1" 
+                                   :max="tempProduct.stock_quantity || 999"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">
+                                Available: <span x-text="tempProduct.stock_quantity || 'Unlimited'"></span>
+                            </p>
+                        </div>
+
+                        <!-- Price Input -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Unit Price (৳) <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" 
+                                   x-model.number="tempProduct.price" 
+                                   step="0.01" 
+                                   min="0"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <!-- Subtotal Display -->
+                        <div class="mb-6 p-3 bg-blue-50 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Subtotal:</span>
+                                <span class="text-lg font-bold text-blue-600" 
+                                      x-text="'৳' + (tempProduct.quantity * tempProduct.price).toFixed(2)">৳0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex space-x-3">
+                            <button type="button" 
+                                    @click="closeProductModal()"
+                                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="button" 
+                                    @click="confirmAddProduct()"
+                                    class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                <span x-text="tempProduct.existingIndex !== -1 ? 'Update' : 'Add to Order'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <form id="order-form" action="{{ route('admin.orders.store') }}" method="POST" @submit="if(items.length === 0) { alert('Please add at least one product to the order'); $event.preventDefault(); return false; }">
         @csrf
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -65,6 +252,7 @@
                 
                 <!-- Order Items Card -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <!-- Card Header with Title -->
                     <div class="p-4 border-b border-gray-200 bg-gray-50">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-gray-900 flex items-center">
@@ -73,113 +261,114 @@
                                 </svg>
                                 Order Items
                             </h3>
-                            <button type="button" @click="addItem()" 
-                                    class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Add Item
-                            </button>
+                            <span class="text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded" x-show="items.length > 0">
+                                <span x-text="items.length"></span> item<span x-show="items.length !== 1">s</span>
+                            </span>
                         </div>
                     </div>
+                    
+                    <!-- Sticky Search Bar (sticks below page header when scrolling) -->
+                    <div class="sticky top-[140px] z-10 p-4 border-b border-gray-200 bg-white shadow-sm">
+                        <label class="block text-xs font-medium text-gray-700 mb-2">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Search & Add Products
+                        </label>
+                        @livewire('order.product-selector')
+                    </div>
+                    
+                    <div class="p-4">
+                        <!-- Selected Items List -->
+                        <div x-show="items.length > 0" class="space-y-3">
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                                    <!-- Hidden inputs for form submission -->
+                                    <input type="hidden" :name="'items['+index+'][product_id]'" x-model="item.product_id">
+                                    <input type="hidden" :name="'items['+index+'][variant_id]'" x-model="item.variant_id">
+                                    <input type="hidden" :name="'items['+index+'][price]'" x-model="item.price">
+                                    <input type="hidden" :name="'items['+index+'][quantity]'" x-model="item.quantity">
+                                    
+                                    <div class="flex items-start space-x-4">
+                                        <!-- Product Image -->
+                                        <div class="flex-shrink-0">
+                                            <template x-if="item.image">
+                                                <img :src="item.image" :alt="item.name" class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                                            </template>
+                                            <template x-if="!item.image">
+                                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
 
-                    <div class="p-4 space-y-3">
-                        <!-- Column Headers (First Item Only) -->
-                        <div class="grid grid-cols-12 gap-3 px-3 pb-2 border-b border-gray-200" x-show="items.length > 0">
-                            <div class="col-span-5">
-                                <label class="text-xs font-semibold text-gray-600 uppercase">Product <span class="text-red-500">*</span></label>
-                            </div>
-                            <div class="col-span-2 text-center">
-                                <label class="text-xs font-semibold text-gray-600 uppercase">Quantity <span class="text-red-500">*</span></label>
-                            </div>
-                            <div class="col-span-2 text-center">
-                                <label class="text-xs font-semibold text-gray-600 uppercase">Price <span class="text-red-500">*</span></label>
-                            </div>
-                            <div class="col-span-2 text-center">
-                                <label class="text-xs font-semibold text-gray-600 uppercase">Subtotal</label>
-                            </div>
-                            <div class="col-span-1 text-center">
-                                <label class="text-xs font-semibold text-gray-600 uppercase">Action</label>
-                            </div>
-                        </div>
-
-                        <template x-for="(item, index) in items" :key="index">
-                            <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors">
-                                <div class="grid grid-cols-12 gap-3 items-center">
-                                    <!-- Product Select -->
-                                    <div class="col-span-5">
-                                        <select :name="'items['+index+'][product_id]'" 
-                                                @change="updateItemPrice($event, index)"
-                                                required
-                                                class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                            <option value="">Select Product</option>
-                                            @php
-                                                $products = \App\Modules\Ecommerce\Product\Models\Product::orderBy('name')->get();
-                                            @endphp
-                                            @forelse($products as $product)
-                                                <option value="{{ $product->id }}" data-price="{{ $product->price ?? 0 }}">
-                                                    {{ $product->name }} - ৳{{ number_format($product->price ?? 0, 2) }}
-                                                    @if($product->status !== 'active')
-                                                        <span class="text-gray-500">({{ ucfirst($product->status ?? 'inactive') }})</span>
-                                                    @endif
-                                                </option>
-                                            @empty
-                                                <option value="" disabled>No products available - Please add products first</option>
-                                            @endforelse
-                                        </select>
-                                        @if($products->isEmpty())
-                                            <p class="text-xs text-red-500 mt-1">
-                                                <a href="{{ route('admin.products.create') }}" class="underline">Add products</a> before creating orders
-                                            </p>
-                                        @endif
-                                    </div>
-
-                                    <!-- Quantity -->
-                                    <div class="col-span-2">
-                                        <input type="number" :name="'items['+index+'][quantity]'" 
-                                               x-model.number="item.quantity" 
-                                               min="1" required
-                                               placeholder="Qty"
-                                               class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
-                                    </div>
-
-                                    <!-- Price -->
-                                    <div class="col-span-2">
-                                        <input type="number" :name="'items['+index+'][price]'" 
-                                               x-model.number="item.price" 
-                                               step="0.01" min="0" required
-                                               placeholder="0.00"
-                                               class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
-                                    </div>
-
-                                    <!-- Subtotal Display -->
-                                    <div class="col-span-2 text-center">
-                                        <div class="bg-blue-50 px-3 py-2 rounded-lg">
-                                            <span class="text-sm font-bold text-blue-600" 
-                                                  x-text="'৳' + (item.quantity * item.price).toFixed(2)">৳0.00</span>
+                                        <!-- Product Details -->
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-start justify-between">
+                                                <div class="flex-1">
+                                                    <h4 class="text-sm font-semibold text-gray-900" x-text="item.name"></h4>
+                                                    <template x-if="item.variant_name">
+                                                        <p class="text-xs text-gray-600 mt-0.5">Variant: <span x-text="item.variant_name"></span></p>
+                                                    </template>
+                                                    <p class="text-xs text-gray-500 mt-0.5">SKU: <span x-text="item.sku"></span></p>
+                                                    <template x-if="item.stock_quantity !== undefined">
+                                                        <p class="text-xs mt-1" :class="item.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'">
+                                                            Stock: <span x-text="item.stock_quantity"></span>
+                                                        </p>
+                                                    </template>
+                                                </div>
+                                                
+                                                <!-- Remove Button -->
+                                                <button type="button" @click="removeItem(index)" 
+                                                        class="ml-3 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Remove Item">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            
+                                            <!-- Quantity and Price Controls -->
+                                            <div class="grid grid-cols-3 gap-3 mt-3">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Quantity</label>
+                                                    <input type="number" 
+                                                           x-model.number="item.quantity" 
+                                                           min="1" 
+                                                           :max="item.stock_quantity || 999"
+                                                           class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Unit Price (৳)</label>
+                                                    <input type="number" 
+                                                           x-model.number="item.price" 
+                                                           step="0.01" 
+                                                           min="0"
+                                                           class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Subtotal</label>
+                                                    <div class="bg-blue-50 px-3 py-2 rounded-lg text-center">
+                                                        <span class="text-sm font-bold text-blue-600" 
+                                                              x-text="'৳' + (item.quantity * item.price).toFixed(2)">৳0.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <!-- Remove Button -->
-                                    <div class="col-span-1 text-center">
-                                        <button type="button" @click="removeItem(index)" 
-                                                x-show="items.length > 1"
-                                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                title="Remove Item">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                            </svg>
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
-                        </template>
+                            </template>
+                        </div>
 
-                        <div x-show="items.length === 0" class="text-center py-8 text-gray-500">
-                            <svg class="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Empty State -->
+                        <div x-show="items.length === 0" class="text-center py-12 text-gray-500">
+                            <svg class="w-16 h-16 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                             </svg>
-                            <p class="text-sm">No items added yet. Click "Add Item" to start.</p>
+                            <p class="text-sm font-medium">No items added yet</p>
+                            <p class="text-xs text-gray-400 mt-1">Search and select products above to add them to the order</p>
                         </div>
                     </div>
                 </div>
@@ -240,44 +429,81 @@
 
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
-                            <input type="text" name="customer_name" id="customer_name" required x-model="customer.name"
-                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <input type="text" name="customer_name" id="customer_name" required 
+                                   value="{{ old('customer_name') }}"
+                                   x-init="customer.name = '{{ old('customer_name') }}'"
+                                   x-model="customer.name"
+                                   class="w-full text-sm px-3 py-2 border {{ $errors->has('customer_name') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500">
+                            @error('customer_name')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
                             <!-- Hidden fields for billing (same as customer) -->
-                            <input type="hidden" name="billing_first_name" id="billing_first_name">
-                            <input type="hidden" name="billing_last_name" id="billing_last_name">
+                            <input type="hidden" name="billing_first_name" id="billing_first_name" value="{{ old('billing_first_name') }}">
+                            <input type="hidden" name="billing_last_name" id="billing_last_name" value="{{ old('billing_last_name') }}">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Phone <span class="text-red-500">*</span></label>
-                                <input type="text" name="customer_phone" id="customer_phone" required x-model="customer.phone"
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <input type="hidden" name="billing_phone" id="billing_phone">
+                                <input type="text" name="customer_phone" id="customer_phone" required 
+                                       value="{{ old('customer_phone') }}"
+                                       x-init="customer.phone = '{{ old('customer_phone') }}'"
+                                       x-model="customer.phone"
+                                       class="w-full text-sm px-3 py-2 border {{ $errors->has('customer_phone') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500">
+                                @error('customer_phone')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                                <input type="hidden" name="billing_phone" id="billing_phone" value="{{ old('billing_phone') }}">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-                                <input type="email" name="customer_email" id="customer_email" required x-model="customer.email"
-                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <input type="hidden" name="billing_email" id="billing_email">
+                                <input type="email" name="customer_email" id="customer_email" required 
+                                       value="{{ old('customer_email') }}"
+                                       x-init="customer.email = '{{ old('customer_email') }}'"
+                                       x-model="customer.email"
+                                       class="w-full text-sm px-3 py-2 border {{ $errors->has('customer_email') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500">
+                                @error('customer_email')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                                <input type="hidden" name="billing_email" id="billing_email" value="{{ old('billing_email') }}">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Address <span class="text-red-500">*</span></label>
-                            <input type="text" name="customer_address" id="customer_address" required x-model="customer.address"
-                                   class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            <input type="text" name="customer_address" id="customer_address" required 
+                                   value="{{ old('customer_address') }}"
+                                   x-init="customer.address = '{{ old('customer_address') }}'"
+                                   x-model="customer.address"
+                                   class="w-full text-sm px-3 py-2 border {{ $errors->has('customer_address') ? 'border-red-500' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500"
                                    placeholder="House/Flat, Street, Area">
-                            <input type="hidden" name="billing_address_line_1" id="billing_address_line_1">
-                            <input type="hidden" name="billing_city" id="billing_city" value="Dhaka">
-                            <input type="hidden" name="billing_postal_code" id="billing_postal_code">
-                            <input type="hidden" name="billing_country" id="billing_country" value="Bangladesh">
+                            @error('customer_address')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Customer Notes</label>
                             <textarea name="customer_notes" rows="2"
                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                      placeholder="Any special instructions or notes..."></textarea>
+                                      placeholder="Any special instructions or notes...">{{ old('customer_notes') }}</textarea>
+                        </div>
+
+                        <!-- Update Customer Info Button (Shows when customer selected and data changed) -->
+                        <div x-show="selectedUserId && customerDataChanged" 
+                             x-transition
+                             class="pt-3 border-t border-gray-200">
+                            <button type="button" 
+                                    @click="updateCustomerInfo()"
+                                    class="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Update Customer Profile Permanently
+                            </button>
+                            <p class="text-xs text-gray-500 mt-2 text-center">
+                                This will save the changes to the customer's profile for future orders
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -302,27 +528,30 @@
                         </div>
                     </div>
                     
-                    <div class="p-4 space-y-3" id="shipping-address-fields" style="display: none;">
+                    <div class="p-4 space-y-3" id="shipping-address-fields" style="display: {{ old('same_as_billing') ? 'none' : 'block' }};">
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Name</label>
                             <input type="text" name="shipping_name" id="shipping_name"
+                                   value="{{ old('shipping_name') }}"
                                    class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                    placeholder="Recipient name">
                             <!-- Hidden fields to match backend expectations -->
-                            <input type="hidden" name="shipping_first_name" id="shipping_first_name">
-                            <input type="hidden" name="shipping_last_name" id="shipping_last_name">
+                            <input type="hidden" name="shipping_first_name" id="shipping_first_name" value="{{ old('shipping_first_name') }}">
+                            <input type="hidden" name="shipping_last_name" id="shipping_last_name" value="{{ old('shipping_last_name') }}">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Phone</label>
                                 <input type="text" name="shipping_phone" id="shipping_phone"
+                                       value="{{ old('shipping_phone') }}"
                                        class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="Recipient phone">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
                                 <input type="email" name="shipping_email" id="shipping_email"
+                                       value="{{ old('shipping_email') }}"
                                        class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="Recipient email">
                             </div>
@@ -331,11 +560,9 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-700 mb-1">Address</label>
                             <input type="text" name="shipping_address_line_1" id="shipping_address_line_1"
+                                   value="{{ old('shipping_address_line_1') }}"
                                    class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                    placeholder="House/Flat, Street, Area">
-                            <input type="hidden" name="shipping_city" id="shipping_city" value="Dhaka">
-                            <input type="hidden" name="shipping_postal_code" id="shipping_postal_code">
-                            <input type="hidden" name="shipping_country" id="shipping_country" value="Bangladesh">
                         </div>
 
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -374,14 +601,20 @@
                         <!-- Shipping -->
                         <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-600">Shipping</span>
-                            <input type="number" name="shipping_cost" x-model.number="shipping" step="0.01" min="0" required
+                            <input type="number" name="shipping_cost" 
+                                   value="{{ old('shipping_cost', 60) }}"
+                                   x-init="shipping = {{ old('shipping_cost', 60) }}"
+                                   x-model.number="shipping" step="0.01" min="0" required
                                    class="w-24 text-right text-sm px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
                         </div>
 
                         <!-- Discount -->
                         <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-600">Discount</span>
-                            <input type="number" name="discount_amount" x-model.number="discount" step="0.01" min="0"
+                            <input type="number" name="discount_amount" 
+                                   value="{{ old('discount_amount', 0) }}"
+                                   x-init="discount = {{ old('discount_amount', 0) }}"
+                                   x-model.number="discount" step="0.01" min="0"
                                    class="w-24 text-right text-sm px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
                         </div>
 
@@ -397,12 +630,12 @@
                             <label class="block text-xs font-medium text-gray-700 mb-2">Payment Method <span class="text-red-500">*</span></label>
                             <select name="payment_method" required
                                     class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <option value="cod">Cash on Delivery</option>
-                                <option value="bkash">bKash</option>
-                                <option value="nagad">Nagad</option>
-                                <option value="rocket">Rocket</option>
-                                <option value="card">Card</option>
-                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="cod" {{ old('payment_method') == 'cod' ? 'selected' : '' }}>Cash on Delivery</option>
+                                <option value="bkash" {{ old('payment_method') == 'bkash' ? 'selected' : '' }}>bKash</option>
+                                <option value="nagad" {{ old('payment_method') == 'nagad' ? 'selected' : '' }}>Nagad</option>
+                                <option value="rocket" {{ old('payment_method') == 'rocket' ? 'selected' : '' }}>Rocket</option>
+                                <option value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>Card</option>
+                                <option value="bank_transfer" {{ old('payment_method') == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
                             </select>
                         </div>
 
@@ -411,8 +644,8 @@
                             <label class="block text-xs font-medium text-gray-700 mb-2">Payment Status <span class="text-red-500">*</span></label>
                             <select name="payment_status" required
                                     class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <option value="pending">Pending</option>
-                                <option value="paid">Paid</option>
+                                <option value="pending" {{ old('payment_status', 'pending') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="paid" {{ old('payment_status') == 'paid' ? 'selected' : '' }}>Paid</option>
                             </select>
                         </div>
 
@@ -421,7 +654,7 @@
                             <label class="block text-xs font-medium text-gray-700 mb-2">Admin Notes</label>
                             <textarea name="admin_notes" rows="2"
                                       class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                      placeholder="Internal notes..."></textarea>
+                                      placeholder="Internal notes...">{{ old('admin_notes') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -434,15 +667,25 @@
 <script>
 function orderForm() {
     return {
-        items: [{ product_id: '', quantity: 1, price: 0 }],
+        items: [],
         shipping: 60,
         discount: 0,
+        showProductModal: false,
+        tempProduct: null,
         customer: {
             name: '',
             email: '',
             phone: '',
             address: ''
         },
+        originalCustomer: {
+            name: '',
+            email: '',
+            phone: '',
+            address: ''
+        },
+        selectedUserId: null,
+        customerDataChanged: false,
         
         init() {
             // Watch customer fields and sync with billing hidden fields
@@ -460,32 +703,102 @@ function orderForm() {
             this.$watch('customer.address', value => {
                 document.getElementById('billing_address_line_1').value = value;
             });
+            
+            // Watch for changes to detect if customer data has been modified
+            this.$watch('customer', value => {
+                if (this.selectedUserId) {
+                    this.customerDataChanged = 
+                        value.name !== this.originalCustomer.name ||
+                        value.email !== this.originalCustomer.email ||
+                        value.phone !== this.originalCustomer.phone ||
+                        value.address !== this.originalCustomer.address;
+                }
+            }, { deep: true });
         },
         
-        addItem() {
-            this.items.push({ product_id: '', quantity: 1, price: 0 });
-        },
-        
-        removeItem(index) {
-            if (this.items.length > 1) {
-                this.items.splice(index, 1);
+        addSelectedProduct(productData) {
+            console.log('Product selected:', productData);
+            
+            if (!productData || !productData.product_id) {
+                console.error('Invalid product data received:', productData);
+                return;
+            }
+            
+            // Check if product already exists in items
+            const existingIndex = this.items.findIndex(item => 
+                item.product_id === productData.product_id && 
+                item.variant_id === productData.variant_id
+            );
+            
+            if (existingIndex !== -1) {
+                // If product exists, open modal to edit it
+                this.tempProduct = {...this.items[existingIndex], existingIndex: existingIndex};
+                this.showProductModal = true;
+            } else {
+                // Show modal for new product
+                this.tempProduct = {
+                    product_id: productData.product_id,
+                    variant_id: productData.variant_id || null,
+                    name: productData.name,
+                    variant_name: productData.variant_name || null,
+                    sku: productData.sku,
+                    price: productData.sale_price || productData.price,
+                    quantity: 1,
+                    stock_quantity: productData.stock_quantity,
+                    image: productData.image,
+                    existingIndex: -1
+                };
+                this.showProductModal = true;
             }
         },
         
-        updateItemPrice(event, index) {
-            const selectedOption = event.target.options[event.target.selectedIndex];
-            const price = parseFloat(selectedOption.dataset.price) || 0;
-            this.items[index].price = price;
+        confirmAddProduct() {
+            if (this.tempProduct.existingIndex !== -1) {
+                // Update existing product
+                this.items[this.tempProduct.existingIndex].quantity = this.tempProduct.quantity;
+                this.items[this.tempProduct.existingIndex].price = this.tempProduct.price;
+                console.log('Updated existing product');
+            } else {
+                // Add new product
+                const newProduct = {...this.tempProduct};
+                delete newProduct.existingIndex;
+                this.items.push(newProduct);
+                console.log('Added new product to items:', this.items);
+            }
+            this.closeProductModal();
+        },
+        
+        closeProductModal() {
+            this.showProductModal = false;
+            this.tempProduct = null;
+        },
+        
+        removeItem(index) {
+            this.items.splice(index, 1);
         },
         
         fillCustomerData(event) {
             const selectedOption = event.target.options[event.target.selectedIndex];
             if (selectedOption.value) {
+                // Store selected user ID
+                this.selectedUserId = selectedOption.value;
+                
                 // Fill customer info (will auto-sync with billing via watchers)
                 this.customer.name = selectedOption.dataset.name || '';
                 this.customer.email = selectedOption.dataset.email || '';
                 this.customer.phone = selectedOption.dataset.phone || '';
                 this.customer.address = selectedOption.dataset.address || '';
+                
+                // Store original values for comparison
+                this.originalCustomer = {
+                    name: this.customer.name,
+                    email: this.customer.email,
+                    phone: this.customer.phone,
+                    address: this.customer.address
+                };
+                
+                // Reset change flag
+                this.customerDataChanged = false;
                 
                 // If shipping is different, also fill shipping fields
                 const sameAsBilling = document.getElementById('same_as_billing');
@@ -500,11 +813,54 @@ function orderForm() {
                 }
             } else {
                 // Clear all fields if "New Customer" is selected
+                this.selectedUserId = null;
+                this.customerDataChanged = false;
                 this.customer.name = '';
                 this.customer.email = '';
                 this.customer.phone = '';
                 this.customer.address = '';
             }
+        },
+        
+        updateCustomerInfo() {
+            if (!this.selectedUserId) return;
+            
+            // Send AJAX request to update customer info
+            fetch(`/admin/customers/${this.selectedUserId}/update-info`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    name: this.customer.name,
+                    email: this.customer.email,
+                    phone: this.customer.phone,
+                    address: this.customer.address
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update original values
+                    this.originalCustomer = {
+                        name: this.customer.name,
+                        email: this.customer.email,
+                        phone: this.customer.phone,
+                        address: this.customer.address
+                    };
+                    this.customerDataChanged = false;
+                    
+                    // Show success message
+                    alert('Customer profile updated successfully!');
+                } else {
+                    alert('Failed to update customer profile: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to update customer profile. Please try again.');
+            });
         },
         
         calculateSubtotal() {
