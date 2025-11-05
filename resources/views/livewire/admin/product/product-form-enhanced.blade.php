@@ -152,6 +152,84 @@
                                 @endif
                             </div>
 
+                            {{-- Product Type --}}
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3">Product Type *</label>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all {{ $product_type === 'simple' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50' }}">
+                                        <input type="radio" wire:model.live="product_type" value="simple" class="sr-only">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-5 h-5 {{ $product_type === 'simple' ? 'text-blue-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                </svg>
+                                                <span class="font-medium {{ $product_type === 'simple' ? 'text-blue-900' : 'text-gray-900' }}">Simple</span>
+                                            </div>
+                                            <span class="text-xs {{ $product_type === 'simple' ? 'text-blue-700' : 'text-gray-500' }}">Single product</span>
+                                        </div>
+                                        @if($product_type === 'simple')
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        @endif
+                                    </label>
+
+                                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all {{ $product_type === 'variable' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50' }}">
+                                        <input type="radio" wire:model.live="product_type" value="variable" class="sr-only">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-5 h-5 {{ $product_type === 'variable' ? 'text-blue-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                                </svg>
+                                                <span class="font-medium {{ $product_type === 'variable' ? 'text-blue-900' : 'text-gray-900' }}">Variable</span>
+                                            </div>
+                                            <span class="text-xs {{ $product_type === 'variable' ? 'text-blue-700' : 'text-gray-500' }}">With variations</span>
+                                        </div>
+                                        @if($product_type === 'variable')
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        @endif
+                                    </label>
+
+                                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all {{ $product_type === 'grouped' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50' }}">
+                                        <input type="radio" wire:model.live="product_type" value="grouped" class="sr-only">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-5 h-5 {{ $product_type === 'grouped' ? 'text-blue-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                                </svg>
+                                                <span class="font-medium {{ $product_type === 'grouped' ? 'text-blue-900' : 'text-gray-900' }}">Grouped</span>
+                                            </div>
+                                            <span class="text-xs {{ $product_type === 'grouped' ? 'text-blue-700' : 'text-gray-500' }}">Collection</span>
+                                        </div>
+                                        @if($product_type === 'grouped')
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        @endif
+                                    </label>
+
+                                    <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all {{ $product_type === 'affiliate' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50' }}">
+                                        <input type="radio" wire:model.live="product_type" value="affiliate" class="sr-only">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <svg class="w-5 h-5 {{ $product_type === 'affiliate' ? 'text-blue-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                </svg>
+                                                <span class="font-medium {{ $product_type === 'affiliate' ? 'text-blue-900' : 'text-gray-900' }}">Affiliate</span>
+                                            </div>
+                                            <span class="text-xs {{ $product_type === 'affiliate' ? 'text-blue-700' : 'text-gray-500' }}">External link</span>
+                                        </div>
+                                        @if($product_type === 'affiliate')
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        @endif
+                                    </label>
+                                </div>
+                            </div>
+
                             {{-- Description --}}
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
@@ -717,45 +795,6 @@
                             <span class="text-sm text-gray-600 block mb-2">Visibility:</span>
                             <p class="text-sm text-gray-900" wire:key="visibility-{{ $is_active }}">{{ $is_active ? '🟢 Public' : '🔴 Hidden' }}</p>
                         </div>
-                    </div>
-                </div>
-
-                {{-- Product Type --}}
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Type</h3>
-                    
-                    <div class="space-y-3">
-                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                            <input type="radio" wire:model.live="product_type" value="simple" class="w-4 h-4 text-blue-600">
-                            <div class="ml-3">
-                                <span class="block text-sm font-medium text-gray-900">Simple Product</span>
-                                <span class="block text-xs text-gray-500">Single product with one price</span>
-                            </div>
-                        </label>
-
-                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                            <input type="radio" wire:model.live="product_type" value="variable" class="w-4 h-4 text-blue-600">
-                            <div class="ml-3">
-                                <span class="block text-sm font-medium text-gray-900">Variable Product</span>
-                                <span class="block text-xs text-gray-500">Product with variations (size, color, etc.)</span>
-                            </div>
-                        </label>
-
-                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                            <input type="radio" wire:model.live="product_type" value="grouped" class="w-4 h-4 text-blue-600">
-                            <div class="ml-3">
-                                <span class="block text-sm font-medium text-gray-900">Grouped Product</span>
-                                <span class="block text-xs text-gray-500">Collection of related products</span>
-                            </div>
-                        </label>
-
-                        <label class="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                            <input type="radio" wire:model.live="product_type" value="affiliate" class="w-4 h-4 text-blue-600">
-                            <div class="ml-3">
-                                <span class="block text-sm font-medium text-gray-900">Affiliate Product</span>
-                                <span class="block text-xs text-gray-500">External product with redirect link</span>
-                            </div>
-                        </label>
                     </div>
                 </div>
 
