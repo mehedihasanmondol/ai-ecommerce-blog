@@ -15,6 +15,7 @@ class ProductForm extends Component
 
     public ?Product $product = null;
     public bool $isEdit = false;
+    public bool $isNewProduct = true;
 
     // Product Info
     public $name = '';
@@ -121,6 +122,7 @@ class ProductForm extends Component
     {
         if ($product && $product->exists) {
             $this->isEdit = true;
+            $this->isNewProduct = false;
             $this->product = $product;
             $this->fill([
                 'name' => $product->name,
@@ -252,12 +254,6 @@ class ProductForm extends Component
             session()->flash('error', 'Error saving product: ' . $e->getMessage());
             $this->dispatch('error', message: 'Error saving product: ' . $e->getMessage());
         }
-    }
-
-    public function saveAsDraft(ProductService $service)
-    {
-        $this->status = 'draft';
-        return $this->save($service);
     }
 
     public function publish(ProductService $service)

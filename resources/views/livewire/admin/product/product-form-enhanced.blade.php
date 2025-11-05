@@ -26,22 +26,14 @@
         {{-- Header with Actions --}}
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ $isEdit ? 'Edit Product' : 'Add New Product' }}</h1>
-                <p class="text-sm text-gray-600 mt-1">{{ $isEdit ? 'Update product information' : 'Create a new product in your catalog' }}</p>
+                <h1 class="text-3xl font-bold text-gray-900">{{ $isNewProduct ? 'Add New Product' : 'Edit Product' }}</h1>
+                <p class="text-sm text-gray-600 mt-1">{{ $isNewProduct ? 'Create a new product in your catalog' : 'Update product information' }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <a href="{{ route('admin.products.index') }}" 
                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                     Cancel
                 </a>
-                <button type="button" 
-                        wire:click="saveAsDraft"
-                        wire:loading.attr="disabled"
-                        wire:loading.class="opacity-50 cursor-not-allowed"
-                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                    <span wire:loading.remove wire:target="saveAsDraft">Save as Draft</span>
-                    <span wire:loading wire:target="saveAsDraft">Saving...</span>
-                </button>
                 <button type="button" 
                         wire:click="publish"
                         wire:loading.attr="disabled"
@@ -58,7 +50,7 @@
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
                     </span>
-                    <span>{{ $isEdit ? 'Update Product' : 'Publish Product' }}</span>
+                    <span>{{ $isNewProduct ? 'Publish Product' : 'Update Product' }}</span>
                 </button>
             </div>
         </div>
@@ -566,9 +558,9 @@
                         <div class="flex items-center justify-between py-2 border-b border-gray-200">
                             <span class="text-sm text-gray-600">Status:</span>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" wire:model="is_active" class="sr-only peer">
+                                <input type="checkbox" wire:model.live="is_active" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                <span class="ml-3 text-sm font-medium text-gray-900">{{ $is_active ? 'Active' : 'Inactive' }}</span>
+                                <span class="ml-3 text-sm font-medium text-gray-900" wire:key="active-label-{{ $is_active }}">{{ $is_active ? 'Active' : 'Inactive' }}</span>
                             </label>
                         </div>
 
@@ -576,16 +568,16 @@
                         <div class="flex items-center justify-between py-2 border-b border-gray-200">
                             <span class="text-sm text-gray-600">Featured:</span>
                             <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" wire:model="is_featured" class="sr-only peer">
+                                <input type="checkbox" wire:model.live="is_featured" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                <span class="ml-3 text-sm font-medium text-gray-900">{{ $is_featured ? 'Yes' : 'No' }}</span>
+                                <span class="ml-3 text-sm font-medium text-gray-900" wire:key="featured-label-{{ $is_featured }}">{{ $is_featured ? 'Yes' : 'No' }}</span>
                             </label>
                         </div>
 
                         {{-- Visibility --}}
                         <div class="py-2">
                             <span class="text-sm text-gray-600 block mb-2">Visibility:</span>
-                            <p class="text-sm text-gray-900">{{ $is_active ? '🟢 Public' : '🔴 Hidden' }}</p>
+                            <p class="text-sm text-gray-900" wire:key="visibility-{{ $is_active }}">{{ $is_active ? '🟢 Public' : '🔴 Hidden' }}</p>
                         </div>
                     </div>
                 </div>
