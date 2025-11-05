@@ -5,6 +5,7 @@ use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Category\Controllers\CategoryController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
+use App\Modules\Ecommerce\Order\Controllers\Admin\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -43,4 +44,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('brands.toggle-featured');
     Route::post('brands/{brand}/duplicate', [BrandController::class, 'duplicate'])
         ->name('brands.duplicate');
+    
+    // Order Management Routes
+    Route::resource('orders', OrderController::class);
+    Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
+        ->name('orders.update-status');
+    Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
+        ->name('orders.cancel');
+    Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
+        ->name('orders.invoice');
 });

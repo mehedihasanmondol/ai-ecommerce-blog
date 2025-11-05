@@ -145,10 +145,13 @@
                     @endif
                 </a>
 
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
+                <a href="{{ route('admin.orders.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shopping-cart w-5 mr-3"></i>
                     <span>Orders</span>
-                    <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
+                    @if(request()->routeIs('admin.orders.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
                 </a>
 
                 <a href="{{ route('admin.categories.index') }}" 
@@ -273,6 +276,12 @@
                     <span>Products</span>
                 </a>
 
+                <a href="{{ route('admin.orders.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.orders.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-shopping-cart w-5 mr-3"></i>
+                    <span>Orders</span>
+                </a>
+
                 <a href="{{ route('admin.categories.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-tags w-5 mr-3"></i>
@@ -343,7 +352,9 @@
             </div>
             @endif
 
-                @yield('content')
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    @yield('content')
+                </div>
             </div>
         </main>
     </div>

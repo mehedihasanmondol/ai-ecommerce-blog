@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,3 +33,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Product Attributes Routes
     Route::resource('attributes', \App\Modules\Ecommerce\Product\Controllers\AttributeController::class)->except(['show']);
 });
+
+// Customer Order Routes (Protected)
+Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () {
+    Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
+    Route::post('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])->name('orders.invoice');
+});
+
+// Public Order Tracking
+Route::get('track-order', [CustomerOrderController::class, 'track'])->name('orders.track');
+Route::post('track-order', [CustomerOrderController::class, 'track']);
