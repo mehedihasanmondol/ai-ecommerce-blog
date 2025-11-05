@@ -94,17 +94,33 @@ class OrderService
         $product = $itemData['product'];
         $variant = $itemData['variant'] ?? null;
 
-        $price = $variant ? $variant->price : $product->price;
+        // Per .windsurfrules: product_variant_id is required
+        if (!$variant) {
+            throw new \Exception("Product variant is required for product: {$product->name}");
+        }
+
+        // Use custom price from form if provided, otherwise use variant/product price
+        $price = $itemData['price'] ?? ($variant->price ?? $product->price);
         $subtotal = $price * $itemData['quantity'];
+
+        // Format variant attributes as key-value pairs
+        $variantAttributes = null;
+        if ($variant->attributeValues && $variant->attributeValues->count() > 0) {
+            $variantAttributes = [];
+            foreach ($variant->attributeValues as $attributeValue) {
+                $attributeName = $attributeValue->attribute->name ?? 'Attribute';
+                $variantAttributes[$attributeName] = $attributeValue->value;
+            }
+        }
 
         return OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
-            'product_variant_id' => $variant?->id,
+            'product_variant_id' => $variant->id, // Required, never null
             'product_name' => $product->name,
-            'product_sku' => $variant?->sku ?? $product->sku,
-            'variant_name' => $variant?->name,
-            'variant_attributes' => $variant?->attributes,
+            'product_sku' => $variant->sku ?? 'N/A',
+            'variant_name' => $variant->name,
+            'variant_attributes' => $variantAttributes,
             'price' => $price,
             'quantity' => $itemData['quantity'],
             'subtotal' => $subtotal,

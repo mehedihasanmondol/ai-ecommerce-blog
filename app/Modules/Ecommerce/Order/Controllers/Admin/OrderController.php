@@ -11,6 +11,7 @@ use App\Modules\Ecommerce\Order\Requests\CreateOrderRequest;
 use App\Modules\Ecommerce\Order\Requests\UpdateOrderRequest;
 use App\Modules\Ecommerce\Order\Requests\UpdateOrderStatusRequest;
 use App\Modules\Ecommerce\Product\Models\Product;
+use App\Modules\Ecommerce\Product\Models\ProductVariant;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -62,10 +63,18 @@ class OrderController extends Controller
             $items = [];
             foreach ($validated['items'] as $itemData) {
                 $product = Product::find($itemData['product_id']);
+                
+                // Get variant if provided (required per .windsurfrules)
+                $variant = null;
+                if (!empty($itemData['variant_id'])) {
+                    $variant = ProductVariant::find($itemData['variant_id']);
+                }
+                
                 $items[] = [
                     'product' => $product,
-                    'variant' => null, // Can be extended for variants
+                    'variant' => $variant,
                     'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'], // Use custom price from form
                 ];
             }
             

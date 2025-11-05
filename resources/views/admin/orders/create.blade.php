@@ -671,22 +671,22 @@
 <script>
 function orderForm() {
     return {
-        items: [],
-        shipping: 60,
-        discount: 0,
+        items: @json(old('items', [])),
+        shipping: {{ old('shipping_cost', 60) }},
+        discount: {{ old('discount', 0) }},
         showProductModal: false,
         tempProduct: null,
         customer: {
-            name: '',
-            email: '',
-            phone: '',
-            address: ''
+            name: '{{ old('customer_name', '') }}',
+            email: '{{ old('customer_email', '') }}',
+            phone: '{{ old('customer_phone', '') }}',
+            address: '{{ old('customer_address', '') }}'
         },
         originalCustomer: {
-            name: '',
-            email: '',
-            phone: '',
-            address: ''
+            name: '{{ old('customer_name', '') }}',
+            email: '{{ old('customer_email', '') }}',
+            phone: '{{ old('customer_phone', '') }}',
+            address: '{{ old('customer_address', '') }}'
         },
         selectedUserId: null,
         customerDataChanged: false,

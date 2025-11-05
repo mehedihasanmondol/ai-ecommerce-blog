@@ -61,9 +61,10 @@
                                     @if($item->variant_name)
                                         <p class="text-sm text-gray-600">{{ $item->variant_name }}</p>
                                     @endif
-                                    @if($item->formatted_variant_attributes)
+                                    {{-- Variant attributes hidden as per user request --}}
+                                    {{-- @if($item->formatted_variant_attributes)
                                         <p class="text-sm text-gray-500">{{ $item->formatted_variant_attributes }}</p>
-                                    @endif
+                                    @endif --}}
                                 </div>
                                 
                                 <div class="text-center">

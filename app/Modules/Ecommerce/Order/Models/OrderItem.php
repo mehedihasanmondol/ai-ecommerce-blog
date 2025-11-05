@@ -73,9 +73,27 @@ class OrderItem extends Model
 
         $formatted = [];
         foreach ($this->variant_attributes as $key => $value) {
-            $formatted[] = ucfirst($key) . ': ' . $value;
+            // Convert value to string safely
+            $stringValue = $this->convertToString($value);
+            $formatted[] = ucfirst($key) . ': ' . $stringValue;
         }
 
         return implode(', ', $formatted);
+    }
+
+    /**
+     * Convert any value to string recursively.
+     */
+    private function convertToString($value): string
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, 'convertToString'], $value));
+        }
+        
+        if (is_object($value)) {
+            return method_exists($value, '__toString') ? (string) $value : json_encode($value);
+        }
+        
+        return (string) $value;
     }
 }

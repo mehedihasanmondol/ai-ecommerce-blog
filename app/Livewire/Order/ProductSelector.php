@@ -70,8 +70,23 @@ class ProductSelector extends Component
         if ($variantId) {
             $variant = ProductVariant::find($variantId);
         } else {
-            $variant = $product->variants->where('is_default', true)->first() 
-                    ?? $product->variants->first();
+            // For variable products, always select a variant
+            if ($product->product_type === 'variable') {
+                $variant = $product->variants->where('is_default', true)->first() 
+                        ?? $product->variants->first();
+                
+                // If no variant exists for variable product, show error
+                if (!$variant) {
+                    session()->flash('error', 'This product has no variants configured.');
+                    return;
+                }
+            }
+        }
+        
+        // Ensure variant_id is never null for variable products
+        if ($product->product_type === 'variable' && !$variant) {
+            session()->flash('error', 'Please select a variant for this product.');
+            return;
         }
 
         // Get image URL
@@ -86,13 +101,13 @@ class ProductSelector extends Component
         
         $productData = [
             'product_id' => $product->id,
-            'variant_id' => $variant?->id,
+            'variant_id' => $variant->id, // Always required per .windsurfrules
             'name' => $product->name,
-            'variant_name' => $variant?->name,
-            'sku' => $variant?->sku ?? 'N/A',
-            'price' => $variant?->price ?? $product->price ?? 0,
-            'sale_price' => $variant?->sale_price,
-            'stock_quantity' => $variant?->stock_quantity ?? 0,
+            'variant_name' => $variant->name ?? null,
+            'sku' => $variant->sku ?? 'N/A',
+            'price' => $variant->price ?? $product->price ?? 0,
+            'sale_price' => $variant->sale_price ?? null,
+            'stock_quantity' => $variant->stock_quantity ?? 0,
             'quantity' => 1,
             'image' => $imageUrl,
         ];
