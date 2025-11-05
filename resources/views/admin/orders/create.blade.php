@@ -84,6 +84,25 @@
                     </div>
 
                     <div class="p-4 space-y-3">
+                        <!-- Column Headers (First Item Only) -->
+                        <div class="grid grid-cols-12 gap-3 px-3 pb-2 border-b border-gray-200" x-show="items.length > 0">
+                            <div class="col-span-5">
+                                <label class="text-xs font-semibold text-gray-600 uppercase">Product <span class="text-red-500">*</span></label>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <label class="text-xs font-semibold text-gray-600 uppercase">Quantity <span class="text-red-500">*</span></label>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <label class="text-xs font-semibold text-gray-600 uppercase">Price <span class="text-red-500">*</span></label>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <label class="text-xs font-semibold text-gray-600 uppercase">Subtotal</label>
+                            </div>
+                            <div class="col-span-1 text-center">
+                                <label class="text-xs font-semibold text-gray-600 uppercase">Action</label>
+                            </div>
+                        </div>
+
                         <template x-for="(item, index) in items" :key="index">
                             <div class="bg-gray-50 rounded-lg p-3 border border-gray-200 hover:border-blue-300 transition-colors">
                                 <div class="grid grid-cols-12 gap-3 items-center">
@@ -94,12 +113,25 @@
                                                 required
                                                 class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                             <option value="">Select Product</option>
-                                            @foreach(\App\Modules\Ecommerce\Product\Models\Product::where('status', 'active')->get() as $product)
-                                                <option value="{{ $product->id }}" data-price="{{ $product->price }}">
-                                                    {{ $product->name }} - ৳{{ number_format($product->price, 2) }}
+                                            @php
+                                                $products = \App\Modules\Ecommerce\Product\Models\Product::orderBy('name')->get();
+                                            @endphp
+                                            @forelse($products as $product)
+                                                <option value="{{ $product->id }}" data-price="{{ $product->price ?? 0 }}">
+                                                    {{ $product->name }} - ৳{{ number_format($product->price ?? 0, 2) }}
+                                                    @if($product->status !== 'active')
+                                                        <span class="text-gray-500">({{ ucfirst($product->status ?? 'inactive') }})</span>
+                                                    @endif
                                                 </option>
-                                            @endforeach
+                                            @empty
+                                                <option value="" disabled>No products available - Please add products first</option>
+                                            @endforelse
                                         </select>
+                                        @if($products->isEmpty())
+                                            <p class="text-xs text-red-500 mt-1">
+                                                <a href="{{ route('admin.products.create') }}" class="underline">Add products</a> before creating orders
+                                            </p>
+                                        @endif
                                     </div>
 
                                     <!-- Quantity -->
@@ -116,21 +148,24 @@
                                         <input type="number" :name="'items['+index+'][price]'" 
                                                x-model.number="item.price" 
                                                step="0.01" min="0" required
-                                               placeholder="Price"
-                                               class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                               placeholder="0.00"
+                                               class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
                                     </div>
 
                                     <!-- Subtotal Display -->
                                     <div class="col-span-2 text-center">
-                                        <span class="text-sm font-semibold text-gray-900" 
-                                              x-text="'৳' + (item.quantity * item.price).toFixed(2)">৳0.00</span>
+                                        <div class="bg-blue-50 px-3 py-2 rounded-lg">
+                                            <span class="text-sm font-bold text-blue-600" 
+                                                  x-text="'৳' + (item.quantity * item.price).toFixed(2)">৳0.00</span>
+                                        </div>
                                     </div>
 
                                     <!-- Remove Button -->
                                     <div class="col-span-1 text-center">
                                         <button type="button" @click="removeItem(index)" 
                                                 x-show="items.length > 1"
-                                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Remove Item">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
@@ -163,12 +198,15 @@
                     <div class="p-4 space-y-3">
                         <!-- Quick Customer Select -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Quick Select Customer</label>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Quick Select Customer (Optional)</label>
                             <select name="user_id" 
                                     @change="fillCustomerData($event)"
                                     class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                                 <option value="">-- New Customer --</option>
-                                @foreach(\App\Models\User::orderBy('name')->limit(50)->get() as $user)
+                                @php
+                                    $users = \App\Models\User::orderBy('name')->limit(100)->get();
+                                @endphp
+                                @foreach($users as $user)
                                     <option value="{{ $user->id }}" 
                                             data-name="{{ $user->name }}" 
                                             data-email="{{ $user->email }}" 
@@ -177,6 +215,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @if($users->isEmpty())
+                                <p class="text-xs text-gray-500 mt-1">No existing customers - Enter new customer details below</p>
+                            @endif
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
