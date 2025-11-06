@@ -67,7 +67,7 @@
 </div>
 
 <!-- Main Header -->
-<header class="bg-white shadow-sm sticky top-0 z-50">
+<header class="bg-white shadow-sm sticky top-0 z-50 relative">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between py-4">
             <!-- Logo -->
@@ -123,45 +123,671 @@
             </div>
         </div>
 
-        <!-- Navigation Menu -->
-        <nav class="border-t border-gray-200">
+        <!-- Navigation Menu with Mega Dropdown -->
+        <nav class="border-t border-gray-200 relative" x-data="{ activeMenu: null }">
             <ul class="flex items-center space-x-1 py-3 overflow-x-auto scrollbar-hide">
-                <li>
-                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
-                        Supplements
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
-                        Sports
-                    </a>
-                </li>
-                <li>
+                <!-- Bath Menu with Mega Dropdown -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'bath'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Bath
                     </a>
                 </li>
-                <li>
+                
+                <!-- Mega Menu Dropdown (Outside li for proper positioning) -->
+                <div x-show="activeMenu === 'bath'" 
+                     @mouseenter="activeMenu = 'bath'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-1"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-5 gap-8 max-w-6xl">
+                                <!-- Column 1: Bath & Shower -->
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        Bath & Shower
+                                    </h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Bar Soap</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Bath Soaks</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Body Scrubs</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Body Wash & Shower Gel</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Column 2: Essential Oils -->
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        Essential Oils
+                                    </h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Essential Oil Blends</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Essential Oil Diffusers</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Essential Oil Sets</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Essential Oil Spray</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Single Essential Oils</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Column 3: Body Care -->
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        Body Care
+                                    </h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Body & Massage Oils</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hand Cream</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Lotion</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Self-Tan</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Skincare Treatments</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Column 4: Haircare -->
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        Haircare
+                                    </h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Conditioner</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Detangler</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hair Accessories</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hair Colour</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hair Styling</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hair Treatments</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Shampoo</a></li>
+                                    </ul>
+                                </div>
+
+                                <!-- Column 5: Trending Brands -->
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplements Mega Menu Dropdown -->
+                <div x-show="activeMenu === 'supplements'" 
+                     @mouseenter="activeMenu = 'supplements'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-1"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-5 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Vitamins</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Multivitamins</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Vitamin C</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Vitamin D</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">B-Complex</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Minerals</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Calcium</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Magnesium</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Zinc</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Iron</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Herbs & Botanicals</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Turmeric</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Ashwagandha</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Ginseng</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Green Tea Extract</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Specialty Supplements</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Probiotics</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Omega-3</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Collagen</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">CoQ10</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sports Mega Menu Dropdown -->
+                <div x-show="activeMenu === 'sports'" 
+                     @mouseenter="activeMenu = 'sports'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-5 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Protein</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Whey Protein</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Plant Protein</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Protein Bars</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Pre-Workout</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Energy Boosters</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Creatine</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">BCAAs</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Weight Management</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Fat Burners</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Meal Replacements</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Appetite Control</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Recovery</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Post-Workout</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Electrolytes</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Joint Support</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Beauty Mega Menu Dropdown -->
+                <div x-show="activeMenu === 'beauty'" 
+                     @mouseenter="activeMenu = 'beauty'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-4 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Skin Care</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Cleansers</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Moisturizers</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Serums</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Face Masks</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Makeup</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Foundation</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Lipstick</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Mascara</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Eye Shadow</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Hair Care</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Shampoo</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Conditioner</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Hair Masks</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Styling Products</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Nails</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Nail Polish</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Nail Care</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Nail Tools</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grocery, Home, Baby, Pets Mega Menus (Simplified) -->
+                <div x-show="activeMenu === 'grocery'" 
+                     @mouseenter="activeMenu = 'grocery'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-5 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Snacks</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Protein Bars</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Nuts & Seeds</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Dried Fruits</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Beverages</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Tea & Coffee</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Juices</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Smoothies</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Pantry</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Oils & Vinegars</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Spices</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Baking</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Organic Foods</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Organic Grains</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Organic Snacks</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="activeMenu === 'home'" 
+                     @mouseenter="activeMenu = 'home'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-4 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Cleaning</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">All-Purpose Cleaners</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Laundry</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Dish Soap</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Air & Fragrance</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Candles</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Air Fresheners</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Diffusers</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Kitchen</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Storage</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Utensils</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Paper Products</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Paper Towels</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Tissues</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="activeMenu === 'baby'" 
+                     @mouseenter="activeMenu = 'baby'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-4 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Baby Care</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Diapers</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Wipes</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Baby Bath</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Feeding</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Baby Formula</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Baby Food</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Bottles</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Health</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Baby Vitamins</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Teething</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Toys</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Educational Toys</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Plush Toys</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="activeMenu === 'pets'" 
+                     @mouseenter="activeMenu = 'pets'" 
+                     @mouseleave="activeMenu = null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="absolute left-0 right-0 top-full w-full bg-white shadow-2xl rounded-lg border border-gray-200 z-[100]"
+                     style="display: none;">
+                    <div class="container mx-auto px-4">
+                        <div class="p-8">
+                            <div class="grid grid-cols-4 gap-8 max-w-6xl">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Dog Care</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Dog Food</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Dog Treats</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Dog Supplements</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Cat Care</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Cat Food</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Cat Treats</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Litter</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Pet Health</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Vitamins</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Joint Support</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Grooming</a></li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-600 mb-3">Pet Accessories</h3>
+                                    <ul class="space-y-2">
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Toys</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Beds</a></li>
+                                        <li><a href="#" class="text-sm text-gray-700 hover:text-green-600 transition">Bowls</a></li>
+                                    </ul>
+                                </div>
+                                <div class="border-l border-gray-200 pl-8">
+                                    <h3 class="text-sm font-bold text-gray-900 mb-3">Trending brands</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-xs font-semibold text-gray-600">Brand</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplements Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'supplements'" 
+                    @mouseleave="activeMenu = null">
+                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
+                        Supplements
+                    </a>
+                </li>
+                
+                <!-- Sports Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'sports'" 
+                    @mouseleave="activeMenu = null">
+                    <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
+                        Sports
+                    </a>
+                </li>
+                
+                <!-- Beauty Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'beauty'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Beauty
                     </a>
                 </li>
-                <li>
+                
+                <!-- Grocery Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'grocery'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Grocery
                     </a>
                 </li>
-                <li>
+                
+                <!-- Home Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'home'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Home
                     </a>
                 </li>
-                <li>
+                
+                <!-- Baby Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'baby'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Baby
                     </a>
                 </li>
-                <li>
+                
+                <!-- Pets Menu -->
+                <li class="relative static" 
+                    @mouseenter="activeMenu = 'pets'" 
+                    @mouseleave="activeMenu = null">
                     <a href="#" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-md transition whitespace-nowrap">
                         Pets
                     </a>
