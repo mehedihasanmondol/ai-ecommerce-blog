@@ -4,6 +4,53 @@
 
 @section('content')
 <div class="space-y-6">
+    <!-- Success/Error Alerts -->
+    @if (session()->has('success'))
+        <div id="success-alert" class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-md">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
+                </div>
+                <div class="ml-3 flex-shrink-0">
+                    <button onclick="this.closest('#success-alert').remove()" 
+                            class="inline-flex text-green-500 hover:text-green-700 focus:outline-none transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div id="error-alert" class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                </div>
+                <div class="ml-3 flex-shrink-0">
+                    <button onclick="this.closest('#error-alert').remove()" 
+                            class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Page Header -->
     <div class="flex items-center justify-between">
         <div>
@@ -158,15 +205,16 @@
         <!-- Sidebar -->
         <div class="space-y-6">
             <!-- Order Status -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="bg-white rounded-lg shadow-sm p-6 relative overflow-visible">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Status</h3>
-                <div class="space-y-3">
-                    <div>
-                        <p class="text-sm text-gray-600">Current Status</p>
-                        <span class="inline-block mt-1 px-3 py-1 text-sm font-semibold rounded-full bg-{{ $order->status_color }}-100 text-{{ $order->status_color }}-800">
-                            {{ ucfirst($order->status) }}
-                        </span>
-                    </div>
+                
+                <!-- Status Update Section -->
+                <div class="mb-6">
+                    @livewire('order.order-status-updater', ['order' => $order, 'availableStatuses' => $availableStatuses])
+                </div>
+
+                <!-- Additional Status Information -->
+                <div class="space-y-3 pt-6 border-t border-gray-200">
                     <div>
                         <p class="text-sm text-gray-600">Payment Status</p>
                         <span class="inline-block mt-1 px-3 py-1 text-sm font-semibold rounded-full bg-{{ $order->payment_status_color }}-100 text-{{ $order->payment_status_color }}-800">
@@ -197,9 +245,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Update Status -->
-            @livewire('order.order-status-updater', ['order' => $order, 'availableStatuses' => $availableStatuses])
 
             <!-- Customer Information -->
             <div class="bg-white rounded-lg shadow-sm p-6">

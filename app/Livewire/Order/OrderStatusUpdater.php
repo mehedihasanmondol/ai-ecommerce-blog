@@ -15,6 +15,8 @@ class OrderStatusUpdater extends Component
     public string $trackingNumber = '';
     public string $carrier = '';
     public array $availableStatuses = [];
+    public bool $showNoteForm = false;
+    public string $pendingStatus = '';
 
     protected $rules = [
         'newStatus' => 'required|string',
@@ -31,6 +33,18 @@ class OrderStatusUpdater extends Component
         $this->newStatus = $order->status;
         $this->trackingNumber = $order->tracking_number ?? '';
         $this->carrier = $order->carrier ?? '';
+    }
+
+    public function updatedNewStatus($value)
+    {
+        // When status changes, show note form
+        if ($value !== $this->order->status) {
+            $this->pendingStatus = $value;
+            $this->showNoteForm = true;
+        } else {
+            $this->showNoteForm = false;
+            $this->pendingStatus = '';
+        }
     }
 
     public function updateStatus()
@@ -56,23 +70,32 @@ class OrderStatusUpdater extends Component
                 $this->notifyCustomer
             );
 
-            // Refresh order
-            $this->order->refresh();
-
-            // Update available statuses
-            $this->availableStatuses = $statusService->getAvailableStatuses($this->order);
-
-            // Clear notes
-            $this->notes = '';
-
+            // Flash success message and redirect to refresh page
             session()->flash('success', 'Order status updated successfully.');
-
-            // Emit event to refresh page components
-            $this->dispatch('orderUpdated');
+            
+            return redirect()->route('admin.orders.show', $this->order);
 
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update status: ' . $e->getMessage());
+            
+            return redirect()->route('admin.orders.show', $this->order);
         }
+    }
+
+    public function skipNote()
+    {
+        // Update status without note
+        $this->notes = '';
+        $this->updateStatus();
+    }
+
+    public function cancelStatusChange()
+    {
+        // Revert to original status
+        $this->newStatus = $this->order->status;
+        $this->showNoteForm = false;
+        $this->pendingStatus = '';
+        $this->notes = '';
     }
 
     public function render()
