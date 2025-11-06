@@ -56,7 +56,7 @@
                                 @endphp
                                 
                                 @if($primaryImage)
-                                    <img src="{{ asset('storage/' . $primaryImage->path) }}" 
+                                    <img src="{{ asset('storage/' . $primaryImage->image_path) }}" 
                                          alt="{{ $product->name }}"
                                          class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-200">
                                 @else

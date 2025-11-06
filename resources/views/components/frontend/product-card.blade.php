@@ -54,7 +54,7 @@
         <div class="relative overflow-hidden rounded-t-lg bg-gray-100">
             @if($image)
                 <img 
-                    src="{{ asset('storage/' . $image->path) }}" 
+                    src="{{ asset('storage/' . $image->image_path) }}" 
                     alt="{{ $product->name }}" 
                     class="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
                 >
