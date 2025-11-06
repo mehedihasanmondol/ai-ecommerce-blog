@@ -20,6 +20,9 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('cat
 Route::get('/brands', [\App\Http\Controllers\BrandController::class, 'index'])->name('brands.index');
 Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('brands.show');
 
+// Public Product Routes (must be last to avoid conflicts)
+Route::get('/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

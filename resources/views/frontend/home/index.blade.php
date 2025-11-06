@@ -11,6 +11,17 @@
 <!-- Hero Slider -->
 <x-frontend.hero-slider />
 
+<!-- Recommended Products Slider -->
+@php
+    // Use featured products, or fallback to new arrivals if no featured products
+    $recommendedProducts = $featuredProducts->count() > 0 ? $featuredProducts : $newArrivals;
+@endphp
+
+{{-- Debug: Show product count --}}
+<!-- DEBUG: Featured Products: {{ $featuredProducts->count() }}, New Arrivals: {{ $newArrivals->count() }}, Recommended: {{ $recommendedProducts->count() }} -->
+
+<x-frontend.recommended-slider :products="$recommendedProducts" />
+
 <!-- Featured Categories -->
 @if($featuredCategories->count() > 0)
 <section id="categories" class="py-12 bg-white">

@@ -33,23 +33,23 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Get featured products (limit 8)
-        $featuredProducts = Product::with(['defaultVariant', 'category', 'brand', 'images'])
-            ->where('status', 'active')
+        // Get featured products (limit 12 for slider)
+        $featuredProducts = Product::with(['variants', 'category', 'brand', 'images'])
+            ->where('is_active', true)
             ->where('is_featured', true)
-            ->limit(8)
+            ->limit(12)
             ->get();
 
         // Get new arrivals (latest 8 products)
-        $newArrivals = Product::with(['defaultVariant', 'category', 'brand', 'images'])
-            ->where('status', 'active')
+        $newArrivals = Product::with(['variants', 'category', 'brand', 'images'])
+            ->where('is_active', true)
             ->latest()
             ->limit(8)
             ->get();
 
         // Get best sellers (products with most orders - placeholder for now)
-        $bestSellers = Product::with(['defaultVariant', 'category', 'brand', 'images'])
-            ->where('status', 'active')
+        $bestSellers = Product::with(['variants', 'category', 'brand', 'images'])
+            ->where('is_active', true)
             ->inRandomOrder()
             ->limit(8)
             ->get();
@@ -81,8 +81,8 @@ class HomeController extends Controller
      */
     public function shop()
     {
-        $products = Product::with(['defaultVariant', 'category', 'brand', 'images'])
-            ->where('status', 'active')
+        $products = Product::with(['variants', 'category', 'brand', 'images'])
+            ->where('is_active', true)
             ->paginate(24);
 
         $categories = Category::where('is_active', true)->get();

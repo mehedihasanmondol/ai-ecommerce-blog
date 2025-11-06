@@ -15,16 +15,41 @@
 @props(['product'])
 
 @php
-    $variant = $product->defaultVariant;
-    $price = $variant ? ($variant->sale_price ?? $variant->price) : 0;
-    $originalPrice = $variant && $variant->sale_price ? $variant->price : null;
-    $discount = $originalPrice ? round((($originalPrice - $price) / $originalPrice) * 100) : 0;
-    $inStock = $variant && $variant->stock_quantity > 0;
-    $image = $product->images->first();
+    // Get default variant - handle both defaultVariant relationship and variants collection
+    $variant = null;
+    
+    // Try to get the variant
+    if (isset($product->defaultVariant) && !is_null($product->defaultVariant)) {
+        $variant = $product->defaultVariant;
+    } elseif (isset($product->variants) && is_object($product->variants) && method_exists($product->variants, 'isNotEmpty') && $product->variants->isNotEmpty()) {
+        $defaultVariant = $product->variants->where('is_default', true)->first();
+        $variant = $defaultVariant ?? $product->variants->first();
+    }
+    
+    // Ensure $variant is an object, not a collection
+    if ($variant && is_object($variant) && method_exists($variant, 'toArray')) {
+        // It's still a collection, get the first item
+        $variant = $variant->first();
+    }
+    
+    // Now safely access properties
+    $price = 0;
+    $originalPrice = null;
+    $discount = 0;
+    $inStock = false;
+    
+    if ($variant && is_object($variant)) {
+        $price = $variant->sale_price ?? $variant->price ?? 0;
+        $originalPrice = ($variant->sale_price ?? null) ? ($variant->price ?? null) : null;
+        $discount = $originalPrice ? round((($originalPrice - $price) / $originalPrice) * 100) : 0;
+        $inStock = ($variant->stock_quantity ?? 0) > 0;
+    }
+    
+    $image = isset($product->images) && is_object($product->images) && method_exists($product->images, 'isNotEmpty') && $product->images->isNotEmpty() ? $product->images->first() : null;
 @endphp
 
 <div class="bg-white rounded-lg shadow-sm hover:shadow-lg transition group">
-    <a href="#" class="block">
+    <a href="{{ route('products.show', $product->slug) }}" class="block">
         <!-- Product Image -->
         <div class="relative overflow-hidden rounded-t-lg bg-gray-100">
             @if($image)
