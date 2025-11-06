@@ -7,6 +7,7 @@ use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
 use App\Models\SaleOffer;
+use App\Models\TrendingProduct;
 
 /**
  * ModuleName: Home Controller
@@ -75,13 +76,22 @@ class HomeController extends Controller
             ->pluck('product')
             ->filter(fn($product) => $product && $product->is_active);
 
+        // Get trending products
+        $trendingProducts = TrendingProduct::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->pluck('product')
+            ->filter(fn($product) => $product && $product->is_active);
+
         return view('frontend.home.index', compact(
             'featuredProducts',
             'newArrivals',
             'bestSellers',
             'featuredCategories',
             'featuredBrands',
-            'saleOffers'
+            'saleOffers',
+            'trendingProducts'
         ));
     }
 

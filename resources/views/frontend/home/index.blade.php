@@ -28,6 +28,9 @@
 <!-- Shop by Category Section -->
 <x-frontend.shop-by-category :categories="$featuredCategories" />
 
+<!-- Trending Products Section -->
+<x-frontend.trending-products :products="$trendingProducts" />
+
 <!-- Promotional Banner -->
 <section class="py-12 bg-gradient-to-r from-green-600 to-green-700 text-white">
     <div class="container mx-auto px-4">

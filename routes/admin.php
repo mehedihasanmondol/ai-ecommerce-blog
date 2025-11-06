@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\TrendingProductController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -64,4 +65,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Customer Management Routes
     Route::post('customers/{id}/update-info', [CustomerController::class, 'updateInfo'])
         ->name('customers.update-info');
+    
+    // Trending Products Management Routes
+    Route::get('trending-products/search', [TrendingProductController::class, 'searchProducts'])->name('trending-products.search');
+    Route::get('trending-products', [TrendingProductController::class, 'index'])->name('trending-products.index');
+    Route::post('trending-products', [TrendingProductController::class, 'store'])->name('trending-products.store');
+    Route::post('trending-products/update-order', [TrendingProductController::class, 'updateOrder'])->name('trending-products.update-order');
+    Route::post('trending-products/{trendingProduct}/toggle-status', [TrendingProductController::class, 'toggleStatus'])->name('trending-products.toggle-status');
+    Route::delete('trending-products/{trendingProduct}', [TrendingProductController::class, 'destroy'])->name('trending-products.destroy');
 });

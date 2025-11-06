@@ -103,6 +103,11 @@ class Product extends Model
         return $this->hasOne(\App\Models\SaleOffer::class);
     }
 
+    public function trendingProduct(): HasOne
+    {
+        return $this->hasOne(\App\Models\TrendingProduct::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

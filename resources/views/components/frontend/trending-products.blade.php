@@ -5,7 +5,7 @@
     <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Recommended for you</h2>
+            <h2 class="text-2xl font-bold text-gray-900">Trending now</h2>
             <a href="#" class="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">
                 Shop all
             </a>
@@ -15,7 +15,7 @@
         <div class="relative">
             <!-- Navigation Buttons -->
             <button 
-                id="recommended-prev" 
+                id="trending-prev" 
                 class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition hidden md:block"
                 aria-label="Previous"
             >
@@ -25,7 +25,7 @@
             </button>
             
             <button 
-                id="recommended-next" 
+                id="trending-next" 
                 class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition hidden md:block"
                 aria-label="Next"
             >
@@ -36,10 +36,10 @@
 
             <!-- Products Container -->
             <div class="overflow-hidden">
-                <div id="recommended-slider" class="flex gap-4 transition-transform duration-300 ease-in-out">
+                <div id="trending-slider" class="flex gap-4 transition-transform duration-300 ease-in-out">
                     @foreach($products as $product)
                         <div class="flex-none w-[calc(100%-1rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(20%-0.8rem)]">
-                            <a href="{{ route('products.show', $product->slug) }}" class="block group">
+                            <a href="{{ route('products.show', $product->slug ?? $product->id) }}" class="block group">
                                 <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
                                     <!-- Product Image -->
                                     <div class="relative aspect-square overflow-hidden bg-gray-100">
@@ -119,6 +119,7 @@
                     @endforeach
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -126,9 +127,9 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const slider = document.getElementById('recommended-slider');
-        const prevBtn = document.getElementById('recommended-prev');
-        const nextBtn = document.getElementById('recommended-next');
+        const slider = document.getElementById('trending-slider');
+        const prevBtn = document.getElementById('trending-prev');
+        const nextBtn = document.getElementById('trending-next');
         
         if (!slider || !prevBtn || !nextBtn) return;
 
