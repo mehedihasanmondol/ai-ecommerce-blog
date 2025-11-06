@@ -33,4 +33,7 @@
 
 <!-- Best Sellers Section -->
 <x-frontend.best-sellers :products="$bestSellerProducts" />
+
+<!-- New Arrivals Section -->
+<x-frontend.new-arrivals :products="$newArrivalProducts" />
 @endsection

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TrendingProductController;
 use App\Http\Controllers\Admin\BestSellerProductController;
+use App\Http\Controllers\Admin\NewArrivalProductController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -82,4 +83,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('best-seller-products/update-order', [BestSellerProductController::class, 'updateOrder'])->name('best-seller-products.update-order');
     Route::post('best-seller-products/{bestSellerProduct}/toggle-status', [BestSellerProductController::class, 'toggleStatus'])->name('best-seller-products.toggle-status');
     Route::delete('best-seller-products/{bestSellerProduct}', [BestSellerProductController::class, 'destroy'])->name('best-seller-products.destroy');
+    
+    // New Arrival Products Management Routes
+    Route::get('new-arrival-products/search', [NewArrivalProductController::class, 'searchProducts'])->name('new-arrival-products.search');
+    Route::get('new-arrival-products', [NewArrivalProductController::class, 'index'])->name('new-arrival-products.index');
+    Route::post('new-arrival-products', [NewArrivalProductController::class, 'store'])->name('new-arrival-products.store');
+    Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
+    Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
+    Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
 });
