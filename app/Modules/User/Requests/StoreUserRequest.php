@@ -31,7 +31,7 @@ class StoreUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'mobile' => ['nullable', 'string', 'max:20', 'unique:users,mobile'],
-            'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers()],
+            'password' => ['required', 'string', 'min:4'],
             'role' => ['required', 'in:admin,customer'],
             'is_active' => ['boolean'],
             'avatar' => ['nullable', 'image', 'max:2048'], // 2MB max
