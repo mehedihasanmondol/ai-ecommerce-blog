@@ -9,6 +9,7 @@
  * - Slide name indicators (instead of dots)
  * - Pause on hover
  * - Full-width banner images
+ * - Database-driven content
  * 
  * @category Frontend
  * @package  Components
@@ -16,38 +17,31 @@
  */
 --}}
 
+@php
+    $sliders = \App\Models\HeroSlider::getActive();
+@endphp
+
+@if($sliders->isEmpty())
+    <!-- No sliders available -->
+    <div class="bg-gray-100 py-16 text-center">
+        <p class="text-gray-500">No sliders available</p>
+    </div>
+@else
 <section class="relative overflow-visible bg-gray-100 mb-8" 
          x-data="{ 
             currentSlide: 0,
             autoplayInterval: null,
             isPlaying: true,
-            slides: [
-                {
-                    title: 'Up to 70% off',
-                    subtitle: 'iHerb Brands',
-                    image: 'https://via.placeholder.com/1920x400/1e3a8a/ffffff?text=Nutricost+-+Take+control+of+your+health'
-                },
-                {
-                    title: 'Trusted Brands',
-                    subtitle: 'Up to 20% off',
-                    image: 'https://via.placeholder.com/1920x400/059669/ffffff?text=Trusted+Brands+-+Shop+Now'
-                },
-                {
-                    title: 'Wellness Hub',
-                    subtitle: 'Learn More',
-                    image: 'https://via.placeholder.com/1920x400/7c3aed/ffffff?text=Wellness+Hub+-+Discover+Health'
-                },
-                {
-                    title: '20 High-Fibre Foods',
-                    subtitle: 'Find out more',
-                    image: 'https://via.placeholder.com/1920x400/dc2626/ffffff?text=High+Fibre+Foods+-+Nutrition+Guide'
-                },
-                {
-                    title: 'Nutricost',
-                    subtitle: 'Shop now',
-                    image: 'https://via.placeholder.com/1920x400/ea580c/ffffff?text=Nutricost+-+Premium+Supplements'
-                }
-            ],
+            slides: @js($sliders->map(function($slider) {
+                return [
+                    'id' => $slider->id,
+                    'title' => $slider->title,
+                    'subtitle' => $slider->subtitle,
+                    'image' => $slider->image_url,
+                    'link' => $slider->link,
+                    'button_text' => $slider->button_text,
+                ];
+            })->values()),
             init() {
                 this.startAutoplay();
             },
@@ -155,3 +149,4 @@
         </svg>
     </button>
 </section>
+@endif

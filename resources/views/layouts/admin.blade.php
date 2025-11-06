@@ -197,6 +197,15 @@
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                 </div>
                 
+                <a href="{{ route('admin.homepage-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.homepage-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-home w-5 mr-3"></i>
+                    <span>Homepage Settings</span>
+                    @if(request()->routeIs('admin.homepage-settings.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
                 <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
                     <i class="fas fa-blog w-5 mr-3"></i>
                     <span>Blog Posts</span>
@@ -299,6 +308,16 @@
                     <i class="fas fa-sliders-h w-5 mr-3"></i>
                     <span>Attributes</span>
                 </a>
+
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
+                </div>
+                
+                <a href="{{ route('admin.homepage-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.homepage-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-home w-5 mr-3"></i>
+                    <span>Homepage Settings</span>
+                </a>
             </nav>
         </aside>
 
@@ -364,6 +383,7 @@
     <!-- Alert Components -->
     <x-confirm-modal />
     <x-alert-toast />
+    <x-toast-notification />
 
     @stack('scripts')
 </body>
