@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TrendingProductController;
 use App\Http\Controllers\Admin\BestSellerProductController;
 use App\Http\Controllers\Admin\NewArrivalProductController;
+use App\Http\Controllers\Admin\FooterManagementController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -91,4 +92,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
     Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
     Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
+    
+    // Footer Management Routes
+    Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
+    Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
+    Route::post('footer-management/links', [FooterManagementController::class, 'storeLink'])->name('footer-management.store-link');
+    Route::put('footer-management/links/{link}', [FooterManagementController::class, 'updateLink'])->name('footer-management.update-link');
+    Route::delete('footer-management/links/{link}', [FooterManagementController::class, 'deleteLink'])->name('footer-management.delete-link');
+    Route::post('footer-management/blog-posts', [FooterManagementController::class, 'storeBlogPost'])->name('footer-management.store-blog');
+    Route::delete('footer-management/blog-posts/{blogPost}', [FooterManagementController::class, 'deleteBlogPost'])->name('footer-management.delete-blog');
 });
