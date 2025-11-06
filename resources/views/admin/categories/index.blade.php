@@ -230,13 +230,19 @@
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </form>
-                            <form action="{{ route('admin.categories.destroy', $category) }}" 
+                            <form id="delete-category-{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" 
                                   method="POST" 
-                                  class="inline"
-                                  onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                  class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
+                                <button type="button"
+                                        onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                            detail: { 
+                                                title: 'Delete Category', 
+                                                message: 'Are you sure you want to delete this category?',
+                                                onConfirm: () => document.getElementById('delete-category-{{ $category->id }}').submit()
+                                            } 
+                                        }))" 
                                         class="text-red-600 hover:text-red-900"
                                         title="Delete">
                                     <i class="fas fa-trash"></i>
@@ -285,11 +291,15 @@ function toggleStatus(categoryId) {
         if (data.success) {
             location.reload();
         } else {
-            alert('Failed to update status: ' + data.message);
+            window.dispatchEvent(new CustomEvent('alert-toast', { 
+                detail: { type: 'error', message: 'Failed to update status: ' + data.message } 
+            }));
         }
     })
     .catch(error => {
-        alert('Error: ' + error);
+        window.dispatchEvent(new CustomEvent('alert-toast', { 
+            detail: { type: 'error', message: 'Error: ' + error } 
+        }));
     });
 }
 </script>

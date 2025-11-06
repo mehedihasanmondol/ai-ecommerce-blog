@@ -173,10 +173,16 @@
 
                 <!-- Actions -->
                 @if($order->canBeCancelled())
-                    <form action="{{ route('customer.orders.cancel', $order) }}" method="POST" 
-                          onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                    <form id="cancel-customer-order-form" action="{{ route('customer.orders.cancel', $order) }}" method="POST">
                         @csrf
-                        <button type="submit" 
+                        <button type="button" 
+                                onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                    detail: { 
+                                        title: 'Cancel Order', 
+                                        message: 'Are you sure you want to cancel this order? This action cannot be undone.',
+                                        onConfirm: () => document.getElementById('cancel-customer-order-form').submit()
+                                    } 
+                                }))"
                                 class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                             Cancel Order
                         </button>

@@ -21,6 +21,10 @@
         @yield('content')
     </div>
 
+    <!-- Alert Components -->
+    <x-confirm-modal />
+    <x-alert-toast />
+
     @stack('scripts')
 </body>
 </html>

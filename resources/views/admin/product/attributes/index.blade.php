@@ -107,13 +107,20 @@
                                class="text-blue-600 hover:text-blue-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('admin.attributes.destroy', $attribute) }}" 
+                            <form id="delete-attribute-{{ $attribute->id }}" action="{{ route('admin.attributes.destroy', $attribute) }}" 
                                   method="POST" 
-                                  class="inline"
-                                  onsubmit="return confirm('Are you sure you want to delete this attribute?');">
+                                  class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                <button type="button"
+                                        onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                            detail: { 
+                                                title: 'Delete Attribute', 
+                                                message: 'Are you sure you want to delete this attribute?',
+                                                onConfirm: () => document.getElementById('delete-attribute-{{ $attribute->id }}').submit()
+                                            } 
+                                        }))"
+                                        class="text-red-600 hover:text-red-900">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

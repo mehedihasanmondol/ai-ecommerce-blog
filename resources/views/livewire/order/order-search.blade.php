@@ -154,9 +154,45 @@
         </div>
 
         <!-- Pagination -->
-        @if($orders->hasPages())
-        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            {{ $orders->links() }}
+        @if($orders->hasPages() || $orders->total() > 0)
+        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="perPage" class="text-sm text-gray-700">Show</label>
+                        <select wire:model.live="perPage" 
+                                id="perPage"
+                                class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="text-sm text-gray-700">entries</span>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} results
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    @if($orders->hasPages() && $orders->lastPage() > 1)
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-700">Go to page:</span>
+                        <input type="number" 
+                               wire:model.live="gotoPage"
+                               min="1" 
+                               max="{{ $orders->lastPage() }}"
+                               placeholder="{{ $orders->currentPage() }}"
+                               class="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <span class="text-sm text-gray-500">of {{ $orders->lastPage() }}</span>
+                    </div>
+                    @endif
+                    <div>
+                        {{ $orders->onEachSide(1)->links() }}
+                    </div>
+                </div>
+            </div>
         </div>
         @endif
     </div>

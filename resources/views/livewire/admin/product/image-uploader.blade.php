@@ -82,8 +82,14 @@
                         </button>
                         @endif
                         
-                        <button wire:click="deleteImage({{ $image['id'] }})"
-                                onclick="return confirm('Are you sure you want to delete this image?')"
+                        <button type="button"
+                                onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                    detail: { 
+                                        title: 'Delete Image', 
+                                        message: 'Are you sure you want to delete this image?',
+                                        onConfirm: () => @this.call('deleteImage', {{ $image['id'] }})
+                                    } 
+                                }))"
                                 class="p-2 bg-white rounded-full text-red-600 hover:bg-red-50 transition-colors"
                                 title="Delete image">
                             <i class="fas fa-trash"></i>

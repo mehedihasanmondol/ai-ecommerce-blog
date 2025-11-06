@@ -4,53 +4,6 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Success/Error Alerts -->
-    @if (session()->has('success'))
-        <div id="success-alert" class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-md">
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-                </div>
-                <div class="ml-3 flex-shrink-0">
-                    <button onclick="this.closest('#success-alert').remove()" 
-                            class="inline-flex text-green-500 hover:text-green-700 focus:outline-none transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    @if (session()->has('error'))
-        <div id="error-alert" class="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-3 flex-1">
-                    <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
-                </div>
-                <div class="ml-3 flex-shrink-0">
-                    <button onclick="this.closest('#error-alert').remove()" 
-                            class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    @endif
-
     <!-- Page Header -->
     <div class="flex items-center justify-between">
         <div>
@@ -297,10 +250,16 @@
 
             <!-- Actions -->
             @if($order->canBeCancelled())
-                <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" 
-                      onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                <form id="cancel-order-form" action="{{ route('admin.orders.cancel', $order) }}" method="POST">
                     @csrf
-                    <button type="submit" 
+                    <button type="button" 
+                            onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                detail: { 
+                                    title: 'Cancel Order', 
+                                    message: 'Are you sure you want to cancel this order? This action cannot be undone.',
+                                    onConfirm: () => document.getElementById('cancel-order-form').submit()
+                                } 
+                            }))"
                             class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                         Cancel Order
                     </button>

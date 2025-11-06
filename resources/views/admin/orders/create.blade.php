@@ -4,85 +4,6 @@
 
 @section('content')
 <div class="space-y-4" x-data="orderForm()" x-cloak @product-selected.window="addSelectedProduct($event.detail.productData || $event.detail)">
-    <!-- Validation Errors Alert -->
-    @if ($errors->any())
-    <div id="validation-alert" class="no-auto-hide bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div class="ml-3 flex-1">
-                <h3 class="text-sm font-semibold text-red-800 mb-2">
-                    Please fix the following errors:
-                </h3>
-                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-            <div class="ml-3 flex-shrink-0">
-                <button onclick="document.getElementById('validation-alert').style.display='none'" 
-                        class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- Success Message Alert -->
-    @if (session('success'))
-    <div id="success-alert" class="no-auto-hide bg-green-50 border-l-4 border-green-500 rounded-lg p-4 shadow-md">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div class="ml-3 flex-1">
-                <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-            </div>
-            <div class="ml-3 flex-shrink-0">
-                <button onclick="document.getElementById('success-alert').style.display='none'" 
-                        class="inline-flex text-green-500 hover:text-green-700 focus:outline-none transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- Error Message Alert -->
-    @if (session('error'))
-    <div id="error-alert" class="no-auto-hide bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-md">
-        <div class="flex items-start">
-            <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div class="ml-3 flex-1">
-                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
-            </div>
-            <div class="ml-3 flex-shrink-0">
-                <button onclick="document.getElementById('error-alert').style.display='none'" 
-                        class="inline-flex text-red-500 hover:text-red-700 focus:outline-none transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    @endif
-
     <!-- Sticky Header with Live Summary & Actions -->
     <div class="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg sticky top-16 z-20">
         <div class="px-4 py-4">
@@ -247,7 +168,7 @@
         </div>
     </div>
 
-    <form id="order-form" action="{{ route('admin.orders.store') }}" method="POST" @submit="if(items.length === 0) { alert('Please add at least one product to the order'); $event.preventDefault(); return false; }">
+    <form id="order-form" action="{{ route('admin.orders.store') }}" method="POST" @submit="if(items.length === 0) { window.dispatchEvent(new CustomEvent('alert-toast', { detail: { type: 'error', message: 'Please add at least one product to the order' } })); $event.preventDefault(); return false; }">
         @csrf
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -856,14 +777,20 @@ function orderForm() {
                     this.customerDataChanged = false;
                     
                     // Show success message
-                    alert('Customer profile updated successfully!');
+                    window.dispatchEvent(new CustomEvent('alert-toast', { 
+                        detail: { type: 'success', message: 'Customer profile updated successfully!' } 
+                    }));
                 } else {
-                    alert('Failed to update customer profile: ' + (data.message || 'Unknown error'));
+                    window.dispatchEvent(new CustomEvent('alert-toast', { 
+                        detail: { type: 'error', message: 'Failed to update customer profile: ' + (data.message || 'Unknown error') } 
+                    }));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to update customer profile. Please try again.');
+                window.dispatchEvent(new CustomEvent('alert-toast', { 
+                    detail: { type: 'error', message: 'Failed to update customer profile. Please try again.' } 
+                }));
             });
         },
         

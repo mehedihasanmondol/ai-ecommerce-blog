@@ -313,7 +313,7 @@
                         <i class="fas fa-check-circle mr-3"></i>
                         <span>{{ session('success') }}</span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-green-600 hover:text-green-800">
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-green-600 hover:text-green-800">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -327,7 +327,7 @@
                         <i class="fas fa-exclamation-circle mr-3"></i>
                         <span>{{ session('error') }}</span>
                     </div>
-                    <button onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -361,19 +361,9 @@
 
     @livewireScripts
 
-    <!-- Auto-hide flash messages -->
-    <script>
-        setTimeout(() => {
-            document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"]').forEach(el => {
-                // Skip elements with no-auto-hide class
-                if (!el.classList.contains('no-auto-hide')) {
-                    el.style.transition = 'opacity 0.5s';
-                    el.style.opacity = '0';
-                    setTimeout(() => el.remove(), 500);
-                }
-            });
-        }, 5000);
-    </script>
+    <!-- Alert Components -->
+    <x-confirm-modal />
+    <x-alert-toast />
 
     @stack('scripts')
 </body>

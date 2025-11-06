@@ -17,6 +17,7 @@ class OrderSearch extends Component
     public string $dateTo = '';
     public int $perPage = 15;
     public bool $showFilters = false;
+    public $gotoPage = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -39,6 +40,19 @@ class OrderSearch extends Component
     public function updatingPaymentStatus()
     {
         $this->resetPage();
+    }
+
+    public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedGotoPage($value)
+    {
+        if ($value && is_numeric($value) && $value > 0) {
+            $this->setPage((int) $value);
+            $this->gotoPage = null;
+        }
     }
 
     public function clearFilters()

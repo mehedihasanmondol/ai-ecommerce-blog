@@ -45,13 +45,19 @@
                    class="flex-1 text-center px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
                     <i class="fas fa-edit mr-1"></i>Edit
                 </a>
-                <form action="{{ route('admin.roles.destroy', $role->id) }}" 
+                <form id="delete-role-{{ $role->id }}" action="{{ route('admin.roles.destroy', $role->id) }}" 
                       method="POST" 
-                      class="flex-1"
-                      onsubmit="return confirm('Delete this role?');">
+                      class="flex-1">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" 
+                    <button type="button"
+                            onclick="window.dispatchEvent(new CustomEvent('confirm-modal', { 
+                                detail: { 
+                                    title: 'Delete Role', 
+                                    message: 'Are you sure you want to delete this role?',
+                                    onConfirm: () => document.getElementById('delete-role-{{ $role->id }}').submit()
+                                } 
+                            }))" 
                             class="w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100">
                         <i class="fas fa-trash mr-1"></i>Delete
                     </button>
