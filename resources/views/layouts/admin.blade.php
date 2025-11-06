@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: true, mobileMenuOpen: false }">
