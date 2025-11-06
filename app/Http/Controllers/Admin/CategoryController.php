@@ -30,7 +30,7 @@ class CategoryController extends Controller
         $parentCategories = Category::whereNull('parent_id')
             ->where('is_active', true)
             ->orderBy('name')
-            ->get();
+            ->pluck('name', 'id');
 
         return view('admin.categories.create', compact('parentCategories'));
     }
@@ -48,8 +48,28 @@ class CategoryController extends Controller
             'slug' => 'required|string|max:255|unique:categories',
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:255',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|url|max:255',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        // Set default sort_order if not provided
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
+        // Handle is_active checkbox
+        $validated['is_active'] = $request->has('is_active');
 
         Category::create($validated);
 
@@ -69,7 +89,7 @@ class CategoryController extends Controller
             ->where('is_active', true)
             ->where('id', '!=', $category->id)
             ->orderBy('name')
-            ->get();
+            ->pluck('name', 'id');
 
         return view('admin.categories.edit', compact('category', 'parentCategories'));
     }
@@ -88,8 +108,35 @@ class CategoryController extends Controller
             'slug' => 'required|string|max:255|unique:categories,slug,' . $category->id,
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+            'canonical_url' => 'nullable|url|max:255',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:500',
+            'og_image' => 'nullable|url|max:255',
         ]);
+
+        // Handle image removal
+        if ($request->has('remove_image') && $category->image) {
+            \Storage::disk('public')->delete($category->image);
+            $validated['image'] = null;
+        }
+
+        // Handle new image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image) {
+                \Storage::disk('public')->delete($category->image);
+            }
+            $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        // Handle is_active checkbox
+        $validated['is_active'] = $request->has('is_active');
 
         $category->update($validated);
 
