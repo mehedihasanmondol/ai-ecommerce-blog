@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TrendingProductController;
+use App\Http\Controllers\Admin\BestSellerProductController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -73,4 +74,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('trending-products/update-order', [TrendingProductController::class, 'updateOrder'])->name('trending-products.update-order');
     Route::post('trending-products/{trendingProduct}/toggle-status', [TrendingProductController::class, 'toggleStatus'])->name('trending-products.toggle-status');
     Route::delete('trending-products/{trendingProduct}', [TrendingProductController::class, 'destroy'])->name('trending-products.destroy');
+    
+    // Best Seller Products Management Routes
+    Route::get('best-seller-products/search', [BestSellerProductController::class, 'searchProducts'])->name('best-seller-products.search');
+    Route::get('best-seller-products', [BestSellerProductController::class, 'index'])->name('best-seller-products.index');
+    Route::post('best-seller-products', [BestSellerProductController::class, 'store'])->name('best-seller-products.store');
+    Route::post('best-seller-products/update-order', [BestSellerProductController::class, 'updateOrder'])->name('best-seller-products.update-order');
+    Route::post('best-seller-products/{bestSellerProduct}/toggle-status', [BestSellerProductController::class, 'toggleStatus'])->name('best-seller-products.toggle-status');
+    Route::delete('best-seller-products/{bestSellerProduct}', [BestSellerProductController::class, 'destroy'])->name('best-seller-products.destroy');
 });

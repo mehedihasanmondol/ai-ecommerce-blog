@@ -8,6 +8,7 @@ use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
 use App\Models\SaleOffer;
 use App\Models\TrendingProduct;
+use App\Models\BestSellerProduct;
 
 /**
  * ModuleName: Home Controller
@@ -84,6 +85,14 @@ class HomeController extends Controller
             ->pluck('product')
             ->filter(fn($product) => $product && $product->is_active);
 
+        // Get best seller products
+        $bestSellerProducts = BestSellerProduct::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->pluck('product')
+            ->filter(fn($product) => $product && $product->is_active);
+
         return view('frontend.home.index', compact(
             'featuredProducts',
             'newArrivals',
@@ -91,7 +100,8 @@ class HomeController extends Controller
             'featuredCategories',
             'featuredBrands',
             'saleOffers',
-            'trendingProducts'
+            'trendingProducts',
+            'bestSellerProducts'
         ));
     }
 

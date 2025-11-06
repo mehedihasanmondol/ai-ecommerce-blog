@@ -108,6 +108,11 @@ class Product extends Model
         return $this->hasOne(\App\Models\TrendingProduct::class);
     }
 
+    public function bestSellerProduct(): HasOne
+    {
+        return $this->hasOne(\App\Models\BestSellerProduct::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {
