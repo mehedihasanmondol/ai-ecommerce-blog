@@ -6,6 +6,7 @@ use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Category\Repositories\CategoryRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\UploadedFile;
 
 /**
@@ -43,6 +44,9 @@ class CategoryService
             $data = $this->autoGenerateSeoFields($data);
 
             $category = $this->repository->create($data);
+
+            // Clear mega menu cache
+            $this->clearMegaMenuCache();
 
             DB::commit();
             return $category;
@@ -87,6 +91,9 @@ class CategoryService
 
             $this->repository->update($category, $data);
 
+            // Clear mega menu cache
+            $this->clearMegaMenuCache();
+
             DB::commit();
             return $category->fresh();
         } catch (\Exception $e) {
@@ -113,6 +120,9 @@ class CategoryService
             }
 
             $result = $this->repository->delete($category);
+
+            // Clear mega menu cache
+            $this->clearMegaMenuCache();
 
             DB::commit();
             return $result;
@@ -223,6 +233,14 @@ class CategoryService
         Storage::disk('public')->copy($originalPath, $newPath);
 
         return $newPath;
+    }
+
+    /**
+     * Clear mega menu cache
+     */
+    protected function clearMegaMenuCache(): void
+    {
+        Cache::forget('mega_menu_categories');
     }
 
     /**

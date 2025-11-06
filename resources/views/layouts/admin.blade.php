@@ -206,6 +206,15 @@
                     @endif
                 </a>
 
+                <a href="{{ route('admin.secondary-menu.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-bars w-5 mr-3"></i>
+                    <span>Secondary Menu</span>
+                    @if(request()->routeIs('admin.secondary-menu.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
                 <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
                     <i class="fas fa-blog w-5 mr-3"></i>
                     <span>Blog Posts</span>
@@ -317,6 +326,12 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.homepage-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-home w-5 mr-3"></i>
                     <span>Homepage Settings</span>
+                </a>
+
+                <a href="{{ route('admin.secondary-menu.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-bars w-5 mr-3"></i>
+                    <span>Secondary Menu</span>
                 </a>
             </nav>
         </aside>
