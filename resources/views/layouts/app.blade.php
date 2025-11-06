@@ -7,24 +7,36 @@
 
     <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'Home')</title>
 
+    <!-- SEO Meta Tags -->
+    @yield('meta')
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     
     @stack('styles')
 </head>
 <body class="antialiased bg-gray-50">
-    <div class="min-h-screen">
+    <!-- Header -->
+    <x-frontend.header />
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
         @yield('content')
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <x-frontend.footer />
 
     <!-- Alert Components -->
     <x-confirm-modal />
     <x-alert-toast />
 
     @stack('scripts')
+    @livewireScripts
 </body>
 </html>

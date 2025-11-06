@@ -17,7 +17,6 @@ This is a Laravel-based ecommerce and blog platform with stock management, finan
 
 ---
 
-
 ## Task Management System (Editor Workflow)
 
 - File Name: editor-task-management.md
@@ -46,6 +45,7 @@ This is a Laravel-based ecommerce and blog platform with stock management, finan
   - The file must always represent the current and accurate state of all ongoing and upcoming tasks.
   - No task should be performed without being logged or updated in this file.
 
+---
 
 ## Critical Rules - ALWAYS FOLLOW
 
@@ -417,8 +417,9 @@ public function destroy(Product $product)
 - Use transition and animation durations consistently (`duration-200`, `ease-in-out`)
 - Maintain consistent component naming:
   - `ButtonPrimary.blade.php`, `CardBase.blade.php`, `ModalConfirm.blade.php`
-- show an toast notification for admin panel crud actions
-- bulk action on every list data shown on admin panel. like: delete, export etc. as per data facility.
+- Show a toast notification for admin panel CRUD actions
+- Bulk action on every list data shown on admin panel. like: delete, export etc. as per data facility.
+
 ### 21. Social Login Implementation
 ```php
 // Use Laravel Socialite
@@ -437,6 +438,96 @@ composer require laravel/socialite
 // - Registration verification (OTP)
 // - Password reset
 ```
+
+### 23. Database Column Name Resolution Rule
+
+**CRITICAL: Before Creating New Columns or Migrations**
+
+When encountering a column name issue or missing column error:
+
+1. **First Check**: Look for relevant or alternative column names in the existing table schema
+2. **Use Existing Columns**: If a relevant or alternative name exists, use that column instead
+3. **DO NOT**: Create new columns or migrations if a suitable column already exists
+4. **DO NOT**: Rename existing columns without explicit approval
+
+**Examples:**
+
+**✅ Correct Approach:**
+```php
+// Error: Column 'user_id' not found in 'orders' table
+// Existing columns: customer_id
+
+// ✅ Use existing alternative
+Order::where('customer_id', $userId)->get();
+// Instead of creating new migration for user_id
+```
+
+**✅ Correct Approach:**
+```php
+// Error: Column 'product_name' not found
+// Existing columns: name, title
+
+// ✅ Use existing relevant column
+$product->name // or $product->title
+// Instead of adding product_name column
+```
+
+**❌ Wrong Approach:**
+```php
+// Error: Column 'thumbnail' not found
+// Existing columns: thumbnail_path, image_path
+
+// ❌ Creating new migration
+Schema::table('products', function (Blueprint $table) {
+    $table->string('thumbnail');
+});
+// This is WRONG - use existing thumbnail_path instead
+```
+
+**Column Name Mapping Strategy:**
+
+Before creating any migration, check for these common alternatives:
+
+| Looking For | Check These Alternatives |
+|------------|-------------------------|
+| user_id | customer_id, client_id, author_id, created_by |
+| product_name | name, title, product_title |
+| image | image_path, thumbnail_path, photo, picture |
+| description | details, content, body, text |
+| price | amount, cost, value, rate |
+| quantity | qty, stock, amount |
+| status | state, is_active, active, enabled |
+| created_at | date_created, created_date, timestamp |
+| phone | phone_number, mobile, contact |
+| address | location, address_line1, street |
+
+**Workflow:**
+
+1. **Error Occurs**: Column not found error appears
+2. **Inspect Schema**: Check existing table structure using:
+   - `php artisan db:table table_name`
+   - Database GUI tool
+   - Check migration files
+3. **Find Alternative**: Look for relevant or alternative column names
+4. **Use Existing**: Update code to use the existing column
+5. **Document**: Add comment explaining the column mapping if not obvious
+
+**When New Column IS Required:**
+
+Only create new columns if:
+- No relevant or alternative column exists in the table
+- The existing column has a completely different purpose/data type
+- Adding new functionality that genuinely needs new data storage
+- After confirming with project lead or documentation
+
+**Code Review Checklist:**
+
+Before committing any migration:
+- [ ] Verified no alternative column exists
+- [ ] Checked all column name variations
+- [ ] Reviewed existing table schema
+- [ ] Confirmed new column is genuinely needed
+- [ ] Documented reason for new column in migration
 
 ---
 
@@ -1127,28 +1218,6 @@ config/admin-search.php
 
 ---
 
-
-## also When Creating New Features or update features
-
-1. **Plan First**: Outline the feature structure
-2. **Create Migration**: Database schema (with proper indexes)
-3. **Create Model**: With relationships, soft deletes, and traits
-4. **Create Repository**: Database queries
-5. **Create Service**: Business logic
-6. **Create Controller**: HTTP handling (thin controllers)
-7. **Create Request**: Validation rules
-8. **Create Views**: Blade templates (use Livewire if interactive)
-9. **Create Routes**: Named routes
-10. **Write Tests**: Feature tests
-11. **Document**: Add to CHANGELOG.md and inline docs
-12. **Activity Log**: Add logging for important actions
-
----
-
-
-
-
-
 ## File Naming Conventions
 - Controllers: `ProductController.php`
 - Models: `Product.php`
@@ -1183,6 +1252,7 @@ chore(module): Maintenance tasks
 6. **Does this create new URLs? Ensure slug uniqueness across all content types**
 7. **For product features: Which product type(s) does this apply to?**
 8. **Does this involve stock/financial data? Always use variant_id**
+9. **Does this column already exist with a different name?**
 
 ---
 
@@ -1531,6 +1601,7 @@ php artisan activitylog:clean
 - Skip validation on user input
 - Expose sensitive data in API responses
 - Use `get()` or `all()` without pagination on large datasets
+- Create new columns without checking for existing alternatives first
 
 **ALWAYS:**
 - Install packages locally (npm/composer)
@@ -1545,6 +1616,8 @@ php artisan activitylog:clean
 - Maintain UI/UX consistency
 - Follow PSR-12 coding standards
 - Use Bengali for user-facing messages
+- Check existing table schema before creating new columns or migrations
+- Verify column name alternatives before adding new migrations
 
 ---
 
