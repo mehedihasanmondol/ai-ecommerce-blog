@@ -25,6 +25,9 @@
 <!-- Sale Offers Slider -->
 <x-frontend.sale-offers-slider :products="$saleOffers" />
 
+<!-- Shop by Category Section -->
+<x-frontend.shop-by-category :categories="$featuredCategories" />
+
 <!-- Featured Categories -->
 @if($featuredCategories->count() > 0)
 <section id="categories" class="py-12 bg-white">

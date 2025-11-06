@@ -71,6 +71,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/sale-offers/{saleOffer}', [\App\Http\Controllers\Admin\SaleOfferController::class, 'destroy'])->name('sale-offers.destroy');
     Route::post('/sale-offers/reorder', [\App\Http\Controllers\Admin\SaleOfferController::class, 'reorder'])->name('sale-offers.reorder');
     Route::patch('/sale-offers/{saleOffer}/toggle', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleStatus'])->name('sale-offers.toggle');
+    
+    // Category Management Routes
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 });
 
 // Customer Order Routes (Protected)

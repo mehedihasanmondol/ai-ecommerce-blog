@@ -55,9 +55,10 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        // Get featured categories (limit 6)
+        // Get all parent categories (for Shop by Category section)
         $featuredCategories = Category::where('is_active', true)
-            ->limit(6)
+            ->whereNull('parent_id')
+            ->orderBy('name')
             ->get();
 
         // Get featured brands (limit 12)

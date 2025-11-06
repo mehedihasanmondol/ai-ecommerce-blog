@@ -41,12 +41,7 @@ class SaleOfferController extends Controller
             ->ordered()
             ->get();
 
-        $availableProducts = Product::whereDoesntHave('saleOffer')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        return view('admin.sale-offers.index', compact('saleOffers', 'availableProducts'));
+        return view('admin.sale-offers.index', compact('saleOffers'));
     }
 
     /**

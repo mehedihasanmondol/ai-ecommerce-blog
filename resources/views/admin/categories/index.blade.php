@@ -80,53 +80,81 @@
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <form method="GET" action="{{ route('admin.categories.index') }}" class="flex flex-wrap gap-4">
-            <!-- Search -->
-            <div class="flex-1 min-w-[200px]">
-                <input type="text" 
-                       name="search" 
-                       value="{{ $filters['search'] ?? '' }}"
-                       placeholder="Search categories..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
+    <!-- Filters Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+            <form method="GET" action="{{ route('admin.categories.index') }}" id="filterForm">
+                <div class="flex items-center gap-4">
+                    <!-- Search -->
+                    <div class="flex-1">
+                        <div class="relative">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $filters['search'] ?? '' }}"
+                                   placeholder="Search categories..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                    </div>
 
-            <!-- Status Filter -->
-            <div class="w-48">
-                <select name="is_active" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Status</option>
-                    <option value="1" {{ ($filters['is_active'] ?? '') === '1' ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ ($filters['is_active'] ?? '') === '0' ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
+                    <!-- Filter Toggle -->
+                    <button type="button" 
+                            onclick="toggleFilters()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filters
+                    </button>
+                </div>
 
-            <!-- Parent Filter -->
-            <div class="w-48">
-                <select name="parent_id" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Categories</option>
-                    <option value="null" {{ ($filters['parent_id'] ?? '') === 'null' ? 'selected' : '' }}>Root Only</option>
-                    @foreach($parents as $parent)
-                        <option value="{{ $parent->id }}" {{ ($filters['parent_id'] ?? '') == $parent->id ? 'selected' : '' }}>
-                            {{ $parent->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Advanced Filters -->
+                <div id="advancedFilters" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200" style="display: {{ ($filters['is_active'] || $filters['parent_id']) ? 'grid' : 'none' }};">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select name="is_active" 
+                                onchange="this.form.submit()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Status</option>
+                            <option value="1" {{ ($filters['is_active'] ?? '') === '1' ? 'selected' : '' }}>Active</option>
+                            <option value="0" {{ ($filters['is_active'] ?? '') === '0' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
 
-            <!-- Buttons -->
-            <button type="submit" 
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                <i class="fas fa-search mr-2"></i>Filter
-            </button>
-            <a href="{{ route('admin.categories.index') }}" 
-               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
-                <i class="fas fa-redo mr-2"></i>Reset
-            </a>
-        </form>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
+                        <select name="parent_id" 
+                                onchange="this.form.submit()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Categories</option>
+                            <option value="null" {{ ($filters['parent_id'] ?? '') === 'null' ? 'selected' : '' }}>Root Only</option>
+                            @foreach($parents as $parent)
+                                <option value="{{ $parent->id }}" {{ ($filters['parent_id'] ?? '') == $parent->id ? 'selected' : '' }}>
+                                    {{ $parent->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <a href="{{ route('admin.categories.index') }}" 
+                           class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            Clear all filters
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <script>
+    function toggleFilters() {
+        const filters = document.getElementById('advancedFilters');
+        filters.style.display = filters.style.display === 'none' ? 'grid' : 'none';
+    }
+    </script>
 
     <!-- Categories Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden">

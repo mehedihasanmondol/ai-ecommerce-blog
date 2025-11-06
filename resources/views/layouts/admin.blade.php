@@ -406,8 +406,6 @@
 
     <!-- Alert Components -->
     <x-confirm-modal />
-    <x-alert-toast />
-    <x-toast-notification />
 
     @stack('scripts')
 </body>

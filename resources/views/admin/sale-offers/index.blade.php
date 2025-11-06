@@ -12,52 +12,19 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Add Product Form -->
+        <!-- Add Product Search -->
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">Add Product to Sale Offers</h2>
                 
-                <form action="{{ route('admin.sale-offers.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="mb-4">
-                        <label for="product_id" class="block text-sm font-medium text-gray-700 mb-2">
-                            Select Product
-                        </label>
-                        <select 
-                            name="product_id" 
-                            id="product_id" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 @error('product_id') border-red-500 @enderror"
-                            required
-                        >
-                            <option value="">-- Select Product --</option>
-                            @foreach($availableProducts as $product)
-                                <option value="{{ $product->id }}">{{ $product->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('product_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <button 
-                        type="submit" 
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition"
-                    >
-                        Add to Sale Offers
-                    </button>
-                </form>
+                <!-- Livewire Product Selector -->
+                @livewire('admin.sale-offer-product-selector')
 
                 <div class="mt-6 p-4 bg-blue-50 rounded-md">
                     <h3 class="text-sm font-semibold text-blue-900 mb-2">Tips:</h3>
                     <ul class="text-sm text-blue-800 space-y-1">
+                        <li>• Search by product name or SKU</li>
                         <li>• Drag and drop to reorder products</li>
                         <li>• Toggle status to show/hide offers</li>
                         <li>• Only active products are shown</li>
@@ -146,11 +113,16 @@
                                     </form>
 
                                     <!-- Delete -->
-                                    <form action="{{ route('admin.sale-offers.destroy', $offer) }}" method="POST" class="inline" onsubmit="return confirm('Remove this product from sale offers?')">
+                                    <form action="{{ route('admin.sale-offers.destroy', $offer) }}" method="POST" class="inline" id="delete-form-{{ $offer->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <button 
-                                            type="submit"
+                                            type="button"
+                                            @click="$dispatch('confirm-modal', {
+                                                title: 'Remove Sale Offer',
+                                                message: 'Are you sure you want to remove {{ addslashes($offer->product->name) }} from sale offers?',
+                                                onConfirm: () => document.getElementById('delete-form-{{ $offer->id }}').submit()
+                                            })"
                                             class="p-2 text-red-600 hover:bg-red-50 rounded-md transition"
                                         >
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
