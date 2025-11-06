@@ -8,32 +8,8 @@
 @endsection
 
 @section('content')
-<!-- Hero Banner -->
-<section class="bg-gradient-to-r from-green-50 to-blue-50 py-12">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-col lg:flex-row items-center justify-between">
-            <div class="lg:w-1/2 mb-8 lg:mb-0">
-                <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                    Welcome to Your Health & Wellness Store
-                </h1>
-                <p class="text-xl text-gray-600 mb-6">
-                    Discover premium supplements, beauty products, and wellness essentials at unbeatable prices.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#featured" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition text-center">
-                        Shop Now
-                    </a>
-                    <a href="#categories" class="bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300 px-8 py-3 rounded-lg font-medium transition text-center">
-                        Browse Categories
-                    </a>
-                </div>
-            </div>
-            <div class="lg:w-1/2">
-                <img src="https://via.placeholder.com/600x400?text=Hero+Banner" alt="Hero Banner" class="rounded-lg shadow-xl">
-            </div>
-        </div>
-    </div>
-</section>
+<!-- Hero Slider -->
+<x-frontend.hero-slider />
 
 <!-- Featured Categories -->
 @if($featuredCategories->count() > 0)
