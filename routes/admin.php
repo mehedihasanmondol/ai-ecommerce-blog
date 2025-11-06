@@ -46,8 +46,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('brands/{brand}/duplicate', [BrandController::class, 'duplicate'])
         ->name('brands.duplicate');
     
-    // Order Management Routes
-    Route::resource('orders', OrderController::class);
+    // Order Management Routes (explicit routes to avoid authorization issues)
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
         ->name('orders.update-status');
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])

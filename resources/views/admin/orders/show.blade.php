@@ -177,6 +177,24 @@
                         <p class="text-sm text-gray-600">Payment Method</p>
                         <p class="font-medium mt-1">{{ ucfirst(str_replace('_', ' ', $order->payment_method)) }}</p>
                     </div>
+                    <div class="pt-3 border-t border-gray-200">
+                        <div class="mb-2">
+                            <p class="text-sm text-gray-600">Shipping Carrier</p>
+                            @if($order->carrier)
+                                <p class="font-medium mt-1 text-green-600">✓ {{ $order->carrier }}</p>
+                            @else
+                                <p class="font-medium mt-1 text-orange-600">⚠ Not Assigned</p>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Tracking Number</p>
+                            @if($order->tracking_number)
+                                <p class="font-medium mt-1 font-mono text-blue-600">{{ $order->tracking_number }}</p>
+                            @else
+                                <p class="font-medium mt-1 text-gray-400">Not Available</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
 

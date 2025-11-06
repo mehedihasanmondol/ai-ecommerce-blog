@@ -22,6 +22,7 @@ class OrderController extends Controller
         protected OrderStatusService $statusService
     ) {
         // Middleware is applied in routes/admin.php
+        // No policy authorization needed - admin middleware handles access
     }
 
     /**
