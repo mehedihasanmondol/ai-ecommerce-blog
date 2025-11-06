@@ -20,13 +20,13 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('cat
 Route::get('/brands', [\App\Http\Controllers\BrandController::class, 'index'])->name('brands.index');
 Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('brands.show');
 
-// Public Product Routes (must be last to avoid conflicts)
-Route::get('/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
-
-// Authentication Routes
+// Authentication Routes (must be before catch-all product route)
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Public Product Routes (must be last to avoid conflicts)
+Route::get('/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
 
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -64,6 +64,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::put('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'update'])->name('secondary-menu.update');
     Route::delete('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'destroy'])->name('secondary-menu.destroy');
     Route::post('/secondary-menu/reorder', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'reorder'])->name('secondary-menu.reorder');
+    
+    // Sale Offers Routes
+    Route::get('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'index'])->name('sale-offers.index');
+    Route::post('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'store'])->name('sale-offers.store');
+    Route::delete('/sale-offers/{saleOffer}', [\App\Http\Controllers\Admin\SaleOfferController::class, 'destroy'])->name('sale-offers.destroy');
+    Route::post('/sale-offers/reorder', [\App\Http\Controllers\Admin\SaleOfferController::class, 'reorder'])->name('sale-offers.reorder');
+    Route::patch('/sale-offers/{saleOffer}/toggle', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleStatus'])->name('sale-offers.toggle');
 });
 
 // Customer Order Routes (Protected)

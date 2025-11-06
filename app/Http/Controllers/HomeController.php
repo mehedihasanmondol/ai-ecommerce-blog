@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
+use App\Models\SaleOffer;
 
 /**
  * ModuleName: Home Controller
@@ -65,12 +66,21 @@ class HomeController extends Controller
             ->limit(12)
             ->get();
 
+        // Get sale offers products
+        $saleOffers = SaleOffer::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+            ->active()
+            ->ordered()
+            ->get()
+            ->pluck('product')
+            ->filter(fn($product) => $product && $product->is_active);
+
         return view('frontend.home.index', compact(
             'featuredProducts',
             'newArrivals',
             'bestSellers',
             'featuredCategories',
-            'featuredBrands'
+            'featuredBrands',
+            'saleOffers'
         ));
     }
 

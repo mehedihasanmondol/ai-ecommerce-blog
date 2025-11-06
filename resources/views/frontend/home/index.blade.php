@@ -22,6 +22,9 @@
 
 <x-frontend.recommended-slider :products="$recommendedProducts" />
 
+<!-- Sale Offers Slider -->
+<x-frontend.sale-offers-slider :products="$saleOffers" />
+
 <!-- Featured Categories -->
 @if($featuredCategories->count() > 0)
 <section id="categories" class="py-12 bg-white">
