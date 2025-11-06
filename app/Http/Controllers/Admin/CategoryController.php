@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Modules\Ecommerce\Category\Models\Category;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -16,63 +16,8 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Category::withCount('children');
-
-        // Capture filters
-        $filters = [
-            'search' => $request->search,
-            'is_active' => $request->is_active,
-            'parent_id' => $request->parent_id,
-        ];
-
-        // Search filter
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Status filter
-        if ($request->filled('is_active')) {
-            $query->where('is_active', $request->is_active);
-        }
-
-        // Parent category filter
-        if ($request->filled('parent_id')) {
-            if ($request->parent_id === 'null') {
-                $query->whereNull('parent_id');
-            } else {
-                $query->where('parent_id', $request->parent_id);
-            }
-        }
-
-        // Sort
-        $sortBy = $request->get('sort_by', 'sort_order');
-        $sortOrder = $request->get('sort_order', 'asc');
-        $query->orderBy($sortBy, $sortOrder);
-
-        // Paginate
-        $perPage = $request->get('per_page', 15);
-        $categories = $query->with('parent')->paginate($perPage)->withQueryString();
-
-        // Get all parent categories for filter dropdown
-        $parents = Category::whereNull('parent_id')
-            ->orderBy('name')
-            ->get();
-
-        // Statistics
-        $statistics = [
-            'total' => Category::count(),
-            'active' => Category::where('is_active', true)->count(),
-            'inactive' => Category::where('is_active', false)->count(),
-            'parents' => Category::whereNull('parent_id')->count(),
-            'with_children' => Category::has('children')->count(),
-        ];
-
-        return view('admin.categories.index', compact('categories', 'parents', 'filters', 'statistics'));
+        // Use Livewire component for automatic filtering
+        return view('admin.categories.index-livewire');
     }
 
     /**
@@ -153,6 +98,19 @@ class CategoryController extends Controller
     }
 
     /**
+     * Display the specified category
+     *
+     * @param Category $category
+     * @return \Illuminate\View\View
+     */
+    public function show(Category $category)
+    {
+        $category->load('parent', 'children');
+        
+        return view('admin.categories.show', compact('category'));
+    }
+
+    /**
      * Remove the specified category
      *
      * @param Category $category
@@ -164,5 +122,54 @@ class CategoryController extends Controller
 
         return redirect()->route('admin.categories.index')
             ->with('success', 'Category deleted successfully!');
+    }
+
+    /**
+     * Toggle category status
+     *
+     * @param Category $category
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus(Category $category)
+    {
+        try {
+            $category->is_active = !$category->is_active;
+            $category->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category status updated successfully!',
+                'is_active' => $category->is_active,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update status: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Duplicate category
+     *
+     * @param Category $category
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function duplicate(Category $category)
+    {
+        try {
+            $newCategory = $category->replicate();
+            $newCategory->name = $category->name . ' (Copy)';
+            $newCategory->slug = $category->slug . '-copy-' . time();
+            $newCategory->save();
+
+            return redirect()
+                ->route('admin.categories.edit', $newCategory)
+                ->with('success', 'Category duplicated successfully!');
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to duplicate category: ' . $e->getMessage());
+        }
     }
 }

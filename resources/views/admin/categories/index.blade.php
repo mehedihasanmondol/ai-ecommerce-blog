@@ -296,9 +296,32 @@
         </table>
 
         <!-- Pagination -->
-        @if($categories->hasPages())
+        @if($categories->hasPages() || $categories->total() > 0)
         <div class="px-6 py-4 border-t border-gray-200">
-            {{ $categories->links() }}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="perPage" class="text-sm text-gray-700">Show</label>
+                        <select name="per_page" 
+                                id="perPage"
+                                onchange="updatePerPage(this.value)"
+                                class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="10" {{ request('per_page', 15) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page', 15) == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page', 15) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page', 15) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                        <span class="text-sm text-gray-700">entries</span>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        Showing {{ $categories->firstItem() ?? 0 }} to {{ $categories->lastItem() ?? 0 }} of {{ $categories->total() }} results
+                    </span>
+                </div>
+                <div>
+                    {{ $categories->onEachSide(1)->links() }}
+                </div>
+            </div>
         </div>
         @endif
     </div>
@@ -329,6 +352,13 @@ function toggleStatus(categoryId) {
             detail: { type: 'error', message: 'Error: ' + error } 
         }));
     });
+}
+
+function updatePerPage(value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('per_page', value);
+    url.searchParams.set('page', '1'); // Reset to first page
+    window.location.href = url.toString();
 }
 </script>
 @endpush

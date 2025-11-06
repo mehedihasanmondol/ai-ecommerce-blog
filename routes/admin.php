@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
-use App\Modules\Ecommerce\Category\Controllers\CategoryController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
 use App\Modules\Ecommerce\Order\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CustomerController;
