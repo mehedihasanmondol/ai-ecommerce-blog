@@ -78,48 +78,152 @@
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <form method="GET" action="{{ route('admin.blog.posts.index') }}" class="flex flex-wrap gap-4">
-            <div class="flex-1 min-w-[200px]">
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}"
-                       placeholder="Search posts..." 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            </div>
-            <div class="w-48">
-                <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <option value="">All Status</option>
-                    <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
-                    <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                    <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                </select>
-            </div>
-            <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg">
-                Filter
-            </button>
-            <a href="{{ route('admin.blog.posts.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg">
-                Reset
-            </a>
-        </form>
+    <!-- Filters Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+            <form method="GET" action="{{ route('admin.blog.posts.index') }}" id="filter-form">
+                <div class="flex items-center gap-4">
+                    {{-- Search --}}
+                    <div class="flex-1">
+                        <div class="relative">
+                            <input type="text" 
+                                   name="search" 
+                                   id="search-input"
+                                   value="{{ request('search') }}"
+                                   placeholder="Search posts by title, content..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            {{-- Loading indicator --}}
+                            <div id="search-loading" class="hidden absolute right-3 top-2.5">
+                                <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Filter Toggle --}}
+                    <button type="button" 
+                            onclick="toggleFilters()" 
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filters
+                        @if(request()->hasAny(['status', 'category_id', 'author_id', 'date_from', 'date_to', 'featured']))
+                        <span class="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-600 rounded-full">Active</span>
+                        @endif
+                    </button>
+                </div>
+
+                {{-- Advanced Filters --}}
+                <div id="advanced-filters" class="{{ request()->hasAny(['status', 'category_id', 'author_id', 'date_from', 'date_to', 'featured']) ? '' : 'hidden' }} grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select name="status" 
+                                onchange="submitFilterForm()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Status</option>
+                            <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
+                            <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                            <option value="scheduled" {{ request('status') == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select name="category_id" 
+                                onchange="submitFilterForm()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Categories</option>
+                            @foreach(\App\Modules\Blog\Models\BlogCategory::active()->ordered()->get() as $category)
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+                        <select name="author_id" 
+                                onchange="submitFilterForm()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Authors</option>
+                            @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                            <option value="{{ $user->id }}" {{ request('author_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Featured</label>
+                        <select name="featured" 
+                                onchange="submitFilterForm()"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Posts</option>
+                            <option value="1" {{ request('featured') == '1' ? 'selected' : '' }}>Featured Only</option>
+                            <option value="0" {{ request('featured') == '0' ? 'selected' : '' }}>Non-Featured</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+                        <input type="date" 
+                               name="date_from" 
+                               value="{{ request('date_from') }}"
+                               onchange="submitFilterForm()"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+                        <input type="date" 
+                               name="date_to" 
+                               value="{{ request('date_to') }}"
+                               onchange="submitFilterForm()"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="md:col-span-2 flex items-end">
+                        <a href="{{ route('admin.blog.posts.index') }}" 
+                           class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            Clear all filters
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Posts Table -->
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+    <div class="bg-white rounded-lg shadow overflow-hidden relative">
+        <!-- Loading Overlay -->
+        <div id="table-loading" class="hidden absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+            <div class="text-center">
+                <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-sm text-gray-600">Loading posts...</p>
+            </div>
+        </div>
+
+        <div id="posts-table-container">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($posts as $post)
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4">
@@ -193,11 +297,128 @@
             {{ $posts->links() }}
         </div>
         @endif
+        </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
+// Toggle filters visibility
+function toggleFilters() {
+    const filtersDiv = document.getElementById('advanced-filters');
+    filtersDiv.classList.toggle('hidden');
+}
+
+// Submit filter form with AJAX (background update)
+function submitFilterForm() {
+    const form = document.getElementById('filter-form');
+    const formData = new FormData(form);
+    const params = new URLSearchParams(formData);
+    
+    // Show loading overlay
+    document.getElementById('table-loading').classList.remove('hidden');
+    
+    // Fetch filtered results
+    fetch(form.action + '?' + params.toString(), {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'text/html',
+        }
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Parse the HTML response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Extract the table container content
+        const newTableContent = doc.querySelector('#posts-table-container');
+        
+        if (newTableContent) {
+            // Update the table
+            document.getElementById('posts-table-container').innerHTML = newTableContent.innerHTML;
+            
+            // Update URL without page reload
+            const newUrl = form.action + '?' + params.toString();
+            window.history.pushState({}, '', newUrl);
+        }
+        
+        // Hide loading overlay
+        document.getElementById('table-loading').classList.add('hidden');
+        
+        // Hide search loading indicator
+        document.getElementById('search-loading').classList.add('hidden');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Hide loading overlay on error
+        document.getElementById('table-loading').classList.add('hidden');
+        document.getElementById('search-loading').classList.add('hidden');
+    });
+}
+
+// Search with debounce (300ms delay)
+let searchTimeout;
+const searchInput = document.getElementById('search-input');
+const searchLoading = document.getElementById('search-loading');
+
+searchInput.addEventListener('input', function() {
+    // Show loading indicator
+    searchLoading.classList.remove('hidden');
+    
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+    
+    // Set new timeout
+    searchTimeout = setTimeout(() => {
+        submitFilterForm();
+    }, 300); // 300ms debounce
+});
+
+// Handle pagination clicks
+document.addEventListener('click', function(e) {
+    // Check if clicked element is a pagination link
+    if (e.target.closest('.pagination a')) {
+        e.preventDefault();
+        const link = e.target.closest('.pagination a');
+        const url = link.href;
+        
+        // Show loading
+        document.getElementById('table-loading').classList.remove('hidden');
+        
+        // Fetch page
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'text/html',
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newTableContent = doc.querySelector('#posts-table-container');
+            
+            if (newTableContent) {
+                document.getElementById('posts-table-container').innerHTML = newTableContent.innerHTML;
+                window.history.pushState({}, '', url);
+                
+                // Scroll to top of table
+                document.getElementById('posts-table-container').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            document.getElementById('table-loading').classList.add('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('table-loading').classList.add('hidden');
+        });
+    }
+});
+
+// Delete post function
 function deletePost(postId) {
     if (confirm('Are you sure you want to delete this post?')) {
         fetch(`/admin/blog/posts/${postId}`, {
@@ -210,7 +431,8 @@ function deletePost(postId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                // Reload table content instead of full page
+                submitFilterForm();
             }
         });
     }

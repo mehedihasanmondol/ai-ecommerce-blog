@@ -37,7 +37,7 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['status', 'category_id', 'author_id', 'search']);
+        $filters = $request->only(['status', 'category_id', 'author_id', 'search', 'featured', 'date_from', 'date_to']);
         $posts = $this->postService->getAllPosts(config('app.paginate', 10), $filters);
         $counts = $this->postService->getPostsCountByStatus();
 

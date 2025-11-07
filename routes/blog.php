@@ -26,8 +26,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     
     Route::prefix('blog')->name('blog.')->group(function () {
         
-        // Posts Management
-        Route::resource('posts', PostController::class);
+        // Posts Management (Livewire)
+        Route::get('posts', function() {
+            return view('admin.blog.posts.index-livewire');
+        })->name('posts.index');
+        Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+        Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+        Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+        Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+        Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
         Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
         
         // TinyMCE Image Upload

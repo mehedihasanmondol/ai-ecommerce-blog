@@ -67,6 +67,18 @@ class PostRepository
             $query->where('is_featured', $filters['is_featured']);
         }
 
+        if (isset($filters['featured']) && $filters['featured'] !== '') {
+            $query->where('is_featured', (bool) $filters['featured']);
+        }
+
+        if (isset($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+
+        if (isset($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
+        }
+
         if (isset($filters['search'])) {
             $query->search($filters['search']);
         }
