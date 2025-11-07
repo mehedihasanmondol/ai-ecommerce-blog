@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Modules\Blog\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdatePostRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $postId = $this->route('post');
+
+        return [
+            'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:blog_posts,slug,' . $postId,
+            'excerpt' => 'nullable|string|max:500',
+            'content' => 'required|string',
+            'blog_category_id' => 'nullable|exists:blog_categories,id',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'featured_image_alt' => 'nullable|string|max:255',
+            'status' => 'required|in:draft,published,scheduled',
+            'published_at' => 'nullable|date',
+            'scheduled_at' => 'nullable|date',
+            'is_featured' => 'boolean',
+            'allow_comments' => 'boolean',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:blog_tags,id',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string|max:500',
+            'meta_keywords' => 'nullable|string|max:255',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'শিরোনাম আবশ্যক',
+            'content.required' => 'কন্টেন্ট আবশ্যক',
+            'featured_image.image' => 'ফিচার্ড ইমেজ একটি ছবি হতে হবে',
+            'status.required' => 'স্ট্যাটাস আবশ্যক',
+        ];
+    }
+}

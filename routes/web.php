@@ -25,8 +25,24 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Public Product Routes (must be last to avoid conflicts)
-Route::get('/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+// Public Product and Blog Post Routes (must be last to avoid conflicts)
+// This route handles both products and blog posts by slug
+Route::get('/{slug}', function($slug) {
+    // Try to find product first
+    $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
+    if ($product) {
+        return app(\App\Http\Controllers\ProductController::class)->show($slug);
+    }
+    
+    // Then try to find blog post
+    $post = \App\Modules\Blog\Models\Post::where('slug', $slug)->published()->first();
+    if ($post) {
+        return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->show($slug);
+    }
+    
+    // Neither found
+    abort(404);
+})->where('slug', '[a-z0-9-]+');
 
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {

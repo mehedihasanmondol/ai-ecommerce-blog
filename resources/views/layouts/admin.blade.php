@@ -260,10 +260,45 @@
                     @endif
                 </a>
 
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-400 cursor-not-allowed">
-                    <i class="fas fa-blog w-5 mr-3"></i>
-                    <span>Blog Posts</span>
-                    <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
+                <!-- Blog Section -->
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
+                </div>
+                
+                <a href="{{ route('admin.blog.posts.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.posts.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-file-alt w-5 mr-3"></i>
+                    <span>Posts</span>
+                    @if(request()->routeIs('admin.blog.posts.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.blog.categories.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-folder w-5 mr-3"></i>
+                    <span>Categories</span>
+                    @if(request()->routeIs('admin.blog.categories.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.blog.tags.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.tags.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-tag w-5 mr-3"></i>
+                    <span>Tags</span>
+                    @if(request()->routeIs('admin.blog.tags.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.blog.comments.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-comments w-5 mr-3"></i>
+                    <span>Comments</span>
+                    @if(request()->routeIs('admin.blog.comments.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
                 </a>
 
                 <!-- Finance Section (Placeholder) -->
@@ -377,6 +412,34 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-bars w-5 mr-3"></i>
                     <span>Secondary Menu</span>
+                </a>
+
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
+                </div>
+                
+                <a href="{{ route('admin.blog.posts.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.posts.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-file-alt w-5 mr-3"></i>
+                    <span>Posts</span>
+                </a>
+
+                <a href="{{ route('admin.blog.categories.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-folder w-5 mr-3"></i>
+                    <span>Categories</span>
+                </a>
+
+                <a href="{{ route('admin.blog.tags.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.tags.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-tag w-5 mr-3"></i>
+                    <span>Tags</span>
+                </a>
+
+                <a href="{{ route('admin.blog.comments.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-comments w-5 mr-3"></i>
+                    <span>Comments</span>
                 </a>
             </nav>
         </aside>

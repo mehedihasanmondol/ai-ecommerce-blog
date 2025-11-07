@@ -179,6 +179,14 @@
             </div>
 
             <nav class="space-y-2">
+                <!-- Blog Link -->
+                <a href="{{ route('blog.index') }}" 
+                   class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition font-medium">
+                    📝 Blog
+                </a>
+                
+                <div class="border-t border-gray-200 my-2"></div>
+                
                 @forelse($megaMenuCategories ?? collect() as $category)
                     <a href="{{ $category->getUrl() }}" 
                        class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition">
