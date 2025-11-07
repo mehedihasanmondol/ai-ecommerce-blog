@@ -81,17 +81,17 @@
                 <div class="mt-8 pt-8 border-t border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-3">Share this post:</h3>
                     <div class="flex space-x-3">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.show', $post->slug)) }}" 
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('products.show', $post->slug)) }}" 
                            target="_blank"
                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                             Facebook
                         </a>
-                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('blog.show', $post->slug)) }}&text={{ urlencode($post->title) }}" 
+                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('products.show', $post->slug)) }}&text={{ urlencode($post->title) }}" 
                            target="_blank"
                            class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg">
                             Twitter
                         </a>
-                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('blog.show', $post->slug)) }}" 
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('products.show', $post->slug)) }}" 
                            target="_blank"
                            class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">
                             LinkedIn
@@ -129,7 +129,7 @@
                         @endif
                         <div class="p-4">
                             <h3 class="font-bold text-gray-900 mb-2 hover:text-blue-600">
-                                <a href="{{ route('blog.show', $related->slug) }}">
+                                <a href="{{ route('products.show', $related->slug) }}">
                                     {{ Str::limit($related->title, 50) }}
                                 </a>
                             </h3>

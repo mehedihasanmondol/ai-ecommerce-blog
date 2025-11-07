@@ -83,7 +83,7 @@
                         <div class="text-xs text-gray-500 mt-1">IP: {{ $comment->ip_address }}</div>
                     </td>
                     <td class="px-6 py-4">
-                        <a href="{{ route('blog.show', $comment->post->slug) }}" target="_blank"
+                        <a href="{{ route('products.show', $comment->post->slug) }}" target="_blank"
                            class="text-sm text-blue-600 hover:text-blue-800">
                             {{ Str::limit($comment->post->title, 40) }}
                         </a>

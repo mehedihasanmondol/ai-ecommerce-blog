@@ -45,7 +45,7 @@
                 <h1 class="text-xl font-semibold text-gray-900">Edit Post</h1>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="{{ route('blog.show', $post->slug) }}" target="_blank"
+                <a href="{{ route('products.show', $post->slug) }}" target="_blank"
                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

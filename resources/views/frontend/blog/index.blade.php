@@ -33,7 +33,7 @@
                                     Featured
                                 </span>
                                 <h3 class="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600">
-                                    <a href="{{ route('blog.show', $featured->slug) }}">{{ $featured->title }}</a>
+                                    <a href="{{ route('products.show', $featured->slug) }}">{{ $featured->title }}</a>
                                 </h3>
                                 <p class="text-gray-600 mb-4">{{ Str::limit($featured->excerpt, 100) }}</p>
                                 <div class="flex items-center text-sm text-gray-500">
@@ -73,7 +73,7 @@
                                     @endif
                                     
                                     <h3 class="text-2xl font-bold text-gray-900 mb-2 hover:text-blue-600">
-                                        <a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a>
+                                        <a href="{{ route('products.show', $post->slug) }}">{{ $post->title }}</a>
                                     </h3>
                                     
                                     <p class="text-gray-600 mb-4">{{ Str::limit($post->excerpt, 150) }}</p>
@@ -86,7 +86,7 @@
                                             <span class="mx-2">•</span>
                                             <span>{{ $post->reading_time_text }}</span>
                                         </div>
-                                        <a href="{{ route('blog.show', $post->slug) }}" 
+                                        <a href="{{ route('products.show', $post->slug) }}" 
                                            class="text-blue-600 hover:text-blue-800 font-medium">
                                             Read More →
                                         </a>
@@ -161,7 +161,7 @@
                             @endif
                             <div class="flex-1">
                                 <h4 class="text-sm font-medium text-gray-900 hover:text-blue-600 mb-1">
-                                    <a href="{{ route('blog.show', $popular->slug) }}">
+                                    <a href="{{ route('products.show', $popular->slug) }}">
                                         {{ Str::limit($popular->title, 50) }}
                                     </a>
                                 </h4>

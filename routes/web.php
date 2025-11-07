@@ -27,6 +27,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Public Product and Blog Post Routes (must be last to avoid conflicts)
 // This route handles both products and blog posts by slug
+// Named 'products.show' as primary, but works for both products and blog posts
 Route::get('/{slug}', function($slug) {
     // Try to find product first
     $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
@@ -42,7 +43,7 @@ Route::get('/{slug}', function($slug) {
     
     // Neither found
     abort(404);
-})->where('slug', '[a-z0-9-]+')->name('blog.show');
+})->where('slug', '[a-z0-9-]+')->name('products.show');
 
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
