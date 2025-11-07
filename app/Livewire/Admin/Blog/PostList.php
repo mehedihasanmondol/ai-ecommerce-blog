@@ -71,6 +71,11 @@ class PostList extends Component
         $this->resetPage();
     }
 
+    public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function confirmDelete($postId)
     {
         $this->postToDelete = $postId;

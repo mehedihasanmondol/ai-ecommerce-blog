@@ -269,9 +269,31 @@
         </div>
 
         {{-- Pagination --}}
-        @if($posts->hasPages())
+        @if($posts->hasPages() || $posts->total() > 0)
         <div class="px-6 py-4 border-t border-gray-200">
-            {{ $posts->links() }}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="perPage" class="text-sm text-gray-700">Show</label>
+                        <select wire:model.live="perPage" 
+                                id="perPage"
+                                class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <span class="text-sm text-gray-700">entries</span>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        Showing {{ $posts->firstItem() ?? 0 }} to {{ $posts->lastItem() ?? 0 }} of {{ $posts->total() }} results
+                    </span>
+                </div>
+                <div>
+                    {{ $posts->onEachSide(1)->links() }}
+                </div>
+            </div>
         </div>
         @endif
     </div>
