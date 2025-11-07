@@ -91,7 +91,20 @@ class PostService
                 $data['published_at'] = now();
             }
 
+            // Extract relationships before creating post
+            $categories = $data['categories'] ?? [];
+            $tags = $data['tags'] ?? [];
+            unset($data['categories'], $data['tags']);
+
             $post = $this->postRepository->create($data);
+
+            // Sync categories and tags
+            if (!empty($categories)) {
+                $post->categories()->sync($categories);
+            }
+            if (!empty($tags)) {
+                $post->tags()->sync($tags);
+            }
 
             // Log activity (TODO: Install spatie/laravel-activitylog package)
             // activity()
@@ -100,7 +113,7 @@ class PostService
             //     ->log('Created blog post');
 
             DB::commit();
-            return $post;
+            return $post->load(['categories', 'tags']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -130,7 +143,20 @@ class PostService
                 $data['published_at'] = now();
             }
 
+            // Extract relationships before updating post
+            $categories = $data['categories'] ?? [];
+            $tags = $data['tags'] ?? [];
+            unset($data['categories'], $data['tags']);
+
             $post = $this->postRepository->update($id, $data);
+
+            // Sync categories and tags
+            if (isset($categories)) {
+                $post->categories()->sync($categories);
+            }
+            if (isset($tags)) {
+                $post->tags()->sync($tags);
+            }
 
             // Log activity (TODO: Install spatie/laravel-activitylog package)
             // activity()
@@ -139,7 +165,7 @@ class PostService
             //     ->log('Updated blog post');
 
             DB::commit();
-            return $post;
+            return $post->load(['categories', 'tags']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

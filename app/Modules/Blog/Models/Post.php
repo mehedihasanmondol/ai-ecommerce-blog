@@ -115,11 +115,20 @@ class Post extends Model
     }
 
     /**
-     * Get the category of the post
+     * Get the category of the post (legacy - kept for backward compatibility)
      */
     public function category(): BelongsTo
     {
         return $this->belongsTo(BlogCategory::class, 'blog_category_id');
+    }
+
+    /**
+     * Get the categories associated with the post (many-to-many)
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(BlogCategory::class, 'blog_post_category', 'blog_post_id', 'blog_category_id')
+            ->withTimestamps();
     }
 
     /**

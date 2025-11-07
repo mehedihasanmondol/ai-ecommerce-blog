@@ -21,6 +21,8 @@ class UpdatePostRequest extends FormRequest
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
             'blog_category_id' => 'nullable|exists:blog_categories,id',
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:blog_categories,id',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'featured_image_alt' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published,scheduled',

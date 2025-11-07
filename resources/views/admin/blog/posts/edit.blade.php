@@ -2,74 +2,133 @@
 
 @section('title', 'Edit Post')
 
+@push('styles')
+<style>
+/* TinyMCE Custom Styling */
+.tox-tinymce {
+    border-radius: 0.5rem !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.tox .tox-toolbar {
+    background: #f8f9fa !important;
+}
+.char-counter {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.75rem;
+    color: #64748b;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+</style>
+@endpush
+
 @section('content')
 <div class="container-fluid px-4 py-6">
-    <div class="max-w-5xl mx-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Edit Post</h1>
-                <p class="text-gray-600 mt-1">Update your blog post</p>
+    <!-- WordPress-style Top Bar -->
+    <div class="bg-white border-b border-gray-200 -mx-4 -mt-6 px-4 py-3 mb-6 sticky top-16 z-10 shadow-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.blog.posts.index') }}" 
+                   class="text-gray-600 hover:text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Posts
+                </a>
+                <span class="text-gray-300">|</span>
+                <h1 class="text-xl font-semibold text-gray-900">Edit Post</h1>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="{{ route('blog.show', $post->slug) }}" target="_blank" 
-                   class="text-blue-600 hover:text-blue-800 flex items-center">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('blog.show', $post->slug) }}" target="_blank"
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
                     View Post
                 </a>
-                <a href="{{ route('admin.blog.posts.index') }}" class="text-gray-600 hover:text-gray-900">
-                    ← Back to Posts
-                </a>
+                <button type="button" onclick="saveDraft()" 
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Save Draft
+                </button>
+                <button type="submit" form="post-form"
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    Update
+                </button>
             </div>
         </div>
+    </div>
 
-        <form action="{{ route('admin.blog.posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
+    <div class="max-w-7xl mx-auto">
+
+        <form id="post-form" action="{{ route('admin.blog.posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            
+            <!-- Auto-save indicator -->
+            <div id="autosave-indicator" class="hidden fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Draft saved
+            </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-6">
-                    <!-- Title -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-                        <input type="text" name="title" value="{{ old('title', $post->title) }}" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="Enter post title">
-                        @error('title')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <!-- Title - WordPress Style -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6 pb-0">
+                            <input type="text" 
+                                   name="title" 
+                                   id="post-title"
+                                   value="{{ old('title', $post->title) }}" 
+                                   required
+                                   class="w-full text-3xl font-bold border-none focus:outline-none focus:ring-0 placeholder-gray-400"
+                                   placeholder="Add title"
+                                   autocomplete="off">
+                            @error('title')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <!-- Permalink -->
+                        <div class="px-6 py-3 border-t border-gray-100">
+                            <div class="flex items-center text-sm">
+                                <span class="text-gray-500 mr-2">Permalink:</span>
+                                <span class="text-blue-600">{{ url('/') }}/</span>
+                                <input type="text" 
+                                       name="slug" 
+                                       id="post-slug"
+                                       value="{{ old('slug', $post->slug) }}"
+                                       class="border-none focus:outline-none focus:ring-0 text-blue-600 px-1 py-0 min-w-[200px]"
+                                       placeholder="auto-generated">
+                                <button type="button" 
+                                        onclick="editSlug()" 
+                                        class="ml-2 text-blue-600 hover:text-blue-800 text-xs">
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Slug -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Slug</label>
-                        <div class="flex items-center space-x-2">
-                            <input type="text" name="slug" value="{{ old('slug', $post->slug) }}"
-                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="post-slug">
-                            <button type="button" onclick="generateSlug()" 
-                                    class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
-                                Generate
-                            </button>
-                        </div>
-                        <p class="mt-1 text-xs text-gray-500">URL: {{ url('/') }}/<span id="slug-preview">{{ $post->slug }}</span></p>
-                        @error('slug')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+
 
                     <!-- Content Editor - TinyMCE -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <label class="block text-sm font-medium text-gray-700 mb-3">Content *</label>
-                        <textarea name="content" id="tinymce-editor"
+                        <textarea name="content" 
+                                  id="tinymce-editor" 
                                   class="tinymce-content">{{ old('content', $post->content) }}</textarea>
                         
                         <!-- Word Counter -->
-                        <div class="mt-3 text-sm text-gray-600">
+                        <div class="char-counter" id="editor-stats">
                             <span id="word-count">0</span> words | 
                             <span id="char-count">0</span> characters
                         </div>

@@ -42,7 +42,7 @@ Route::get('/{slug}', function($slug) {
     
     // Neither found
     abort(404);
-})->where('slug', '[a-z0-9-]+');
+})->where('slug', '[a-z0-9-]+')->name('blog.show');
 
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
