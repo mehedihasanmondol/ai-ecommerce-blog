@@ -17,46 +17,61 @@
     <div class="container mx-auto px-4">
         <!-- Blog Articles Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-            <a href="#" class="group">
+            @php
+                $featuredPosts = \App\Modules\Blog\Models\Post::where('is_featured', true)
+                    ->where('status', 'published')
+                    ->latest('published_at')
+                    ->take(6)
+                    ->get();
+            @endphp
+            
+            @foreach($featuredPosts->take(3) as $post)
+            <a href="{{ route('products.show', $post->slug) }}" class="group">
                 <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Health+Tips" alt="5 Simple Oral Health Tips" class="w-full h-32 object-cover">
+                    @if($post->featured_image)
+                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                             alt="{{ $post->title }}" 
+                             class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                    @else
+                        <div class="w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                    @endif
                 </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">5 Simple Oral Health Tips</h4>
+                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600 line-clamp-2">
+                    {{ $post->title }}
+                </h4>
             </a>
-            <a href="#" class="group">
-                <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Baby+DHA" alt="Why Do Babies Need DHA?" class="w-full h-32 object-cover">
-                </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">Why Do Babies Need DHA?</h4>
-            </a>
-            <a href="#" class="group">
-                <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Home+Remedies" alt="Best Home Remedies For A Cough + Sore Throat" class="w-full h-32 object-cover">
-                </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">Best Home Remedies For A Cough + Sore Throat</h4>
-            </a>
-            <a href="#" class="block bg-yellow-400 rounded-lg p-6 text-center">
+            @endforeach
+            
+            <!-- Wellness Hub Badge -->
+            <a href="{{ route('blog.index') }}" class="block bg-yellow-400 rounded-lg p-6 text-center hover:bg-yellow-500 transition">
                 <h3 class="text-lg font-bold text-gray-900 mb-1">WELLBEING</h3>
                 <h2 class="text-2xl font-bold text-gray-900">HUB</h2>
             </a>
-            <a href="#" class="group">
+            
+            @foreach($featuredPosts->slice(3, 3) as $post)
+            <a href="{{ route('products.show', $post->slug) }}" class="group">
                 <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Supplements" alt="Top 10 Supplements For Longevity" class="w-full h-32 object-cover">
+                    @if($post->featured_image)
+                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                             alt="{{ $post->title }}" 
+                             class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                    @else
+                        <div class="w-full h-32 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                    @endif
                 </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">Top 10 Supplements For Longevity</h4>
+                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600 line-clamp-2">
+                    {{ $post->title }}
+                </h4>
             </a>
-            <a href="#" class="group">
-                <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Fungal+Acne" alt="What Is Fungal Acne? A Doctor's Guide To Products" class="w-full h-32 object-cover">
-                </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">What Is Fungal Acne? A Doctor's Guide To Products</h4>
-            </a>
-            <a href="#" class="group">
-                <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    <img src="https://via.placeholder.com/200x150?text=Krill+Oil" alt="Krill Oil: What It Is + 12 Science-Backed Benefits" class="w-full h-32 object-cover">
-                </div>
-                <h4 class="text-xs font-medium text-gray-900 group-hover:text-green-600">Krill Oil: What It Is + 12 Science-Backed Benefits</h4>
-            </a>
+            @endforeach
         </div>
 
         <!-- Rewards Banner -->
