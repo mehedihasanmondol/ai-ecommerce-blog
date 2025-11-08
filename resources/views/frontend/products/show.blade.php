@@ -408,18 +408,17 @@
 <!-- Inspired by Browsing -->
 <x-inspired-by-browsing :products="$inspiredByBrowsing" />
 
-<!-- Product Tabs Section -->
-<div class="bg-gray-50 py-8">
-    <div class="container mx-auto px-4">
-        <x-product-tabs :product="$product" :averageRating="$averageRating" :totalReviews="$totalReviews" />
-    </div>
-</div>
-
-<!-- Related Products -->
-@if($relatedProducts->count() > 0)
+<!-- Product Overview Section -->
+@if($product->description)
 <div class="bg-white py-8">
     <div class="container mx-auto px-4">
-        <x-related-products :products="$relatedProducts" title="Customers Also Viewed" />
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Product overview</h2>
+        
+        <div class="bg-white rounded-lg border border-gray-200 p-6 lg:p-8">
+            <div class="prose max-w-none">
+                {!! $product->description !!}
+            </div>
+        </div>
     </div>
 </div>
 @endif
