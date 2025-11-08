@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\BestSellerProductController;
 use App\Http\Controllers\Admin\NewArrivalProductController;
 use App\Http\Controllers\Admin\FooterManagementController;
 use App\Http\Controllers\Admin\ProductQuestionController;
-use App\Modules\Admin\Controllers\ReviewController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;

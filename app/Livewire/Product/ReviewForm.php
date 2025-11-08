@@ -26,6 +26,8 @@ class ReviewForm extends Component
     public $images = [];
     public $reviewerName = '';
     public $reviewerEmail = '';
+    public $errorMessage = '';
+    public $successMessage = '';
 
     protected function rules()
     {
@@ -61,6 +63,29 @@ class ReviewForm extends Component
 
     public function submit()
     {
+        // Clear previous messages
+        $this->errorMessage = '';
+        $this->successMessage = '';
+
+        // Validate purchase for authenticated users
+        if (auth()->check()) {
+            $hasPurchased = \DB::table('order_items')
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->where('orders.user_id', auth()->id())
+                ->where('order_items.product_id', $this->productId)
+                ->where('orders.status', 'completed')
+                ->exists();
+
+            if (!$hasPurchased) {
+                $this->errorMessage = 'You can only review products you have purchased.';
+                return;
+            }
+        } else {
+            // Guest users cannot review
+            $this->errorMessage = 'Please login to write a review. Only verified purchases can be reviewed.';
+            return;
+        }
+
         $this->validate();
 
         try {
@@ -82,10 +107,10 @@ class ReviewForm extends Component
             // Reset form
             $this->reset(['rating', 'title', 'review', 'images', 'reviewerName', 'reviewerEmail']);
 
-            session()->flash('success', 'Thank you! Your review has been submitted and is pending approval.');
+            $this->successMessage = 'Thank you! Your review has been submitted successfully and is pending approval.';
             $this->dispatch('review-submitted');
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            $this->errorMessage = $e->getMessage();
         }
     }
 

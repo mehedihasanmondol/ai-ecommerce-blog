@@ -1,0 +1,1 @@
+*example: make categoies feature clone as brands feature
