@@ -1196,6 +1196,41 @@ Added "Inspired by your browsing" section to the product detail page, displaying
 
 ---
 
+## ✅ Admin Product List - Sort Order Updated
+
+**Date**: November 8, 2025
+
+### Change Summary
+
+Updated the admin product list page to display products ordered by ID in descending order (newest products first).
+
+### File Modified
+
+- **`app/Livewire/Admin/Product/ProductList.php`**
+  - Changed `$sortBy` from `'updated_at'` to `'id'`
+  - Kept `$sortOrder` as `'desc'`
+
+### Before
+```php
+public $sortBy = 'updated_at';  // Sorted by last update
+public $sortOrder = 'desc';
+```
+
+### After
+```php
+public $sortBy = 'id';          // Sorted by ID (newest first)
+public $sortOrder = 'desc';
+```
+
+### Result
+
+- Products now display with newest products at the top
+- Most recently created products appear first in the list
+- Better for tracking new product additions
+- Users can still change sort order using column headers
+
+---
+
 ## Pending Tasks 📋
 
 1. **Product Management - Next Steps**

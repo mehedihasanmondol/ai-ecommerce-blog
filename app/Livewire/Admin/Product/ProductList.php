@@ -20,7 +20,7 @@ class ProductList extends Component
     public $typeFilter = '';
     public $statusFilter = '';
     public $perPage = 15;
-    public $sortBy = 'updated_at';
+    public $sortBy = 'id';
     public $sortOrder = 'desc';
 
     public $showFilters = false;
