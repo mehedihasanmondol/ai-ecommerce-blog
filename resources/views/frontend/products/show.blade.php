@@ -424,9 +424,21 @@
 @endif
 
 <!-- Questions and Answers Section -->
-<div class="bg-gray-50 py-8">
+<div class="bg-gray-50 py-8" id="questions-section">
     <div class="container mx-auto px-4">
         <div class="bg-white rounded-lg border border-gray-200 p-6 lg:p-8">
+            <!-- Success Message -->
+            @if(session('question_success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-sm text-green-800 font-medium">{{ session('question_success') }}</p>
+                    </div>
+                </div>
+            @endif
+
             <!-- Header -->
             <div class="mb-6 flex items-start justify-between">
                 <div>

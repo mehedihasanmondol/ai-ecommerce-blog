@@ -94,11 +94,18 @@ class AskQuestion extends Component
 
             $this->closeModal();
             
-            session()->flash('success', 'Your question has been submitted and is pending approval.');
+            // Flash success message
+            session()->flash('question_success', 'Your question has been submitted successfully and is pending approval. Thank you!');
+            
+            // Dispatch event to refresh question list
             $this->dispatch('question-submitted');
             
+            // Redirect to refresh and show flash message
+            return redirect()->to(request()->url() . '#questions-section');
+            
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            // Show error in modal
+            $this->addError('submit', $e->getMessage());
         }
     }
 

@@ -83,6 +83,15 @@
                             </div>
                         @endguest
 
+                        <!-- Submit Error -->
+                        @error('submit')
+                            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <p class="text-sm text-red-800">
+                                    <strong>Error:</strong> {{ $message }}
+                                </p>
+                            </div>
+                        @enderror
+
                         <!-- Disclaimer -->
                         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                             <p class="text-sm text-blue-800">
