@@ -164,15 +164,20 @@ class AddToCart extends Component
             $cart[$cartKey]['quantity'] += $this->quantity;
         } else {
             // Add new item
+            $primaryImage = $this->product->images->where('is_primary', true)->first() ?? $this->product->images->first();
+            
             $cart[$cartKey] = [
                 'product_id' => $this->product->id,
                 'variant_id' => $variant->id,
                 'product_name' => $this->product->name,
-                'variant_name' => $variant->variant_name,
+                'variant_name' => $variant->name ?? null,
                 'sku' => $variant->sku,
                 'price' => $variant->sale_price ?? $variant->price,
+                'original_price' => $variant->price,
                 'quantity' => $this->quantity,
-                'image' => $this->product->images->first()->path ?? null,
+                'image' => $primaryImage ? $primaryImage->image_path : null,
+                'brand' => $this->product->brand ? $this->product->brand->name : null,
+                'stock_quantity' => $variant->stock_quantity,
             ];
         }
 

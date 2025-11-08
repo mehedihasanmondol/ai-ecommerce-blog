@@ -62,9 +62,22 @@ class ProductController extends Controller
         // Track this product as recently viewed
         $this->trackRecentlyViewed($product->id);
 
-        // Get review statistics
-        $averageRating = $product->average_rating ?? 0;
-        $totalReviews = $product->review_count ?? 0;
+        // Get review statistics - count actual approved reviews
+        $approvedReviews = $product->approvedReviews;
+        $totalReviews = $approvedReviews->count();
+        
+        // Calculate average rating from approved reviews
+        if ($totalReviews > 0) {
+            $averageRating = round($approvedReviews->avg('rating'), 1);
+        } else {
+            $averageRating = 0;
+        }
+        
+        // Get Q&A statistics
+        $totalQuestions = $product->approvedQuestions()->count();
+        $totalAnswers = $product->approvedQuestions()->whereHas('answers', function($query) {
+            $query->where('status', 'approved');
+        })->count();
 
         return view('frontend.products.show', compact(
             'product', 
@@ -73,7 +86,9 @@ class ProductController extends Controller
             'recentlyViewed',
             'inspiredByBrowsing',
             'averageRating',
-            'totalReviews'
+            'totalReviews',
+            'totalQuestions',
+            'totalAnswers'
         ));
     }
 

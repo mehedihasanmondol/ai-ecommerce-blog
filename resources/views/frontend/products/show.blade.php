@@ -90,18 +90,18 @@
                 </div>
                 @endif
 
-                <!-- Rating & Reviews -->
-                <div class="flex items-center space-x-4 mb-4">
-                    <div class="flex items-center space-x-1">
-                        <span class="text-lg font-bold text-gray-900">{{ number_format($averageRating, 1) }}</span>
-                        <div class="flex items-center">
+                <!-- Rating & Reviews Summary -->
+                <div class="mb-4 pb-4 border-b border-gray-200">
+                    <!-- Rating Stars and Score with Hover Tooltip -->
+                    <div class="flex items-center space-x-2 mb-2 relative group">
+                        <div class="flex items-center cursor-pointer">
                             @for($i = 1; $i <= 5; $i++)
                                 @if($i <= floor($averageRating))
-                                    <svg class="w-4 h-4 text-orange-400 fill-current" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-orange-400 fill-current" viewBox="0 0 20 20">
                                         <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                                     </svg>
                                 @elseif($i - 0.5 <= $averageRating)
-                                    <svg class="w-4 h-4 text-orange-400" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-orange-400" viewBox="0 0 20 20">
                                         <defs>
                                             <linearGradient id="half-{{ $i }}">
                                                 <stop offset="50%" stop-color="currentColor"/>
@@ -111,25 +111,115 @@
                                         <path fill="url(#half-{{ $i }})" d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                                     </svg>
                                 @else
-                                    <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20">
                                         <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
                                     </svg>
                                 @endif
                             @endfor
                         </div>
+                        <span class="text-xl font-bold text-gray-900">{{ number_format($averageRating, 1) }}</span>
+                        <span class="text-sm text-gray-500">out of 5</span>
+                        
+                        @php
+                            // Calculate rating distribution
+                            $ratingCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+                            $reviews = $product->approvedReviews;
+                            foreach($reviews as $review) {
+                                $rating = (int) $review->rating;
+                                if(isset($ratingCounts[$rating])) {
+                                    $ratingCounts[$rating]++;
+                                }
+                            }
+                        @endphp
+                        
+                        <!-- Hover Tooltip -->
+                        <div class="absolute left-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <!-- Average Rating Header -->
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-3xl font-bold text-gray-900">{{ number_format($averageRating, 1) }}</span>
+                                    <div class="flex items-center">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= floor($averageRating))
+                                                <svg class="w-4 h-4 text-orange-400 fill-current" viewBox="0 0 20 20">
+                                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                                </svg>
+                                            @else
+                                                <svg class="w-4 h-4 text-gray-300 fill-current" viewBox="0 0 20 20">
+                                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                                </svg>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mb-3">Based on {{ number_format($totalReviews) }} ratings</p>
+                            
+                            <!-- Rating Bars -->
+                            <div class="space-y-1">
+                                @foreach([5, 4, 3, 2, 1] as $star)
+                                    @php
+                                        $count = $ratingCounts[$star];
+                                        $percentage = $totalReviews > 0 ? round(($count / $totalReviews) * 100) : 0;
+                                    @endphp
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-gray-700 w-6">{{ $star }}</span>
+                                        <div class="flex items-center flex-1">
+                                            @for($i = 1; $i <= $star; $i++)
+                                                <svg class="w-3 h-3 text-orange-400 fill-current" viewBox="0 0 20 20">
+                                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                                                </svg>
+                                            @endfor
+                                        </div>
+                                        <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                            <div class="bg-orange-400 h-full rounded-full transition-all duration-300" style="width: {{ $percentage }}%"></div>
+                                        </div>
+                                        <span class="text-gray-700 w-10 text-right">{{ $percentage }}%</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                            
+                            <!-- See Reviews Link -->
+                            <a href="#reviews-section" class="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                See customer reviews →
+                            </a>
+                        </div>
                     </div>
-                    <a href="#reviews-section" class="text-sm text-blue-600 hover:underline flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                        </svg>
-                        {{ number_format($totalReviews) }} {{ Str::plural('Review', $totalReviews) }}
-                    </a>
-                    <a href="#questions-section" class="text-sm text-blue-600 hover:underline flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Q & A
-                    </a>
+                    
+                    <!-- Review and Q&A Links -->
+                    <div class="flex flex-wrap items-center gap-4 text-sm">
+                        <a href="#reviews-section" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center transition">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                            </svg>
+                            <span class="font-medium">{{ number_format($totalReviews) }}</span>
+                            <span class="ml-1 text-gray-600">{{ Str::plural('Review', $totalReviews) }}</span>
+                        </a>
+                        
+                        <span class="text-gray-300">|</span>
+                        
+                        <a href="#questions-section" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center transition">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium">{{ number_format($totalQuestions) }}</span>
+                            <span class="ml-1 text-gray-600">{{ Str::plural('Question', $totalQuestions) }}</span>
+                            @if($totalAnswers > 0)
+                                <span class="ml-1 text-gray-500">({{ number_format($totalAnswers) }} answered)</span>
+                            @endif
+                        </a>
+                        
+                        @if($product->views_count > 0)
+                        <span class="text-gray-300">|</span>
+                        <div class="flex items-center text-gray-600">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            <span>{{ number_format($product->views_count) }} {{ Str::plural('view', $product->views_count) }}</span>
+                        </div>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Stock Status -->
@@ -141,12 +231,12 @@
                         </svg>
                         <span class="text-green-700 font-semibold">In stock</span>
                     </div>
-                    @if($variant->stock_quantity <= 10)
+                    @if($variant->stock_quantity <= $variant->low_stock_alert)
                         <div class="mt-1 flex items-center text-sm text-orange-600">
                             <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                             </svg>
-                            <span class="font-medium">{{ $variant->stock_quantity }} left - Order soon!</span>
+                            <span class="font-medium">Only {{ $variant->stock_quantity }} left - Order soon!</span>
                         </div>
                     @endif
                 </div>
@@ -165,31 +255,7 @@
                 <!-- Product Information List -->
                 <div class="mb-6">
                     <div class="space-y-2 text-sm">
-                        <!-- 100% Authentic Badge -->
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                            </svg>
-                            <span class="font-semibold text-green-700">100% authentic</span>
-                            <button class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <!-- Best By Date -->
-                        @if($variant && $variant->expires_at)
-                        <div class="flex items-start space-x-2">
-                            <span class="text-gray-700 font-medium min-w-[100px]">Best by:</span>
-                            <span class="text-gray-900">{{ $variant->expires_at->format('m/Y') }}</span>
-                            <button class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        @endif
+                        <!-- Best By Date - Removed as expires_at field doesn't exist in database -->
 
                         <!-- First Available -->
                         <div class="flex items-start space-x-2">
@@ -210,91 +276,30 @@
                         </div>
                         @endif
 
-                        <!-- Product Code -->
+                        <!-- Product Code (SKU) -->
+                        @if($variant && $variant->sku)
                         <div class="flex items-start space-x-2">
                             <span class="text-gray-700 font-medium min-w-[100px]">Product code:</span>
-                            <span class="text-gray-900">{{ $variant->sku ?? $product->sku }}</span>
-                        </div>
-
-                        <!-- UPC Code -->
-                        @if($variant && $variant->barcode)
-                        <div class="flex items-start space-x-2">
-                            <span class="text-gray-700 font-medium min-w-[100px]">UPC:</span>
-                            <span class="text-gray-900">{{ $variant->barcode }}</span>
+                            <span class="text-gray-900">{{ $variant->sku }}</span>
                         </div>
                         @endif
 
-                        <!-- Package Quantity -->
-                        @if($variant && $variant->dimensions)
-                        <div class="flex items-start space-x-2">
-                            <span class="text-gray-700 font-medium min-w-[100px]">Package quantity:</span>
-                            <span class="text-gray-900">{{ $variant->dimensions }}</span>
-                        </div>
-                        @endif
+                        <!-- UPC Code - Removed as barcode field doesn't exist in database -->
+
+                        <!-- Package Quantity - Removed as dimensions field doesn't exist in database -->
 
                         <!-- Dimensions -->
                         @if($variant && ($variant->length || $variant->width || $variant->height))
                         <div class="flex items-start space-x-2">
                             <span class="text-gray-700 font-medium min-w-[100px]">Dimensions:</span>
                             <span class="text-gray-900">
-                                {{ $variant->length ?? 0 }} x {{ $variant->width ?? 0 }} x {{ $variant->height ?? 0 }} cm
+                                {{ number_format($variant->length ?? 0, 2) }} x {{ number_format($variant->width ?? 0, 2) }} x {{ number_format($variant->height ?? 0, 2) }} cm
                             </span>
                         </div>
                         @endif
 
-                        <!-- Try Risk Free -->
-                        <div class="flex items-start space-x-2">
-                            <span class="text-gray-700 font-medium min-w-[100px]">Try Risk Free:</span>
-                            <span class="text-green-700 font-semibold">Free for 90 Days</span>
-                            <button class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div>
                     </div>
                 </div>
-
-                <!-- Product Rankings -->
-                @if($product->category)
-                <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 class="text-sm font-bold text-gray-900 mb-2">Product rankings:</h3>
-                    <div class="space-y-1 text-sm">
-                        <div>
-                            <span class="font-semibold text-blue-700">#1</span>
-                            <span class="text-gray-700"> in </span>
-                            <a href="{{ route('shop') }}?category={{ $product->category->slug }}" class="text-blue-600 hover:underline">
-                                {{ $product->category->name }}
-                            </a>
-                        </div>
-                        @if($product->category->parent)
-                        <div>
-                            <span class="font-semibold text-blue-700">#1</span>
-                            <span class="text-gray-700"> in </span>
-                            <a href="{{ route('shop') }}?category={{ $product->category->parent->slug }}" class="text-blue-600 hover:underline">
-                                {{ $product->category->parent->name }}
-                            </a>
-                        </div>
-                        @endif
-                        @if($product->brand)
-                        <div>
-                            <span class="font-semibold text-blue-700">#32</span>
-                            <span class="text-gray-700"> in </span>
-                            <a href="{{ route('shop') }}?brand={{ $product->brand->slug }}" class="text-blue-600 hover:underline">
-                                {{ $product->brand->name }} Products
-                            </a>
-                        </div>
-                        @endif
-                        <div>
-                            <span class="font-semibold text-blue-700">#90</span>
-                            <span class="text-gray-700"> in </span>
-                            <a href="{{ route('shop') }}" class="text-blue-600 hover:underline">
-                                All Products
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                @endif
 
             </div>
 
@@ -320,9 +325,11 @@
                                         </span>
                                     @endif
                                 </div>
+                                @if($product->variants->first() && $product->variants->first()->weight)
                                 <div class="text-sm text-gray-600">
-                                    ${{ number_format($minPrice / 50, 2) }}/ml
+                                    ${{ number_format($minPrice / $product->variants->first()->weight, 2) }}/unit
                                 </div>
+                                @endif
                             </div>
                         @else
                             @if($variant)
@@ -341,9 +348,11 @@
                                             <span class="text-sm text-gray-500 line-through">
                                                 ${{ number_format($variant->price, 2) }}
                                             </span>
+                                            @if($variant->weight)
                                             <span class="text-sm text-gray-600">
-                                                ${{ number_format($variant->sale_price / ($variant->weight ?? 50), 2) }}/ml
+                                                ${{ number_format($variant->sale_price / $variant->weight, 2) }}/unit
                                             </span>
+                                            @endif
                                         </div>
                                     @else
                                         <div class="mb-1">
@@ -351,9 +360,11 @@
                                                 ${{ number_format($variant->price, 2) }}
                                             </span>
                                         </div>
+                                        @if($variant->weight)
                                         <div class="text-sm text-gray-600">
-                                            ${{ number_format($variant->price / ($variant->weight ?? 50), 2) }}/ml
+                                            ${{ number_format($variant->price / $variant->weight, 2) }}/unit
                                         </div>
+                                        @endif
                                     @endif
                                 </div>
                             @endif
@@ -361,14 +372,20 @@
                         
                         <!-- Progress Bar & Claimed Text -->
                         @if($variant && $variant->stock_quantity > 0)
+                        @php
+                            // Calculate claimed percentage based on sales
+                            $claimedPercentage = $product->sales_count > 0 
+                                ? min(round(($product->sales_count / ($product->sales_count + $variant->stock_quantity)) * 100), 95)
+                                : rand(5, 25);
+                        @endphp
                         <div class="mb-4">
                             <!-- Progress Bar -->
                             <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: 19%"></div>
+                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ $claimedPercentage }}%"></div>
                             </div>
                             <!-- Claimed Text -->
                             <div class="text-sm text-gray-700">
-                                19% claimed
+                                {{ $claimedPercentage }}% claimed
                             </div>
                         </div>
                         @endif

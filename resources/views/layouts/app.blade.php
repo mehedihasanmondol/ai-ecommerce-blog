@@ -36,6 +36,9 @@
     <x-confirm-modal />
     <x-alert-toast />
 
+    <!-- Cart Sidebar -->
+    @livewire('cart.cart-sidebar')
+
     @stack('scripts')
     @livewireScripts
 </body>
