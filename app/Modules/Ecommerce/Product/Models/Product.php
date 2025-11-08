@@ -118,6 +118,16 @@ class Product extends Model
         return $this->hasOne(\App\Models\NewArrivalProduct::class);
     }
 
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class);
+    }
+
+    public function approvedQuestions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class)->where('status', 'approved');
+    }
+
     // Scopes
     public function scopeActive($query)
     {

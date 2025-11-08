@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\TrendingProductController;
 use App\Http\Controllers\Admin\BestSellerProductController;
 use App\Http\Controllers\Admin\NewArrivalProductController;
 use App\Http\Controllers\Admin\FooterManagementController;
+use App\Http\Controllers\Admin\ProductQuestionController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -92,6 +93,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
     Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
     Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
+    
+    // Product Q&A Management Routes
+    Route::resource('product-questions', ProductQuestionController::class);
+    Route::post('questions/{id}/approve', [ProductQuestionController::class, 'approve'])->name('questions.approve');
+    Route::post('questions/{id}/reject', [ProductQuestionController::class, 'reject'])->name('questions.reject');
+    Route::post('answers/{id}/approve', [ProductQuestionController::class, 'approveAnswer'])->name('answers.approve');
+    Route::post('answers/{id}/reject', [ProductQuestionController::class, 'rejectAnswer'])->name('answers.reject');
+    Route::post('answers/{id}/best', [ProductQuestionController::class, 'markBestAnswer'])->name('answers.best');
     
     // Footer Management Routes
     Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');

@@ -423,6 +423,29 @@
 </div>
 @endif
 
+<!-- Questions and Answers Section -->
+<div class="bg-gray-50 py-8">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-6 lg:p-8">
+            <!-- Header -->
+            <div class="mb-6 flex items-start justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Questions and answers</h2>
+                    <p class="text-sm text-gray-600">
+                        Answers posted solely reflect the views and opinions expressed by the contributors and not those of our store.
+                    </p>
+                </div>
+                <div>
+                    @livewire('product.ask-question', ['productId' => $product->id])
+                </div>
+            </div>
+
+            <!-- Livewire Question List Component -->
+            @livewire('product.question-list', ['productId' => $product->id])
+        </div>
+    </div>
+</div>
+
 <!-- Recently Viewed Products -->
 @if($recentlyViewed->count() > 0)
 <div class="bg-gray-50 py-8">

@@ -181,6 +181,15 @@
                     @endif
                 </a>
 
+                <a href="{{ route('admin.product-questions.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-question-circle w-5 mr-3"></i>
+                    <span>Product Q&A</span>
+                    @if(request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
                 <!-- Inventory Section (Placeholder) -->
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
@@ -396,6 +405,12 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.attributes.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-sliders-h w-5 mr-3"></i>
                     <span>Attributes</span>
+                </a>
+
+                <a href="{{ route('admin.product-questions.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-question-circle w-5 mr-3"></i>
+                    <span>Product Q&A</span>
                 </a>
 
                 <div class="pt-4 pb-2">
