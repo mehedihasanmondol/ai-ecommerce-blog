@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BestSellerProductController;
 use App\Http\Controllers\Admin\NewArrivalProductController;
 use App\Http\Controllers\Admin\FooterManagementController;
 use App\Http\Controllers\Admin\ProductQuestionController;
+use App\Modules\Admin\Controllers\ReviewController;
 use App\Modules\User\Controllers\UserController;
 use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
@@ -101,6 +102,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('answers/{id}/approve', [ProductQuestionController::class, 'approveAnswer'])->name('answers.approve');
     Route::post('answers/{id}/reject', [ProductQuestionController::class, 'rejectAnswer'])->name('answers.reject');
     Route::post('answers/{id}/best', [ProductQuestionController::class, 'markBestAnswer'])->name('answers.best');
+    
+    // Product Review Management Routes
+    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
+    Route::get('reviews/{id}', [ReviewController::class, 'show'])->name('reviews.show');
+    Route::post('reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('reviews/bulk-approve', [ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+    Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
     
     // Footer Management Routes
     Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');

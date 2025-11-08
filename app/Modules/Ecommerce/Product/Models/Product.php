@@ -36,6 +36,8 @@ class Product extends Model
         'meta_keywords',
         'views_count',
         'sales_count',
+        'average_rating',
+        'review_count',
     ];
 
     protected $casts = [
@@ -43,6 +45,8 @@ class Product extends Model
         'is_active' => 'boolean',
         'views_count' => 'integer',
         'sales_count' => 'integer',
+        'average_rating' => 'float',
+        'review_count' => 'integer',
     ];
 
     // Removed eager loading to prevent issues with products without variants
@@ -126,6 +130,16 @@ class Product extends Model
     public function approvedQuestions(): HasMany
     {
         return $this->hasMany(ProductQuestion::class)->where('status', 'approved');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    public function approvedReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)->where('status', 'approved');
     }
 
     // Scopes

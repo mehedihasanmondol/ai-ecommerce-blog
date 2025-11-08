@@ -118,17 +118,17 @@
                             @endfor
                         </div>
                     </div>
-                    <a href="#reviews" class="text-sm text-blue-600 hover:underline flex items-center">
+                    <a href="#reviews-section" class="text-sm text-blue-600 hover:underline flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                         </svg>
                         {{ number_format($totalReviews) }} {{ Str::plural('Review', $totalReviews) }}
                     </a>
-                    <a href="#qa" class="text-sm text-blue-600 hover:underline flex items-center">
+                    <a href="#questions-section" class="text-sm text-blue-600 hover:underline flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        61 Q & A
+                        Q & A
                     </a>
                 </div>
 
@@ -454,6 +454,29 @@
 
             <!-- Livewire Question List Component -->
             @livewire('product.question-list', ['productId' => $product->id])
+        </div>
+    </div>
+</div>
+
+<!-- Customer Reviews Section -->
+<div class="bg-gray-50 py-8" id="reviews-section">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-lg border border-gray-200 p-6 lg:p-8">
+            <!-- Header -->
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Customer Reviews</h2>
+                <p class="text-sm text-gray-600">
+                    Share your experience with this product and help other customers make informed decisions.
+                </p>
+            </div>
+
+            <!-- Review List Component -->
+            @livewire('product.review-list', ['productId' => $product->id])
+
+            <!-- Review Form Component -->
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                @livewire('product.review-form', ['productId' => $product->id])
+            </div>
         </div>
     </div>
 </div>

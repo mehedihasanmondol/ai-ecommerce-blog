@@ -62,9 +62,9 @@ class ProductController extends Controller
         // Track this product as recently viewed
         $this->trackRecentlyViewed($product->id);
 
-        // Calculate average rating (placeholder - will implement when reviews are added)
-        $averageRating = 0;
-        $totalReviews = 0;
+        // Get review statistics
+        $averageRating = $product->average_rating ?? 0;
+        $totalReviews = $product->review_count ?? 0;
 
         return view('frontend.products.show', compact(
             'product', 
