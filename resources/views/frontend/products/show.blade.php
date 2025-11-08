@@ -11,27 +11,43 @@
 @endphp
 
 <!-- Breadcrumb -->
-<div class="bg-gray-50 border-b">
-    <div class="container mx-auto px-4 py-2">
-        <nav class="flex items-center space-x-2 text-xs text-gray-600">
-            <a href="{{ route('home') }}" class="hover:text-orange-600 transition">Home</a>
-            <span>›</span>
-            @if($product->category)
-                @if($product->category->parent)
-                    <a href="{{ route('shop') }}?category={{ $product->category->parent->slug }}" class="hover:text-orange-600 transition">
-                        {{ $product->category->parent->name }}
-                    </a>
-                    <span>›</span>
-                @endif
-                <a href="{{ route('shop') }}?category={{ $product->category->slug }}" class="hover:text-orange-600 transition">
-                    {{ $product->category->name }}
-                </a>
-                <span>›</span>
-            @endif
-            <span class="text-gray-900">{{ Str::limit($product->name, 50) }}</span>
-        </nav>
-    </div>
-</div>
+@php
+    $breadcrumbs = [
+        ['label' => 'Home', 'url' => route('home')]
+    ];
+    
+    // Add parent category if exists
+    if($product->category && $product->category->parent) {
+        $breadcrumbs[] = [
+            'label' => $product->category->parent->name,
+            'url' => route('shop') . '?category=' . $product->category->parent->slug
+        ];
+    }
+    
+    // Add category if exists
+    if($product->category) {
+        $breadcrumbs[] = [
+            'label' => $product->category->name,
+            'url' => route('shop') . '?category=' . $product->category->slug
+        ];
+    }
+    
+    // Add brand if exists (optional)
+    if($product->brand) {
+        $breadcrumbs[] = [
+            'label' => $product->brand->name,
+            'url' => route('shop') . '?brand=' . $product->brand->slug
+        ];
+    }
+    
+    // Add current product (no link)
+    $breadcrumbs[] = [
+        'label' => $product->name,
+        'url' => null
+    ];
+@endphp
+
+<x-breadcrumb :items="$breadcrumbs" />
 
 <!-- Main Product Section -->
 <div class="bg-white">
@@ -385,6 +401,9 @@
         </div>
     </div>
 </div>
+
+<!-- Frequently Purchased Together -->
+<x-frequently-purchased-together :product="$product" :relatedProducts="$relatedProducts" />
 
 <!-- Product Tabs Section -->
 <div class="bg-gray-50 py-8">
