@@ -5,7 +5,6 @@ namespace App\Livewire\Product;
 use App\Modules\Ecommerce\Product\Services\ProductQuestionService;
 use App\Modules\Ecommerce\Product\Services\ProductAnswerService;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 /**
  * ModuleName: Question List Livewire Component
@@ -27,13 +26,14 @@ use Livewire\WithPagination;
  */
 class QuestionList extends Component
 {
-    use WithPagination;
-
     public $productId;
     public $search = '';
     public $sortBy = 'recent'; // recent, helpful, most_answers
     public $showAnswerForm = [];
     public $answerText = [];
+    public $perLoad = 10;
+    public $offset = 0;
+    public $totalCount = 0;
 
     protected $queryString = ['search', 'sortBy'];
     protected $listeners = ['question-submitted' => '$refresh'];
@@ -45,7 +45,17 @@ class QuestionList extends Component
 
     public function updatingSearch()
     {
-        $this->resetPage();
+        $this->offset = 0;
+    }
+
+    public function updatingSortBy()
+    {
+        $this->offset = 0;
+    }
+
+    public function loadMore()
+    {
+        $this->offset += $this->perLoad;
     }
 
     public function voteHelpful($type, $id, $isHelpful = true)
@@ -94,10 +104,24 @@ class QuestionList extends Component
     public function render()
     {
         $questionService = app(ProductQuestionService::class);
-        $questions = $questionService->getQuestionsByProduct($this->productId, 10);
+        
+        // Get total count
+        $this->totalCount = $questionService->getQuestionCountByProduct($this->productId, $this->search);
+        
+        // Get ALL questions from start to current offset + perLoad (to keep previous loaded questions)
+        $limit = $this->offset + $this->perLoad;
+        $questions = $questionService->getQuestionsByProduct(
+            $this->productId, 
+            $limit,
+            0, // Always start from 0 to get all previous questions
+            $this->sortBy,
+            $this->search
+        );
 
         return view('livewire.product.question-list', [
             'questions' => $questions,
+            'hasMore' => $limit < $this->totalCount,
+            'loadedCount' => min($limit, $this->totalCount),
         ]);
     }
 }

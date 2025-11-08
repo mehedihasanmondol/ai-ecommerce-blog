@@ -5,6 +5,7 @@ namespace App\Modules\Ecommerce\Product\Repositories;
 use App\Modules\Ecommerce\Product\Models\ProductQuestion;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * ModuleName: Product Question Repository
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\Collection;
 class ProductQuestionRepository
 {
     /**
-     * Get questions for a specific product
+     * Get questions for a specific product with pagination
      */
     public function getByProduct(int $productId, int $perPage = 10): LengthAwarePaginator
     {
@@ -39,6 +40,39 @@ class ProductQuestionRepository
             ->approved()
             ->recent()
             ->paginate($perPage);
+    }
+
+    /**
+     * Get questions for a specific product with limit and offset
+     */
+    public function getByProductWithLimit(int $productId, int $limit = 10, int $offset = 0, string $sortBy = 'recent', string $search = ''): SupportCollection
+    {
+        $query = ProductQuestion::with(['user', 'approvedAnswers.user'])
+            ->where('product_id', $productId)
+            ->approved();
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where('question', 'like', "%{$search}%");
+        }
+
+        // Apply sorting
+        switch ($sortBy) {
+            case 'helpful':
+                $query->mostHelpful();
+                break;
+            case 'most_answers':
+                $query->withCount('approvedAnswers')
+                      ->orderBy('approved_answers_count', 'desc');
+                break;
+            default:
+                $query->recent();
+                break;
+        }
+
+        return $query->skip($offset)
+                    ->take($limit)
+                    ->get();
     }
 
     /**
@@ -156,10 +190,16 @@ class ProductQuestionRepository
     /**
      * Get question count for product
      */
-    public function getCountByProduct(int $productId): int
+    public function getCountByProduct(int $productId, string $search = ''): int
     {
-        return ProductQuestion::where('product_id', $productId)
-            ->approved()
-            ->count();
+        $query = ProductQuestion::where('product_id', $productId)
+            ->approved();
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where('question', 'like', "%{$search}%");
+        }
+
+        return $query->count();
     }
 }

@@ -146,11 +146,19 @@ class ProductQuestionService
     }
 
     /**
-     * Get questions for product
+     * Get questions for product with limit and offset
      */
-    public function getQuestionsByProduct(int $productId, int $perPage = 10)
+    public function getQuestionsByProduct(int $productId, int $limit = 10, int $offset = 0, string $sortBy = 'recent', string $search = '')
     {
-        return $this->questionRepository->getByProduct($productId, $perPage);
+        return $this->questionRepository->getByProductWithLimit($productId, $limit, $offset, $sortBy, $search);
+    }
+
+    /**
+     * Get question count for product
+     */
+    public function getQuestionCountByProduct(int $productId, string $search = ''): int
+    {
+        return $this->questionRepository->getCountByProduct($productId, $search);
     }
 
     /**
