@@ -233,10 +233,11 @@
                             {{-- Description --}}
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                                <textarea wire:model="description" 
-                                          rows="6"
-                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                          placeholder="Enter detailed product description"></textarea>
+                                <div wire:ignore>
+                                    <textarea id="product-description-editor" 
+                                              class="w-full">{{ $description }}</textarea>
+                                </div>
+                                <input type="hidden" wire:model="description" id="product-description-hidden">
                                 @error('description') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
