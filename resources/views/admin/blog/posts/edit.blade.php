@@ -558,23 +558,16 @@
 tinymce.init({
     selector: '#tinymce-editor',
     height: 500,
-    menubar: true,
+    menubar: false, // Hide menubar for cleaner interface
     plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
-        'emoticons', 'codesample', 'quickbars'
+        'lists', 'link', 'image', 'fullscreen', 'code'
     ],
-    toolbar: 'undo redo | blocks | ' +
-        'bold italic underline strikethrough | forecolor backcolor | ' +
-        'alignleft aligncenter alignright alignjustify | ' +
-        'bullist numlist outdent indent | ' +
-        'link image media table | ' +
-        'codesample code | ' +
-        'removeformat | help | fullscreen',
-    toolbar_mode: 'sliding',
-    quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
-    contextmenu: 'link image table',
+    toolbar: 'undo redo | bold italic underline | ' +
+        'alignleft aligncenter alignright | ' +
+        'bullist numlist | link image | ' +
+        'fullscreen | code | removeformat',
+    toolbar_mode: 'wrap',
+    promotion: false, // Remove "Upgrade" button
     content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; font-size: 16px; line-height: 1.6; }',
     
     // Image upload settings

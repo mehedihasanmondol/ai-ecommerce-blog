@@ -52,19 +52,16 @@ function initTinyMCE() {
     tinymce.init({
         selector: '#product-description-editor',
         height: 400,
-        menubar: true,
+        menubar: false, // Hide menubar for cleaner interface
         plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            'lists', 'link', 'image', 'fullscreen', 'code'
         ],
-        toolbar: 'undo redo | blocks | ' +
-            'bold italic underline strikethrough | forecolor backcolor | ' +
-            'alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | ' +
-            'link image media table | ' +
-            'code | removeformat | help',
-        toolbar_mode: 'sliding',
+        toolbar: 'undo redo | bold italic underline | ' +
+            'alignleft aligncenter alignright | ' +
+            'bullist numlist | link image | ' +
+            'fullscreen | code | removeformat',
+        toolbar_mode: 'wrap',
+        promotion: false, // Remove "Upgrade" button
         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; font-size: 16px; line-height: 1.6; }',
         
         // Image upload settings
