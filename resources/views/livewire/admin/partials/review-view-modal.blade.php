@@ -13,7 +13,7 @@
     
     <!-- Modal -->
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative rounded-lg shadow-2xl max-w-3xl w-full border border-gray-200 max-h-[90vh] overflow-y-auto"
+        <div class="relative rounded-lg shadow-2xl max-w-3xl w-full border border-gray-200 max-h-[90vh] flex flex-col"
              style="background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -23,8 +23,8 @@
              x-transition:leave-start="opacity-100 transform scale-100"
              x-transition:leave-end="opacity-0 transform scale-90">
             
-            {{-- Header --}}
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            {{-- Header (Sticky) --}}
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white rounded-t-lg flex-shrink-0">
                 <div class="flex-1">
                     <h3 class="text-lg font-bold text-gray-900 mb-2">Review Details</h3>
                     <div class="flex items-center gap-1">
@@ -45,8 +45,8 @@
                 </button>
             </div>
             
-            {{-- Body --}}
-            <div class="px-6 py-4">
+            {{-- Body (Scrollable) --}}
+            <div class="px-6 py-4 overflow-y-auto flex-1">
 
             {{-- Product Info --}}
             @if($selectedReview->product)
@@ -97,16 +97,116 @@
                 <p class="text-gray-700 leading-relaxed whitespace-pre-wrap">{{ $selectedReview->review }}</p>
             </div>
 
-            {{-- Review Images --}}
+            {{-- Review Images Gallery --}}
             @if($selectedReview->images && count($selectedReview->images) > 0)
-            <div class="mb-6">
-                <h4 class="text-sm font-medium text-gray-700 mb-3">Review Images</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    @foreach($selectedReview->images as $image)
-                    <div class="aspect-square rounded-lg overflow-hidden border border-gray-200">
-                        <img src="{{ asset('storage/' . $image) }}" alt="Review Image" class="w-full h-full object-cover">
+            <div class="mb-6" x-data="{ 
+                showLightbox: false, 
+                currentImage: 0,
+                images: {{ json_encode(array_map(fn($img) => asset('storage/' . $img), $selectedReview->images)) }}
+            }">
+                <h4 class="text-sm font-medium text-gray-700 mb-3">
+                    Review Images ({{ count($selectedReview->images) }})
+                </h4>
+                
+                <!-- Image Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    @foreach($selectedReview->images as $index => $image)
+                    <div class="group relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 cursor-pointer hover:border-blue-500 transition-all bg-gray-100"
+                         @click="showLightbox = true; currentImage = {{ $index }}">
+                        <img src="{{ asset('storage/' . $image) }}" 
+                             alt="Review Image {{ $index + 1 }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        
+                        <!-- Hover overlay - only visible on hover -->
+                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none"></div>
+                        
+                        <!-- Zoom icon - only visible on hover -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                            <div class="bg-white bg-opacity-90 rounded-full p-2">
+                                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Image number badge -->
+                        <div class="absolute top-2 right-2 bg-white text-gray-900 text-xs font-semibold px-2 py-1 rounded shadow-md">
+                            {{ $index + 1 }}/{{ count($selectedReview->images) }}
+                        </div>
                     </div>
                     @endforeach
+                </div>
+
+                <!-- Lightbox Modal -->
+                <div x-show="showLightbox" 
+                     x-cloak
+                     @keydown.escape.window="showLightbox = false"
+                     @keydown.arrow-left.window="currentImage = currentImage > 0 ? currentImage - 1 : images.length - 1"
+                     @keydown.arrow-right.window="currentImage = currentImage < images.length - 1 ? currentImage + 1 : 0"
+                     @click="showLightbox = false"
+                     class="fixed inset-0 z-[60] bg-black bg-opacity-95"
+                     style="display: none;">
+                    
+                    <!-- Close Button -->
+                    <button @click.stop="showLightbox = false" 
+                            class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-20 bg-black bg-opacity-50 rounded-full p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <!-- Main Content Container -->
+                    <div class="h-full flex flex-col items-center justify-center p-4" @click.stop>
+                        
+                        <!-- Image Container with Navigation -->
+                        <div class="relative w-full max-w-5xl flex items-center justify-center mb-20">
+                            
+                            <!-- Previous Button -->
+                            <button @click.stop="currentImage = currentImage > 0 ? currentImage - 1 : images.length - 1"
+                                    class="absolute left-0 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+
+                            <!-- Image -->
+                            <div class="relative">
+                                <img :src="images[currentImage]" 
+                                     alt="Review Image"
+                                     class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl"
+                                     @click.stop>
+                                
+                                <!-- Image Counter -->
+                                <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white text-gray-900 px-4 py-2 rounded-full text-sm font-medium shadow-lg">
+                                    <span x-text="currentImage + 1"></span> / <span x-text="images.length"></span>
+                                </div>
+                            </div>
+
+                            <!-- Next Button -->
+                            <button @click.stop="currentImage = currentImage < images.length - 1 ? currentImage + 1 : 0"
+                                    class="absolute right-0 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-70">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Thumbnail Strip -->
+                        <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 max-w-4xl" @click.stop>
+                            <div class="flex gap-2 px-4 py-3 bg-white rounded-lg shadow-2xl overflow-x-auto">
+                                <template x-for="(img, idx) in images" :key="idx">
+                                    <div @click.stop="currentImage = idx"
+                                         :class="{ 'ring-4 ring-blue-500': currentImage === idx, 'ring-2 ring-gray-300': currentImage !== idx }"
+                                         class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer transition-all hover:ring-4 hover:ring-blue-400">
+                                        <img :src="img" 
+                                             alt="Thumbnail"
+                                             class="w-full h-full object-cover"
+                                             :class="{ 'opacity-100': currentImage === idx, 'opacity-60': currentImage !== idx }">
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             @endif
@@ -158,9 +258,9 @@
 
             </div>
             
-            {{-- Footer Actions --}}
+            {{-- Footer Actions (Sticky) --}}
             @if($selectedReview->status == 'pending')
-            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div class="px-6 py-4 border-t border-gray-200 bg-white rounded-b-lg flex-shrink-0">
                 <div class="flex gap-3">
                     <button wire:click="approve({{ $selectedReview->id }})" 
                             wire:loading.attr="disabled"
