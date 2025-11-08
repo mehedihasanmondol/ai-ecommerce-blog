@@ -77,11 +77,20 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Active Status</label>
                     <select wire:model.live="statusFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-                        <option value="">All Status</option>
+                        <option value="">All</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Publish Status</label>
+                    <select wire:model.live="publishStatusFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option value="">All</option>
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
                     </select>
                 </div>
 
@@ -176,20 +185,26 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-2">
-                                <button wire:click="toggleActive({{ $product->id }})" 
-                                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                                        {{ $product->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
-                                    <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                                        {{ $product->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                                </button>
-                                @if($product->is_featured)
-                                <span class="text-yellow-500" title="Featured">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-2">
+                                    <button wire:click="toggleActive({{ $product->id }})" 
+                                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+                                            {{ $product->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
+                                        <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+                                            {{ $product->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                    </button>
+                                    @if($product->is_featured)
+                                    <span class="text-yellow-500" title="Featured">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </span>
+                                    @endif
+                                </div>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                    {{ $product->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                    {{ ucfirst($product->status ?? 'draft') }}
                                 </span>
-                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

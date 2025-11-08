@@ -44,6 +44,14 @@ class ProductRepository
             $query->where('is_active', $filters['is_active']);
         }
 
+        // Filter by status (draft, published, etc.)
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        } else {
+            // By default, hide draft products in admin panel
+            $query->where('status', '!=', 'draft');
+        }
+
         $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortOrder = $filters['sort_order'] ?? 'desc';
         $query->orderBy($sortBy, $sortOrder);

@@ -18,7 +18,8 @@ class ProductList extends Component
     public $categoryFilter = '';
     public $brandFilter = '';
     public $typeFilter = '';
-    public $statusFilter = '';
+    public $statusFilter = ''; // active/inactive filter
+    public $publishStatusFilter = ''; // draft/published filter
     public $perPage = 15;
     public $sortBy = 'id';
     public $sortOrder = 'desc';
@@ -33,6 +34,7 @@ class ProductList extends Component
         'brandFilter' => ['except' => ''],
         'typeFilter' => ['except' => ''],
         'statusFilter' => ['except' => ''],
+        'publishStatusFilter' => ['except' => ''],
     ];
 
     public function updatingSearch()
@@ -56,6 +58,11 @@ class ProductList extends Component
     }
 
     public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPublishStatusFilter()
     {
         $this->resetPage();
     }
@@ -115,7 +122,7 @@ class ProductList extends Component
 
     public function clearFilters()
     {
-        $this->reset(['search', 'categoryFilter', 'brandFilter', 'typeFilter', 'statusFilter']);
+        $this->reset(['search', 'categoryFilter', 'brandFilter', 'typeFilter', 'statusFilter', 'publishStatusFilter']);
         $this->resetPage();
     }
 
@@ -133,6 +140,10 @@ class ProductList extends Component
 
             if ($this->statusFilter !== '') {
                 $filters['is_active'] = $this->statusFilter === 'active';
+            }
+
+            if ($this->publishStatusFilter !== '') {
+                $filters['status'] = $this->publishStatusFilter;
             }
 
             $products = $repository->paginate($this->perPage, $filters);
