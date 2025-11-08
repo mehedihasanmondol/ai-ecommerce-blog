@@ -42,6 +42,7 @@
 @if($bundleProducts->count() > 0)
 <div class="bg-white py-8 border-t border-gray-200" x-data="{
     selectedItems: [{{ $product->id }}],
+    items: {{ Js::from($bundleItems->toArray()) }},
     toggleItem(id) {
         if (this.selectedItems.includes(id)) {
             this.selectedItems = this.selectedItems.filter(i => i !== id);
@@ -54,10 +55,9 @@
     },
     get totalPrice() {
         let total = 0;
-        const items = {{ json_encode($bundleItems) }};
-        items.forEach(item => {
+        this.items.forEach(item => {
             if (this.selectedItems.includes(item.id)) {
-                total += item.price;
+                total += parseFloat(item.price);
             }
         });
         return total.toFixed(2);
@@ -67,15 +67,11 @@
     }
 }">
     <div class="container mx-auto px-4">
-        <!-- Section Title with Badge Style -->
-        <div class="mb-6">
-            <span class="inline-block bg-gray-100 text-gray-900 text-lg font-semibold px-4 py-2 rounded-lg">
-                Frequently purchased together
-            </span>
-        </div>
+        <!-- Section Title -->
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently purchased together</h2>
         
         <!-- Bundle Container -->
-        <div class="bg-white border-t border-gray-200 pt-6">
+        <div class="bg-white p-6">
             <div class="flex flex-col lg:flex-row lg:items-start gap-6">
                 
                 <!-- Left Side: Product Images with Plus Signs -->
