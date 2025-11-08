@@ -405,6 +405,9 @@
 <!-- Frequently Purchased Together -->
 <x-frequently-purchased-together :product="$product" :relatedProducts="$relatedProducts" />
 
+<!-- Inspired by Browsing -->
+<x-inspired-by-browsing :products="$inspiredByBrowsing" />
+
 <!-- Product Tabs Section -->
 <div class="bg-gray-50 py-8">
     <div class="container mx-auto px-4">

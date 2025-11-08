@@ -1142,6 +1142,60 @@ The product detail page has been successfully transformed to match the iHerb des
 
 ---
 
+## ✅ Inspired by Browsing Section - COMPLETED
+
+**Date**: November 8, 2025
+
+### Implementation Summary
+
+Added "Inspired by your browsing" section to the product detail page, displaying personalized product recommendations based on user's browsing history.
+
+### Files Created/Modified
+
+1. **Component Created**:
+   - `resources/views/components/inspired-by-browsing.blade.php`
+     - Horizontal scrollable product carousel
+     - Navigation arrows (left/right)
+     - Product cards with image, brand, name, rating, and price
+     - Sale badges for discounted products
+     - Responsive design matching iHerb style
+
+2. **Controller Updated**:
+   - `app/Http/Controllers/ProductController.php`
+     - Added `getInspiredByBrowsing()` method
+     - Analyzes user's browsing history (categories and brands)
+     - Returns 10 personalized product recommendations
+     - Falls back to same-category products if no browsing history
+     - Passes `$inspiredByBrowsing` to view
+
+3. **View Updated**:
+   - `resources/views/frontend/products/show.blade.php`
+     - Added `<x-inspired-by-browsing>` component
+     - Positioned after "Frequently Purchased Together" section
+     - Before "Product Tabs" section
+
+### Features Implemented
+
+- **Smart Recommendations**: Products based on browsing history (categories & brands)
+- **Horizontal Scroll**: Smooth scrolling carousel with navigation buttons
+- **Product Cards**: Clean design with all essential information
+- **Rating Display**: Star ratings with review counts
+- **Price Display**: Shows sale prices with original price strikethrough
+- **Sale Badges**: Visual indicators for discounted products
+- **Responsive**: Works on all screen sizes
+- **Performance**: Lazy loading for images
+
+### How It Works
+
+1. Tracks user's recently viewed products in session
+2. Analyzes browsing patterns (categories and brands)
+3. Fetches products from similar categories/brands
+4. Excludes already viewed products
+5. Displays up to 10 recommendations in scrollable carousel
+6. Falls back to category-based recommendations if no history
+
+---
+
 ## Pending Tasks 📋
 
 1. **Product Management - Next Steps**

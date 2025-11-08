@@ -56,6 +56,9 @@ class ProductController extends Controller
         // Get recently viewed products from session
         $recentlyViewed = $this->getRecentlyViewedProducts($product->id);
 
+        // Get inspired by browsing products (based on browsing history)
+        $inspiredByBrowsing = $this->getInspiredByBrowsing($product);
+
         // Track this product as recently viewed
         $this->trackRecentlyViewed($product->id);
 
@@ -68,6 +71,7 @@ class ProductController extends Controller
             'defaultVariant',
             'relatedProducts', 
             'recentlyViewed',
+            'inspiredByBrowsing',
             'averageRating',
             'totalReviews'
         ));
@@ -121,5 +125,58 @@ class ProductController extends Controller
                 return array_search($product->id, $recentlyViewedIds);
             })
             ->take(6);
+    }
+
+    /**
+     * Get inspired by browsing products based on user's browsing history
+     *
+     * @param Product $currentProduct
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getInspiredByBrowsing(Product $currentProduct)
+    {
+        $recentlyViewedIds = session()->get('recently_viewed', []);
+        
+        // If no browsing history, return products from same category
+        if (empty($recentlyViewedIds)) {
+            return Product::with(['variants', 'images', 'brand'])
+                ->where('category_id', $currentProduct->category_id)
+                ->where('id', '!=', $currentProduct->id)
+                ->where('is_active', true)
+                ->inRandomOrder()
+                ->limit(10)
+                ->get();
+        }
+
+        // Get recently viewed products to analyze browsing patterns
+        $recentlyViewedProducts = Product::whereIn('id', $recentlyViewedIds)
+            ->where('is_active', true)
+            ->get();
+
+        // Collect category IDs and brand IDs from browsing history
+        $categoryIds = $recentlyViewedProducts->pluck('category_id')->unique()->toArray();
+        $brandIds = $recentlyViewedProducts->pluck('brand_id')->filter()->unique()->toArray();
+
+        // Get products from browsed categories and brands
+        $query = Product::with(['variants', 'images', 'brand'])
+            ->where('id', '!=', $currentProduct->id)
+            ->where('is_active', true);
+
+        // Filter by categories or brands from browsing history
+        $query->where(function ($q) use ($categoryIds, $brandIds) {
+            if (!empty($categoryIds)) {
+                $q->whereIn('category_id', $categoryIds);
+            }
+            if (!empty($brandIds)) {
+                $q->orWhereIn('brand_id', $brandIds);
+            }
+        });
+
+        // Exclude already viewed products
+        $query->whereNotIn('id', $recentlyViewedIds);
+
+        return $query->inRandomOrder()
+            ->limit(10)
+            ->get();
     }
 }
