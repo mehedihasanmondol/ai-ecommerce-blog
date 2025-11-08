@@ -49,12 +49,10 @@ class ProductQuestionController extends Controller
         }
         
         // Status filter
-        if ($request->has('status') && $request->status) {
+        if ($request->has('status') && $request->status !== '') {
             $query->where('status', $request->status);
-        } else {
-            // Default to pending questions
-            $query->where('status', 'pending');
         }
+        // If no status filter, show all questions (no where clause)
         
         $questions = $query->latest()->paginate($perPage);
 
