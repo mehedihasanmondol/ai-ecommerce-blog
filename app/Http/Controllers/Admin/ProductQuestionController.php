@@ -36,27 +36,11 @@ class ProductQuestionController extends Controller
 
     /**
      * Display a listing of questions
+     * Data is handled by Livewire component
      */
-    public function index(Request $request)
+    public function index()
     {
-        $perPage = 15;
-        
-        $query = \App\Modules\Ecommerce\Product\Models\ProductQuestion::with(['product', 'user', 'answers']);
-        
-        // Search filter
-        if ($request->has('search') && $request->search) {
-            $query->where('question', 'like', '%' . $request->search . '%');
-        }
-        
-        // Status filter
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
-        }
-        // If no status filter, show all questions (no where clause)
-        
-        $questions = $query->latest()->paginate($perPage);
-
-        return view('admin.product-questions.index', compact('questions'));
+        return view('admin.product-questions.index');
     }
 
     /**
