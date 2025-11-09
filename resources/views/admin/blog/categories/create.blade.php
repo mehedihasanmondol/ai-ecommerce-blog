@@ -112,13 +112,13 @@
                             Category Image
                         </label>
                         <input type="file" 
-                               name="image_path" 
+                               name="image" 
                                id="image" 
                                accept="image/*"
                                onchange="previewImage(event)"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('image_path') border-red-500 @enderror">
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('image') border-red-500 @enderror">
                         <p class="mt-1 text-xs text-gray-500">Max size: 2MB. Formats: JPG, PNG, GIF, WebP</p>
-                        @error('image_path')
+                        @error('image')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                         
