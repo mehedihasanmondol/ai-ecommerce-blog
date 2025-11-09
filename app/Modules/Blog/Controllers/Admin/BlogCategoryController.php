@@ -27,8 +27,7 @@ class BlogCategoryController extends Controller
 
     public function index()
     {
-        $categories = $this->categoryService->getAllCategories();
-        return view('admin.blog.categories.index', compact('categories'));
+        return view('admin.blog.categories.index-livewire');
     }
 
     public function create()
