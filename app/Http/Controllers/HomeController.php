@@ -120,16 +120,120 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function shop()
+    public function shop(Request $request)
     {
-        $products = Product::with(['variants', 'category', 'brand', 'images'])
-            ->where('is_active', true)
-            ->paginate(24);
+        $query = Product::with(['variants', 'category', 'brand', 'images'])
+            ->where('is_active', true);
 
-        $categories = Category::where('is_active', true)->get();
-        $brands = Brand::where('is_active', true)->get();
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
 
-        return view('frontend.shop.index', compact('products', 'categories', 'brands'));
+        // Category Filter
+        if ($request->filled('category')) {
+            $categoryIds = is_array($request->category) ? $request->category : [$request->category];
+            $query->whereIn('category_id', $categoryIds);
+        }
+
+        // Brand Filter
+        if ($request->filled('brand')) {
+            $brandIds = is_array($request->brand) ? $request->brand : [$request->brand];
+            $query->whereIn('brand_id', $brandIds);
+        }
+
+        // Price Range Filter
+        if ($request->filled('min_price')) {
+            $query->whereHas('variants', function($q) use ($request) {
+                $q->where('price', '>=', $request->min_price);
+            });
+        }
+        if ($request->filled('max_price')) {
+            $query->whereHas('variants', function($q) use ($request) {
+                $q->where('price', '<=', $request->max_price);
+            });
+        }
+
+        // Rating Filter
+        if ($request->filled('rating')) {
+            $query->where('average_rating', '>=', $request->rating);
+        }
+
+        // In Stock Filter
+        if ($request->filled('in_stock') && $request->in_stock == '1') {
+            $query->whereHas('variants', function($q) {
+                $q->where('stock_quantity', '>', 0);
+            });
+        }
+
+        // On Sale Filter
+        if ($request->filled('on_sale') && $request->on_sale == '1') {
+            $query->whereHas('variants', function($q) {
+                $q->whereNotNull('sale_price')
+                  ->whereColumn('sale_price', '<', 'price');
+            });
+        }
+
+        // Sorting
+        $sortBy = $request->get('sort', 'latest');
+        switch ($sortBy) {
+            case 'price_low':
+                $query->orderByRaw('(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) ASC');
+                break;
+            case 'price_high':
+                $query->orderByRaw('(SELECT MIN(price) FROM product_variants WHERE product_id = products.id) DESC');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'rating':
+                $query->orderBy('average_rating', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('view_count', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
+        }
+
+        // Pagination
+        $perPage = $request->get('per_page', 24);
+        $products = $query->paginate($perPage)->withQueryString();
+
+        // Get all categories and brands for filters
+        $categories = Category::where('is_active', true)
+            ->withCount(['products' => function($q) {
+                $q->where('is_active', true);
+            }])
+            ->having('products_count', '>', 0)
+            ->orderBy('name')
+            ->get();
+
+        $brands = Brand::where('is_active', true)
+            ->withCount(['products' => function($q) {
+                $q->where('is_active', true);
+            }])
+            ->having('products_count', '>', 0)
+            ->orderBy('name')
+            ->get();
+
+        // Get price range
+        $priceRange = Product::where('is_active', true)
+            ->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+            ->selectRaw('MIN(product_variants.price) as min_price, MAX(product_variants.price) as max_price')
+            ->first();
+
+        return view('frontend.shop.index', compact('products', 'categories', 'brands', 'priceRange'));
     }
 
     /**

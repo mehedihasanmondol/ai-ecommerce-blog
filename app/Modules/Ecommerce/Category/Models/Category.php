@@ -79,6 +79,14 @@ class Category extends Model
     }
 
     /**
+     * Get products in this category
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Ecommerce\Product\Models\Product::class, 'category_id');
+    }
+
+    /**
      * Get all descendants recursively
      */
     public function descendants()

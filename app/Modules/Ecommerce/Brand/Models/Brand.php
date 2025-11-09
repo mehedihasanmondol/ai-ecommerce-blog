@@ -56,12 +56,11 @@ class Brand extends Model
 
     /**
      * Get products for this brand
-     * Note: Will be implemented when Product model is created
      */
-    // public function products()
-    // {
-    //     return $this->hasMany(Product::class);
-    // }
+    public function products()
+    {
+        return $this->hasMany(\App\Modules\Ecommerce\Product\Models\Product::class, 'brand_id');
+    }
 
     /**
      * Scope: Get only active brands

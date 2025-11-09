@@ -10,7 +10,7 @@ use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as Customer
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/shop', [HomeController::class, 'shop'])->name('shop');
+Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
