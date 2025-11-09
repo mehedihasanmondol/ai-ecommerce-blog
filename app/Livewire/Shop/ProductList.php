@@ -210,9 +210,11 @@ class ProductList extends Component
             });
         }
 
-        // Category Filter (for additional filtering on shop page)
+        // Category Filter (for additional filtering on shop and brand pages)
         if (!empty($this->selectedCategories) && !$this->category) {
-            $query->whereIn('category_id', $this->selectedCategories);
+            $query->whereHas('categories', function($q) {
+                $q->whereIn('categories.id', $this->selectedCategories);
+            });
         }
 
         // Brand Filter

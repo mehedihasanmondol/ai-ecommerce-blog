@@ -259,7 +259,8 @@
                         </div>
                         @endif
 
-                        <!-- Brands -->
+                        <!-- Brands (hide on brand pages) -->
+                        @if($pageType !== 'brand')
                         <div>
                             <h3 class="text-sm font-semibold text-gray-900 mb-3">Brands</h3>
                             <div class="space-y-2 max-h-64 overflow-y-auto">
@@ -275,6 +276,7 @@
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
                         <!-- Price Range -->
                         <div>
