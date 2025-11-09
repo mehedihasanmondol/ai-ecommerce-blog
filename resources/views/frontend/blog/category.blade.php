@@ -226,7 +226,7 @@
                     @endif
 
                 <!-- Posts List/Grid -->
-                <div>
+                <div class="pt-6">
                     <!-- List View -->
                     <div x-show="viewMode === 'list'" class="space-y-6">
                         @forelse($posts as $post)

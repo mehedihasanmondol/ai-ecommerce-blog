@@ -37,10 +37,15 @@ class Tag extends Model
         'slug',
         'description',
         'posts_count',
+        'is_active',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
     ];
 
     protected $casts = [
         'posts_count' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     /**

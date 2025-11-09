@@ -27,8 +27,7 @@ class TagController extends Controller
 
     public function index()
     {
-        $tags = $this->tagService->getAllTags();
-        return view('admin.blog.tags.index', compact('tags'));
+        return view('admin.blog.tags.index-livewire');
     }
 
     public function create()
