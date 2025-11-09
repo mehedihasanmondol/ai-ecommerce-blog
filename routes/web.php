@@ -45,6 +45,9 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// Blog Routes (must be before catch-all product route)
+require __DIR__.'/blog.php';
+
 // Public Product and Blog Post Routes (must be last to avoid conflicts)
 // This route handles both products and blog posts by slug
 // Named 'products.show' as primary, but works for both products and blog posts

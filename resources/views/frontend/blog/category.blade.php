@@ -132,7 +132,7 @@
                 </div>
 
                 <!-- Search, Filter & View Mode Bar -->
-                <div class="bg-white rounded-lg shadow-sm mb-6 p-6" x-data="{ viewMode: 'list' }">
+                <div class="bg-white rounded-lg shadow-sm mb-6 p-6" x-data="{ viewMode: 'grid' }">
                     <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                         <!-- Search Form -->
                         <form action="{{ route('blog.category', $category->slug) }}" method="GET" class="flex-1 w-full lg:max-w-md">
