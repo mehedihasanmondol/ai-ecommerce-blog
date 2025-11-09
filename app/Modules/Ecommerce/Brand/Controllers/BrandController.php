@@ -25,20 +25,11 @@ class BrandController extends Controller
     ) {}
 
     /**
-     * Display a listing of brands
+     * Display a listing of brands (Livewire)
      */
     public function index(Request $request)
     {
-        $filters = [
-            'search' => $request->get('search'),
-            'is_active' => $request->get('is_active'),
-            'is_featured' => $request->get('is_featured'),
-        ];
-
-        $brands = $this->repository->paginate(15, $filters);
-        $statistics = $this->service->getStatistics();
-
-        return view('admin.brands.index', compact('brands', 'statistics', 'filters'));
+        return view('admin.brands.index-livewire');
     }
 
     /**

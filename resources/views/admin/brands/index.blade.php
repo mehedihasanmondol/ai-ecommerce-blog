@@ -68,48 +68,80 @@
         </div>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow mb-6 p-4">
-        <form method="GET" action="{{ route('admin.brands.index') }}" class="flex flex-wrap gap-4">
-            <!-- Search -->
-            <div class="flex-1 min-w-[200px]">
-                <input type="text" 
-                       name="search" 
-                       value="{{ $filters['search'] ?? '' }}"
-                       placeholder="Search brands..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+    <!-- Filters Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div class="p-4">
+            <div class="flex items-center gap-4">
+                <!-- Search -->
+                <div class="flex-1">
+                    <form method="GET" action="{{ route('admin.brands.index') }}" id="searchForm">
+                        <div class="relative">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $filters['search'] ?? '' }}"
+                                   placeholder="Search brands..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <!-- Hidden inputs to preserve filters -->
+                            <input type="hidden" name="is_active" value="{{ $filters['is_active'] ?? '' }}">
+                            <input type="hidden" name="is_featured" value="{{ $filters['is_featured'] ?? '' }}">
+                            <input type="hidden" name="per_page" value="{{ request('per_page', 15) }}">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Filter Toggle -->
+                <button onclick="toggleFilters()" 
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    Filters
+                </button>
             </div>
 
-            <!-- Status Filter -->
-            <div class="w-48">
-                <select name="is_active" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Status</option>
-                    <option value="1" {{ ($filters['is_active'] ?? '') === '1' ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ ($filters['is_active'] ?? '') === '0' ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
+            <!-- Advanced Filters -->
+            <div id="advancedFilters" class="hidden">
+                <form method="GET" action="{{ route('admin.brands.index') }}" id="filterForm">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Active Status</label>
+                            <select name="is_active" 
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="">All</option>
+                                <option value="1" {{ ($filters['is_active'] ?? '') === '1' ? 'selected' : '' }}>Active</option>
+                                <option value="0" {{ ($filters['is_active'] ?? '') === '0' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                        </div>
 
-            <!-- Featured Filter -->
-            <div class="w-48">
-                <select name="is_featured" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Brands</option>
-                    <option value="1" {{ ($filters['is_featured'] ?? '') === '1' ? 'selected' : '' }}>Featured Only</option>
-                    <option value="0" {{ ($filters['is_featured'] ?? '') === '0' ? 'selected' : '' }}>Not Featured</option>
-                </select>
-            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Featured Status</label>
+                            <select name="is_featured" 
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                <option value="">All</option>
+                                <option value="1" {{ ($filters['is_featured'] ?? '') === '1' ? 'selected' : '' }}>Featured</option>
+                                <option value="0" {{ ($filters['is_featured'] ?? '') === '0' ? 'selected' : '' }}>Not Featured</option>
+                            </select>
+                        </div>
 
-            <!-- Buttons -->
-            <button type="submit" 
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                <i class="fas fa-search mr-2"></i>Filter
-            </button>
-            <a href="{{ route('admin.brands.index') }}" 
-               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
-                <i class="fas fa-redo mr-2"></i>Reset
-            </a>
-        </form>
+                        <!-- Hidden inputs to preserve search and per_page -->
+                        <input type="hidden" name="search" value="{{ $filters['search'] ?? '' }}">
+                        <input type="hidden" name="per_page" id="perPageInput" value="{{ request('per_page', 15) }}">
+
+                        <div class="md:col-span-4">
+                            <button type="submit" class="text-sm text-blue-600 hover:text-blue-700 font-medium mr-4">
+                                Apply Filters
+                            </button>
+                            <a href="{{ route('admin.brands.index') }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                Clear all filters
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Brands Table -->
@@ -266,9 +298,31 @@
         </table>
 
         <!-- Pagination -->
-        @if($brands->hasPages())
+        @if($brands->hasPages() || $brands->total() > 0)
         <div class="px-6 py-4 border-t border-gray-200">
-            {{ $brands->links() }}
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="perPage" class="text-sm text-gray-700">Show</label>
+                        <select id="perPage" 
+                                onchange="updatePerPage(this.value)"
+                                class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="10" {{ request('per_page', 15) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="25" {{ request('per_page', 15) == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page', 15) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page', 15) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                        <span class="text-sm text-gray-700">entries</span>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        Showing {{ $brands->firstItem() ?? 0 }} to {{ $brands->lastItem() ?? 0 }} of {{ $brands->total() }} results
+                    </span>
+                </div>
+                <div>
+                    {{ $brands->appends(request()->except('page'))->links() }}
+                </div>
+            </div>
         </div>
         @endif
     </div>
@@ -276,6 +330,41 @@
 
 @push('scripts')
 <script>
+// Toggle advanced filters visibility
+function toggleFilters() {
+    const filtersDiv = document.getElementById('advancedFilters');
+    filtersDiv.classList.toggle('hidden');
+}
+
+// Auto-submit search form on Enter key
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('searchForm').submit();
+            }
+        });
+    }
+    
+    // Show filters if any filter is active
+    const hasActiveFilters = {{ (($filters['is_active'] ?? '') !== '' || ($filters['is_featured'] ?? '') !== '') ? 'true' : 'false' }};
+    if (hasActiveFilters) {
+        document.getElementById('advancedFilters').classList.remove('hidden');
+    }
+});
+
+function updatePerPage(value) {
+    // Get current URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('per_page', value);
+    urlParams.delete('page'); // Reset to first page when changing per page
+    
+    // Redirect with new parameters
+    window.location.href = window.location.pathname + '?' + urlParams.toString();
+}
+
 function toggleStatus(brandId) {
     fetch(`/admin/brands/${brandId}/toggle-status`, {
         method: 'POST',
