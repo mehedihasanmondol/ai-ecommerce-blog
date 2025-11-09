@@ -18,6 +18,17 @@ class OrderController extends Controller
     }
 
     /**
+     * Display customer profile.
+     */
+    public function profile()
+    {
+        $user = auth()->user();
+        $orders = $this->orderRepository->getUserOrders(auth()->id());
+
+        return view('customer.profile', compact('user', 'orders'));
+    }
+
+    /**
      * Display customer's orders.
      */
     public function index()

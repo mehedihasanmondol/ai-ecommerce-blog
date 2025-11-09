@@ -95,6 +95,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 // Customer Order Routes (Protected)
 Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () {
+    Route::get('profile', [CustomerOrderController::class, 'profile'])->name('profile');
     Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
