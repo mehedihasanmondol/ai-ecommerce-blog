@@ -242,7 +242,7 @@
 
             <!-- Action Buttons -->
             <div class="space-y-2">
-                <a href="#" class="block w-full bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                <a href="{{ route('cart.index') }}" class="block w-full bg-green-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-green-700 transition">
                     View Cart
                 </a>
                 <button 

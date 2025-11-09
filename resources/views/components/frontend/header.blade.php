@@ -171,6 +171,9 @@
                     </a>
                 @endauth
 
+                <!-- Wishlist -->
+                @livewire('wishlist.wishlist-counter')
+
                 <!-- Cart -->
                 @livewire('cart.cart-counter')
             </div>
