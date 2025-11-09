@@ -60,43 +60,6 @@
                             @endforeach
                         </nav>
                     </div>
-
-                    <!-- Content Types -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Content Types</h3>
-                        </div>
-                        <nav class="py-2">
-                            <a href="#" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span class="font-medium">Articles</span>
-                            </a>
-                            <a href="#" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="font-medium">Videos</span>
-                            </a>
-                        </nav>
-                    </div>
-
-                    <!-- Content Team -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Content Team</h3>
-                        </div>
-                        <nav class="py-2">
-                            <a href="#" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                <span class="font-medium">Wellness Experts</span>
-                            </a>
-                        </nav>
-                    </div>
                 </div>
             </aside>
 
@@ -172,32 +135,6 @@
                              class="w-full rounded-xl">
                     </div>
                     @endif
-
-                    <!-- Table of Contents -->
-                    <div class="px-8 pb-6">
-                        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                            <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                                    </svg>
-                                    Table of Contents
-                                </h2>
-                                <button class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <ul class="space-y-2 text-sm">
-                                <li><a href="#key-takeaways" class="text-blue-600 hover:text-blue-800">Key Takeaways</a></li>
-                                <li><a href="#nutrition-reset" class="text-blue-600 hover:text-blue-800">Do You Need A Nutrition Reset?</a></li>
-                                <li><a href="#science-tips" class="text-blue-600 hover:text-blue-800">7 Science-Backed Nutrition Tips</a></li>
-                                <li><a href="#practice" class="text-blue-600 hover:text-blue-800">Putting It Into Practice: A Sample Healthy Eating Day</a></li>
-                                <li><a href="#faq" class="text-blue-600 hover:text-blue-800">Frequently Asked Questions About Eating Habits</a></li>
-                            </ul>
-                        </div>
-                    </div>
 
                     <!-- Content -->
                     <div class="px-8 pb-8">

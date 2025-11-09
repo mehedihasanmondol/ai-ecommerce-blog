@@ -568,7 +568,26 @@ tinymce.init({
         'fullscreen | code | removeformat',
     toolbar_mode: 'wrap',
     promotion: false, // Remove "Upgrade" button
-    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; font-size: 16px; line-height: 1.6; }',
+    content_style: `
+        body { 
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 18px;
+            line-height: 1.75;
+            color: #374151;
+            max-width: none;
+        }
+        h1 { font-size: 2.25em; font-weight: 800; margin-top: 0; margin-bottom: 0.8888889em; line-height: 1.1111111; }
+        h2 { font-size: 1.5em; font-weight: 700; margin-top: 2em; margin-bottom: 1em; line-height: 1.3333333; }
+        h3 { font-size: 1.25em; font-weight: 600; margin-top: 1.6em; margin-bottom: 0.6em; line-height: 1.6; }
+        p { margin-top: 1.25em; margin-bottom: 1.25em; }
+        ul, ol { margin-top: 1.25em; margin-bottom: 1.25em; padding-left: 1.625em; }
+        li { margin-top: 0.5em; margin-bottom: 0.5em; }
+        strong { font-weight: 600; color: #111827; }
+        a { color: #2563eb; text-decoration: underline; }
+        blockquote { font-style: italic; border-left: 4px solid #e5e7eb; padding-left: 1em; margin: 1.6em 0; color: #6b7280; }
+        code { background-color: #f3f4f6; padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.875em; }
+        img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1.5em 0; }
+    `,
     
     // Image upload settings
     images_upload_handler: function (blobInfo, progress) {
