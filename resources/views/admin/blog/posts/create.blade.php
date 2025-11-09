@@ -218,6 +218,77 @@
                         </div>
                     </div>
 
+                    <!-- Featured Image -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
+                        
+                        <!-- Image Preview -->
+                        <div id="image-preview-container" class="hidden mb-4">
+                            <div class="relative inline-block">
+                                <img id="image-preview" src="" alt="Preview" 
+                                     class="w-full max-w-md h-auto rounded-lg border-2 border-gray-200 shadow-sm">
+                                <button type="button" 
+                                        onclick="removeImagePreview()"
+                                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <input type="file" 
+                               name="featured_image" 
+                               id="featured-image-input"
+                               accept="image/*"
+                               onchange="previewFeaturedImage(event)"
+                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="mt-2 text-xs text-gray-500">Max size: 2MB (JPG, PNG, WebP)</p>
+                        
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
+                            <input type="text" name="featured_image_alt" value="{{ old('featured_image_alt') }}"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Image description for SEO">
+                        </div>
+                    </div>
+
+                    <!-- YouTube Video -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">YouTube Video (Optional)</h3>
+                        
+                        <!-- Video Preview -->
+                        <div id="youtube-preview" class="mb-4 hidden">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Video Preview:</p>
+                            <div class="relative" style="padding-bottom: 56.25%; height: 0;">
+                                <iframe 
+                                    id="youtube-iframe"
+                                    src="" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen
+                                    class="absolute top-0 left-0 w-full h-full rounded-lg">
+                                </iframe>
+                            </div>
+                        </div>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-2">YouTube URL</label>
+                        <input type="url" 
+                               name="youtube_url" 
+                               id="youtube_url"
+                               value="{{ old('youtube_url') }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                               placeholder="https://www.youtube.com/watch?v=..."
+                               onchange="previewYouTubeVideo(this.value)"
+                               onpaste="setTimeout(() => previewYouTubeVideo(this.value), 100)">
+                        <p class="mt-2 text-xs text-gray-500">
+                            <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Paste the full YouTube video URL. The video will be embedded in the post.
+                        </p>
+                    </div>
+
                     <!-- Blog Categories -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex items-center justify-between mb-4">
@@ -281,41 +352,6 @@
                             @empty
                                 <p class="text-sm text-gray-500 text-center py-4">No tags available. Click "Add New" to create one.</p>
                             @endforelse
-                        </div>
-                    </div>
-
-                    <!-- Featured Image -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
-                        
-                        <!-- Image Preview -->
-                        <div id="image-preview-container" class="hidden mb-4">
-                            <div class="relative inline-block">
-                                <img id="image-preview" src="" alt="Preview" 
-                                     class="w-full max-w-md h-auto rounded-lg border-2 border-gray-200 shadow-sm">
-                                <button type="button" 
-                                        onclick="removeImagePreview()"
-                                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <input type="file" 
-                               name="featured_image" 
-                               id="featured-image-input"
-                               accept="image/*"
-                               onchange="previewFeaturedImage(event)"
-                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <p class="mt-2 text-xs text-gray-500">Max size: 2MB (JPG, PNG, WebP)</p>
-                        
-                        <div class="mt-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
-                            <input type="text" name="featured_image_alt" value="{{ old('featured_image_alt') }}"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="Image description for SEO">
                         </div>
                     </div>
 
@@ -909,20 +945,46 @@ function previewFeaturedImage(event) {
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
         if (!validTypes.includes(file.type)) {
             alert('Please select a valid image file (JPG, PNG, WebP, or GIF).');
-            event.target.value = ''; // Clear the input
-            return;
-        }
-        
-        // Create preview
         const reader = new FileReader();
         reader.onload = function(e) {
-            const preview = document.getElementById('image-preview');
-            const container = document.getElementById('image-preview-container');
-            
             preview.src = e.target.result;
-            container.classList.remove('hidden');
-        };
+            previewContainer.classList.remove('hidden');
+        }
         reader.readAsDataURL(file);
+    }
+}
+
+function previewYouTubeVideo(url) {
+    const previewContainer = document.getElementById('youtube-preview');
+    const iframe = document.getElementById('youtube-iframe');
+    
+    if (!url) {
+        previewContainer.classList.add('hidden');
+        iframe.src = '';
+        return;
+    }
+
+    // Extract video ID from various YouTube URL formats
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+        /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+    ];
+
+    let videoId = null;
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+            videoId = match[1];
+            break;
+        }
+    }
+
+    if (videoId) {
+        iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        previewContainer.classList.remove('hidden');
+    } else {
+        previewContainer.classList.add('hidden');
+        iframe.src = '';
     }
 }
 

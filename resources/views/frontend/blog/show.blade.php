@@ -102,7 +102,7 @@
                         </div>
 
                         <!-- Author Info -->
-                        <div class="flex items-center gap-3 mb-6">
+                        <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
                                 {{ substr($post->author->name, 0, 1) }}
                             </div>
@@ -110,20 +110,6 @@
                                 <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
                                 <p class="text-sm text-gray-500">Posted on {{ $post->published_at->format('F j, Y') }}</p>
                             </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex items-center gap-3">
-                            <button class="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
-                                </svg>
-                            </button>
-                            <button class="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                                </svg>
-                            </button>
                         </div>
                     </div>
 
@@ -133,6 +119,21 @@
                         <img src="{{ asset('storage/' . $post->featured_image) }}" 
                              alt="{{ $post->featured_image_alt }}" 
                              class="w-full rounded-xl">
+                    </div>
+                    @endif
+
+                    <!-- YouTube Video -->
+                    @if($post->youtube_url && $post->youtube_video_id)
+                    <div class="px-8 pb-8">
+                        <div class="relative rounded-xl overflow-hidden shadow-lg" style="padding-bottom: 56.25%; height: 0;">
+                            <iframe 
+                                src="{{ $post->youtube_embed_url }}" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowfullscreen
+                                class="absolute top-0 left-0 w-full h-full">
+                            </iframe>
+                        </div>
                     </div>
                     @endif
 

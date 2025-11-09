@@ -57,6 +57,7 @@ class Post extends Model
         'blog_category_id',
         'featured_image',
         'featured_image_alt',
+        'youtube_url',
         'status',
         'published_at',
         'scheduled_at',
@@ -183,7 +184,44 @@ class Post extends Model
      */
     public function getReadingTimeTextAttribute(): string
     {
+        if ($this->reading_time < 1) {
+            return 'Less than a minute';
+        }
+        
         return $this->reading_time . ' min read';
+    }
+
+    /**
+     * Get YouTube video ID from URL
+     */
+    public function getYoutubeVideoIdAttribute(): ?string
+    {
+        if (!$this->youtube_url) {
+            return null;
+        }
+
+        // Extract video ID from various YouTube URL formats
+        $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i';
+        
+        if (preg_match($pattern, $this->youtube_url, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get YouTube embed URL
+     */
+    public function getYoutubeEmbedUrlAttribute(): ?string
+    {
+        $videoId = $this->youtube_video_id;
+        
+        if (!$videoId) {
+            return null;
+        }
+
+        return "https://www.youtube.com/embed/{$videoId}";
     }
 
     /**
