@@ -1,4 +1,18 @@
 <div class="space-y-3">
+    <!-- Progress Bar & Claimed Text -->
+    @if($maxQuantity > 0)
+    <div class="mb-1">
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+            <div class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: {{ $this->claimedPercentage }}%"></div>
+        </div>
+        <!-- Claimed Text -->
+        <div class="text-sm text-gray-700 text-center">
+            {{ $this->claimedPercentage }}% claimed
+        </div>
+    </div>
+    @endif
+
     <!-- Quantity Selector (Exact iHerb Style) -->
     <div class="flex items-center justify-center bg-gray-100 rounded-full p-1 w-40 mx-auto">
         <!-- Decrement Button -->

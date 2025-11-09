@@ -370,26 +370,6 @@
                             @endif
                         @endif
                         
-                        <!-- Progress Bar & Claimed Text -->
-                        @if($variant && $variant->stock_quantity > 0)
-                        @php
-                            // Calculate claimed percentage based on sales
-                            $claimedPercentage = $product->sales_count > 0 
-                                ? min(round(($product->sales_count / ($product->sales_count + $variant->stock_quantity)) * 100), 95)
-                                : rand(5, 25);
-                        @endphp
-                        <div class="mb-4">
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ $claimedPercentage }}%"></div>
-                            </div>
-                            <!-- Claimed Text -->
-                            <div class="text-sm text-gray-700">
-                                {{ $claimedPercentage }}% claimed
-                            </div>
-                        </div>
-                        @endif
-                        
                         <!-- Variant Selector (for variable products) -->
                         @if($product->product_type === 'variable' && $product->variants->count() > 1)
                         <div class="mb-4">
