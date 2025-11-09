@@ -20,7 +20,7 @@
     if($product->category && $product->category->parent) {
         $breadcrumbs[] = [
             'label' => $product->category->parent->name,
-            'url' => route('shop') . '?category=' . $product->category->parent->slug
+            'url' => route('categories.show', $product->category->parent->slug)
         ];
     }
     
@@ -28,7 +28,7 @@
     if($product->category) {
         $breadcrumbs[] = [
             'label' => $product->category->name,
-            'url' => route('shop') . '?category=' . $product->category->slug
+            'url' => route('categories.show', $product->category->slug)
         ];
     }
     
@@ -36,7 +36,7 @@
     if($product->brand) {
         $breadcrumbs[] = [
             'label' => $product->brand->name,
-            'url' => route('shop') . '?brand=' . $product->brand->slug
+            'url' => route('brands.show', $product->brand->slug)
         ];
     }
     
@@ -84,8 +84,11 @@
                 @if($product->brand)
                 <div class="mb-3">
                     <span class="text-sm text-gray-600">By </span>
-                    <a href="{{ route('shop') }}?brand={{ $product->brand->slug }}" class="text-sm text-blue-600 hover:text-blue-800 transition font-medium">
-                        {{ $product->brand->name }}
+                    <a href="{{ route('brands.show', $product->brand->slug) }}" class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 transition font-medium group">
+                        <span>{{ $product->brand->name }}</span>
+                        <svg class="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
                     </a>
                 </div>
                 @endif
