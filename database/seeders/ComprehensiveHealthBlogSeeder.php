@@ -63,6 +63,38 @@ class ComprehensiveHealthBlogSeeder extends Seeder
             'meta_description' => 'Discover nutrition tips, diet plans, and healthy eating strategies',
         ]);
 
+        // Create subcategories
+        $subcategories = [
+            [
+                'name' => 'Meal Planning',
+                'slug' => 'meal-planning',
+                'description' => 'Practical meal planning tips and strategies',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Vitamins & Minerals',
+                'slug' => 'vitamins-minerals',
+                'description' => 'Essential vitamins and minerals for health',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Special Diets',
+                'slug' => 'special-diets',
+                'description' => 'Keto, Vegan, Paleo and other diet plans',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($subcategories as $subcat) {
+            BlogCategory::create($subcat);
+        }
+
         $posts = [
             ['title' => 'Complete Guide to Balanced Nutrition', 'excerpt' => 'Learn the fundamentals of balanced nutrition for optimal health'],
             ['title' => 'Top 10 Superfoods You Should Eat Daily', 'excerpt' => 'Nutrient-dense foods that boost your health'],
@@ -81,6 +113,38 @@ class ComprehensiveHealthBlogSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 2,
         ]);
+
+        // Create subcategories
+        $subcategories = [
+            [
+                'name' => 'Strength Training',
+                'slug' => 'strength-training',
+                'description' => 'Build muscle and increase strength',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Cardio Workouts',
+                'slug' => 'cardio-workouts',
+                'description' => 'Cardiovascular exercises for heart health',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Home Workouts',
+                'slug' => 'home-workouts',
+                'description' => 'Exercise routines you can do at home',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($subcategories as $subcat) {
+            BlogCategory::create($subcat);
+        }
 
         $posts = [
             ['title' => 'Beginner\'s Guide to Starting Your Fitness Journey', 'excerpt' => 'Everything you need to know to start exercising'],
@@ -101,6 +165,38 @@ class ComprehensiveHealthBlogSeeder extends Seeder
             'sort_order' => 3,
         ]);
 
+        // Create subcategories
+        $subcategories = [
+            [
+                'name' => 'Stress Management',
+                'slug' => 'stress-management',
+                'description' => 'Techniques to reduce and manage stress',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Anxiety & Depression',
+                'slug' => 'anxiety-depression',
+                'description' => 'Understanding and coping with anxiety and depression',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Mindfulness & Meditation',
+                'slug' => 'mindfulness-meditation',
+                'description' => 'Practices for present moment awareness',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($subcategories as $subcat) {
+            BlogCategory::create($subcat);
+        }
+
         $posts = [
             ['title' => '10 Daily Habits for Better Mental Health', 'excerpt' => 'Simple practices to improve your mental wellbeing'],
             ['title' => 'Managing Stress: Effective Techniques That Work', 'excerpt' => 'Proven strategies to reduce stress and anxiety'],
@@ -120,6 +216,38 @@ class ComprehensiveHealthBlogSeeder extends Seeder
             'sort_order' => 4,
         ]);
 
+        // Create subcategories
+        $subcategories = [
+            [
+                'name' => 'Diet Plans',
+                'slug' => 'diet-plans',
+                'description' => 'Various diet plans for weight loss',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Calorie Counting',
+                'slug' => 'calorie-counting',
+                'description' => 'Track and manage your calorie intake',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Weight Loss Tips',
+                'slug' => 'weight-loss-tips',
+                'description' => 'Practical tips for losing weight',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($subcategories as $subcat) {
+            BlogCategory::create($subcat);
+        }
+
         $posts = [
             ['title' => 'Healthy Weight Loss: Science-Based Strategies', 'excerpt' => 'Lose weight sustainably with evidence-based methods'],
             ['title' => 'Intermittent Fasting: Complete Beginner\'s Guide', 'excerpt' => 'Everything about intermittent fasting for weight loss'],
@@ -138,6 +266,38 @@ class ComprehensiveHealthBlogSeeder extends Seeder
             'is_active' => true,
             'sort_order' => 5,
         ]);
+
+        // Create subcategories
+        $subcategories = [
+            [
+                'name' => 'Beginner Yoga',
+                'slug' => 'beginner-yoga',
+                'description' => 'Yoga basics for beginners',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 1,
+            ],
+            [
+                'name' => 'Advanced Poses',
+                'slug' => 'advanced-poses',
+                'description' => 'Challenging yoga poses for experienced practitioners',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 2,
+            ],
+            [
+                'name' => 'Yoga Styles',
+                'slug' => 'yoga-styles',
+                'description' => 'Different types of yoga practices',
+                'parent_id' => $category->id,
+                'is_active' => true,
+                'sort_order' => 3,
+            ],
+        ];
+
+        foreach ($subcategories as $subcat) {
+            BlogCategory::create($subcat);
+        }
 
         $posts = [
             ['title' => 'Yoga for Beginners: Essential Poses', 'excerpt' => 'Start your yoga journey with these basic poses'],

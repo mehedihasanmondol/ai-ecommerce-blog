@@ -78,11 +78,61 @@ class BlogController extends Controller
     /**
      * Category archive page
      */
-    public function category($slug)
+    public function category(Request $request, $slug)
     {
         $category = $this->categoryRepository->findBySlug($slug);
-        $posts = $this->postService->getPostsByCategory($category->id, config('app.paginate', 10));
-        $categories = $this->categoryRepository->getRoots();
+        
+        // Get sidebar categories: if current category has children, show them; otherwise show root categories
+        if ($category->children()->where('is_active', true)->count() > 0) {
+            // Show subcategories of current category
+            $categories = $category->children()
+                ->where('is_active', true)
+                ->withCount(['posts' => function($query) {
+                    $query->where('status', 'published');
+                }])
+                ->orderBy('sort_order')
+                ->get();
+        } else {
+            // Show root categories
+            $categories = $this->categoryRepository->getRoots();
+        }
+        
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+        $perPage = $request->input('per_page', 10);
+        
+        // Build query
+        $query = $category->posts()->where('status', 'published');
+        
+        // Apply search
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'title':
+                $query->orderBy('title', 'asc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('published_at', 'desc');
+                break;
+        }
+        
+        // Paginate
+        $posts = $query->with(['author', 'tags'])->paginate($perPage)->appends($request->query());
 
         return view('frontend.blog.category', compact('category', 'posts', 'categories'));
     }
