@@ -38,7 +38,7 @@ Route::get('/categories/{slug}', \App\Livewire\Shop\ProductList::class)->name('c
 
 // Public Brand Routes
 Route::get('/brands', [\App\Http\Controllers\BrandController::class, 'index'])->name('brands.index');
-Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('brands.show');
+Route::get('/brands/{slug}', \App\Livewire\Shop\ProductList::class)->name('brands.show');
 
 // Authentication Routes (must be before catch-all product route)
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

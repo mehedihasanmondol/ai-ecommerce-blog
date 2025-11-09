@@ -25,6 +25,7 @@ class ProductList extends Component
     // Route parameters
     public $slug = null; // Category or brand slug from route
     public $category = null; // Category model instance
+    public $brand = null; // Brand model instance
     public $pageType = 'shop'; // 'shop', 'category', or 'brand'
 
     // URL query string parameters
@@ -68,14 +69,26 @@ class ProductList extends Component
     {
         $this->slug = $slug;
         
-        // Determine page type and load category if needed
+        // Determine page type and load category or brand if needed
         if ($slug) {
-            $this->category = Category::with(['activeChildren', 'parent', 'products'])
-                ->where('slug', $slug)
-                ->where('is_active', true)
-                ->firstOrFail();
-            
-            $this->pageType = 'category';
+            // Check if it's a category route
+            if (request()->route()->getName() === 'categories.show') {
+                $this->category = Category::with(['activeChildren', 'parent', 'products'])
+                    ->where('slug', $slug)
+                    ->where('is_active', true)
+                    ->firstOrFail();
+                
+                $this->pageType = 'category';
+            }
+            // Check if it's a brand route
+            elseif (request()->route()->getName() === 'brands.show') {
+                $this->brand = Brand::with(['products'])
+                    ->where('slug', $slug)
+                    ->where('is_active', true)
+                    ->firstOrFail();
+                
+                $this->pageType = 'brand';
+            }
         }
     }
 
@@ -181,6 +194,11 @@ class ProductList extends Component
             $query->whereHas('categories', function ($q) use ($categoryIds) {
                 $q->whereIn('categories.id', $categoryIds);
             });
+        }
+
+        // If viewing a specific brand, filter by that brand
+        if ($this->brand) {
+            $query->where('brand_id', $this->brand->id);
         }
 
         // Search
@@ -472,37 +490,48 @@ class ProductList extends Component
     }
 
     /**
-     * Get breadcrumb for category page
+     * Get breadcrumb for category or brand page
      */
     public function getBreadcrumbProperty()
     {
-        if (!$this->category) {
+        // Brand page breadcrumb
+        if ($this->brand) {
             return [
                 ['label' => 'Home', 'url' => route('home')],
-                ['label' => 'Shop', 'url' => null]
+                ['label' => 'Brands', 'url' => route('brands.index')],
+                ['label' => $this->brand->name, 'url' => null],
             ];
         }
 
-        $breadcrumb = [
-            ['label' => 'Home', 'url' => route('home')],
-            ['label' => 'Categories', 'url' => route('categories.index')],
-        ];
+        // Category page breadcrumb
+        if ($this->category) {
+            $breadcrumb = [
+                ['label' => 'Home', 'url' => route('home')],
+                ['label' => 'Categories', 'url' => route('categories.index')],
+            ];
 
-        // Add parent categories
-        foreach ($this->category->ancestors() as $ancestor) {
+            // Add parent categories
+            foreach ($this->category->ancestors() as $ancestor) {
+                $breadcrumb[] = [
+                    'label' => $ancestor->name,
+                    'url' => route('categories.show', $ancestor->slug),
+                ];
+            }
+
+            // Add current category
             $breadcrumb[] = [
-                'label' => $ancestor->name,
-                'url' => route('categories.show', $ancestor->slug),
+                'label' => $this->category->name,
+                'url' => null,
             ];
+
+            return $breadcrumb;
         }
 
-        // Add current category
-        $breadcrumb[] = [
-            'label' => $this->category->name,
-            'url' => null,
+        // Shop page breadcrumb
+        return [
+            ['label' => 'Home', 'url' => route('home')],
+            ['label' => 'Shop', 'url' => null]
         ];
-
-        return $breadcrumb;
     }
 
     /**
@@ -517,6 +546,7 @@ class ProductList extends Component
             'priceRange' => $this->priceRange,
             'breadcrumb' => $this->breadcrumb,
             'category' => $this->category,
+            'brand' => $this->brand,
             'pageType' => $this->pageType,
         ])->extends('layouts.app')
           ->section('content');

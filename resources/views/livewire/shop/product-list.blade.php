@@ -4,6 +4,72 @@
         <x-breadcrumb :items="$breadcrumb" />
     @endif
 
+    <!-- Brand Header (for brand pages) - Compact Version -->
+    @if($brand)
+        <div class="bg-white border-b border-gray-200">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center gap-4">
+                    <!-- Brand Logo -->
+                    @if($brand->logo)
+                        <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white shadow-md border border-gray-200 p-2">
+                            <img 
+                                src="{{ asset('storage/' . $brand->logo) }}" 
+                                alt="{{ $brand->name }}"
+                                class="w-full h-full object-contain"
+                            >
+                        </div>
+                    @else
+                        <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 shadow-md flex items-center justify-center">
+                            <svg class="w-8 h-8 md:w-10 md:h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                        </div>
+                    @endif
+
+                    <!-- Brand Info -->
+                    <div class="flex-1 min-w-0">
+                        <h1 class="text-xl md:text-2xl font-bold text-gray-900 truncate">
+                            {{ $brand->name }}
+                        </h1>
+                        @if($brand->description)
+                            <p class="text-sm text-gray-600 line-clamp-1 mt-1">
+                                {{ $brand->description }}
+                            </p>
+                        @endif
+                    </div>
+                    
+                    <!-- Stats (Inline) -->
+                    @php
+                        $totalProducts = $brand->products->count();
+                    @endphp
+                    <div class="hidden sm:flex items-center gap-4 text-sm">
+                        @if($totalProducts > 0)
+                            <div class="flex items-center gap-1 text-gray-600">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
+                                <span class="font-semibold text-gray-900">{{ $totalProducts }}</span>
+                            </div>
+                        @endif
+                        
+                        <!-- Brand Website Link -->
+                        @if($brand->website)
+                            <a href="{{ $brand->getWebsiteUrl() }}" target="_blank" rel="noopener" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                                </svg>
+                                <span class="text-sm font-medium">Website</span>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Category Header (for category pages) - Compact Version with Dropdown -->
     @if($category)
         <div class="bg-white border-b border-gray-200" x-data="{ subcategoriesOpen: false }">
