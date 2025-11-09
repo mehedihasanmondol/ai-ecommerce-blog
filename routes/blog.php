@@ -47,12 +47,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         // Tags Management
         Route::resource('tags', TagController::class)->except(['show']);
         
-        // Comments Moderation
-        Route::get('comments', [CommentController::class, 'index'])->name('comments.index');
-        Route::post('comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
-        Route::post('comments/{comment}/spam', [CommentController::class, 'spam'])->name('comments.spam');
-        Route::post('comments/{comment}/trash', [CommentController::class, 'trash'])->name('comments.trash');
-        Route::delete('comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+        // Comments Moderation (Livewire)
+        Route::get('comments', function() {
+            return view('admin.blog.comments.index-livewire');
+        })->name('comments.index');
     });
 });
 

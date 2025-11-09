@@ -225,72 +225,175 @@
 
                 <!-- Comments Section -->
                 @if($post->allow_comments)
-                <div class="bg-white rounded-lg shadow-sm mt-8 p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                    Comments ({{ $post->approvedComments->count() }})
-                </h2>
+                @livewire('blog.comment-section', ['post' => $post])
+                @endif
 
-                <!-- Comment Form -->
-                <form action="{{ route('blog.comments.store', $post->id) }}" method="POST" class="mb-8">
-                    @csrf
-                    <div class="space-y-4">
-                        @guest
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <input type="text" name="guest_name" placeholder="Your Name *" required
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <input type="email" name="guest_email" placeholder="Your Email *" required
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        @endguest
-
-                        <div>
-                            <textarea name="content" rows="4" placeholder="Write your comment..." required
-                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                        </div>
-
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
-                            Post Comment
-                        </button>
+                <!-- Old Comment Section (Backup) -->
+                @if(false && $post->allow_comments)
+                <div class="bg-white rounded-lg shadow-sm mt-8 p-8" x-data="{ replyingTo: null }">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900">
+                            <svg class="w-6 h-6 inline-block mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            Comments ({{ $post->approvedComments->count() }})
+                        </h2>
                     </div>
-                </form>
 
-                <!-- Comments List -->
-                <div class="space-y-6">
-                    @foreach($post->approvedComments as $comment)
-                    <div class="border-l-4 border-blue-500 pl-4">
-                        <div class="flex items-start justify-between mb-2">
-                            <div>
-                                <h4 class="font-semibold text-gray-900">{{ $comment->commenter_name }}</h4>
-                                <p class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-700">{{ $comment->content }}</p>
+                    @if(session('comment_success'))
+                    <div class="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ session('comment_success') }}
+                    </div>
+                    @endif
 
-                        <!-- Replies -->
-                        @if($comment->approvedReplies->count() > 0)
-                        <div class="mt-4 ml-8 space-y-4">
-                            @foreach($comment->approvedReplies as $reply)
-                            <div class="border-l-4 border-gray-300 pl-4">
-                                <div class="flex items-start justify-between mb-2">
+                    <!-- Comment Form -->
+                    <div class="mb-8 bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Leave a Comment</h3>
+                        <form action="{{ route('blog.comments.store', $post->id) }}" method="POST">
+                            @csrf
+                            <div class="space-y-4">
+                                @guest
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <h5 class="font-semibold text-gray-900">{{ $reply->commenter_name }}</h5>
-                                        <p class="text-sm text-gray-500">{{ $reply->created_at->diffForHumans() }}</p>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                                        <input type="text" 
+                                               name="guest_name" 
+                                               value="{{ old('guest_name') }}"
+                                               placeholder="Your Name" 
+                                               required
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('guest_name') border-red-500 @enderror">
+                                        @error('guest_name')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                        <input type="email" 
+                                               name="guest_email" 
+                                               value="{{ old('guest_email') }}"
+                                               placeholder="your@email.com" 
+                                               required
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('guest_email') border-red-500 @enderror">
+                                        @error('guest_email')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
-                                <p class="text-gray-700">{{ $reply->content }}</p>
+                                @else
+                                <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-900">{{ auth()->user()->name }}</p>
+                                        <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
+                                    </div>
+                                </div>
+                                @endguest
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Comment *</label>
+                                    <textarea name="content" 
+                                              rows="4" 
+                                              placeholder="Share your thoughts..." 
+                                              required
+                                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('content') border-red-500 @enderror">{{ old('content') }}</textarea>
+                                    @error('content')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    <p class="mt-1 text-xs text-gray-500">Your comment will be reviewed before being published.</p>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <button type="submit" 
+                                            class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                        </svg>
+                                        Post Comment
+                                    </button>
+                                    @guest
+                                    <p class="text-sm text-gray-600">
+                                        Have an account? 
+                                        <a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-700 font-medium">Sign in</a>
+                                    </p>
+                                    @endguest
+                                </div>
                             </div>
-                            @endforeach
-                        </div>
-                        @endif
+                        </form>
                     </div>
-                    @endforeach
+
+                    <!-- Comments List -->
+                    @if($post->approvedComments->count() > 0)
+                    <div class="space-y-6">
+                        @foreach($post->approvedComments as $comment)
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <div class="flex items-start gap-4">
+                                <!-- Avatar -->
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                        {{ substr($comment->commenter_name, 0, 1) }}
+                                    </div>
+                                </div>
+
+                                <!-- Comment Content -->
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">{{ $comment->commenter_name }}</h4>
+                                            <p class="text-sm text-gray-500 flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                {{ $comment->created_at->diffForHumans() }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-700 leading-relaxed">{{ $comment->content }}</p>
+
+                                    <!-- Replies -->
+                                    @if($comment->approvedReplies->count() > 0)
+                                    <div class="mt-4 space-y-4">
+                                        @foreach($comment->approvedReplies as $reply)
+                                        <div class="flex items-start gap-3 pl-4 border-l-2 border-blue-200">
+                                            <!-- Reply Avatar -->
+                                            <div class="flex-shrink-0">
+                                                <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                    {{ substr($reply->commenter_name, 0, 1) }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Reply Content -->
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h5 class="font-semibold text-gray-900 text-sm">{{ $reply->commenter_name }}</h5>
+                                                    <span class="text-xs text-gray-500">{{ $reply->created_at->diffForHumans() }}</span>
+                                                </div>
+                                                <p class="text-gray-700 text-sm">{{ $reply->content }}</p>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                        <p class="text-gray-500 text-lg font-medium">No comments yet</p>
+                        <p class="text-gray-400 text-sm mt-1">Be the first to share your thoughts!</p>
+                    </div>
+                    @endif
                 </div>
-            </div>
-            @endif
+                @endif
             </article>
         </div>
     </div>
