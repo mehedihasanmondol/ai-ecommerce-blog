@@ -34,7 +34,7 @@ Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishl
 
 // Public Category Routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/{slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/categories/{slug}', \App\Livewire\Shop\ProductList::class)->name('categories.show');
 
 // Public Brand Routes
 Route::get('/brands', [\App\Http\Controllers\BrandController::class, 'index'])->name('brands.index');

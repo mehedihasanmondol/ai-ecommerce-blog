@@ -74,9 +74,9 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function defaultVariant(): HasMany
+    public function defaultVariant(): HasOne
     {
-        return $this->hasMany(ProductVariant::class)->where('is_default', true);
+        return $this->hasOne(ProductVariant::class)->where('is_default', true);
     }
 
     public function images(): HasMany

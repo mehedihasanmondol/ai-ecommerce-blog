@@ -7,6 +7,7 @@ use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -79,11 +80,12 @@ class Category extends Model
     }
 
     /**
-     * Get products in this category
+     * Get products in this category (many-to-many relationship)
      */
-    public function products(): HasMany
+    public function products()
     {
-        return $this->hasMany(\App\Modules\Ecommerce\Product\Models\Product::class, 'category_id');
+        return $this->belongsToMany(\App\Modules\Ecommerce\Product\Models\Product::class, 'category_product')
+                    ->withTimestamps();
     }
 
     /**
@@ -120,14 +122,14 @@ class Category extends Model
 
         foreach ($ancestors as $ancestor) {
             $breadcrumb[] = [
-                'name' => $ancestor->name,
+                'label' => $ancestor->name,
                 'url' => route('categories.show', $ancestor->slug),
             ];
         }
 
         $breadcrumb[] = [
-            'name' => $this->name,
-            'url' => route('categories.show', $this->slug),
+            'label' => $this->name,
+            'url' => null, // Current page, no link
         ];
 
         return $breadcrumb;

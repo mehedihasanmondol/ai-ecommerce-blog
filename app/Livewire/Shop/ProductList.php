@@ -22,6 +22,11 @@ class ProductList extends Component
 {
     use WithPagination;
 
+    // Route parameters
+    public $slug = null; // Category or brand slug from route
+    public $category = null; // Category model instance
+    public $pageType = 'shop'; // 'shop', 'category', or 'brand'
+
     // URL query string parameters
     #[Url(as: 'q')]
     public $search = '';
@@ -55,6 +60,24 @@ class ProductList extends Component
 
     public $viewMode = 'grid';
     public $showFilters = false;
+
+    /**
+     * Mount component with optional slug
+     */
+    public function mount($slug = null)
+    {
+        $this->slug = $slug;
+        
+        // Determine page type and load category if needed
+        if ($slug) {
+            $this->category = Category::with(['activeChildren', 'parent', 'products'])
+                ->where('slug', $slug)
+                ->where('is_active', true)
+                ->firstOrFail();
+            
+            $this->pageType = 'category';
+        }
+    }
 
     /**
      * Reset pagination when filters change
@@ -149,8 +172,16 @@ class ProductList extends Component
      */
     public function getProductsProperty()
     {
-        $query = Product::with(['variants', 'category', 'brand', 'images'])
+        $query = Product::with(['variants', 'category', 'brand', 'images', 'defaultVariant'])
             ->where('is_active', true);
+
+        // If viewing a specific category, filter by that category and its children
+        if ($this->category) {
+            $categoryIds = $this->getCategoryIdsWithChildren($this->category);
+            $query->whereHas('categories', function ($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            });
+        }
 
         // Search
         if ($this->search) {
@@ -161,8 +192,8 @@ class ProductList extends Component
             });
         }
 
-        // Category Filter
-        if (!empty($this->selectedCategories)) {
+        // Category Filter (for additional filtering on shop page)
+        if (!empty($this->selectedCategories) && !$this->category) {
             $query->whereIn('category_id', $this->selectedCategories);
         }
 
@@ -422,6 +453,59 @@ class ProductList extends Component
     }
 
     /**
+     * Get category IDs including all children recursively
+     */
+    protected function getCategoryIdsWithChildren(Category $category): array
+    {
+        $ids = [$category->id];
+
+        foreach ($category->activeChildren as $child) {
+            $ids[] = $child->id;
+            
+            // Get third level
+            foreach ($child->activeChildren as $grandChild) {
+                $ids[] = $grandChild->id;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Get breadcrumb for category page
+     */
+    public function getBreadcrumbProperty()
+    {
+        if (!$this->category) {
+            return [
+                ['label' => 'Home', 'url' => route('home')],
+                ['label' => 'Shop', 'url' => null]
+            ];
+        }
+
+        $breadcrumb = [
+            ['label' => 'Home', 'url' => route('home')],
+            ['label' => 'Categories', 'url' => route('categories.index')],
+        ];
+
+        // Add parent categories
+        foreach ($this->category->ancestors() as $ancestor) {
+            $breadcrumb[] = [
+                'label' => $ancestor->name,
+                'url' => route('categories.show', $ancestor->slug),
+            ];
+        }
+
+        // Add current category
+        $breadcrumb[] = [
+            'label' => $this->category->name,
+            'url' => null,
+        ];
+
+        return $breadcrumb;
+    }
+
+    /**
      * Render component
      */
     public function render()
@@ -431,6 +515,9 @@ class ProductList extends Component
             'categories' => $this->categories,
             'brands' => $this->brands,
             'priceRange' => $this->priceRange,
+            'breadcrumb' => $this->breadcrumb,
+            'category' => $this->category,
+            'pageType' => $this->pageType,
         ])->extends('layouts.app')
           ->section('content');
     }

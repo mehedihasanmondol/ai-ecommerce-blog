@@ -32,9 +32,9 @@ class CategoryController extends Controller
     /**
      * Display a specific category and its products
      */
-    public function show(string $slug)
+    public function show(Request $request, string $slug)
     {
-        $category = Category::with(['activeChildren', 'parent'])
+        $category = Category::with(['activeChildren', 'parent', 'products'])
             ->where('slug', $slug)
             ->active()
             ->firstOrFail();
@@ -42,12 +42,82 @@ class CategoryController extends Controller
         // Get products in this category and its subcategories
         $categoryIds = $this->getCategoryIdsWithChildren($category);
 
-        $products = Product::whereHas('categories', function ($query) use ($categoryIds) {
+        $query = Product::whereHas('categories', function ($query) use ($categoryIds) {
                 $query->whereIn('categories.id', $categoryIds);
             })
             ->active()
-            ->with(['images', 'categories'])
-            ->paginate(24);
+            ->with(['images', 'categories', 'brand', 'defaultVariant', 'variants']);
+
+        // Apply filters
+        if ($request->filled('min_price')) {
+            $query->whereHas('variants', function ($q) use ($request) {
+                $q->where(function ($sq) use ($request) {
+                    $sq->where('sale_price', '>=', $request->min_price)
+                      ->orWhere(function ($ssq) use ($request) {
+                          $ssq->whereNull('sale_price')
+                             ->where('price', '>=', $request->min_price);
+                      });
+                });
+            });
+        }
+
+        if ($request->filled('max_price')) {
+            $query->whereHas('variants', function ($q) use ($request) {
+                $q->where(function ($sq) use ($request) {
+                    $sq->where('sale_price', '<=', $request->max_price)
+                      ->orWhere(function ($ssq) use ($request) {
+                          $ssq->whereNull('sale_price')
+                             ->where('price', '<=', $request->max_price);
+                      });
+                });
+            });
+        }
+
+        if ($request->filled('in_stock') && $request->in_stock == '1') {
+            $query->whereHas('variants', function ($q) {
+                $q->where('stock_quantity', '>', 0);
+            });
+        }
+
+        if ($request->filled('on_sale') && $request->on_sale == '1') {
+            $query->whereHas('variants', function ($q) {
+                $q->whereNotNull('sale_price')
+                  ->whereColumn('sale_price', '<', 'price');
+            });
+        }
+
+        // Apply sorting
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'price_low':
+                $query->join('product_variants', function($join) {
+                    $join->on('products.id', '=', 'product_variants.product_id')
+                         ->where('product_variants.is_default', true);
+                })
+                ->orderByRaw('COALESCE(product_variants.sale_price, product_variants.price) ASC')
+                ->select('products.*');
+                break;
+            case 'price_high':
+                $query->join('product_variants', function($join) {
+                    $join->on('products.id', '=', 'product_variants.product_id')
+                         ->where('product_variants.is_default', true);
+                })
+                ->orderByRaw('COALESCE(product_variants.sale_price, product_variants.price) DESC')
+                ->select('products.*');
+                break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->latest();
+                break;
+        }
+
+        $products = $query->paginate(24)->withQueryString();
 
         // Get breadcrumb
         $breadcrumb = $category->getBreadcrumb();
