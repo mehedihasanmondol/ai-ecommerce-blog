@@ -3,6 +3,7 @@
 namespace App\Modules\Blog\Models;
 
 use App\Models\User;
+use App\Modules\Blog\Models\TickMark;
 use App\Traits\HasSeo;
 use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -68,6 +69,14 @@ class Post extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        // Tick mark management fields
+        'is_verified',
+        'is_editor_choice',
+        'is_trending',
+        'is_premium',
+        'verified_at',
+        'verified_by',
+        'verification_notes',
     ];
 
     protected $casts = [
@@ -77,6 +86,12 @@ class Post extends Model
         'reading_time' => 'integer',
         'is_featured' => 'boolean',
         'allow_comments' => 'boolean',
+        // Tick mark management casts
+        'is_verified' => 'boolean',
+        'is_editor_choice' => 'boolean',
+        'is_trending' => 'boolean',
+        'is_premium' => 'boolean',
+        'verified_at' => 'datetime',
     ];
 
     protected $appends = ['reading_time_text'];
@@ -113,6 +128,14 @@ class Post extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the user who verified the post
+     */
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     /**
@@ -158,6 +181,30 @@ class Post extends Model
             ->where('status', 'approved')
             ->whereNull('parent_id')
             ->latest();
+    }
+
+    /**
+     * Get the tick marks associated with the post
+     */
+    public function tickMarks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TickMark::class,
+            'blog_post_tick_mark',
+            'blog_post_id',
+            'blog_tick_mark_id'
+        )
+        ->withPivot(['added_by', 'notes'])
+        ->withTimestamps()
+        ->orderBy('sort_order');
+    }
+
+    /**
+     * Get only active tick marks
+     */
+    public function activeTickMarks(): BelongsToMany
+    {
+        return $this->tickMarks()->where('is_active', true);
     }
 
     /**
@@ -263,6 +310,38 @@ class Post extends Model
     }
 
     /**
+     * Scope to get only verified posts
+     */
+    public function scopeVerified($query)
+    {
+        return $query->where('is_verified', true);
+    }
+
+    /**
+     * Scope to get only editor's choice posts
+     */
+    public function scopeEditorChoice($query)
+    {
+        return $query->where('is_editor_choice', true);
+    }
+
+    /**
+     * Scope to get only trending posts
+     */
+    public function scopeTrending($query)
+    {
+        return $query->where('is_trending', true);
+    }
+
+    /**
+     * Scope to get only premium posts
+     */
+    public function scopePremium($query)
+    {
+        return $query->where('is_premium', true);
+    }
+
+    /**
      * Scope to get posts by category
      */
     public function scopeByCategory($query, $categoryId)
@@ -348,5 +427,115 @@ class Post extends Model
     public function getSlugUniqueTables(): array
     {
         return ['blog_posts', 'products'];
+    }
+
+    /**
+     * Get all active tick marks for this post
+     */
+    public function getActiveTickMarks(): array
+    {
+        $marks = [];
+        
+        if ($this->is_verified) {
+            $marks[] = [
+                'type' => 'verified',
+                'label' => 'Verified',
+                'color' => 'blue',
+                'icon' => 'check-circle',
+            ];
+        }
+        
+        if ($this->is_editor_choice) {
+            $marks[] = [
+                'type' => 'editor_choice',
+                'label' => "Editor's Choice",
+                'color' => 'purple',
+                'icon' => 'star',
+            ];
+        }
+        
+        if ($this->is_trending) {
+            $marks[] = [
+                'type' => 'trending',
+                'label' => 'Trending',
+                'color' => 'red',
+                'icon' => 'trending-up',
+            ];
+        }
+        
+        if ($this->is_premium) {
+            $marks[] = [
+                'type' => 'premium',
+                'label' => 'Premium',
+                'color' => 'yellow',
+                'icon' => 'crown',
+            ];
+        }
+        
+        return $marks;
+    }
+
+    /**
+     * Check if post has any tick marks (legacy or custom)
+     */
+    public function hasTickMarks(): bool
+    {
+        return $this->is_verified || 
+               $this->is_editor_choice || 
+               $this->is_trending || 
+               $this->is_premium ||
+               $this->tickMarks()->exists();
+    }
+
+    /**
+     * Check if post has a specific tick mark
+     */
+    public function hasTickMark(int|string $tickMarkIdOrSlug): bool
+    {
+        if (is_numeric($tickMarkIdOrSlug)) {
+            return $this->tickMarks()->where('blog_tick_marks.id', $tickMarkIdOrSlug)->exists();
+        }
+        
+        return $this->tickMarks()->where('blog_tick_marks.slug', $tickMarkIdOrSlug)->exists();
+    }
+
+    /**
+     * Attach a tick mark to this post
+     */
+    public function attachTickMark(int $tickMarkId, ?string $notes = null): void
+    {
+        $this->tickMarks()->syncWithoutDetaching([
+            $tickMarkId => [
+                'added_by' => auth()->id(),
+                'notes' => $notes,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+    }
+
+    /**
+     * Detach a tick mark from this post
+     */
+    public function detachTickMark(int $tickMarkId): void
+    {
+        $this->tickMarks()->detach($tickMarkId);
+    }
+
+    /**
+     * Sync tick marks for this post
+     */
+    public function syncTickMarks(array $tickMarkIds): void
+    {
+        $syncData = [];
+        foreach ($tickMarkIds as $tickMarkId) {
+            $syncData[$tickMarkId] = [
+                'added_by' => auth()->id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        
+        $this->tickMarks()->sync($syncData);
     }
 }

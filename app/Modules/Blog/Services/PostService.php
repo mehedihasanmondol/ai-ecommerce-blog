@@ -91,6 +91,12 @@ class PostService
                 $data['published_at'] = now();
             }
 
+            // Handle tick mark fields
+            if (isset($data['is_verified']) && $data['is_verified']) {
+                $data['verified_at'] = now();
+                $data['verified_by'] = auth()->id();
+            }
+
             // Extract relationships before creating post
             $categories = $data['categories'] ?? [];
             $tags = $data['tags'] ?? [];

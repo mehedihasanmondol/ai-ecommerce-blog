@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Blog\Repositories\BlogCategoryRepository;
 use App\Modules\Blog\Repositories\TagRepository;
 use App\Modules\Blog\Services\PostService;
+use App\Modules\Blog\Services\TickMarkService;
 use App\Modules\Blog\Requests\StorePostRequest;
 use App\Modules\Blog\Requests\UpdatePostRequest;
 use Illuminate\Http\Request;
@@ -24,15 +25,18 @@ class PostController extends Controller
     protected PostService $postService;
     protected BlogCategoryRepository $categoryRepository;
     protected TagRepository $tagRepository;
+    protected TickMarkService $tickMarkService;
 
     public function __construct(
         PostService $postService,
         BlogCategoryRepository $categoryRepository,
-        TagRepository $tagRepository
+        TagRepository $tagRepository,
+        TickMarkService $tickMarkService
     ) {
         $this->postService = $postService;
         $this->categoryRepository = $categoryRepository;
         $this->tagRepository = $tagRepository;
+        $this->tickMarkService = $tickMarkService;
     }
 
     public function index(Request $request)
@@ -139,6 +143,135 @@ class PostController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get tick mark statistics
+     */
+    public function tickMarkStats()
+    {
+        $stats = $this->tickMarkService->getStatistics();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $stats,
+        ]);
+    }
+
+    /**
+     * Toggle verification status
+     */
+    public function toggleVerification($id)
+    {
+        try {
+            $post = $this->tickMarkService->toggleVerification($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => $post->is_verified ? 'পোস্ট যাচাইকৃত হয়েছে' : 'যাচাইকরণ সরানো হয়েছে',
+                'data' => $post,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle editor's choice status
+     */
+    public function toggleEditorChoice($id)
+    {
+        try {
+            $post = $this->tickMarkService->toggleEditorChoice($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => $post->is_editor_choice ? 'সম্পাদকের পছন্দে যোগ করা হয়েছে' : 'সম্পাদকের পছন্দ থেকে সরানো হয়েছে',
+                'data' => $post,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle trending status
+     */
+    public function toggleTrending($id)
+    {
+        try {
+            $post = $this->tickMarkService->toggleTrending($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => $post->is_trending ? 'ট্রেন্ডিং হিসেবে চিহ্নিত করা হয়েছে' : 'ট্রেন্ডিং থেকে সরানো হয়েছে',
+                'data' => $post,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Toggle premium status
+     */
+    public function togglePremium($id)
+    {
+        try {
+            $post = $this->tickMarkService->togglePremium($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => $post->is_premium ? 'প্রিমিয়াম হিসেবে চিহ্নিত করা হয়েছে' : 'প্রিমিয়াম থেকে সরানো হয়েছে',
+                'data' => $post,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk update tick marks
+     */
+    public function bulkUpdateTickMarks(Request $request)
+    {
+        $request->validate([
+            'post_ids' => 'required|array',
+            'post_ids.*' => 'exists:blog_posts,id',
+            'tick_mark_type' => 'required|in:verified,editor_choice,trending,premium',
+            'value' => 'required|boolean',
+        ]);
+
+        try {
+            $affected = $this->tickMarkService->bulkUpdateTickMarks(
+                $request->post_ids,
+                $request->tick_mark_type,
+                $request->value
+            );
+            
+            return response()->json([
+                'success' => true,
+                'message' => "{$affected}টি পোস্ট আপডেট করা হয়েছে",
+                'affected' => $affected,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

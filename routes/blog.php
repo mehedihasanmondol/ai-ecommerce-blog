@@ -41,6 +41,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         // TinyMCE Image Upload
         Route::post('upload-image', [PostController::class, 'uploadImage'])->name('upload-image');
         
+        // Tick Mark Management
+        Route::get('tick-marks/stats', [PostController::class, 'tickMarkStats'])->name('tick-marks.stats');
+        Route::post('posts/{post}/toggle-verification', [PostController::class, 'toggleVerification'])->name('posts.toggle-verification');
+        Route::post('posts/{post}/toggle-editor-choice', [PostController::class, 'toggleEditorChoice'])->name('posts.toggle-editor-choice');
+        Route::post('posts/{post}/toggle-trending', [PostController::class, 'toggleTrending'])->name('posts.toggle-trending');
+        Route::post('posts/{post}/toggle-premium', [PostController::class, 'togglePremium'])->name('posts.toggle-premium');
+        Route::post('posts/bulk-update-tick-marks', [PostController::class, 'bulkUpdateTickMarks'])->name('posts.bulk-update-tick-marks');
+        
         // Categories Management
         Route::resource('categories', BlogCategoryController::class)->except(['show']);
         

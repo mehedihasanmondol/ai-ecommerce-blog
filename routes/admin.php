@@ -13,6 +13,7 @@ use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
 use App\Modules\Ecommerce\Order\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Modules\Blog\Controllers\Admin\TickMarkController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -121,4 +122,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('footer-management/links/{link}', [FooterManagementController::class, 'deleteLink'])->name('footer-management.delete-link');
     Route::post('footer-management/blog-posts', [FooterManagementController::class, 'storeBlogPost'])->name('footer-management.store-blog');
     Route::delete('footer-management/blog-posts/{blogPost}', [FooterManagementController::class, 'deleteBlogPost'])->name('footer-management.delete-blog');
+    
+    // Blog Tick Marks Management Routes
+    Route::prefix('blog')->name('blog.')->group(function () {
+        Route::resource('tick-marks', TickMarkController::class);
+        Route::patch('tick-marks/{tick_mark}/toggle-active', [TickMarkController::class, 'toggleActive'])
+            ->name('tick-marks.toggle-active');
+        Route::post('tick-marks/update-sort-order', [TickMarkController::class, 'updateSortOrder'])
+            ->name('tick-marks.update-sort-order');
+    });
 });

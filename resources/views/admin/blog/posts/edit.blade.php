@@ -255,6 +255,50 @@
                         </div>
                     </div>
 
+                    <!-- Quality Indicators (Dynamic Tick Marks - Expandable) -->
+                    <div class="bg-white rounded-lg shadow" x-data="{ expanded: {{ $post->tickMarks->count() > 0 ? 'true' : 'false' }} }">
+                        <!-- Expandable Header -->
+                        <button type="button" @click="expanded = !expanded" 
+                                class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <h3 class="text-lg font-semibold text-gray-900">Quality Indicators</h3>
+                                
+                                <!-- Active Indicator Icons (shown when collapsed) -->
+                                <div class="flex items-center gap-1" x-show="!expanded">
+                                    @foreach($post->tickMarks as $tickMark)
+                                        <span class="inline-flex items-center p-1 rounded" style="background-color: {{ $tickMark->bg_color }}; color: {{ $tickMark->text_color }};" title="{{ $tickMark->label }}">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                                {!! $tickMark->getIconHtml() !!}
+                                            </svg>
+                                        </span>
+                                    @endforeach
+                                    @if($post->tickMarks->count() === 0)
+                                        <span class="text-xs text-gray-400">None</span>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <!-- Expand/Collapse Icon -->
+                            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': expanded }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Expandable Content -->
+                        <div x-show="expanded" x-collapse class="px-6 pb-6 border-t border-gray-100">
+                            <div class="pt-4">
+                                <!-- Livewire Component for Dynamic Tick Mark Management -->
+                                <livewire:admin.blog.post-tick-mark-manager :postId="$post->id" />
+                            </div>
+                        </div>
+                        
+                        <!-- Legacy checkboxes for backward compatibility (hidden, will be synced by Livewire) -->
+                        <input type="hidden" name="is_verified" value="{{ old('is_verified', $post->is_verified) ? '1' : '0' }}">
+                        <input type="hidden" name="is_editor_choice" value="{{ old('is_editor_choice', $post->is_editor_choice) ? '1' : '0' }}">
+                        <input type="hidden" name="is_trending" value="{{ old('is_trending', $post->is_trending) ? '1' : '0' }}">
+                        <input type="hidden" name="is_premium" value="{{ old('is_premium', $post->is_premium) ? '1' : '0' }}">
+                    </div>
+
                     <!-- Featured Image -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>

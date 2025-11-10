@@ -195,6 +195,13 @@
                                     
                                     <p class="text-gray-600 mb-4">{{ Str::limit($post->excerpt, 150) }}</p>
                                     
+                                    <!-- Tick Marks -->
+                                    @if($post->hasTickMarks())
+                                    <div class="mb-3">
+                                        <x-blog.tick-marks :post="$post" />
+                                    </div>
+                                    @endif
+                                    
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center text-sm text-gray-500">
                                             <span>{{ $post->author->name }}</span>
@@ -251,6 +258,13 @@
                                 
                                 @if($post->excerpt)
                                 <p class="text-gray-600 mb-4 text-sm line-clamp-3">{{ $post->excerpt }}</p>
+                                @endif
+                                
+                                <!-- Tick Marks -->
+                                @if($post->hasTickMarks())
+                                <div class="mb-3">
+                                    <x-blog.tick-marks :post="$post" />
+                                </div>
                                 @endif
                                 
                                 <div class="flex items-center text-xs text-gray-500 mb-4">
