@@ -105,9 +105,15 @@
                             @click="userMenuOpen = !userMenuOpen"
                             @click.away="userMenuOpen = false"
                             class="flex items-center text-gray-700 hover:text-green-600 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
                             <span class="ml-2 text-sm font-medium hidden lg:block">{{ auth()->user()->name }}</span>
                             <svg class="w-4 h-4 ml-1 hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -238,9 +244,15 @@
                 @auth
                     <div class="bg-green-50 rounded-md p-4 mb-4">
                         <div class="flex items-center mb-3">
-                            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-12 h-12 rounded-full object-cover border-2 border-green-200">
+                            @else
+                                <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
                             <div class="ml-3">
                                 <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-gray-600">{{ auth()->user()->email }}</p>

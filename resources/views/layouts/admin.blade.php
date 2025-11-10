@@ -66,9 +66,15 @@
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" 
                                     class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
-                                <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                </div>
+                                @if(auth()->user()->avatar)
+                                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
+                                         alt="{{ auth()->user()->name }}"
+                                         class="h-8 w-8 rounded-full object-cover border-2 border-gray-200">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
                                 <span class="hidden md:block">{{ auth()->user()->name }}</span>
                                 <i class="fas fa-chevron-down text-xs hidden md:block"></i>
                             </button>
