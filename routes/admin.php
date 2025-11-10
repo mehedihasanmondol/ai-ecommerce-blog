@@ -13,6 +13,9 @@ use App\Modules\User\Controllers\RoleController;
 use App\Modules\Ecommerce\Brand\Controllers\BrandController;
 use App\Modules\Ecommerce\Order\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\DeliveryZoneController;
+use App\Http\Controllers\Admin\DeliveryMethodController;
+use App\Http\Controllers\Admin\DeliveryRateController;
 use App\Modules\Blog\Controllers\Admin\TickMarkController;
 use Illuminate\Support\Facades\Route;
 
@@ -130,5 +133,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             ->name('tick-marks.toggle-active');
         Route::post('tick-marks/update-sort-order', [TickMarkController::class, 'updateSortOrder'])
             ->name('tick-marks.update-sort-order');
+    });
+    
+    // Delivery Management Routes
+    Route::prefix('delivery')->name('delivery.')->group(function () {
+        // Delivery Zones
+        Route::resource('zones', DeliveryZoneController::class);
+        Route::post('zones/{zone}/toggle-status', [DeliveryZoneController::class, 'toggleStatus'])
+            ->name('zones.toggle-status');
+        
+        // Delivery Methods
+        Route::resource('methods', DeliveryMethodController::class);
+        Route::post('methods/{method}/toggle-status', [DeliveryMethodController::class, 'toggleStatus'])
+            ->name('methods.toggle-status');
+        
+        // Delivery Rates
+        Route::resource('rates', DeliveryRateController::class);
+        Route::post('rates/{rate}/toggle-status', [DeliveryRateController::class, 'toggleStatus'])
+            ->name('rates.toggle-status');
     });
 });

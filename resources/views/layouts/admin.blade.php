@@ -205,6 +205,38 @@
                     @endif
                 </a>
 
+                <!-- Shipping & Delivery Section -->
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipping & Delivery</p>
+                </div>
+                
+                <a href="{{ route('admin.delivery.zones.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.delivery.zones.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-map-marked-alt w-5 mr-3"></i>
+                    <span>Delivery Zones</span>
+                    @if(request()->routeIs('admin.delivery.zones.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.delivery.methods.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.delivery.methods.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-shipping-fast w-5 mr-3"></i>
+                    <span>Delivery Methods</span>
+                    @if(request()->routeIs('admin.delivery.methods.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.delivery.rates.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.delivery.rates.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-dollar-sign w-5 mr-3"></i>
+                    <span>Delivery Rates</span>
+                    @if(request()->routeIs('admin.delivery.rates.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
                 <!-- Inventory Section (Placeholder) -->
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
@@ -432,6 +464,28 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.reviews.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-star w-5 mr-3"></i>
                     <span>Product Reviews</span>
+                </a>
+
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipping & Delivery</p>
+                </div>
+                
+                <a href="{{ route('admin.delivery.zones.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.zones.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-map-marked-alt w-5 mr-3"></i>
+                    <span>Delivery Zones</span>
+                </a>
+
+                <a href="{{ route('admin.delivery.methods.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.methods.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-shipping-fast w-5 mr-3"></i>
+                    <span>Delivery Methods</span>
+                </a>
+
+                <a href="{{ route('admin.delivery.rates.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.rates.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-dollar-sign w-5 mr-3"></i>
+                    <span>Delivery Rates</span>
                 </a>
 
                 <div class="pt-4 pb-2">

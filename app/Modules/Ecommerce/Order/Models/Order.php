@@ -4,6 +4,8 @@ namespace App\Modules\Ecommerce\Order\Models;
 
 use App\Models\User;
 use App\Modules\Ecommerce\Product\Models\Product;
+use App\Modules\Ecommerce\Delivery\Models\DeliveryZone;
+use App\Modules\Ecommerce\Delivery\Models\DeliveryMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +36,19 @@ class Order extends Model
         'admin_notes',
         'tracking_number',
         'carrier',
+        'delivery_method_id',
+        'delivery_zone_id',
+        'delivery_method_name',
+        'delivery_zone_name',
+        'estimated_delivery',
+        'base_shipping_cost',
+        'handling_fee',
+        'insurance_fee',
+        'cod_fee',
+        'delivery_status',
+        'picked_up_at',
+        'in_transit_at',
+        'out_for_delivery_at',
         'ip_address',
         'paid_at',
         'shipped_at',
@@ -47,10 +62,17 @@ class Order extends Model
         'shipping_cost' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'base_shipping_cost' => 'decimal:2',
+        'handling_fee' => 'decimal:2',
+        'insurance_fee' => 'decimal:2',
+        'cod_fee' => 'decimal:2',
         'paid_at' => 'datetime',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'picked_up_at' => 'datetime',
+        'in_transit_at' => 'datetime',
+        'out_for_delivery_at' => 'datetime',
     ];
 
     /**
@@ -141,6 +163,22 @@ class Order extends Model
     public function latestPayment()
     {
         return $this->hasOne(OrderPayment::class)->latestOfMany();
+    }
+
+    /**
+     * Get the delivery zone.
+     */
+    public function deliveryZone(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryZone::class);
+    }
+
+    /**
+     * Get the delivery method.
+     */
+    public function deliveryMethod(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryMethod::class);
     }
 
     /**
