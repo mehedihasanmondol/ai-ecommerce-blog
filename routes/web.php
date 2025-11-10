@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WishlistController;
 use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
 
@@ -20,10 +21,11 @@ Route::post('/cart/update', [CartController::class, 'update'])->name('cart.updat
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/remove-multiple', [CartController::class, 'removeMultiple'])->name('cart.remove-multiple');
 
-// Checkout Routes (placeholder - will be implemented later)
-Route::get('/checkout', function() {
-    return redirect()->route('cart.index')->with('info', 'Checkout page coming soon!');
-})->name('checkout.index');
+// Checkout Routes
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/calculate-shipping', [CheckoutController::class, 'calculateShipping'])->name('checkout.calculate-shipping');
+Route::get('/checkout/zone-methods', [CheckoutController::class, 'getZoneMethods'])->name('checkout.zone-methods');
+Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.place-order');
 
 // Wishlist Routes
 Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');

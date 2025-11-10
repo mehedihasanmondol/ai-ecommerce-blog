@@ -15,9 +15,9 @@ class DeliveryService
     ) {}
 
     /**
-     * Calculate shipping cost for an order.
+     * Calculate shipping cost for an order (with detailed breakdown).
      */
-    public function calculateShippingCost(
+    public function calculateShippingCostDetailed(
         int $zoneId,
         int $methodId,
         float $orderTotal,
@@ -102,7 +102,7 @@ class DeliveryService
 
         $options = [];
         foreach ($methods as $method) {
-            $costData = $this->calculateShippingCost(
+            $costData = $this->calculateShippingCostDetailed(
                 $zone->id,
                 $method->id,
                 $orderTotal,
@@ -263,5 +263,117 @@ class DeliveryService
     public function getAllRates(int $perPage = 15)
     {
         return $this->repository->getAllRatesPaginated($perPage);
+    }
+
+    /**
+     * Get active delivery zones for checkout.
+     */
+    public function getActiveZones()
+    {
+        return DeliveryZone::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+    }
+
+    /**
+     * Get active delivery methods for checkout.
+     */
+    public function getActiveMethods()
+    {
+        return DeliveryMethod::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Get delivery methods available for a specific zone.
+     */
+    public function getMethodsByZone(int $zoneId)
+    {
+        $rates = DeliveryRate::where('delivery_zone_id', $zoneId)
+            ->where('is_active', true)
+            ->with('method')
+            ->get();
+
+        $methods = [];
+        $seenMethodIds = [];
+
+        foreach ($rates as $rate) {
+            if ($rate->method && !in_array($rate->method->id, $seenMethodIds)) {
+                $method = $rate->method;
+                
+                // Add rate information to method
+                $methodData = $method->toArray();
+                $methodData['base_rate'] = $rate->base_rate;
+                $methodData['delivery_time'] = $method->estimated_days ?? $method->min_days . '-' . $method->max_days . ' days';
+                
+                $methods[] = $methodData;
+                $seenMethodIds[] = $method->id;
+            }
+        }
+
+        return collect($methods);
+    }
+
+    /**
+     * Calculate shipping cost (simplified for checkout).
+     */
+    public function calculateShippingCost(
+        int $zoneId,
+        int $methodId,
+        float $orderTotal,
+        float $orderWeight = 0,
+        int $itemCount = 0
+    ): float {
+        $rate = DeliveryRate::where('delivery_zone_id', $zoneId)
+            ->where('delivery_method_id', $methodId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$rate) {
+            return 0;
+        }
+
+        $method = $rate->method;
+
+        // Check for free shipping
+        if ($method->calculation_type === 'free') {
+            return 0;
+        }
+
+        if ($method->free_shipping_threshold && $orderTotal >= $method->free_shipping_threshold) {
+            return 0;
+        }
+
+        // Calculate base cost
+        $cost = $rate->base_rate;
+
+        // Add calculation-specific costs
+        switch ($method->calculation_type) {
+            case 'weight_based':
+                if ($orderWeight > 0) {
+                    $cost += $orderWeight * ($rate->per_kg_rate ?? 0);
+                }
+                break;
+
+            case 'price_based':
+                if ($orderTotal > 0) {
+                    $percentage = $rate->percentage_rate ?? 0;
+                    $cost += ($orderTotal * $percentage / 100);
+                }
+                break;
+
+            case 'item_based':
+                if ($itemCount > 0) {
+                    $cost += $itemCount * ($rate->per_item_rate ?? 0);
+                }
+                break;
+        }
+
+        // Add additional fees
+        $cost += $rate->handling_fee ?? 0;
+        $cost += $rate->insurance_fee ?? 0;
+
+        return round($cost, 2);
     }
 }
