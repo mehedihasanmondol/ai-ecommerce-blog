@@ -5,7 +5,42 @@
 @section('content')
 <div class="bg-gray-50 min-h-screen py-8" x-data="checkoutPage()">
     <div class="container mx-auto px-4">
-        <form @submit.prevent="submitOrder" method="POST" action="{{ route('checkout.place-order') }}">
+        
+        <!-- Error/Success Messages -->
+        @if(session('success'))
+            <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+                <div class="font-semibold mb-2">Please fix the following errors:</div>
+                <ul class="list-disc list-inside space-y-1">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="checkoutForm" method="POST" action="{{ route('checkout.place-order') }}" @submit="submitOrder">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column - Checkout Form -->
@@ -341,8 +376,19 @@ function checkoutPage() {
             });
         },
 
-        submitOrder() {
+        submitOrder(event) {
+            // Validate required fields
+            if (!this.selectedZone || !this.selectedMethod) {
+                event.preventDefault();
+                alert('Please select delivery zone and method');
+                return false;
+            }
+            
+            // Set processing state
             this.isProcessing = true;
+            
+            // Allow form to submit normally (don't prevent default)
+            return true;
         }
     }
 }

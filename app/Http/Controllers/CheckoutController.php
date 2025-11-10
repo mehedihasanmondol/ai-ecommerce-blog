@@ -38,6 +38,8 @@ class CheckoutController extends Controller
     {
         $cart = Session::get('cart', []);
         
+        \Log::info('Checkout page accessed', ['cart_count' => count($cart)]);
+        
         if (empty($cart)) {
             return redirect()->route('cart.index')
                 ->with('error', 'Your cart is empty');
@@ -128,6 +130,8 @@ class CheckoutController extends Controller
      */
     public function placeOrder(Request $request)
     {
+        \Log::info('Place order attempt', ['request_data' => $request->except(['_token'])]);
+        
         $validated = $request->validate([
             'shipping_name' => 'required|string|max:255',
             'shipping_first_name' => 'nullable|string|max:255',
@@ -142,6 +146,8 @@ class CheckoutController extends Controller
         ]);
 
         $cart = Session::get('cart', []);
+        
+        \Log::info('Cart contents', ['cart' => $cart]);
         
         if (empty($cart)) {
             return redirect()->route('cart.index')
@@ -169,27 +175,45 @@ class CheckoutController extends Controller
                 $itemCount
             );
 
-            $total = $subtotal + $shippingCost;
-
-            // Prepare order data
-            $orderData = [
-                'user_id' => Auth::id(),
-                'order_number' => 'ORD-' . strtoupper(uniqid()),
-                'status' => 'pending',
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shippingCost,
-                'total' => $total,
-                'payment_method' => $validated['payment_method'],
-                'payment_status' => 'pending',
-                'delivery_zone_id' => $validated['delivery_zone_id'],
-                'delivery_method_id' => $validated['delivery_method_id'],
-                'notes' => $validated['order_notes'] ?? null,
-            ];
-
             // Parse name into first and last name
             $nameParts = explode(' ', $validated['shipping_name'], 2);
             $firstName = $validated['shipping_first_name'] ?? $nameParts[0] ?? '';
             $lastName = $validated['shipping_last_name'] ?? ($nameParts[1] ?? '');
+
+            // Prepare order items for OrderService
+            $orderItems = [];
+            foreach ($cart as $item) {
+                // If no variant_id, create a default variant object
+                $variant = null;
+                if (isset($item['variant_id']) && $item['variant_id']) {
+                    $variant = (object)[
+                        'id' => $item['variant_id'],
+                        'sku' => $item['sku'] ?? 'N/A',
+                        'price' => $item['price'],
+                        'attributeValues' => collect([]), // Empty collection
+                    ];
+                } else {
+                    // Create a pseudo-variant for products without variants
+                    $variant = (object)[
+                        'id' => null, // Will be handled by OrderService
+                        'sku' => $item['sku'] ?? 'N/A',
+                        'price' => $item['price'],
+                        'attributeValues' => collect([]),
+                    ];
+                }
+
+                $orderItems[] = [
+                    'product' => (object)[
+                        'id' => $item['product_id'],
+                        'name' => $item['product_name'],
+                        'sku' => $item['sku'] ?? 'N/A',
+                        'price' => $item['price'],
+                    ],
+                    'variant' => $variant,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                ];
+            }
 
             // Shipping address
             $shippingAddress = [
@@ -198,46 +222,49 @@ class CheckoutController extends Controller
                 'email' => $validated['shipping_email'],
                 'phone' => $validated['shipping_phone'],
                 'address_line_1' => $validated['shipping_address_line_1'],
-                'address_line_2' => null,
-                'city' => null,
-                'state' => null,
-                'postal_code' => null,
+                'address_line_2' => '',
+                'city' => 'N/A', // Required field, use placeholder
+                'state' => '',
+                'postal_code' => '',
                 'country' => 'BD',
             ];
 
-            // Order items
-            $orderItems = [];
-            foreach ($cart as $item) {
-                $orderItems[] = [
-                    'product_id' => $item['product_id'],
-                    'product_variant_id' => $item['variant_id'] ?? null,
-                    'product_name' => $item['product_name'],
-                    'product_sku' => $item['sku'] ?? null,
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'subtotal' => $item['price'] * $item['quantity'],
-                ];
-            }
+            // Prepare order data for OrderService
+            $orderData = [
+                'user_id' => Auth::id(),
+                'customer_name' => $validated['shipping_name'],
+                'customer_email' => $validated['shipping_email'],
+                'customer_phone' => $validated['shipping_phone'],
+                'customer_notes' => $validated['order_notes'] ?? null,
+                'payment_method' => $validated['payment_method'],
+                'shipping_cost' => $shippingCost,
+                'items' => $orderItems,
+                'billing_address' => $shippingAddress,
+                'shipping_address' => $shippingAddress,
+            ];
 
             // Create order
-            $order = $this->orderService->createOrder(
-                $orderData,
-                $orderItems,
-                $shippingAddress,
-                $shippingAddress // Use same address for billing
-            );
+            $order = $this->orderService->createOrder($orderData);
 
             // Clear cart
             Session::forget('cart');
 
-            return redirect()->route('orders.show', $order->id)
-                ->with('success', 'Order placed successfully! Order number: ' . $order->order_number);
+            // Redirect based on authentication
+            if (Auth::check()) {
+                return redirect()->route('customer.orders.show', $order->id)
+                    ->with('success', 'Order placed successfully! Order number: ' . $order->order_number);
+            } else {
+                // For guest users, redirect to a thank you page or home
+                return redirect()->route('home')
+                    ->with('success', 'Order placed successfully! Order number: ' . $order->order_number . '. Check your email for order details.');
+            }
 
         } catch (\Exception $e) {
             \Log::error('Checkout error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()
                 ->withInput()
-                ->with('error', 'Failed to place order. Please try again.');
+                ->with('error', 'Failed to place order: ' . $e->getMessage());
         }
     }
 }

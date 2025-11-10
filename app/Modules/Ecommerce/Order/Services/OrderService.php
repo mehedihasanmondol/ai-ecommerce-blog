@@ -94,18 +94,13 @@ class OrderService
         $product = $itemData['product'];
         $variant = $itemData['variant'] ?? null;
 
-        // Per .windsurfrules: product_variant_id is required
-        if (!$variant) {
-            throw new \Exception("Product variant is required for product: {$product->name}");
-        }
-
         // Use custom price from form if provided, otherwise use variant/product price
         $price = $itemData['price'] ?? ($variant->price ?? $product->price);
         $subtotal = $price * $itemData['quantity'];
 
         // Format variant attributes as key-value pairs
         $variantAttributes = null;
-        if ($variant->attributeValues && $variant->attributeValues->count() > 0) {
+        if ($variant && isset($variant->attributeValues) && $variant->attributeValues->count() > 0) {
             $variantAttributes = [];
             foreach ($variant->attributeValues as $attributeValue) {
                 $attributeName = $attributeValue->attribute->name ?? 'Attribute';
@@ -116,10 +111,10 @@ class OrderService
         return OrderItem::create([
             'order_id' => $order->id,
             'product_id' => $product->id,
-            'product_variant_id' => $variant->id, // Required, never null
+            'product_variant_id' => $variant->id ?? null, // Allow null for products without variants
             'product_name' => $product->name,
-            'product_sku' => $variant->sku ?? 'N/A',
-            'variant_name' => $variant->name,
+            'product_sku' => ($variant && isset($variant->sku)) ? $variant->sku : ($product->sku ?? 'N/A'),
+            'variant_name' => ($variant && isset($variant->name)) ? $variant->name : null,
             'variant_attributes' => $variantAttributes,
             'price' => $price,
             'quantity' => $itemData['quantity'],
@@ -127,7 +122,7 @@ class OrderService
             'tax_amount' => 0, // Calculate if needed
             'discount_amount' => 0, // Calculate if needed
             'total' => $subtotal,
-            'product_image' => $product->primary_image,
+            'product_image' => isset($product->primary_image) ? $product->primary_image : null,
         ]);
     }
 
