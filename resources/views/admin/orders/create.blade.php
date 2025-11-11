@@ -436,7 +436,7 @@
                 <!-- Shipping Address Card -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="p-4 border-b border-gray-200 bg-gray-50">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-2">
                             <h3 class="font-semibold text-gray-900 flex items-center">
                                 <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -444,12 +444,15 @@
                                 </svg>
                                 Shipping Address
                             </h3>
-                            <label class="flex items-center text-sm cursor-pointer">
-                                <input type="checkbox" name="same_as_billing" id="same_as_billing" value="1"
-                                       @change="toggleShippingAddress()"
-                                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
-                                <span class="text-gray-700">Same as customer info</span>
-                            </label>
+                            <div class="flex items-center space-x-3">
+                                @livewire('admin.order.customer-address-selector')
+                                <label class="flex items-center text-sm cursor-pointer">
+                                    <input type="checkbox" name="same_as_billing" id="same_as_billing" value="1"
+                                           @change="toggleShippingAddress()"
+                                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-2">
+                                    <span class="text-gray-700">Same as customer</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     
@@ -725,6 +728,9 @@ function orderForm() {
                 // Reset change flag
                 this.customerDataChanged = false;
                 
+                // Trigger Livewire to load customer addresses
+                window.Livewire.dispatch('customerSelected', { userId: selectedOption.value });
+                
                 // If shipping is different, also fill shipping fields
                 const sameAsBilling = document.getElementById('same_as_billing');
                 if (!sameAsBilling.checked) {
@@ -744,6 +750,9 @@ function orderForm() {
                 this.customer.email = '';
                 this.customer.phone = '';
                 this.customer.address = '';
+                
+                // Clear Livewire component
+                window.Livewire.dispatch('customerSelected', { userId: null });
             }
         },
         
@@ -816,6 +825,54 @@ function orderForm() {
         }
     }
 }
+
+// Livewire event listeners
+window.addEventListener('customerDataLoaded', event => {
+    const data = event.detail;
+    
+    // Auto-fill customer phone from profile if empty
+    const phoneInput = document.getElementById('customer_phone');
+    if (phoneInput && data.phone && !phoneInput.value) {
+        phoneInput.value = data.phone;
+        // Trigger Alpine.js update
+        phoneInput.dispatchEvent(new Event('input'));
+    }
+});
+
+window.addEventListener('addressSelected', event => {
+    console.log('Address selected event:', event.detail);
+    
+    // Get address data from event detail
+    const { name, phone, email, address } = event.detail;
+    
+    // Populate shipping form fields with selected address
+    const nameInput = document.getElementById('shipping_name');
+    const phoneInput = document.getElementById('shipping_phone');
+    const emailInput = document.getElementById('shipping_email');
+    const addressInput = document.getElementById('shipping_address_line_1');
+    
+    if (nameInput) nameInput.value = name || '';
+    if (phoneInput) phoneInput.value = phone || '';
+    if (emailInput) emailInput.value = email || '';
+    if (addressInput) addressInput.value = address || '';
+    
+    // Also update hidden fields for first/last name
+    const nameParts = (name || '').split(' ', 2);
+    const firstNameInput = document.getElementById('shipping_first_name');
+    const lastNameInput = document.getElementById('shipping_last_name');
+    if (firstNameInput) firstNameInput.value = nameParts[0] || '';
+    if (lastNameInput) lastNameInput.value = nameParts[1] || '';
+    
+    // Show success notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-20 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50';
+    notification.innerHTML = '✓ Address selected successfully';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
+});
 </script>
 @endpush
 @endsection
