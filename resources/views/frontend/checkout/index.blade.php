@@ -57,13 +57,26 @@
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Shipping Information -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                            <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            Shipping Address
-                        </h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Shipping Address
+                            </h2>
+                            @auth
+                            @if($savedAddresses->count() > 0 || $userProfile)
+                            <button type="button" onclick="openAddressModal()" 
+                                    class="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                                </svg>
+                                Select Saved Address
+                            </button>
+                            @endif
+                            @endauth
+                        </div>
                         
                         <div class="space-y-4">
                             <div>
@@ -249,6 +262,108 @@
     </div>
 </div>
 
+<!-- Address Selection Modal -->
+@auth
+@if($savedAddresses->count() > 0 || $userProfile)
+<div id="addressModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 transition-opacity" 
+             style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
+             onclick="closeAddressModal()"></div>
+        
+        <div class="relative rounded-lg shadow-xl max-w-2xl w-full p-6 border border-gray-200 max-h-[80vh] overflow-y-auto"
+             style="background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Select Shipping Address</h3>
+                <button onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Address Options -->
+            <div class="space-y-3">
+                <!-- Profile Address -->
+                @if($userProfile && ($userProfile->name || $userProfile->mobile || $userProfile->email || $userProfile->address))
+                <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-green-500 cursor-pointer transition-colors"
+                     onclick="selectAddress({
+                        name: '{{ $userProfile->name }}',
+                        phone: '{{ $userProfile->mobile ?? $userProfile->phone ?? "" }}',
+                        email: '{{ $userProfile->email }}',
+                        address: '{{ $userProfile->address ?? "" }}'
+                     })">
+                    <div class="flex items-start">
+                        <div class="bg-blue-100 rounded-lg p-2 mr-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900">My Profile</h4>
+                            <p class="text-sm text-gray-700 mt-1">{{ $userProfile->name }}</p>
+                            @if($userProfile->mobile || $userProfile->phone)
+                            <p class="text-sm text-gray-600">📱 {{ $userProfile->mobile ?? $userProfile->phone }}</p>
+                            @endif
+                            @if($userProfile->email)
+                            <p class="text-sm text-gray-600">✉️ {{ $userProfile->email }}</p>
+                            @endif
+                            @if($userProfile->address)
+                            <p class="text-sm text-gray-600">{{ $userProfile->address }}</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Saved Addresses -->
+                @foreach($savedAddresses as $address)
+                <div class="border-2 {{ $address->is_default ? 'border-green-500 bg-green-50' : 'border-gray-200' }} rounded-lg p-4 hover:border-green-500 cursor-pointer transition-colors"
+                     onclick="selectAddress({
+                        name: '{{ $address->name }}',
+                        phone: '{{ $address->phone }}',
+                        email: '{{ $address->email ?? "" }}',
+                        address: '{{ $address->address }}'
+                     })">
+                    <div class="flex items-start">
+                        <div class="bg-green-100 rounded-lg p-2 mr-3">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-semibold text-gray-900">{{ $address->label }}</h4>
+                                @if($address->is_default)
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Default</span>
+                                @endif
+                            </div>
+                            <p class="text-sm text-gray-700 mt-1">{{ $address->name }}</p>
+                            <p class="text-sm text-gray-600">📱 {{ $address->phone }}</p>
+                            @if($address->email)
+                            <p class="text-sm text-gray-600">✉️ {{ $address->email }}</p>
+                            @endif
+                            <p class="text-sm text-gray-600">{{ $address->address }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- Manage Addresses Link -->
+            <div class="mt-4 pt-4 border-t border-gray-200 text-center">
+                <a href="{{ route('customer.addresses.index') }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    Manage My Addresses →
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+@endauth
+
 <script>
 function checkoutPage() {
     return {
@@ -327,5 +442,49 @@ function checkoutPage() {
         }
     }
 }
+
+// Address Selection Modal Functions
+function openAddressModal() {
+    document.getElementById('addressModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAddressModal() {
+    document.getElementById('addressModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+function selectAddress(addressData) {
+    // Populate form fields with selected address
+    const nameInput = document.querySelector('input[name="shipping_name"]');
+    const phoneInput = document.querySelector('input[name="shipping_phone"]');
+    const emailInput = document.querySelector('input[name="shipping_email"]');
+    const addressInput = document.querySelector('input[name="shipping_address_line_1"]');
+    
+    if (nameInput) nameInput.value = addressData.name || '';
+    if (phoneInput) phoneInput.value = addressData.phone || '';
+    if (emailInput) emailInput.value = addressData.email || '';
+    if (addressInput) addressInput.value = addressData.address || '';
+    
+    // Close modal
+    closeAddressModal();
+    
+    // Optional: Show success message
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg z-50';
+    notification.innerHTML = '✓ Address selected successfully';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 2000);
+}
+
+// Close modal when pressing Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeAddressModal();
+    }
+});
 </script>
 @endsection

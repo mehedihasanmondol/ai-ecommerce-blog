@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Modules\Ecommerce\Delivery\Services\DeliveryService;
 use App\Modules\Ecommerce\Order\Services\OrderService;
+use App\Modules\User\Models\UserAddress;
 use App\Services\CouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,34 +60,39 @@ class CheckoutController extends Controller
             }
         }
 
-        // Get default shipping information
+        // Get default shipping information and all saved addresses
         $defaultShipping = [];
+        $savedAddresses = collect([]);
+        $userProfile = null;
+        
         if (Auth::check()) {
-            // Try to get last order's shipping address
-            $lastOrder = \App\Modules\Ecommerce\Order\Models\Order::where('user_id', Auth::id())
-                ->with(['addresses' => function ($query) {
-                    $query->where('type', 'shipping');
-                }])
-                ->latest()
-                ->first();
+            // Get all saved addresses
+            $savedAddresses = UserAddress::where('user_id', Auth::id())
+                ->orderBy('is_default', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get();
             
-            if ($lastOrder && $lastOrder->addresses->isNotEmpty()) {
-                // Use last order's shipping address
-                $shippingAddress = $lastOrder->addresses->first();
+            // Get user profile for fallback option
+            $userProfile = Auth::user();
+            
+            // First, try to get default address from address manager
+            $defaultAddress = $savedAddresses->where('is_default', true)->first();
+            
+            if ($defaultAddress) {
+                // Use default address from address manager
                 $defaultShipping = [
-                    'name' => $shippingAddress->first_name . ' ' . $shippingAddress->last_name,
-                    'phone' => $shippingAddress->phone,
-                    'email' => $shippingAddress->email,
-                    'address' => $shippingAddress->address_line_1,
+                    'name' => $defaultAddress->name,
+                    'phone' => $defaultAddress->phone,
+                    'email' => $defaultAddress->email ?? '',
+                    'address' => $defaultAddress->address,
                 ];
             } else {
-                // Use user profile info
-                $user = Auth::user();
+                // Fallback to user profile info
                 $defaultShipping = [
-                    'name' => $user->name,
-                    'phone' => $user->mobile ?? $user->phone ?? '',
-                    'email' => $user->email,
-                    'address' => $user->address ?? '',
+                    'name' => $userProfile->name,
+                    'phone' => $userProfile->mobile ?? $userProfile->phone ?? '',
+                    'email' => $userProfile->email,
+                    'address' => $userProfile->address ?? '',
                 ];
             }
         }
@@ -95,7 +101,9 @@ class CheckoutController extends Controller
             'cart',
             'subtotal',
             'totalWeight',
-            'defaultShipping'
+            'defaultShipping',
+            'savedAddresses',
+            'userProfile'
         ));
     }
 
