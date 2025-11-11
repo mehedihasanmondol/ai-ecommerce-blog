@@ -308,19 +308,27 @@
                         </a>
                         
                         <!-- Payment Methods -->
-                        <div class="border-t border-gray-200 pt-4 mb-4">
-                            <p class="text-xs text-gray-600 mb-2">Accepted payment methods</p>
-                            <div class="flex flex-wrap gap-2">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" 
-                                     alt="Visa" class="h-6">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/MasterCard_Logo.svg/200px-MasterCard_Logo.svg.png" 
-                                     alt="Mastercard" class="h-6">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/200px-American_Express_logo_%282018%29.svg.png" 
-                                     alt="Amex" class="h-6">
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_logo.svg/200px-PayPal_logo.svg.png" 
-                                     alt="PayPal" class="h-6">
+                        @php
+                            $paymentGateways = \App\Models\PaymentGateway::active()->get();
+                        @endphp
+                        
+                        @if($paymentGateways->count() > 0)
+                            <div class="border-t border-gray-200 pt-4 mb-4">
+                                <p class="text-xs text-gray-600 mb-2">Accepted payment methods</p>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    @foreach($paymentGateways as $gateway)
+                                        @if($gateway->logo)
+                                            <img src="{{ asset('storage/' . $gateway->logo) }}" 
+                                                 alt="{{ $gateway->name }}" 
+                                                 class="h-6 w-auto"
+                                                 title="{{ $gateway->name }}">
+                                        @else
+                                            <span class="text-xs px-2 py-1 bg-gray-100 rounded">{{ $gateway->name }}</span>
+                                        @endif
+                                    @endforeach
+                                </div>
                             </div>
-                        </div>
+                        @endif
 
                         <!-- Coupon Code -->
                         <div class="border-t border-gray-200 pt-4">
