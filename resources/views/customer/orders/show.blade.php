@@ -228,6 +228,19 @@
                                         <span class="text-red-600">-৳{{ number_format($order->discount_amount, 2) }}</span>
                                     </div>
                                 @endif
+                                @if($order->coupon_discount > 0)
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-gray-600">
+                                            Coupon Discount
+                                            @if($order->coupon_code)
+                                                <span class="inline-flex items-center px-2 py-0.5 ml-2 rounded text-xs font-bold bg-green-100 text-green-800">
+                                                    {{ $order->coupon_code }}
+                                                </span>
+                                            @endif
+                                        </span>
+                                        <span class="text-red-600">-৳{{ number_format($order->coupon_discount, 2) }}</span>
+                                    </div>
+                                @endif
                                 <div class="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                                     <span class="text-gray-900">Total</span>
                                     <span class="text-gray-900">৳{{ number_format($order->total_amount, 2) }}</span>

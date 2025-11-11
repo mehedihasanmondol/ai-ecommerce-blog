@@ -63,10 +63,18 @@
                 <p class="text-indigo-100 text-sm font-medium">Shipping</p>
                 <p class="text-2xl font-bold mt-1">৳{{ number_format($order->shipping_cost, 2) }}</p>
             </div>
-            <div>
-                <p class="text-indigo-100 text-sm font-medium">Discount</p>
-                <p class="text-2xl font-bold mt-1">৳{{ number_format($order->discount_amount, 2) }}</p>
-            </div>
+            @if($order->discount_amount > 0)
+                <div>
+                    <p class="text-indigo-100 text-sm font-medium">Discount</p>
+                    <p class="text-2xl font-bold mt-1">৳{{ number_format($order->discount_amount, 2) }}</p>
+                </div>
+            @endif
+            @if($order->coupon_discount > 0)
+                <div>
+                    <p class="text-indigo-100 text-sm font-medium">Coupon</p>
+                    <p class="text-2xl font-bold mt-1">৳{{ number_format($order->coupon_discount, 2) }}</p>
+                </div>
+            @endif
             <div class="border-l border-indigo-400 pl-6">
                 <p class="text-indigo-100 text-sm font-medium">Total Amount</p>
                 <p class="text-3xl font-bold mt-1">৳{{ number_format($order->total_amount, 2) }}</p>

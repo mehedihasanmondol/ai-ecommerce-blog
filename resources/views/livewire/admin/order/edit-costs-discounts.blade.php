@@ -34,22 +34,37 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Discount Amount
+                        Discount Amount (Manual)
                     </label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
                         <input type="number" step="0.01" wire:model.live="discount_amount" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all" placeholder="0.00">
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">Manual discount (not from coupon)</p>
                     @error('discount_amount') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Coupon Code
-                    </label>
-                    <input type="text" wire:model="coupon_code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all" placeholder="DISCOUNT10">
-                    @error('coupon_code') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
-                </div>
+                <!-- Coupon Discount (Read-only) -->
+                @if($coupon_discount > 0)
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Coupon Discount (Read-only)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">৳</span>
+                            <input type="text" value="{{ number_format($coupon_discount, 2) }}" disabled class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
+                        </div>
+                        @if($coupon_code)
+                            <p class="text-xs text-green-600 mt-1 flex items-center">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                Coupon: <code class="ml-1 font-semibold">{{ $coupon_code }}</code>
+                            </p>
+                        @endif
+                        <p class="text-xs text-gray-500 mt-1">This discount is from a coupon and cannot be edited manually</p>
+                    </div>
+                @endif
 
                 @if($calculatedTotal !== null)
                     <div class="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border-2 border-indigo-300">
@@ -84,20 +99,30 @@
                     <span class="text-lg font-bold text-blue-700">৳{{ number_format($order->shipping_cost ?? 0, 2) }}</span>
                 </div>
 
-                <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
-                        <span class="text-sm font-medium text-gray-700">Discount</span>
+                @if($order->discount_amount > 0)
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700">Manual Discount</span>
+                        </div>
+                        <span class="text-lg font-bold text-red-600">৳{{ number_format($order->discount_amount ?? 0, 2) }}</span>
                     </div>
-                    <span class="text-lg font-bold text-red-600">৳{{ number_format($order->discount_amount ?? 0, 2) }}</span>
-                </div>
+                @endif
 
-                @if($order->coupon_code)
-                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-                        <span class="text-sm text-gray-500">Coupon Code:</span>
-                        <code class="text-sm bg-white px-3 py-1 rounded border border-gray-200 font-mono font-semibold text-gray-700">{{ $order->coupon_code }}</code>
+                @if($order->coupon_discount > 0)
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                            </svg>
+                            <span class="text-sm font-medium text-gray-700">Coupon Discount</span>
+                            @if($order->coupon_code)
+                                <code class="ml-2 text-xs bg-white px-2 py-0.5 rounded border border-green-300 font-mono font-semibold text-green-700">{{ $order->coupon_code }}</code>
+                            @endif
+                        </div>
+                        <span class="text-lg font-bold text-green-600">৳{{ number_format($order->coupon_discount ?? 0, 2) }}</span>
                     </div>
                 @endif
             </div>

@@ -118,6 +118,12 @@
                         <td class="text-right" style="color: #dc2626;">-৳{{ number_format($order->discount_amount, 2) }}</td>
                     </tr>
                 @endif
+                @if($order->coupon_discount > 0)
+                    <tr>
+                        <td>Coupon Discount @if($order->coupon_code)({{ $order->coupon_code }})@endif:</td>
+                        <td class="text-right" style="color: #dc2626;">-৳{{ number_format($order->coupon_discount, 2) }}</td>
+                    </tr>
+                @endif
                 <tr class="grand-total">
                     <td><strong>Grand Total:</strong></td>
                     <td class="text-right"><strong>৳{{ number_format($order->total_amount, 2) }}</strong></td>

@@ -15,19 +15,20 @@ class OrderCalculationService
     public function calculateOrderTotals(
         array $items,
         float $shippingCost = 0,
-        ?string $couponCode = null
+        float $couponDiscount = 0
     ): array {
         $subtotal = $this->calculateSubtotal($items);
         $taxAmount = $this->calculateTax($subtotal);
-        $discountAmount = $this->calculateDiscount($subtotal, $couponCode);
-        $totalAmount = $subtotal + $taxAmount + $shippingCost - $discountAmount;
+        
+        // Total amount calculation: subtotal + tax + shipping - coupon discount
+        $totalAmount = $subtotal + $taxAmount + $shippingCost - $couponDiscount;
 
         return [
             'subtotal' => round($subtotal, 2),
             'tax_amount' => round($taxAmount, 2),
             'shipping_cost' => round($shippingCost, 2),
-            'discount_amount' => round($discountAmount, 2),
-            'total_amount' => round($totalAmount, 2),
+            'discount_amount' => round($couponDiscount, 2),
+            'total_amount' => round(max(0, $totalAmount), 2), // Ensure total is never negative
         ];
     }
 
@@ -59,18 +60,22 @@ class OrderCalculationService
     }
 
     /**
-     * Calculate discount amount.
+     * Calculate product-level discount amount.
+     * Note: Coupon discounts are handled separately and passed directly.
      */
-    protected function calculateDiscount(float $subtotal, ?string $couponCode): float
+    protected function calculateProductDiscount(array $items): float
     {
-        if (!$couponCode) {
-            return 0;
-        }
-
-        // TODO: Implement coupon validation and discount calculation
-        // This will be integrated with Coupon module later
+        $discount = 0;
         
-        return 0;
+        foreach ($items as $item) {
+            // If item has a discount (original_price vs sale_price)
+            if (isset($item['original_price']) && isset($item['price'])) {
+                $itemDiscount = ($item['original_price'] - $item['price']) * $item['quantity'];
+                $discount += max(0, $itemDiscount);
+            }
+        }
+        
+        return $discount;
     }
 
     /**

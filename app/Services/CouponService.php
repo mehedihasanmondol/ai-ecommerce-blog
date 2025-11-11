@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Coupon;
 use App\Models\User;
-use App\Models\Order;
+use App\Modules\Ecommerce\Order\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 

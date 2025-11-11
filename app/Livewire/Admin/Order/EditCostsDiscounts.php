@@ -10,6 +10,7 @@ class EditCostsDiscounts extends Component
     public Order $order;
     public $shipping_cost;
     public $discount_amount;
+    public $coupon_discount;  // Read-only, from coupon
     public $coupon_code;
     public $isEditing = false;
     public $isSaving = false;
@@ -26,6 +27,7 @@ class EditCostsDiscounts extends Component
         $this->order = $order;
         $this->shipping_cost = $order->shipping_cost ?? 0;
         $this->discount_amount = $order->discount_amount ?? 0;
+        $this->coupon_discount = $order->coupon_discount ?? 0;  // Read-only
         $this->coupon_code = $order->coupon_code;
         $this->calculateTotal();
     }
@@ -39,10 +41,12 @@ class EditCostsDiscounts extends Component
 
     public function calculateTotal()
     {
+        // Total calculation: subtotal + tax + shipping - discount - coupon_discount
         $this->calculatedTotal = $this->order->subtotal + 
                                 ($this->shipping_cost ?? 0) + 
                                 ($this->order->tax_amount ?? 0) - 
-                                ($this->discount_amount ?? 0);
+                                ($this->discount_amount ?? 0) - 
+                                ($this->coupon_discount ?? 0);
     }
 
     public function toggleEdit()
@@ -52,6 +56,7 @@ class EditCostsDiscounts extends Component
         if (!$this->isEditing) {
             $this->shipping_cost = $this->order->shipping_cost ?? 0;
             $this->discount_amount = $this->order->discount_amount ?? 0;
+            $this->coupon_discount = $this->order->coupon_discount ?? 0;
             $this->coupon_code = $this->order->coupon_code;
             $this->calculateTotal();
             $this->resetValidation();
@@ -68,7 +73,8 @@ class EditCostsDiscounts extends Component
             $this->order->update([
                 'shipping_cost' => $this->shipping_cost,
                 'discount_amount' => $this->discount_amount,
-                'coupon_code' => $this->coupon_code,
+                // Note: coupon_discount and coupon_code are NOT updated here
+                // They should only be changed through the coupon system
                 'total_amount' => $this->calculatedTotal,
             ]);
 

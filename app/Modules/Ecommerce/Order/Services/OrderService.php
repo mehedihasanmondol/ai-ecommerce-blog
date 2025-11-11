@@ -26,11 +26,11 @@ class OrderService
         try {
             DB::beginTransaction();
 
-            // Calculate totals
+            // Calculate totals with coupon discount passed separately
             $calculations = $this->calculationService->calculateOrderTotals(
                 $data['items'],
                 $data['shipping_cost'] ?? 0,
-                $data['coupon_code'] ?? null
+                $data['discount_amount'] ?? 0  // Coupon discount amount
             );
 
             // Get delivery zone and method names for historical record
@@ -59,6 +59,7 @@ class OrderService
                 'tax_amount' => $calculations['tax_amount'],
                 'shipping_cost' => $calculations['shipping_cost'],
                 'discount_amount' => $calculations['discount_amount'],
+                'coupon_discount' => $data['discount_amount'] ?? 0,  // Coupon discount in separate field
                 'total_amount' => $calculations['total_amount'],
                 'coupon_code' => $data['coupon_code'] ?? null,
                 'ip_address' => request()->ip(),
