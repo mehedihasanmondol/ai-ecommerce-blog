@@ -191,4 +191,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(DeliveryMethod::class, 'default_delivery_method_id');
     }
+
+    /**
+     * Get coupons used by this user
+     */
+    public function coupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user')
+            ->withPivot(['order_id', 'discount_amount', 'used_at'])
+            ->withTimestamps();
+    }
 }

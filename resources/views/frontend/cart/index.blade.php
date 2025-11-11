@@ -230,24 +230,8 @@
             <!-- Right Column - Order Summary -->
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                    <!-- Promo Code -->
-                    <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Promo code</h3>
-                        <div class="flex space-x-2">
-                            <input type="text" 
-                                   x-model="promoCode"
-                                   placeholder="Enter code"
-                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <button @click="applyPromoCode()"
-                                    class="px-6 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition">
-                                Apply
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">One code per order</p>
-                    </div>
-
                     <!-- Order Summary -->
-                    <div class="border-t border-gray-200 pt-4">
+                    <div>
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Order summary</h3>
                         
                         <div class="space-y-3 text-sm">
@@ -284,6 +268,12 @@
                                 </div>
                             </div>
                             
+                            <!-- Coupon Discount -->
+                            <div class="flex justify-between" x-show="couponDiscount > 0">
+                                <span class="text-gray-600">Coupon Discount</span>
+                                <span class="font-medium text-green-600">-$<span x-text="couponDiscount.toFixed(2)">0.00</span></span>
+                            </div>
+                            
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center text-gray-600">
                                     <span>Shipping</span>
@@ -291,7 +281,12 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
-                                <span class="font-medium text-gray-900">$<span x-text="getShippingCost().toFixed(2)">0.00</span></span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-medium" :class="freeShipping ? 'line-through text-gray-400 text-xs' : 'text-gray-900'">
+                                        $<span x-text="shippingCost.toFixed(2)">0.00</span>
+                                    </span>
+                                    <span x-show="freeShipping" class="font-medium text-green-600">FREE</span>
+                                </div>
                             </div>
                             
                         </div>
@@ -304,27 +299,6 @@
                                     $<span x-text="calculateGrandTotal().toFixed(2)">0.00</span>
                                 </span>
                             </div>
-                            
-                            <!-- Promo Banner -->
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                                <div class="flex items-start">
-                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                    </svg>
-                                    <div class="flex-1">
-                                        <p class="text-xs text-gray-700">
-                                            Order over $100.00 and receive a minimum 10% off with code 
-                                            <span class="font-bold">GOLD100</span>
-                                        </p>
-                                        <button class="text-xs text-green-600 font-medium hover:underline mt-1">Apply</button>
-                                    </div>
-                                    <button class="text-gray-400 hover:text-gray-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- Checkout Button -->
@@ -333,8 +307,8 @@
                             Proceed to Checkout
                         </a>
                         
-                        <!-- Payment Methods Moved Below Checkout Button -->
-                        <div class="border-t border-gray-200 pt-4">
+                        <!-- Payment Methods -->
+                        <div class="border-t border-gray-200 pt-4 mb-4">
                             <p class="text-xs text-gray-600 mb-2">Accepted payment methods</p>
                             <div class="flex flex-wrap gap-2">
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" 
@@ -346,6 +320,11 @@
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/PayPal_logo.svg/200px-PayPal_logo.svg.png" 
                                      alt="PayPal" class="h-6">
                             </div>
+                        </div>
+
+                        <!-- Coupon Code -->
+                        <div class="border-t border-gray-200 pt-4">
+                            @livewire('cart.coupon-applier')
                         </div>
                     </div>
                 </div>
@@ -439,6 +418,8 @@ function cartPage() {
         shippingCost: {{ session('shipping_cost', 0) }},
         totalWeight: {{ $totalWeight }},
         cartData: @json($cart->toArray()),
+        couponDiscount: {{ session('applied_coupon.discount_amount', 0) }},
+        freeShipping: {{ session('applied_coupon.free_shipping', false) ? 'true' : 'false' }},
         
         init() {
             // Initialize any required data
@@ -454,6 +435,17 @@ function cartPage() {
             // Listen for shipping updates from Livewire component
             window.addEventListener('shipping-updated', (event) => {
                 this.shippingCost = event.detail.shippingCost || 0;
+            });
+            
+            // Listen for Livewire coupon events
+            Livewire.on('couponApplied', (event) => {
+                this.couponDiscount = event[0]?.discount || event.discount || 0;
+                this.freeShipping = event[0]?.freeShipping || event.freeShipping || false;
+            });
+            
+            Livewire.on('couponRemoved', () => {
+                this.couponDiscount = 0;
+                this.freeShipping = false;
             });
         },
         
@@ -511,13 +503,18 @@ function cartPage() {
         
         // Get shipping cost from Livewire component
         getShippingCost() {
+            // Free shipping from coupon
+            if (this.freeShipping) {
+                return 0;
+            }
             // The Livewire component will update this via events
             return this.shippingCost || 0;
         },
         
         // Calculate grand total
         calculateGrandTotal() {
-            return this.calculateSubtotal() + this.getShippingCost();
+            let total = this.calculateSubtotal() - this.couponDiscount + this.getShippingCost();
+            return Math.max(0, total); // Ensure total is never negative
         },
         
         updateQuantity(cartKey, quantity) {

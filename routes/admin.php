@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\DeliveryMethodController;
 use App\Http\Controllers\Admin\DeliveryRateController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Modules\Blog\Controllers\Admin\TickMarkController;
 use Illuminate\Support\Facades\Route;
 
@@ -154,4 +155,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('rates/{rate}/toggle-status', [DeliveryRateController::class, 'toggleStatus'])
             ->name('rates.toggle-status');
     });
+    
+    // Coupon Management Routes
+    Route::get('coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
+    Route::get('coupons/create', [AdminCouponController::class, 'create'])->name('coupons.create');
+    Route::get('coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
+    Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
 });

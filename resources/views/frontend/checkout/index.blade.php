@@ -208,14 +208,27 @@
                                 <span class="font-medium text-gray-900">৳{{ number_format($subtotal, 2) }}</span>
                             </div>
                             
+                            @if(session('applied_coupon'))
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">
+                                    Coupon ({{ session('applied_coupon.code') }})
+                                </span>
+                                <span class="font-medium text-green-600">-৳{{ number_format(session('applied_coupon.discount_amount', 0), 2) }}</span>
+                            </div>
+                            @endif
+                            
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Shipping</span>
-                                <span class="font-medium text-gray-900" x-text="shippingCost > 0 ? '৳' + shippingCost.toFixed(2) : 'Select method'"></span>
+                                @if(session('applied_coupon.free_shipping'))
+                                    <span class="font-medium text-green-600">FREE</span>
+                                @else
+                                    <span class="font-medium text-gray-900" x-text="shippingCost > 0 ? '৳' + shippingCost.toFixed(2) : 'Select method'"></span>
+                                @endif
                             </div>
 
                             <div class="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-200">
                                 <span>Total</span>
-                                <span x-text="'৳' + ({{ $subtotal }} + shippingCost).toFixed(2)"></span>
+                                <span x-text="'৳' + ({{ $subtotal }} - {{ session('applied_coupon.discount_amount', 0) }} + {{ session('applied_coupon.free_shipping') ? 0 : 'shippingCost' }}).toFixed(2)"></span>
                             </div>
                         </div>
 

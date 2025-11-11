@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Modules\Ecommerce\Delivery\Services\DeliveryService;
 use App\Modules\Ecommerce\Order\Services\OrderService;
+use App\Services\CouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -28,7 +29,8 @@ class CheckoutController extends Controller
 {
     public function __construct(
         protected DeliveryService $deliveryService,
-        protected OrderService $orderService
+        protected OrderService $orderService,
+        protected CouponService $couponService
     ) {}
 
     /**
@@ -215,27 +217,58 @@ class CheckoutController extends Controller
                 $itemCount += $item['quantity'];
             }
 
+            // Handle coupon discount
+            $discountAmount = 0;
+            $couponCode = null;
+            $freeShipping = false;
+            
+            $appliedCoupon = Session::get('applied_coupon');
+            if ($appliedCoupon) {
+                $discountAmount = $appliedCoupon['discount_amount'] ?? 0;
+                $couponCode = $appliedCoupon['code'] ?? null;
+                $freeShipping = $appliedCoupon['free_shipping'] ?? false;
+                
+                // Record coupon usage
+                if ($couponCode && Auth::check()) {
+                    $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                    if ($coupon) {
+                        // Will record usage after order is created
+                    }
+                }
+            }
+
             // Determine if COD payment
             $isCod = $validated['payment_method'] === 'cod';
             
             // Calculate shipping cost with detailed breakdown (includes COD fee if applicable)
-            $shippingData = $this->deliveryService->calculateShippingCostDetailed(
-                $validated['delivery_zone_id'],
-                $validated['delivery_method_id'],
-                $subtotal,
-                $totalWeight,
-                $itemCount,
-                $isCod
-            );
-            
-            if (!$shippingData['success']) {
-                return back()
-                    ->withInput()
-                    ->with('error', $shippingData['message'] ?? 'Failed to calculate shipping cost');
+            // Apply free shipping from coupon
+            if ($freeShipping) {
+                $shippingCost = 0;
+                $shippingBreakdown = [
+                    'base_rate' => 0,
+                    'handling_fee' => 0,
+                    'insurance_fee' => 0,
+                    'cod_fee' => 0,
+                ];
+            } else {
+                $shippingData = $this->deliveryService->calculateShippingCostDetailed(
+                    $validated['delivery_zone_id'],
+                    $validated['delivery_method_id'],
+                    $subtotal,
+                    $totalWeight,
+                    $itemCount,
+                    $isCod
+                );
+                
+                if (!$shippingData['success']) {
+                    return back()
+                        ->withInput()
+                        ->with('error', $shippingData['message'] ?? 'Failed to calculate shipping cost');
+                }
+                
+                $shippingCost = $shippingData['cost'];
+                $shippingBreakdown = $shippingData['breakdown'];
             }
-            
-            $shippingCost = $shippingData['cost'];
-            $shippingBreakdown = $shippingData['breakdown'];
 
             // Parse name into first and last name
             $nameParts = explode(' ', $validated['shipping_name'], 2);
@@ -304,6 +337,8 @@ class CheckoutController extends Controller
                 'handling_fee' => $shippingBreakdown['handling_fee'] ?? 0,
                 'insurance_fee' => $shippingBreakdown['insurance_fee'] ?? 0,
                 'cod_fee' => $shippingBreakdown['cod_fee'] ?? 0,
+                'discount_amount' => $discountAmount,
+                'coupon_code' => $couponCode,
                 'items' => $orderItems,
                 'billing_address' => $shippingAddress,
                 'shipping_address' => $shippingAddress,
@@ -315,8 +350,17 @@ class CheckoutController extends Controller
             // Create order
             $order = $this->orderService->createOrder($orderData);
 
-            // Clear cart
+            // Record coupon usage after order is created
+            if ($couponCode && Auth::check()) {
+                $coupon = \App\Models\Coupon::where('code', $couponCode)->first();
+                if ($coupon) {
+                    $this->couponService->recordUsage($coupon, Auth::id(), $discountAmount, $order->id);
+                }
+            }
+
+            // Clear cart and coupon session
             Session::forget('cart');
+            Session::forget('applied_coupon');
 
             // Redirect based on authentication
             if (Auth::check()) {

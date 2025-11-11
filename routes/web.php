@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\CouponController;
 use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
 
 // Public Homepage
@@ -33,6 +34,9 @@ Route::post('/wishlist/add', [WishlistController::class, 'add'])->name('wishlist
 Route::post('/wishlist/remove', [WishlistController::class, 'remove'])->name('wishlist.remove');
 Route::post('/wishlist/move-to-cart', [WishlistController::class, 'moveToCart'])->name('wishlist.move-to-cart');
 Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishlist.count');
+
+// Coupon Routes
+Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
 
 // Public Category Routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
