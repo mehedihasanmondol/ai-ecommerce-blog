@@ -10,6 +10,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CouponController;
 use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerController;
+use App\Http\Controllers\PaymentController;
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -121,6 +122,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    
+    // Payment Gateway Management Routes
+    Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+    Route::get('/payment-gateways/{gateway}/edit', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'edit'])->name('payment-gateways.edit');
+    Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+    Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
 });
 
 // Customer Dashboard and Profile Routes (Protected)
@@ -151,3 +158,13 @@ Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () 
 // Public Order Tracking
 Route::get('track-order', [CustomerOrderController::class, 'track'])->name('orders.track');
 Route::post('track-order', [CustomerOrderController::class, 'track']);
+
+// Payment Routes
+Route::post('/payment/initiate/{order}', [PaymentController::class, 'initiate'])->name('payment.initiate');
+Route::get('/payment/bkash/callback', [PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
+Route::post('/payment/bkash/callback', [PaymentController::class, 'bkashCallback']);
+Route::get('/payment/nagad/callback', [PaymentController::class, 'nagadCallback'])->name('payment.nagad.callback');
+Route::post('/payment/nagad/callback', [PaymentController::class, 'nagadCallback']);
+Route::post('/payment/sslcommerz/success', [PaymentController::class, 'sslcommerzSuccess'])->name('payment.sslcommerz.success');
+Route::post('/payment/sslcommerz/fail', [PaymentController::class, 'sslcommerzFail'])->name('payment.sslcommerz.fail');
+Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerzCancel'])->name('payment.sslcommerz.cancel');

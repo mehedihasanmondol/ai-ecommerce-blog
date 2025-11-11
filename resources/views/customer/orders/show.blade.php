@@ -40,15 +40,24 @@
                 <span class="px-4 py-2 text-sm font-semibold rounded-full {{ $statusClass }}">
                     {{ ucfirst($order->status) }}
                 </span>
-                @if($order->status === 'delivered')
-                    <a href="{{ route('customer.orders.invoice', $order) }}" target="_blank"
-                       class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors shadow-sm">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Download Invoice
-                    </a>
-                @endif
+                
+                <!-- Download Invoice Button -->
+                <a href="{{ route('customer.orders.invoice', $order) }}" target="_blank"
+                   class="inline-flex items-center px-4 py-2 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors shadow-sm border border-blue-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Download
+                </a>
+                
+                <!-- Print Button -->
+                <button onclick="window.open('{{ route('customer.orders.invoice', $order) }}', '_blank').print()"
+                        class="inline-flex items-center px-4 py-2 bg-white text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors shadow-sm border border-gray-300">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    Print
+                </button>
             </div>
         </div>
 
@@ -269,6 +278,41 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Pay With -->
+                        @if($order->payment_status !== 'paid' && in_array($order->payment_method, ['online', 'cod']))
+                            @php
+                                $paymentGateways = \App\Models\PaymentGateway::active()->get();
+                            @endphp
+                            
+                            @if($paymentGateways->count() > 0)
+                                <div class="mt-6 pt-6 border-t border-gray-200">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <span class="text-gray-700 font-medium">Pay with:</span>
+                                        @foreach($paymentGateways as $gateway)
+                                            <form action="{{ route('payment.initiate', $order) }}" method="POST" class="inline-block">
+                                                @csrf
+                                                <input type="hidden" name="gateway" value="{{ $gateway->slug }}">
+                                                <button type="submit" 
+                                                        class="group relative px-4 py-3 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500 hover:shadow-md transition-all duration-200 cursor-pointer"
+                                                        title="Pay with {{ $gateway->name }}">
+                                                    @if($gateway->logo)
+                                                        <img src="{{ asset('storage/' . $gateway->logo) }}" 
+                                                             alt="{{ $gateway->name }}" 
+                                                             class="h-8 w-auto group-hover:scale-105 transition-transform">
+                                                    @else
+                                                        <span class="text-sm font-semibold text-gray-700 group-hover:text-green-600">{{ $gateway->name }}</span>
+                                                    @endif
+                                                    
+                                                    <!-- Hover indicator -->
+                                                    <div class="absolute inset-0 bg-green-500 opacity-0 group-hover:opacity-5 rounded-lg transition-opacity"></div>
+                                                </button>
+                                            </form>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>

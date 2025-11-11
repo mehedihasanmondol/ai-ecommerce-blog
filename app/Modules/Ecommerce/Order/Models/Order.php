@@ -22,6 +22,7 @@ class Order extends Model
         'status',
         'payment_status',
         'payment_method',
+        'payment_gateway_id',
         'transaction_id',
         'subtotal',
         'tax_amount',
@@ -182,6 +183,14 @@ class Order extends Model
     public function deliveryMethod(): BelongsTo
     {
         return $this->belongsTo(DeliveryMethod::class);
+    }
+
+    /**
+     * Get the payment gateway.
+     */
+    public function paymentGateway(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\PaymentGateway::class);
     }
 
     /**
