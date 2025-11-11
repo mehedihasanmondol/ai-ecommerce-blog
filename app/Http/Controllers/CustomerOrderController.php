@@ -14,7 +14,12 @@ class CustomerOrderController extends Controller
     public function index()
     {
         $orders = Order::where('user_id', Auth::id())
-            ->with(['items.product', 'deliveryZone', 'deliveryMethod'])
+            ->with([
+                'items.product.images', 
+                'items.variant',
+                'deliveryZone', 
+                'deliveryMethod'
+            ])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 

@@ -155,7 +155,7 @@ class OrderService
             'tax_amount' => 0, // Calculate if needed
             'discount_amount' => 0, // Calculate if needed
             'total' => $subtotal,
-            'product_image' => isset($product->primary_image) ? $product->primary_image : null,
+            'product_image' => $product->image_url ?? null,
         ]);
     }
 

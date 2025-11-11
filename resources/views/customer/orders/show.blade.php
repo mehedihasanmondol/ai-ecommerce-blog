@@ -82,7 +82,7 @@
         </div>
 
         @if($order->tracking_number)
-            <div class="mt-6 p-4 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+            <div class="mt-6 p-4 bg-blue-900 bg-opacity-30 rounded-lg backdrop-blur-sm border border-white border-opacity-20">
                 <p class="text-sm text-white">
                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
