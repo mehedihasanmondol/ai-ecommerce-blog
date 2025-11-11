@@ -73,6 +73,7 @@ class Order extends Model
         'picked_up_at' => 'datetime',
         'in_transit_at' => 'datetime',
         'out_for_delivery_at' => 'datetime',
+        'estimated_delivery' => 'datetime',
     ];
 
     /**

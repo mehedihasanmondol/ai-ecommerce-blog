@@ -57,6 +57,8 @@ class OrderRepository
             'items.variant',
             'billingAddress',
             'shippingAddress',
+            'deliveryZone',
+            'deliveryMethod',
             'statusHistories.user',
             'payments'
         ])->find($id);
@@ -73,6 +75,8 @@ class OrderRepository
             'items.variant',
             'billingAddress',
             'shippingAddress',
+            'deliveryZone',
+            'deliveryMethod',
             'statusHistories',
             'payments'
         ])->where('order_number', $orderNumber)->first();

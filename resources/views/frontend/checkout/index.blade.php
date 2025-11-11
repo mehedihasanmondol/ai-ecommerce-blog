@@ -3,7 +3,7 @@
 @section('title', 'Checkout')
 
 @section('content')
-<div class="bg-gray-50 min-h-screen py-8" x-data="checkoutPage()">
+<div class="bg-gray-50 min-h-screen py-8" x-data="checkoutPage()" @shipping-updated.window="shippingCost = $event.detail.shippingCost || 0">
     <div class="container mx-auto px-4">
         
         <!-- Error/Success Messages -->
@@ -30,13 +30,23 @@
         @endif
 
         @if($errors->any())
-            <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
-                <div class="font-semibold mb-2">Please fix the following errors:</div>
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="mb-6 p-5 bg-red-50 border-2 border-red-300 text-red-800 rounded-lg shadow-md">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 mr-3 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg mb-2">⚠️ Please fix the following errors:</h3>
+                        <ul class="space-y-2">
+                            @foreach($errors->all() as $error)
+                                <li class="flex items-start">
+                                    <span class="text-red-600 mr-2">•</span>
+                                    <span class="font-medium">{{ $error }}</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             </div>
         @endif
 
@@ -59,7 +69,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                                 <input type="text" name="shipping_name" required
-                                       value="{{ old('shipping_name', Auth::user()->name ?? '') }}"
+                                       value="{{ old('shipping_name', $defaultShipping['name'] ?? '') }}"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                        placeholder="Recipient name">
                                 <!-- Hidden fields to match backend expectations -->
@@ -74,7 +84,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
                                     <input type="tel" name="shipping_phone" required
-                                           value="{{ old('shipping_phone', Auth::user()->phone ?? '') }}"
+                                           value="{{ old('shipping_phone', $defaultShipping['phone'] ?? '') }}"
                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                            placeholder="Recipient phone">
                                     @error('shipping_phone')
@@ -83,11 +93,11 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                                    <input type="email" name="shipping_email" required
-                                           value="{{ old('shipping_email', Auth::user()->email ?? '') }}"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="shipping_email"
+                                           value="{{ old('shipping_email', $defaultShipping['email'] ?? '') }}"
                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                           placeholder="Recipient email">
+                                           placeholder="Recipient email (optional)">
                                     @error('shipping_email')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -97,7 +107,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
                                 <input type="text" name="shipping_address_line_1" required
-                                       value="{{ old('shipping_address_line_1') }}"
+                                       value="{{ old('shipping_address_line_1', $defaultShipping['address'] ?? '') }}"
                                        placeholder="House/Flat, Street, Area"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                 @error('shipping_address_line_1')
@@ -109,88 +119,7 @@
 
                     <!-- Delivery Options -->
                     <div class="bg-white rounded-lg shadow-sm p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
-                            </svg>
-                            Delivery Options
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <!-- Delivery Zone -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Zone *</label>
-                                <select name="delivery_zone_id" required
-                                        x-model="selectedZone"
-                                        @change="onZoneChange()"
-                                        class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors">
-                                    <option value="">Select your area</option>
-                                    @foreach($deliveryZones as $zone)
-                                        <option value="{{ $zone->id }}">
-                                            {{ $zone->name }}@if($zone->description) - {{ $zone->description }}@endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('delivery_zone_id')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Delivery Method -->
-                            <div x-show="selectedZone">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Delivery Method *</label>
-                                
-                                <!-- Loading state -->
-                                <div x-show="loadingMethods" class="text-center py-2">
-                                    <div class="inline-flex items-center gap-2 text-xs text-gray-500">
-                                        <svg class="animate-spin h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Loading methods...
-                                    </div>
-                                </div>
-
-                                <!-- Methods list - Ultra Compact Design -->
-                                <div class="space-y-1.5" x-show="!loadingMethods && availableMethods.length > 0">
-                                    <template x-for="method in availableMethods" :key="method.id">
-                                        <label class="flex items-center gap-2 p-2 border-2 rounded-md cursor-pointer transition-all"
-                                               :class="selectedMethod == method.id ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'">
-                                            <input type="radio" 
-                                                   name="delivery_method_id" 
-                                                   :value="method.id"
-                                                   x-model="selectedMethod"
-                                                   @change="calculateShipping()"
-                                                   required
-                                                   class="w-3.5 h-3.5 text-green-600 border-gray-300 focus:ring-green-500">
-                                            <div class="flex items-center justify-between flex-1 min-w-0">
-                                                <div class="flex-1 min-w-0">
-                                                    <p class="text-sm font-medium text-gray-900 truncate" x-text="method.name"></p>
-                                                    <p class="text-xs text-gray-500 truncate" x-text="(method.delivery_time || 'Standard') + (method.carrier_name ? ' • ' + method.carrier_name : '')"></p>
-                                                </div>
-                                                <div class="text-right ml-3 flex-shrink-0">
-                                                    <p class="text-sm font-bold whitespace-nowrap" 
-                                                       :class="method.base_rate > 0 ? 'text-gray-900' : 'text-green-600'" 
-                                                       x-text="method.base_rate > 0 ? '৳' + method.base_rate : 'FREE'"></p>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </template>
-                                </div>
-
-                                <!-- No methods available -->
-                                <div x-show="!loadingMethods && availableMethods.length === 0" class="text-center py-4 bg-gray-50 rounded-md border border-dashed border-gray-300">
-                                    <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                    </svg>
-                                    <p class="text-xs text-gray-600 mt-1.5">No delivery methods available</p>
-                                </div>
-
-                                @error('delivery_method_id')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
+                        @livewire('checkout.delivery-selector', ['cartTotal' => $subtotal, 'cartWeight' => $totalWeight, 'itemCount' => count($cart)])
                     </div>
 
                     <!-- Payment Method -->
@@ -291,7 +220,7 @@
                         </div>
 
                         <button type="submit" 
-                                :disabled="!selectedZone || !selectedMethod || isProcessing"
+                                :disabled="isProcessing"
                                 class="w-full mt-6 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors">
                             <span x-show="!isProcessing">Place Order</span>
                             <span x-show="isProcessing">Processing...</span>
@@ -314,7 +243,7 @@ function checkoutPage() {
         selectedMethod: '',
         availableMethods: [],
         allMethods: [],
-        shippingCost: 0,
+        shippingCost: {{ session('shipping_cost', 0) }},
         paymentMethod: 'cod',
         isProcessing: false,
         loadingMethods: false,
@@ -377,17 +306,10 @@ function checkoutPage() {
         },
 
         submitOrder(event) {
-            // Validate required fields
-            if (!this.selectedZone || !this.selectedMethod) {
-                event.preventDefault();
-                alert('Please select delivery zone and method');
-                return false;
-            }
-            
             // Set processing state
             this.isProcessing = true;
             
-            // Allow form to submit normally (don't prevent default)
+            // Allow form to submit normally - backend validation will handle errors
             return true;
         }
     }

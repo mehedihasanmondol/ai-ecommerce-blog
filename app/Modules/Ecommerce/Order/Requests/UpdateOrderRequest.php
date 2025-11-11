@@ -31,6 +31,11 @@ class UpdateOrderRequest extends FormRequest
             'admin_notes' => ['nullable', 'string'],
             'tracking_number' => ['nullable', 'string', 'max:100'],
             'carrier' => ['nullable', 'string', 'max:100'],
+            // Delivery fields
+            'delivery_zone_id' => ['nullable', 'exists:delivery_zones,id'],
+            'delivery_method_id' => ['nullable', 'exists:delivery_methods,id'],
+            'delivery_status' => ['nullable', 'string', 'in:pending,picked_up,in_transit,out_for_delivery,delivered,failed,returned'],
+            'estimated_delivery' => ['nullable', 'date'],
         ];
     }
 }

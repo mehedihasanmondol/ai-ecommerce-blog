@@ -31,6 +31,11 @@ class CartController extends Controller
         foreach ($cart as $item) {
             $itemsTotal += $item['price'] * $item['quantity'];
             
+            // Calculate weight (assuming weight is in grams, convert to kg)
+            if (isset($item['weight'])) {
+                $totalWeight += ($item['weight'] / 1000) * $item['quantity'];
+            }
+            
             // Calculate discount if original price exists
             if (isset($item['original_price']) && $item['original_price'] > $item['price']) {
                 $discounts += ($item['original_price'] - $item['price']) * $item['quantity'];

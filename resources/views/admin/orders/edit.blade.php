@@ -95,9 +95,112 @@
                 </div>
             </div>
 
+            <!-- Delivery Information -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    Delivery Information
+                    @if($order->deliveryZone || $order->deliveryMethod)
+                        <span class="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                            Customer Selected
+                        </span>
+                    @endif
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Delivery Zone -->
+                    <div>
+                        <label for="delivery_zone_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            Delivery Zone
+                            @if($order->deliveryZone)
+                                <span class="text-xs text-green-600 font-normal">(Currently: {{ $order->deliveryZone->name }})</span>
+                            @endif
+                        </label>
+                        <select name="delivery_zone_id" id="delivery_zone_id"
+                                class="w-full px-4 py-2 border {{ $order->delivery_zone_id ? 'border-green-300 bg-green-50' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Delivery Zone</option>
+                            @foreach(\App\Modules\Ecommerce\Delivery\Models\DeliveryZone::where('is_active', true)->orderBy('name')->get() as $zone)
+                                <option value="{{ $zone->id }}" 
+                                        {{ old('delivery_zone_id', $order->delivery_zone_id) == $zone->id ? 'selected' : '' }}
+                                        data-type="{{ $zone->type }}"
+                                        data-cost="{{ $zone->base_cost }}">
+                                    {{ $zone->name }} ({{ ucfirst($zone->type) }}) - ৳{{ number_format($zone->base_cost, 2) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('delivery_zone_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        
+                        @if($order->deliveryZone)
+                            <p class="mt-1 text-xs text-gray-600">
+                                <span class="font-medium">Type:</span> {{ ucfirst($order->deliveryZone->type) }} | 
+                                <span class="font-medium">Cost:</span> ৳{{ number_format($order->deliveryZone->base_cost, 2) }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Delivery Method -->
+                    <div>
+                        <label for="delivery_method_id" class="block text-sm font-medium text-gray-700 mb-2">
+                            Delivery Method
+                            @if($order->deliveryMethod)
+                                <span class="text-xs text-green-600 font-normal">(Currently: {{ $order->deliveryMethod->name }})</span>
+                            @endif
+                        </label>
+                        <select name="delivery_method_id" id="delivery_method_id"
+                                class="w-full px-4 py-2 border {{ $order->delivery_method_id ? 'border-green-300 bg-green-50' : 'border-gray-300' }} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select Delivery Method</option>
+                            @foreach(\App\Modules\Ecommerce\Delivery\Models\DeliveryMethod::where('is_active', true)->orderBy('name')->get() as $method)
+                                <option value="{{ $method->id }}" 
+                                        {{ old('delivery_method_id', $order->delivery_method_id) == $method->id ? 'selected' : '' }}
+                                        data-time="{{ $method->delivery_time }}"
+                                        data-cost="{{ $method->cost }}">
+                                    {{ $method->name }} ({{ $method->delivery_time }}) - ৳{{ number_format($method->cost, 2) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('delivery_method_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        
+                        @if($order->deliveryMethod)
+                            <p class="mt-1 text-xs text-gray-600">
+                                <span class="font-medium">Time:</span> {{ $order->deliveryMethod->delivery_time }} | 
+                                <span class="font-medium">Cost:</span> ৳{{ number_format($order->deliveryMethod->cost, 2) }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Delivery Status -->
+                    <div>
+                        <label for="delivery_status" class="block text-sm font-medium text-gray-700 mb-2">
+                            Delivery Status
+                        </label>
+                        <select name="delivery_status" id="delivery_status"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Not Set</option>
+                            <option value="pending" {{ old('delivery_status', $order->delivery_status) === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="picked_up" {{ old('delivery_status', $order->delivery_status) === 'picked_up' ? 'selected' : '' }}>Picked Up</option>
+                            <option value="in_transit" {{ old('delivery_status', $order->delivery_status) === 'in_transit' ? 'selected' : '' }}>In Transit</option>
+                            <option value="out_for_delivery" {{ old('delivery_status', $order->delivery_status) === 'out_for_delivery' ? 'selected' : '' }}>Out for Delivery</option>
+                            <option value="delivered" {{ old('delivery_status', $order->delivery_status) === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                            <option value="failed" {{ old('delivery_status', $order->delivery_status) === 'failed' ? 'selected' : '' }}>Failed</option>
+                            <option value="returned" {{ old('delivery_status', $order->delivery_status) === 'returned' ? 'selected' : '' }}>Returned</option>
+                        </select>
+                        @error('delivery_status') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Estimated Delivery -->
+                    <div>
+                        <label for="estimated_delivery" class="block text-sm font-medium text-gray-700 mb-2">
+                            Estimated Delivery Date
+                        </label>
+                        <input type="date" name="estimated_delivery" id="estimated_delivery"
+                               value="{{ old('estimated_delivery', $order->estimated_delivery ? $order->estimated_delivery->format('Y-m-d') : '') }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        @error('estimated_delivery') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+            </div>
+
             <!-- Shipping Information -->
             <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping Information</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Shipping & Tracking</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="tracking_number" class="block text-sm font-medium text-gray-700 mb-2">

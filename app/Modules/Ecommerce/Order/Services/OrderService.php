@@ -33,6 +33,20 @@ class OrderService
                 $data['coupon_code'] ?? null
             );
 
+            // Get delivery zone and method names for historical record
+            $deliveryZoneName = null;
+            $deliveryMethodName = null;
+            
+            if (!empty($data['delivery_zone_id'])) {
+                $deliveryZone = \App\Modules\Ecommerce\Delivery\Models\DeliveryZone::find($data['delivery_zone_id']);
+                $deliveryZoneName = $deliveryZone?->name;
+            }
+            
+            if (!empty($data['delivery_method_id'])) {
+                $deliveryMethod = \App\Modules\Ecommerce\Delivery\Models\DeliveryMethod::find($data['delivery_method_id']);
+                $deliveryMethodName = $deliveryMethod?->name;
+            }
+
             // Create order
             $order = $this->orderRepository->create([
                 'user_id' => $data['user_id'],
@@ -50,6 +64,11 @@ class OrderService
                 'ip_address' => request()->ip(),
                 'status' => 'pending',
                 'payment_status' => $data['payment_method'] === 'cod' ? 'pending' : 'pending',
+                // Delivery information
+                'delivery_zone_id' => $data['delivery_zone_id'] ?? null,
+                'delivery_method_id' => $data['delivery_method_id'] ?? null,
+                'delivery_zone_name' => $deliveryZoneName,
+                'delivery_method_name' => $deliveryMethodName,
             ]);
 
             // Create order items

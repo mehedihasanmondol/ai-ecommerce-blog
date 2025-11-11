@@ -6,7 +6,10 @@ namespace App\Models;
 use App\Modules\User\Models\Permission;
 use App\Modules\User\Models\Role;
 use App\Modules\User\Models\UserActivity;
+use App\Modules\Ecommerce\Delivery\Models\DeliveryZone;
+use App\Modules\Ecommerce\Delivery\Models\DeliveryMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -59,6 +62,8 @@ class User extends Authenticatable
         'state',
         'country',
         'postal_code',
+        'default_delivery_zone_id',
+        'default_delivery_method_id',
     ];
 
     /**
@@ -169,5 +174,21 @@ class User extends Authenticatable
     public function getFullNameAttribute(): string
     {
         return $this->name ?: 'Unknown User';
+    }
+
+    /**
+     * Get default delivery zone
+     */
+    public function defaultDeliveryZone(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryZone::class, 'default_delivery_zone_id');
+    }
+
+    /**
+     * Get default delivery method
+     */
+    public function defaultDeliveryMethod(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryMethod::class, 'default_delivery_method_id');
     }
 }

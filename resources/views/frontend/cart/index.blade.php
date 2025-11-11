@@ -14,13 +14,8 @@
                         <h1 class="text-2xl font-bold text-gray-900">
                             Cart (<span x-text="cartItemsCount">{{ count($cart) }}</span>)
                         </h1>
-                        <div class="flex items-center text-sm text-gray-600">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Ship to Bangladesh
-                        </div>
+                        <!-- Delivery Information Inline -->
+                        @livewire('cart.delivery-selector-inline')
                     </div>
 
                     <!-- Select All & Actions -->
@@ -365,6 +360,70 @@
             </div>
         </div>
     </div>
+    
+    <!-- Delivery Selector Modal -->
+    <div x-data="{ open: false }" 
+         @open-modal.window="if ($event.detail.modalId === 'delivery-selector-modal') open = true"
+         @close-modal.window="open = false"
+         x-show="open"
+         x-cloak
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+             @click="open = false"
+             x-show="open"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+        </div>
+
+        <!-- Modal Content -->
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto"
+                 @click.away="open = false"
+                 x-show="open"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+                
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        Select Delivery Method
+                    </h3>
+                    <button @click="open = false" 
+                            class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 max-h-[70vh] overflow-y-auto">
+                    @livewire('cart.delivery-selector', ['cartTotal' => $itemsTotal, 'cartWeight' => $totalWeight, 'itemCount' => count($cart)])
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+                    <button @click="open = false"
+                            class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -377,11 +436,17 @@ function cartPage() {
         cartItemsCount: {{ count($cart) }},
         totalWeight: {{ $totalWeight }},
         cartData: @json($cart->toArray()),
+        shippingCost: 0,
         
         init() {
             // Select all items by default
             this.selectedItems = Object.keys(this.cartData);
             this.selectAll = true;
+            
+            // Listen for shipping updates from Livewire
+            window.addEventListener('shippingUpdated', (event) => {
+                this.shippingCost = event.detail.shippingCost || 0;
+            });
         },
         
         toggleSelectAll() {
@@ -436,9 +501,9 @@ function cartPage() {
             return this.calculateItemsTotal() - this.calculateDiscounts();
         },
         
-        // Calculate shipping (free if no items selected)
+        // Calculate shipping (from Livewire component)
         calculateShipping() {
-            return this.selectedItems.length > 0 ? 18.31 : 0;
+            return this.selectedItems.length > 0 ? this.shippingCost : 0;
         },
         
         // Calculate grand total

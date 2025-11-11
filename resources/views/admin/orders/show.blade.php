@@ -98,12 +98,51 @@
                                     <span class="text-gray-900">৳{{ number_format($order->tax_amount, 2) }}</span>
                                 </div>
                             @endif
+                            
                             @if($order->shipping_cost > 0)
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-gray-600">Shipping</span>
-                                    <span class="text-gray-900">৳{{ number_format($order->shipping_cost, 2) }}</span>
+                                <!-- Shipping Charges Breakdown -->
+                                <div class="py-2 px-3 bg-blue-50 rounded-lg border border-blue-100">
+                                    <div class="flex justify-between text-sm font-medium text-blue-900 mb-2">
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                                            </svg>
+                                            Shipping Charges
+                                        </span>
+                                        <span class="text-blue-700">৳{{ number_format($order->shipping_cost, 2) }}</span>
+                                    </div>
+                                    
+                                    @if($order->base_shipping_cost || $order->handling_fee || $order->insurance_fee || $order->cod_fee)
+                                        <div class="space-y-1 pl-5 text-xs">
+                                            @if($order->base_shipping_cost > 0)
+                                                <div class="flex justify-between text-gray-600">
+                                                    <span>• Base Rate</span>
+                                                    <span class="font-medium">৳{{ number_format($order->base_shipping_cost, 2) }}</span>
+                                                </div>
+                                            @endif
+                                            @if($order->handling_fee > 0)
+                                                <div class="flex justify-between text-gray-600">
+                                                    <span>• Handling Fee</span>
+                                                    <span class="font-medium">৳{{ number_format($order->handling_fee, 2) }}</span>
+                                                </div>
+                                            @endif
+                                            @if($order->insurance_fee > 0)
+                                                <div class="flex justify-between text-gray-600">
+                                                    <span>• Insurance</span>
+                                                    <span class="font-medium">৳{{ number_format($order->insurance_fee, 2) }}</span>
+                                                </div>
+                                            @endif
+                                            @if($order->cod_fee > 0)
+                                                <div class="flex justify-between text-gray-600">
+                                                    <span>• COD Fee</span>
+                                                    <span class="font-medium">৳{{ number_format($order->cod_fee, 2) }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             @endif
+                            
                             @if($order->discount_amount > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-600">Discount</span>
@@ -198,6 +237,145 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Delivery Information (Customer Selected) -->
+            @if($order->deliveryZone || $order->deliveryMethod || $order->delivery_status || $order->estimated_delivery)
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        </svg>
+                        Delivery Information
+                        <span class="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                            Customer Selected
+                        </span>
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- Delivery Zone & Method -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @if($order->deliveryZone)
+                                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <p class="text-xs text-gray-600 mb-1 uppercase tracking-wide">Delivery Zone</p>
+                                    <p class="font-bold text-gray-900 text-lg">{{ $order->deliveryZone->name }}</p>
+                                    @if($order->deliveryZone->description)
+                                        <p class="text-xs text-gray-600 mt-1">{{ $order->deliveryZone->description }}</p>
+                                    @endif
+                                </div>
+                            @endif
+
+                            @if($order->deliveryMethod)
+                                <div class="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                                    <p class="text-xs text-gray-600 mb-1 uppercase tracking-wide">Delivery Method</p>
+                                    <div class="flex items-center">
+                                        @if($order->deliveryMethod->icon)
+                                            <span class="text-2xl mr-2">{{ $order->deliveryMethod->icon }}</span>
+                                        @endif
+                                        <p class="font-bold text-gray-900 text-lg">{{ $order->deliveryMethod->name }}</p>
+                                    </div>
+                                    @if($order->deliveryMethod->estimated_days)
+                                        <p class="text-xs text-gray-600 mt-1">
+                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ $order->deliveryMethod->estimated_days }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Shipping Cost Breakdown -->
+                        @if($order->shipping_cost > 0)
+                            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="text-sm font-semibold text-gray-900 uppercase tracking-wide">Shipping Cost Breakdown</p>
+                                    <p class="text-xl font-bold text-green-700">৳{{ number_format($order->shipping_cost, 2) }}</p>
+                                </div>
+                                
+                                <div class="space-y-2 text-sm">
+                                    @if($order->base_shipping_cost > 0)
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">• Base Rate</span>
+                                            <span class="font-medium text-gray-900">৳{{ number_format($order->base_shipping_cost, 2) }}</span>
+                                        </div>
+                                    @endif
+                                    @if($order->handling_fee > 0)
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">• Handling Fee</span>
+                                            <span class="font-medium text-gray-900">৳{{ number_format($order->handling_fee, 2) }}</span>
+                                        </div>
+                                    @endif
+                                    @if($order->insurance_fee > 0)
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">• Insurance Fee</span>
+                                            <span class="font-medium text-gray-900">৳{{ number_format($order->insurance_fee, 2) }}</span>
+                                        </div>
+                                    @endif
+                                    @if($order->cod_fee > 0)
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">• COD Fee</span>
+                                            <span class="font-medium text-gray-900">৳{{ number_format($order->cod_fee, 2) }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif($order->shipping_cost == 0 && ($order->deliveryZone || $order->deliveryMethod))
+                            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    <p class="text-lg font-bold text-green-700">FREE SHIPPING</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Delivery Status & Estimated Delivery -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @if($order->delivery_status)
+                                <div>
+                                    <p class="text-xs text-gray-600 mb-2 uppercase tracking-wide">Delivery Status</p>
+                                    <span class="inline-block px-3 py-1.5 text-sm font-semibold rounded-lg 
+                                        @if($order->delivery_status === 'delivered') bg-green-100 text-green-800
+                                        @elseif($order->delivery_status === 'out_for_delivery') bg-blue-100 text-blue-800
+                                        @elseif($order->delivery_status === 'in_transit') bg-yellow-100 text-yellow-800
+                                        @elseif($order->delivery_status === 'picked_up') bg-indigo-100 text-indigo-800
+                                        @elseif($order->delivery_status === 'failed' || $order->delivery_status === 'returned') bg-red-100 text-red-800
+                                        @else bg-gray-100 text-gray-800
+                                        @endif">
+                                        {{ ucfirst(str_replace('_', ' ', $order->delivery_status)) }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            @if($order->estimated_delivery)
+                                <div>
+                                    <p class="text-xs text-gray-600 mb-2 uppercase tracking-wide">Estimated Delivery</p>
+                                    <p class="font-semibold text-gray-900">
+                                        <svg class="w-4 h-4 inline mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {{ $order->estimated_delivery->format('M d, Y') }}
+                                        <span class="text-xs text-gray-500 ml-1">({{ $order->estimated_delivery->diffForHumans() }})</span>
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+
+                        @if(!$order->deliveryZone && !$order->deliveryMethod)
+                            <div class="text-center py-4">
+                                <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                </svg>
+                                <p class="text-sm text-gray-500">No delivery information selected</p>
+                                <a href="{{ route('admin.orders.edit', $order) }}" class="text-sm text-blue-600 hover:text-blue-700 mt-1 inline-block">
+                                    Add delivery details →
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
             <!-- Customer Information -->
             <div class="bg-white rounded-lg shadow-sm p-6">

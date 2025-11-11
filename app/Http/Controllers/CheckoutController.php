@@ -47,29 +47,53 @@ class CheckoutController extends Controller
 
         // Calculate cart totals
         $subtotal = 0;
+        $totalWeight = 0;
         foreach ($cart as $item) {
             $subtotal += $item['price'] * $item['quantity'];
+            
+            // Calculate weight (assuming weight is in grams, convert to kg)
+            if (isset($item['weight'])) {
+                $totalWeight += ($item['weight'] / 1000) * $item['quantity'];
+            }
         }
 
-        // Get active delivery zones
-        $deliveryZones = $this->deliveryService->getActiveZones();
-        
-        // Get active delivery methods
-        $deliveryMethods = $this->deliveryService->getActiveMethods();
-
-        // Get user's saved addresses if authenticated
-        $savedAddresses = [];
+        // Get default shipping information
+        $defaultShipping = [];
         if (Auth::check()) {
-            // TODO: Implement saved addresses feature
-            $savedAddresses = [];
+            // Try to get last order's shipping address
+            $lastOrder = \App\Modules\Ecommerce\Order\Models\Order::where('user_id', Auth::id())
+                ->with(['addresses' => function ($query) {
+                    $query->where('type', 'shipping');
+                }])
+                ->latest()
+                ->first();
+            
+            if ($lastOrder && $lastOrder->addresses->isNotEmpty()) {
+                // Use last order's shipping address
+                $shippingAddress = $lastOrder->addresses->first();
+                $defaultShipping = [
+                    'name' => $shippingAddress->first_name . ' ' . $shippingAddress->last_name,
+                    'phone' => $shippingAddress->phone,
+                    'email' => $shippingAddress->email,
+                    'address' => $shippingAddress->address_line_1,
+                ];
+            } else {
+                // Use user profile info
+                $user = Auth::user();
+                $defaultShipping = [
+                    'name' => $user->name,
+                    'phone' => $user->mobile ?? $user->phone ?? '',
+                    'email' => $user->email,
+                    'address' => $user->address ?? '',
+                ];
+            }
         }
 
         return view('frontend.checkout.index', compact(
             'cart',
             'subtotal',
-            'deliveryZones',
-            'deliveryMethods',
-            'savedAddresses'
+            'totalWeight',
+            'defaultShipping'
         ));
     }
 
@@ -136,13 +160,23 @@ class CheckoutController extends Controller
             'shipping_name' => 'required|string|max:255',
             'shipping_first_name' => 'nullable|string|max:255',
             'shipping_last_name' => 'nullable|string|max:255',
-            'shipping_email' => 'required|email|max:255',
+            'shipping_email' => 'nullable|email|max:255',
             'shipping_phone' => 'required|string|max:20',
             'shipping_address_line_1' => 'required|string|max:255',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'delivery_method_id' => 'required|exists:delivery_methods,id',
             'payment_method' => 'required|in:cod,online',
             'order_notes' => 'nullable|string|max:500',
+        ], [
+            'delivery_zone_id.required' => 'Please select a delivery zone',
+            'delivery_zone_id.exists' => 'The selected delivery zone is invalid',
+            'delivery_method_id.required' => 'Please select a delivery method',
+            'delivery_method_id.exists' => 'The selected delivery method is invalid',
+            'shipping_name.required' => 'Recipient name is required',
+            'shipping_email.email' => 'Please enter a valid email address',
+            'shipping_phone.required' => 'Phone number is required',
+            'shipping_address_line_1.required' => 'Shipping address is required',
+            'payment_method.required' => 'Please select a payment method',
         ]);
 
         $cart = Session::get('cart', []);
@@ -241,6 +275,9 @@ class CheckoutController extends Controller
                 'items' => $orderItems,
                 'billing_address' => $shippingAddress,
                 'shipping_address' => $shippingAddress,
+                // Delivery information
+                'delivery_zone_id' => $validated['delivery_zone_id'],
+                'delivery_method_id' => $validated['delivery_method_id'],
             ];
 
             // Create order
