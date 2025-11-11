@@ -78,8 +78,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Left Column -->
         <div class="space-y-6">
-            <!-- Customer Information -->
-            @livewire('admin.order.edit-customer-info', ['order' => $order], key('customer-'.$order->id))
+            <!-- Shipping & Billing Addresses -->
+            @livewire('admin.order.edit-addresses', ['order' => $order], key('addresses-'.$order->id))
 
             <!-- Payment Information -->
             @livewire('admin.order.edit-payment-info', ['order' => $order], key('payment-'.$order->id))

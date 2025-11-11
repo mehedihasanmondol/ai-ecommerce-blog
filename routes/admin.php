@@ -64,7 +64,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('orders/{order}/edit', function (\App\Modules\Ecommerce\Order\Models\Order $order) {
         return view('admin.orders.edit-livewire', compact('order'));
     })->name('orders.edit');
-    Route::get('orders/{order}/edit-old', [OrderController::class, 'editOld'])->name('orders.edit-old');
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])

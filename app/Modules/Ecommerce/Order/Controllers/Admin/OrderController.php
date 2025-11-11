@@ -169,16 +169,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Show the old form for editing the specified order.
-     * Kept for backward compatibility.
-     */
-    public function editOld(Order $order)
-    {
-        $order = $this->orderRepository->find($order->id);
-        return view('admin.orders.edit', compact('order'));
-    }
-
-    /**
      * Update the specified order.
      */
     public function update(UpdateOrderRequest $request, Order $order)
