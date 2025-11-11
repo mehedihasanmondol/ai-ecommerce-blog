@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DeliveryZoneController;
 use App\Http\Controllers\Admin\DeliveryMethodController;
 use App\Http\Controllers\Admin\DeliveryRateController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\SiteSettingController;
 use App\Modules\Blog\Controllers\Admin\TickMarkController;
 use Illuminate\Support\Facades\Route;
 
@@ -161,4 +162,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('coupons/create', [AdminCouponController::class, 'create'])->name('coupons.create');
     Route::get('coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
     Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
+    
+    // Site Settings Routes
+    Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
+    Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
+    Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
 });

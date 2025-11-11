@@ -74,9 +74,20 @@
             <!-- Logo -->
             <div class="flex items-center">
                 <a href="{{ route('home') }}" class="flex items-center">
-                    <div class="bg-green-600 text-white font-bold text-2xl px-3 py-2 rounded">
-                        iHerb
-                    </div>
+                    @php
+                        $siteLogo = \App\Models\SiteSetting::get('site_logo');
+                        $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
+                    @endphp
+                    
+                    @if($siteLogo)
+                        <img src="{{ asset('storage/' . $siteLogo) }}" 
+                             alt="{{ $siteName }}" 
+                             class="h-12 w-auto">
+                    @else
+                        <div class="bg-green-600 text-white font-bold text-2xl px-3 py-2 rounded">
+                            {{ $siteName }}
+                        </div>
+                    @endif
                 </a>
             </div>
 

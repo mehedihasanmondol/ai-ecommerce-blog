@@ -44,8 +44,19 @@
 
                         <!-- Logo -->
                         <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-                            <i class="fas fa-shield-alt text-2xl text-blue-600 mr-2"></i>
-                            <span class="text-xl font-bold text-gray-900">Admin Panel</span>
+                            @php
+                                $adminLogo = \App\Models\SiteSetting::get('admin_logo');
+                                $siteName = \App\Models\SiteSetting::get('site_name', 'Laravel');
+                            @endphp
+                            
+                            @if($adminLogo)
+                                <img src="{{ asset('storage/' . $adminLogo) }}" 
+                                     alt="{{ $siteName }} Admin" 
+                                     class="h-10 w-auto">
+                            @else
+                                <i class="fas fa-shield-alt text-2xl text-blue-600 mr-2"></i>
+                                <span class="text-xl font-bold text-gray-900">Admin Panel</span>
+                            @endif
                         </a>
                     </div>
 
@@ -388,9 +399,13 @@
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
                 </div>
                 
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50">
+                <a href="{{ route('admin.site-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.site-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-cog w-5 mr-3"></i>
-                    <span>Settings</span>
+                    <span>Site Settings</span>
+                    @if(request()->routeIs('admin.site-settings.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
                 </a>
             </nav>
         </aside>
