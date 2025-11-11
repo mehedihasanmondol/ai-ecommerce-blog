@@ -3,53 +3,55 @@
 @section('title', 'Shopping Cart')
 
 @section('content')
-<div class="bg-gray-50 min-h-screen py-8" x-data="cartPage()">
+<div class="bg-gray-50 min-h-screen py-8" x-data="cartPage()" @shipping-updated.window="shippingCost = $event.detail.shippingCost || 0">
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column - Cart Items -->
             <div class="lg:col-span-2">
-                <!-- Cart Header -->
-                <div class="bg-white rounded-lg shadow-sm p-6 mb-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h1 class="text-2xl font-bold text-gray-900">
-                            Cart (<span x-text="cartItemsCount">{{ count($cart) }}</span>)
-                        </h1>
-                        <!-- Delivery Information Inline -->
-                        @livewire('cart.delivery-selector-inline')
-                    </div>
+                <!-- Combined Cart Card -->
+                <div class="bg-white rounded-lg shadow-sm">
+                    <!-- Cart Header -->
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h1 class="text-2xl font-bold text-gray-900">
+                                Cart (<span x-text="cartItemsCount">{{ count($cart) }}</span>)
+                            </h1>
+                            <!-- Delivery Information Inline -->
+                            @livewire('cart.delivery-selector-inline')
+                        </div>
 
-                    <!-- Select All & Actions -->
-                    <div class="flex items-center justify-between pb-4 border-b border-gray-200">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" 
-                                   x-model="selectAll" 
-                                   @change="toggleSelectAll()"
-                                   class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-                            <span class="ml-2 text-sm font-medium text-gray-700">Select all</span>
-                        </label>
+                        <!-- Select All & Actions -->
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" 
+                                       x-model="selectAll" 
+                                       @change="toggleSelectAll()"
+                                       class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                <span class="ml-2 text-sm font-medium text-gray-700">Select all</span>
+                            </label>
 
-                        <div class="flex items-center space-x-4">
-                            <button @click="removeSelected()" 
-                                    x-show="selectedItems.length > 0"
-                                    class="flex items-center text-sm text-red-600 hover:text-red-700">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                Remove all
-                            </button>
-                            <button class="flex items-center text-sm text-gray-600 hover:text-gray-700">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                                </svg>
-                                Share
-                            </button>
+                            <div class="flex items-center space-x-4">
+                                <button @click="removeSelected()" 
+                                        x-show="selectedItems.length > 0"
+                                        class="flex items-center text-sm text-red-600 hover:text-red-700">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Remove all
+                                </button>
+                                <button class="flex items-center text-sm text-gray-600 hover:text-gray-700">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                    </svg>
+                                    Share
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Cart Items -->
-                @forelse($cart as $key => $item)
-                <div class="bg-white rounded-lg shadow-sm p-6 mb-4" x-data="{ quantity: {{ $item['quantity'] }} }">
+                    <!-- Cart Items -->
+                    @forelse($cart as $key => $item)
+                    <div class="p-6 {{ !$loop->last ? 'border-b border-gray-200' : '' }}" x-data="{ quantity: {{ $item['quantity'] }} }">
                     <div class="flex items-start space-x-4">
                         <!-- Checkbox -->
                         <input type="checkbox" 
@@ -148,20 +150,21 @@
                             </div>
                         </div>
                     </div>
+                    </div>
+                    @empty
+                    <div class="p-12 text-center">
+                        <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
+                        <p class="text-gray-600 mb-6">Add items to get started</p>
+                        <a href="{{ route('shop') }}" 
+                           class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
+                            Continue Shopping
+                        </a>
+                    </div>
+                    @endforelse
                 </div>
-                @empty
-                <div class="bg-white rounded-lg shadow-sm p-12 text-center">
-                    <svg class="w-24 h-24 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h3>
-                    <p class="text-gray-600 mb-6">Add items to get started</p>
-                    <a href="{{ route('shop') }}" 
-                       class="inline-flex items-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition">
-                        Continue Shopping
-                    </a>
-                </div>
-                @endforelse
 
                 <!-- Recommended Products -->
                 @if($recommendedProducts->count() > 0)
@@ -288,20 +291,9 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </div>
-                                <span class="font-medium text-gray-900">$<span x-text="calculateShipping().toFixed(2)">0.00</span></span>
+                                <span class="font-medium text-gray-900">$<span x-text="getShippingCost().toFixed(2)">0.00</span></span>
                             </div>
                             
-                            <p class="text-xs text-red-600">Duties & Taxes may be collected at delivery.</p>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center text-gray-600">
-                                    <span>Rewards Credit</span>
-                                    <svg class="w-4 h-4 ml-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <span class="font-medium text-gray-900">$0.00</span>
-                            </div>
                         </div>
                         
                         <!-- Total -->
@@ -335,8 +327,14 @@
                             </div>
                         </div>
                         
-                        <!-- Payment Methods -->
-                        <div class="mb-4">
+                        <!-- Checkout Button -->
+                        <a href="{{ route('checkout.index') }}" 
+                           class="block w-full px-6 py-3 bg-green-600 text-white text-center font-bold rounded-lg hover:bg-green-700 transition mb-4">
+                            Proceed to Checkout
+                        </a>
+                        
+                        <!-- Payment Methods Moved Below Checkout Button -->
+                        <div class="border-t border-gray-200 pt-4">
                             <p class="text-xs text-gray-600 mb-2">Accepted payment methods</p>
                             <div class="flex flex-wrap gap-2">
                                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/200px-Visa_Inc._logo.svg.png" 
@@ -349,12 +347,6 @@
                                      alt="PayPal" class="h-6">
                             </div>
                         </div>
-                        
-                        <!-- Checkout Button -->
-                        <a href="{{ route('checkout.index') }}" 
-                           class="block w-full px-6 py-3 bg-green-600 text-white text-center font-bold rounded-lg hover:bg-green-700 transition">
-                            Proceed to Checkout
-                        </a>
                     </div>
                 </div>
             </div>
@@ -369,8 +361,9 @@
          x-cloak
          class="fixed inset-0 z-50 overflow-y-auto"
          style="display: none;">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        <!-- Backdrop with blur effect -->
+        <div class="fixed inset-0 transition-opacity" 
+             style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
              @click="open = false"
              x-show="open"
              x-transition:enter="ease-out duration-300"
@@ -382,8 +375,9 @@
         </div>
 
         <!-- Modal Content -->
-        <div class="flex min-h-screen items-center justify-center p-4">
-            <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full mx-auto"
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="relative rounded-lg shadow-xl max-w-2xl w-full p-6 border border-gray-200"
+                 style="background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);"
                  @click.away="open = false"
                  x-show="open"
                  x-transition:enter="ease-out duration-300"
@@ -393,32 +387,40 @@
                  x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                  x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                 
-                <!-- Modal Header -->
-                <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
-                        <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
-                        </svg>
-                        Select Delivery Method
-                    </h3>
-                    <button @click="open = false" 
-                            class="text-gray-400 hover:text-gray-600 transition">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
+                <!-- Close Button -->
+                <button type="button" 
+                        @click="open = false"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-500">
+                    <span class="sr-only">Close</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                
+                <!-- Modal Header with Icon -->
+                <div class="flex items-center justify-center w-16 h-16 mx-auto bg-blue-100 rounded-full mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
                 </div>
+                
+                <h3 class="text-xl font-medium text-gray-900 text-center mb-2">Select Delivery Method</h3>
+                <p class="text-sm text-gray-500 text-center mb-6">Choose your preferred delivery zone and shipping method</p>
 
                 <!-- Modal Body -->
-                <div class="p-6 max-h-[70vh] overflow-y-auto">
+                <div class="mb-6 max-h-[60vh] overflow-y-auto px-2 -mx-2">
                     @livewire('cart.delivery-selector', ['cartTotal' => $itemsTotal, 'cartWeight' => $totalWeight, 'itemCount' => count($cart)])
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
-                    <button @click="open = false"
-                            class="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition">
-                        Close
+                <div class="flex gap-3">
+                    <button @click="open = false" 
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button @click="open = false" 
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Confirm Selection
                     </button>
                 </div>
             </div>
@@ -434,17 +436,23 @@ function cartPage() {
         selectedItems: [],
         promoCode: '',
         cartItemsCount: {{ count($cart) }},
+        shippingCost: {{ session('shipping_cost', 0) }},
         totalWeight: {{ $totalWeight }},
         cartData: @json($cart->toArray()),
-        shippingCost: 0,
         
         init() {
+            // Initialize any required data
+            this.$watch('selectedItems', () => {
+                this.updateSelectAllState();
+                // Shipping will be updated by Livewire component
+            });
+            
             // Select all items by default
             this.selectedItems = Object.keys(this.cartData);
             this.selectAll = true;
             
-            // Listen for shipping updates from Livewire
-            window.addEventListener('shippingUpdated', (event) => {
+            // Listen for shipping updates from Livewire component
+            window.addEventListener('shipping-updated', (event) => {
                 this.shippingCost = event.detail.shippingCost || 0;
             });
         },
@@ -501,14 +509,15 @@ function cartPage() {
             return this.calculateItemsTotal() - this.calculateDiscounts();
         },
         
-        // Calculate shipping (from Livewire component)
-        calculateShipping() {
-            return this.selectedItems.length > 0 ? this.shippingCost : 0;
+        // Get shipping cost from Livewire component
+        getShippingCost() {
+            // The Livewire component will update this via events
+            return this.shippingCost || 0;
         },
         
         // Calculate grand total
         calculateGrandTotal() {
-            return this.calculateSubtotal() + this.calculateShipping();
+            return this.calculateSubtotal() + this.getShippingCost();
         },
         
         updateQuantity(cartKey, quantity) {

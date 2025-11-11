@@ -14,7 +14,10 @@ class DeliverySelectorInline extends Component
     public $selectedZone;
     public $selectedMethod;
 
-    protected $listeners = ['deliveryUpdated' => 'refreshSelection'];
+    protected $listeners = [
+        'deliveryUpdated' => 'refreshSelection',
+        'shippingUpdated' => 'handleShippingUpdate'
+    ];
 
     public function mount()
     {
@@ -29,6 +32,11 @@ class DeliverySelectorInline extends Component
         }
         
         $this->loadSelection();
+        
+        // Dispatch shipping cost from session on mount
+        $shippingCost = session('shipping_cost', 0);
+        $this->dispatch('shippingUpdated', shippingCost: $shippingCost);
+        $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: {$shippingCost} } }))");
     }
 
     public function loadSelection()
@@ -47,6 +55,17 @@ class DeliverySelectorInline extends Component
         $this->selectedZoneId = session('delivery_zone_id');
         $this->selectedMethodId = session('delivery_method_id');
         $this->loadSelection();
+        
+        // Dispatch updated shipping cost
+        $shippingCost = session('shipping_cost', 0);
+        $this->dispatch('shippingUpdated', shippingCost: $shippingCost);
+        $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: {$shippingCost} } }))");
+    }
+
+    public function handleShippingUpdate($shippingCost)
+    {
+        // Forward the shipping update to the browser as a custom event
+        $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: {$shippingCost} } }))");
     }
 
     public function render()

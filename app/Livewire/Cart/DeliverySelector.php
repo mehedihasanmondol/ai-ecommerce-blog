@@ -114,7 +114,8 @@ class DeliverySelector extends Component
         if (!$this->selectedZoneId || !$this->selectedMethodId) {
             $this->shippingCost = 0;
             $this->deliveryRate = null;
-            $this->dispatch('shippingUpdated', shippingCost: 0);
+            $this->dispatch('shippingUpdated', shippingCost: 0)->to('cart.delivery-selector-inline');
+            $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: 0 } }))");
             return;
         }
 
@@ -136,11 +137,13 @@ class DeliverySelector extends Component
                 $this->shippingCost = 0;
             }
             
-            $this->dispatch('shippingUpdated', shippingCost: $this->shippingCost);
+            $this->dispatch('shippingUpdated', shippingCost: $this->shippingCost)->to('cart.delivery-selector-inline');
+            $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: {$this->shippingCost} } }))");
         } else {
             $this->shippingCost = 0;
             $this->deliveryRate = null;
-            $this->dispatch('shippingUpdated', shippingCost: 0);
+            $this->dispatch('shippingUpdated', shippingCost: 0)->to('cart.delivery-selector-inline');
+            $this->js("window.dispatchEvent(new CustomEvent('shipping-updated', { detail: { shippingCost: 0 } }))");
         }
     }
 

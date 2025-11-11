@@ -147,7 +147,7 @@
 
                 <!-- Frequently Purchased Together Section -->
                 @if(count($frequentlyPurchased) > 0)
-                <div class="mt-6 pt-6 border-t border-gray-200">
+                <div class="mt-6">
                     <h3 class="text-sm font-bold text-gray-900 mb-4">Frequently purchased together</h3>
                     <div class="space-y-3">
                         @foreach($frequentlyPurchased as $product)
