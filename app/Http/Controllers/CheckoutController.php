@@ -108,21 +108,36 @@ class CheckoutController extends Controller
             'subtotal' => 'required|numeric|min:0',
             'weight' => 'nullable|numeric|min:0',
             'item_count' => 'nullable|integer|min:1',
+            'payment_method' => 'nullable|in:cod,online',
         ]);
 
         try {
-            $shippingCost = $this->deliveryService->calculateShippingCost(
+            // Determine if COD payment
+            $isCod = ($validated['payment_method'] ?? 'online') === 'cod';
+            
+            // Use detailed calculation to include COD fee
+            $shippingData = $this->deliveryService->calculateShippingCostDetailed(
                 $validated['zone_id'],
                 $validated['method_id'],
                 $validated['subtotal'],
                 $validated['weight'] ?? 0,
-                $validated['item_count'] ?? 1
+                $validated['item_count'] ?? 1,
+                $isCod
             );
+            
+            if (!$shippingData['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $shippingData['message'] ?? 'Failed to calculate shipping',
+                ], 400);
+            }
 
             return response()->json([
                 'success' => true,
-                'shipping_cost' => $shippingCost,
-                'total' => $validated['subtotal'] + $shippingCost,
+                'shipping_cost' => $shippingData['cost'],
+                'breakdown' => $shippingData['breakdown'],
+                'total' => $validated['subtotal'] + $shippingData['cost'],
+                'is_free' => $shippingData['is_free'] ?? false,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -200,14 +215,27 @@ class CheckoutController extends Controller
                 $itemCount += $item['quantity'];
             }
 
-            // Calculate shipping cost
-            $shippingCost = $this->deliveryService->calculateShippingCost(
+            // Determine if COD payment
+            $isCod = $validated['payment_method'] === 'cod';
+            
+            // Calculate shipping cost with detailed breakdown (includes COD fee if applicable)
+            $shippingData = $this->deliveryService->calculateShippingCostDetailed(
                 $validated['delivery_zone_id'],
                 $validated['delivery_method_id'],
                 $subtotal,
                 $totalWeight,
-                $itemCount
+                $itemCount,
+                $isCod
             );
+            
+            if (!$shippingData['success']) {
+                return back()
+                    ->withInput()
+                    ->with('error', $shippingData['message'] ?? 'Failed to calculate shipping cost');
+            }
+            
+            $shippingCost = $shippingData['cost'];
+            $shippingBreakdown = $shippingData['breakdown'];
 
             // Parse name into first and last name
             $nameParts = explode(' ', $validated['shipping_name'], 2);
@@ -272,6 +300,10 @@ class CheckoutController extends Controller
                 'customer_notes' => $validated['order_notes'] ?? null,
                 'payment_method' => $validated['payment_method'],
                 'shipping_cost' => $shippingCost,
+                'base_shipping_cost' => $shippingBreakdown['base_rate'] ?? 0,
+                'handling_fee' => $shippingBreakdown['handling_fee'] ?? 0,
+                'insurance_fee' => $shippingBreakdown['insurance_fee'] ?? 0,
+                'cod_fee' => $shippingBreakdown['cod_fee'] ?? 0,
                 'items' => $orderItems,
                 'billing_address' => $shippingAddress,
                 'shipping_address' => $shippingAddress,

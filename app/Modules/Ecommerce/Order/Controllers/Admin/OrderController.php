@@ -169,12 +169,12 @@ class OrderController extends Controller
     }
 
     /**
-     * Show the form for editing the specified order.
+     * Show the old form for editing the specified order.
+     * Kept for backward compatibility.
      */
-    public function edit(Order $order)
+    public function editOld(Order $order)
     {
         $order = $this->orderRepository->find($order->id);
-
         return view('admin.orders.edit', compact('order'));
     }
 

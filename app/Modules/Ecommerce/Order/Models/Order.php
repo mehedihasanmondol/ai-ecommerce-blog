@@ -183,6 +183,22 @@ class Order extends Model
     }
 
     /**
+     * Get the delivery rate that was applied to this order.
+     * This finds the rate based on the zone and method combination.
+     */
+    public function getAppliedDeliveryRateAttribute()
+    {
+        if (!$this->delivery_zone_id || !$this->delivery_method_id) {
+            return null;
+        }
+
+        return \App\Modules\Ecommerce\Delivery\Models\DeliveryRate::where('delivery_zone_id', $this->delivery_zone_id)
+            ->where('delivery_method_id', $this->delivery_method_id)
+            ->where('is_active', true)
+            ->first();
+    }
+
+    /**
      * Scope: Filter by status.
      */
     public function scopeStatus($query, $status)
