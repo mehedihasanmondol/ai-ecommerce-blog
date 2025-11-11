@@ -26,11 +26,24 @@ class OrderService
         try {
             DB::beginTransaction();
 
-            // Calculate totals with coupon discount passed separately
+            // Separate coupon discount from general discount
+            // When order is from frontend with coupon, don't pass it as general discount
+            $couponDiscount = 0;
+            $generalDiscount = 0;
+            
+            if (!empty($data['coupon_code']) && !empty($data['discount_amount'])) {
+                // This is a coupon discount from frontend
+                $couponDiscount = $data['discount_amount'];
+            } elseif (!empty($data['discount_amount'])) {
+                // This is a general discount (admin-applied)
+                $generalDiscount = $data['discount_amount'];
+            }
+            
+            // Calculate totals with general discount only (not coupon)
             $calculations = $this->calculationService->calculateOrderTotals(
                 $data['items'],
                 $data['shipping_cost'] ?? 0,
-                $data['discount_amount'] ?? 0  // Coupon discount amount
+                $generalDiscount
             );
 
             // Get delivery zone and method names for historical record
@@ -58,9 +71,9 @@ class OrderService
                 'subtotal' => $calculations['subtotal'],
                 'tax_amount' => $calculations['tax_amount'],
                 'shipping_cost' => $calculations['shipping_cost'],
-                'discount_amount' => $calculations['discount_amount'],
-                'coupon_discount' => $data['discount_amount'] ?? 0,  // Coupon discount in separate field
-                'total_amount' => $calculations['total_amount'],
+                'discount_amount' => $generalDiscount,  // General discount only
+                'coupon_discount' => $couponDiscount,  // Coupon discount in separate field
+                'total_amount' => $calculations['total_amount'] - $couponDiscount,  // Subtract coupon discount from total
                 'coupon_code' => $data['coupon_code'] ?? null,
                 'ip_address' => request()->ip(),
                 'status' => 'pending',
