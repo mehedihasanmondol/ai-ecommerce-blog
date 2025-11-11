@@ -34,7 +34,7 @@ class CustomerController extends Controller
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
-                'phone' => $request->phone,
+                'mobile' => $request->phone, // Update mobile field with phone value
                 'address' => $request->address,
             ]);
 

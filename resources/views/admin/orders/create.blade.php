@@ -329,7 +329,7 @@
                                     <option value="{{ $user->id }}" 
                                             data-name="{{ $user->name }}" 
                                             data-email="{{ $user->email }}" 
-                                            data-phone="{{ $user->phone ?? '' }}"
+                                            data-phone="{{ $user->mobile ?? '' }}"
                                             data-first-name="{{ $firstName }}"
                                             data-last-name="{{ $lastName }}"
                                             data-address="{{ $user->address ?? '' }}"
@@ -830,12 +830,20 @@ function orderForm() {
 window.addEventListener('customerDataLoaded', event => {
     const data = event.detail;
     
-    // Auto-fill customer phone from profile if empty
-    const phoneInput = document.getElementById('customer_phone');
-    if (phoneInput && data.phone && !phoneInput.value) {
-        phoneInput.value = data.phone;
-        // Trigger Alpine.js update
-        phoneInput.dispatchEvent(new Event('input'));
+    // Get the Alpine component
+    const alpineComponent = Alpine.$data(document.querySelector('[x-data]'));
+    
+    if (alpineComponent && data.phone) {
+        // Update customer phone if it's empty or different
+        if (!alpineComponent.customer.phone) {
+            alpineComponent.customer.phone = data.phone;
+        }
+        
+        // Sync originalCustomer with actual database values to prevent false change detection
+        alpineComponent.originalCustomer.phone = data.phone;
+        
+        // Reset change flag since we're syncing with actual database values
+        alpineComponent.customerDataChanged = false;
     }
 });
 
