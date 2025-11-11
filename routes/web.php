@@ -9,6 +9,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CouponController;
 use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customer\CustomerController;
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -122,9 +123,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 });
 
-// Customer Order Routes (Protected)
+// Customer Dashboard and Profile Routes (Protected)
 Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () {
-    Route::get('profile', [CustomerOrderController::class, 'profile'])->name('profile');
+    // Dashboard
+    Route::get('dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
+    
+    // Profile Management
+    Route::get('profile', [CustomerController::class, 'profile'])->name('profile');
+    Route::put('profile', [CustomerController::class, 'updateProfile'])->name('profile.update');
+    
+    // Address Management
+    Route::get('addresses', [CustomerController::class, 'addresses'])->name('addresses.index');
+    
+    // Account Settings
+    Route::get('settings', [CustomerController::class, 'settings'])->name('settings');
+    Route::put('password', [CustomerController::class, 'updatePassword'])->name('password.update');
+    Route::put('preferences', [CustomerController::class, 'updatePreferences'])->name('preferences.update');
+    Route::delete('account', [CustomerController::class, 'deleteAccount'])->name('account.delete');
+    
+    // Order Management
     Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');

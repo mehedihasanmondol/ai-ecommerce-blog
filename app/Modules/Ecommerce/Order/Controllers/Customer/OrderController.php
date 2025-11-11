@@ -29,11 +29,31 @@ class OrderController extends Controller
     }
 
     /**
-     * Display customer's orders.
+     * Display customer's orders with search and filter.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = $this->orderRepository->getUserOrders(auth()->id());
+        $query = Order::where('user_id', auth()->id())
+            ->with(['items.product', 'items.variant']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('order_number', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('items', function ($itemQuery) use ($searchTerm) {
+                      $itemQuery->where('product_name', 'like', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Sort by latest first
+        $orders = $query->latest()->paginate(10)->withQueryString();
 
         return view('customer.orders.index', compact('orders'));
     }

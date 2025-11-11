@@ -64,6 +64,10 @@ class User extends Authenticatable
         'postal_code',
         'default_delivery_zone_id',
         'default_delivery_method_id',
+        'email_order_updates',
+        'email_promotions',
+        'email_newsletter',
+        'email_recommendations',
     ];
 
     /**
@@ -200,5 +204,24 @@ class User extends Authenticatable
         return $this->belongsToMany(Coupon::class, 'coupon_user')
             ->withPivot(['order_id', 'discount_amount', 'used_at'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get user addresses
+     */
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(\App\Modules\User\Models\UserAddress::class);
+    }
+
+    /**
+     * Get wishlist count (session-based)
+     * 
+     * @return int
+     */
+    public function wishlistCount(): int
+    {
+        $wishlist = session()->get('wishlist', []);
+        return count($wishlist);
     }
 }
