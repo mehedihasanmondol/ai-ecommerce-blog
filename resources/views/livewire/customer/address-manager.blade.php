@@ -1,14 +1,16 @@
 <div>
-    <!-- Add Address Button -->
-    <div class="mb-6 flex justify-end">
-        <button wire:click="openModal" 
-                class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-sm hover:shadow-md">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-            Add New Address
-        </button>
-    </div>
+    {{-- Flash Messages --}}
+    @if(session()->has('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session()->has('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <!-- Addresses Grid -->
     @if($addresses->count() > 0)
@@ -40,20 +42,22 @@
 
                         <!-- Address Details -->
                         <div class="space-y-2 mb-4">
-                            <p class="text-sm text-gray-700">{{ $address->address_line1 }}</p>
-                            @if($address->address_line2)
-                                <p class="text-sm text-gray-700">{{ $address->address_line2 }}</p>
-                            @endif
-                            <p class="text-sm text-gray-700">
-                                {{ $address->city }}, {{ $address->state }} {{ $address->postal_code }}
-                            </p>
-                            <p class="text-sm text-gray-700">{{ $address->country }}</p>
-                            <p class="text-sm text-gray-600 flex items-center mt-2">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <p class="text-sm font-medium text-gray-900">{{ $address->name }}</p>
+                            <p class="text-sm text-gray-700 flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                 </svg>
                                 {{ $address->phone }}
                             </p>
+                            @if($address->email)
+                                <p class="text-sm text-gray-700 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    {{ $address->email }}
+                                </p>
+                            @endif
+                            <p class="text-sm text-gray-700">{{ $address->address }}</p>
                         </div>
 
                         <!-- Action Buttons -->
@@ -68,8 +72,7 @@
                                     class="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
                                 Edit
                             </button>
-                            <button wire:click="delete({{ $address->id }})" 
-                                    onclick="return confirm('Are you sure you want to delete this address?')"
+                            <button wire:click="confirmDelete({{ $address->id }})" 
                                     class="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
                                 Delete
                             </button>
@@ -99,18 +102,19 @@
         </div>
     @endif
 
-    <!-- Address Modal -->
+    <!-- Add/Edit Address Modal -->
     @if($showModal)
-        <div class="fixed inset-0 z-[9999] overflow-y-auto">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" 
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <!-- Background overlay with blur -->
+            <div class="fixed inset-0 transition-opacity" 
+                 style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
                  wire:click="closeModal"></div>
 
             <!-- Modal Container -->
             <div class="flex min-h-screen items-center justify-center p-4">
                 <!-- Modal panel -->
-                <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full z-[10000]">
-                    <div class="bg-white">
+                <div class="relative rounded-lg shadow-xl max-w-2xl w-full border border-gray-200"
+                     style="background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
                         <!-- Modal Header -->
                         <div class="px-6 py-4 border-b border-gray-200">
                             <div class="flex items-center justify-between">
@@ -144,105 +148,64 @@
                                     @enderror
                                 </div>
 
-                                <!-- Address Line 1 -->
+                                <!-- Name -->
                                 <div>
-                                    <label for="address_line1" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Address Line 1 <span class="text-red-500">*</span>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Name <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text" 
-                                           wire:model="address_line1" 
-                                           id="address_line1" 
-                                           placeholder="House/Flat No, Street Name"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('address_line1') border-red-500 @enderror">
-                                    @error('address_line1')
+                                           wire:model="name" 
+                                           id="name" 
+                                           placeholder="Recipient name"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
+                                    @error('name')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
-                                <!-- Address Line 2 -->
-                                <div>
-                                    <label for="address_line2" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Address Line 2 (Optional)
-                                    </label>
-                                    <input type="text" 
-                                           wire:model="address_line2" 
-                                           id="address_line2" 
-                                           placeholder="Apartment, Building, Floor"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <!-- City -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Phone -->
                                     <div>
-                                        <label for="city" class="block text-sm font-medium text-gray-700 mb-1">
-                                            City <span class="text-red-500">*</span>
+                                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Phone <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" 
-                                               wire:model="city" 
-                                               id="city" 
-                                               placeholder="Dhaka"
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('city') border-red-500 @enderror">
-                                        @error('city')
+                                        <input type="tel" 
+                                               wire:model="phone" 
+                                               id="phone" 
+                                               placeholder="+880 1XXX-XXXXXX"
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('phone') border-red-500 @enderror">
+                                        @error('phone')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
-                                    <!-- State -->
+                                    <!-- Email -->
                                     <div>
-                                        <label for="state" class="block text-sm font-medium text-gray-700 mb-1">
-                                            State/Division <span class="text-red-500">*</span>
+                                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Email
                                         </label>
-                                        <input type="text" 
-                                               wire:model="state" 
-                                               id="state" 
-                                               placeholder="Dhaka Division"
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('state') border-red-500 @enderror">
-                                        @error('state')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Postal Code -->
-                                    <div>
-                                        <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Postal Code <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" 
-                                               wire:model="postal_code" 
-                                               id="postal_code" 
-                                               placeholder="1200"
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('postal_code') border-red-500 @enderror">
-                                        @error('postal_code')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Country -->
-                                    <div>
-                                        <label for="country" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Country <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" 
-                                               wire:model="country" 
-                                               id="country" 
-                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('country') border-red-500 @enderror">
-                                        @error('country')
+                                        <input type="email" 
+                                               wire:model="email" 
+                                               id="email" 
+                                               placeholder="email@example.com (optional)"
+                                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror">
+                                        @error('email')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
                                 </div>
 
-                                <!-- Phone -->
+                                <!-- Address -->
                                 <div>
-                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
-                                        Phone Number <span class="text-red-500">*</span>
+                                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Address <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" 
-                                           wire:model="phone" 
-                                           id="phone" 
-                                           placeholder="+880 1XX-XXX-XXXX"
-                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('phone') border-red-500 @enderror">
-                                    @error('phone')
+                                    <textarea wire:model="address" 
+                                              id="address" 
+                                              rows="3"
+                                              placeholder="Full address with area, city, postal code"
+                                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('address') border-red-500 @enderror"></textarea>
+                                    @error('address')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
@@ -276,5 +239,38 @@
                 </div>
             </div>
         </div>
+    @endif
+
+    {{-- Delete Confirmation Modal --}}
+    @if($showDeleteModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 transition-opacity" 
+                 style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
+                 wire:click="$set('showDeleteModal', false)"></div>
+            
+            <div class="relative rounded-lg shadow-xl max-w-md w-full p-6 border border-gray-200"
+                 style="background-color: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 text-center mb-2">Delete Address</h3>
+                <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this address? This action cannot be undone.</p>
+                
+                <div class="flex gap-3">
+                    <button wire:click="$set('showDeleteModal', false)" 
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button wire:click="deleteAddress" 
+                            class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
 </div>

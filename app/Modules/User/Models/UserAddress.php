@@ -15,13 +15,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $id
  * @property int $user_id
  * @property string $label
- * @property string $address_line1
- * @property string|null $address_line2
- * @property string $city
- * @property string $state
- * @property string $postal_code
- * @property string $country
+ * @property string $name
  * @property string $phone
+ * @property string|null $email
+ * @property string $address
  * @property boolean $is_default
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
@@ -35,13 +32,10 @@ class UserAddress extends Model
     protected $fillable = [
         'user_id',
         'label',
-        'address_line1',
-        'address_line2',
-        'city',
-        'state',
-        'postal_code',
-        'country',
+        'name',
         'phone',
+        'email',
+        'address',
         'is_default',
     ];
 
@@ -64,15 +58,7 @@ class UserAddress extends Model
      */
     public function getFullAddressAttribute(): string
     {
-        $parts = array_filter([
-            $this->address_line1,
-            $this->address_line2,
-            $this->city,
-            $this->state . ' ' . $this->postal_code,
-            $this->country,
-        ]);
-
-        return implode(', ', $parts);
+        return $this->address ?? '';
     }
 
     /**

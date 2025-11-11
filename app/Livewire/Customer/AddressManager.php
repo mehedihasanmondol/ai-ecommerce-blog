@@ -16,33 +16,29 @@ class AddressManager extends Component
 {
     public $addresses;
     public $showModal = false;
+    public $showDeleteModal = false;
     public $editMode = false;
     public $addressId;
+    public $addressToDelete = null;
 
     // Form fields
     public $label;
-    public $address_line1;
-    public $address_line2;
-    public $city;
-    public $state;
-    public $postal_code;
-    public $country = 'Bangladesh';
+    public $name;
     public $phone;
+    public $email;
+    public $address;
     public $is_default = false;
 
-    // Removed listeners - using direct wire:click now
+    protected $listeners = ['openAddressModal' => 'openModal'];
 
     protected function rules()
     {
         return [
             'label' => 'required|string|max:50',
-            'address_line1' => 'required|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'address' => 'required|string',
             'is_default' => 'boolean',
         ];
     }
@@ -72,13 +68,10 @@ class AddressManager extends Component
         
         $this->addressId = $address->id;
         $this->label = $address->label;
-        $this->address_line1 = $address->address_line1;
-        $this->address_line2 = $address->address_line2;
-        $this->city = $address->city;
-        $this->state = $address->state;
-        $this->postal_code = $address->postal_code;
-        $this->country = $address->country;
+        $this->name = $address->name;
         $this->phone = $address->phone;
+        $this->email = $address->email;
+        $this->address = $address->address;
         $this->is_default = $address->is_default;
         
         $this->editMode = true;
@@ -114,17 +107,28 @@ class AddressManager extends Component
         }
     }
 
-    public function delete($addressId)
+    public function confirmDelete($addressId)
     {
-        try {
-            $address = UserAddress::where('user_id', Auth::id())->findOrFail($addressId);
-            $address->delete();
-            
-            $this->loadAddresses();
-            session()->flash('success', 'Address deleted successfully!');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Failed to delete address.');
+        $this->addressToDelete = $addressId;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteAddress()
+    {
+        if ($this->addressToDelete) {
+            try {
+                $address = UserAddress::where('user_id', Auth::id())->findOrFail($this->addressToDelete);
+                $address->delete();
+                
+                $this->loadAddresses();
+                session()->flash('success', 'Address deleted successfully!');
+            } catch (\Exception $e) {
+                session()->flash('error', 'Failed to delete address.');
+            }
         }
+
+        $this->showDeleteModal = false;
+        $this->addressToDelete = null;
     }
 
     public function setAsDefault($addressId)
@@ -155,29 +159,23 @@ class AddressManager extends Component
         $this->reset([
             'addressId',
             'label',
-            'address_line1',
-            'address_line2',
-            'city',
-            'state',
-            'postal_code',
+            'name',
             'phone',
+            'email',
+            'address',
             'is_default',
             'editMode'
         ]);
-        $this->country = 'Bangladesh';
     }
 
     private function getFormData()
     {
         return [
             'label' => $this->label,
-            'address_line1' => $this->address_line1,
-            'address_line2' => $this->address_line2,
-            'city' => $this->city,
-            'state' => $this->state,
-            'postal_code' => $this->postal_code,
-            'country' => $this->country,
+            'name' => $this->name,
             'phone' => $this->phone,
+            'email' => $this->email,
+            'address' => $this->address,
             'is_default' => $this->is_default,
         ];
     }
