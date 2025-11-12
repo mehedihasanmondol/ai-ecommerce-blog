@@ -121,10 +121,10 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $movement->warehouse->name }}
+                                {{ $movement->warehouse->name ?? 'No Warehouse' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $movement->creator->name }}
+                                {{ $movement->user->name ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">{{ $movement->created_at->format('M d, Y') }}</div>

@@ -18,7 +18,7 @@ class StockMovementRepository
      */
     public function getAll(array $filters = [], $perPage = 20)
     {
-        $query = $this->model->with(['product', 'variant', 'warehouse', 'creator', 'supplier'])
+        $query = $this->model->with(['product', 'variant', 'warehouse', 'user', 'supplier'])
             ->latest();
 
         // Filter by type
@@ -66,7 +66,7 @@ class StockMovementRepository
      */
     public function find($id)
     {
-        return $this->model->with(['product', 'variant', 'warehouse', 'creator', 'approver', 'supplier'])
+        return $this->model->with(['product', 'variant', 'warehouse', 'user', 'supplier'])
             ->findOrFail($id);
     }
 
@@ -97,14 +97,14 @@ class StockMovementRepository
         $query = $this->model->where('product_id', $productId);
 
         if ($variantId) {
-            $query->where('variant_id', $variantId);
+            $query->where('product_variant_id', $variantId);
         }
 
         if ($warehouseId) {
             $query->where('warehouse_id', $warehouseId);
         }
 
-        return $query->with(['warehouse', 'creator'])
+        return $query->with(['warehouse', 'user'])
             ->latest()
             ->get();
     }
@@ -117,17 +117,15 @@ class StockMovementRepository
         $query = $this->model->where('product_id', $productId);
 
         if ($variantId) {
-            $query->where('variant_id', $variantId);
+            $query->where('product_variant_id', $variantId);
         }
 
         if ($warehouseId) {
             $query->where('warehouse_id', $warehouseId);
         }
 
-        $inQuantity = (clone $query)->whereIn('type', ['in', 'adjustment'])->sum('quantity');
-        $outQuantity = (clone $query)->whereIn('type', ['out', 'transfer', 'damaged', 'lost'])->sum('quantity');
-
-        return $inQuantity - $outQuantity;
+        // Sum all quantities (positive and negative)
+        return $query->sum('quantity');
     }
 
     /**
@@ -136,7 +134,7 @@ class StockMovementRepository
     public function getByType($type, $limit = null)
     {
         $query = $this->model->where('type', $type)
-            ->with(['product', 'warehouse', 'creator'])
+            ->with(['product', 'warehouse', 'user'])
             ->latest();
 
         return $limit ? $query->take($limit)->get() : $query->get();
@@ -147,7 +145,7 @@ class StockMovementRepository
      */
     public function getRecent($limit = 10)
     {
-        return $this->model->with(['product', 'variant', 'warehouse', 'creator'])
+        return $this->model->with(['product', 'variant', 'warehouse', 'user'])
             ->latest()
             ->take($limit)
             ->get();

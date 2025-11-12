@@ -14,42 +14,36 @@ class StockMovement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'reference_number',
         'product_id',
-        'variant_id',
+        'product_variant_id',
         'warehouse_id',
         'type',
         'quantity',
         'quantity_before',
         'quantity_after',
-        'unit_cost',
+        'cost_per_unit',
         'total_cost',
-        'reason',
-        'notes',
-        'order_id',
+        'reference_type',
+        'reference_id',
+        'note',
         'supplier_id',
-        'transfer_to_warehouse_id',
-        'created_by',
-        'approved_by',
-        'approved_at',
+        'user_id',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
         'quantity_before' => 'integer',
         'quantity_after' => 'integer',
-        'unit_cost' => 'decimal:2',
+        'cost_per_unit' => 'decimal:2',
         'total_cost' => 'decimal:2',
-        'approved_at' => 'datetime',
     ];
 
-    const TYPE_IN = 'in';
-    const TYPE_OUT = 'out';
-    const TYPE_ADJUSTMENT = 'adjustment';
-    const TYPE_TRANSFER = 'transfer';
+    const TYPE_PURCHASE = 'purchase';
+    const TYPE_SALE = 'sale';
     const TYPE_RETURN = 'return';
+    const TYPE_ADJUSTMENT = 'adjustment';
     const TYPE_DAMAGED = 'damaged';
-    const TYPE_LOST = 'lost';
+    const TYPE_TRANSFER = 'transfer';
 
     /**
      * Get the product
@@ -64,7 +58,7 @@ class StockMovement extends Model
      */
     public function variant()
     {
-        return $this->belongsTo(ProductVariant::class);
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 
     /**
@@ -84,52 +78,43 @@ class StockMovement extends Model
     }
 
     /**
-     * Get the order
+     * Get the user who performed this movement
      */
-    public function order()
+    public function user()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
-     * Get the transfer warehouse
+     * Get the referenced model (polymorphic)
      */
-    public function transferToWarehouse()
+    public function reference()
     {
-        return $this->belongsTo(Warehouse::class, 'transfer_to_warehouse_id');
+        return $this->morphTo();
     }
 
     /**
-     * Get the user who created this movement
+     * Get movement direction (in/out)
      */
-    public function creator()
+    public function getDirectionAttribute()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return in_array($this->type, [self::TYPE_PURCHASE, self::TYPE_RETURN]) ? 'in' : 'out';
     }
 
     /**
-     * Get the user who approved this movement
+     * Check if movement increases stock
      */
-    public function approver()
+    public function isStockIncrease()
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->quantity > 0;
     }
 
     /**
-     * Generate reference number
+     * Check if movement decreases stock
      */
-    public static function generateReferenceNumber($type)
+    public function isStockDecrease()
     {
-        $prefix = strtoupper(substr($type, 0, 3));
-        $date = now()->format('Ymd');
-        $lastMovement = static::whereDate('created_at', today())
-            ->where('type', $type)
-            ->latest()
-            ->first();
-
-        $number = $lastMovement ? (intval(substr($lastMovement->reference_number, -4)) + 1) : 1;
-
-        return $prefix . '-' . $date . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        return $this->quantity < 0;
     }
 
     /**
@@ -156,17 +141,25 @@ class StockMovement extends Model
         $query->where('product_id', $productId);
 
         if ($variantId) {
-            $query->where('variant_id', $variantId);
+            $query->where('product_variant_id', $variantId);
         }
 
         return $query;
     }
 
     /**
-     * Check if approved
+     * Scope for stock increases (purchase, return)
      */
-    public function isApproved()
+    public function scopeStockIn($query)
     {
-        return !is_null($this->approved_at);
+        return $query->whereIn('type', [self::TYPE_PURCHASE, self::TYPE_RETURN]);
+    }
+
+    /**
+     * Scope for stock decreases (sale, damaged, transfer out)
+     */
+    public function scopeStockOut($query)
+    {
+        return $query->whereIn('type', [self::TYPE_SALE, self::TYPE_DAMAGED, self::TYPE_TRANSFER]);
     }
 }

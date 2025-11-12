@@ -34,20 +34,20 @@ class StockService
             );
 
             $movement = $this->stockMovementRepo->create([
-                'reference_number' => StockMovement::generateReferenceNumber('in'),
                 'product_id' => $data['product_id'],
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'],
                 'warehouse_id' => $data['warehouse_id'],
-                'type' => StockMovement::TYPE_IN,
+                'type' => StockMovement::TYPE_PURCHASE,
                 'quantity' => $data['quantity'],
                 'quantity_before' => $currentStock,
                 'quantity_after' => $currentStock + $data['quantity'],
-                'unit_cost' => $data['unit_cost'] ?? null,
+                'cost_per_unit' => $data['unit_cost'] ?? null,
                 'total_cost' => ($data['unit_cost'] ?? 0) * $data['quantity'],
-                'reason' => $data['reason'] ?? null,
-                'notes' => $data['notes'] ?? null,
+                'reference_type' => $data['reference_type'] ?? 'manual',
+                'reference_id' => $data['reference_id'] ?? null,
+                'note' => $data['notes'] ?? null,
                 'supplier_id' => $data['supplier_id'] ?? null,
-                'created_by' => auth()->id(),
+                'user_id' => auth()->id(),
             ]);
 
             // Update variant stock
@@ -77,20 +77,19 @@ class StockService
             }
 
             $movement = $this->stockMovementRepo->create([
-                'reference_number' => StockMovement::generateReferenceNumber($data['type']),
                 'product_id' => $data['product_id'],
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'],
                 'warehouse_id' => $data['warehouse_id'],
-                'type' => $data['type'], // out, damaged, lost
-                'quantity' => $data['quantity'],
+                'type' => $data['type'], // sale, damaged
+                'quantity' => -$data['quantity'], // Negative for stock decrease
                 'quantity_before' => $currentStock,
                 'quantity_after' => $currentStock - $data['quantity'],
-                'unit_cost' => $data['unit_cost'] ?? null,
+                'cost_per_unit' => $data['unit_cost'] ?? null,
                 'total_cost' => ($data['unit_cost'] ?? 0) * $data['quantity'],
-                'reason' => $data['reason'] ?? null,
-                'notes' => $data['notes'] ?? null,
-                'order_id' => $data['order_id'] ?? null,
-                'created_by' => auth()->id(),
+                'reference_type' => $data['reference_type'] ?? 'manual',
+                'reference_id' => $data['reference_id'] ?? null,
+                'note' => $data['notes'] ?? null,
+                'user_id' => auth()->id(),
             ]);
 
             // Update variant stock
@@ -118,19 +117,16 @@ class StockService
             $adjustment = $data['new_quantity'] - $currentStock;
 
             $movement = $this->stockMovementRepo->create([
-                'reference_number' => StockMovement::generateReferenceNumber('adjustment'),
                 'product_id' => $data['product_id'],
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'],
                 'warehouse_id' => $data['warehouse_id'],
                 'type' => StockMovement::TYPE_ADJUSTMENT,
                 'quantity' => $adjustment,
                 'quantity_before' => $currentStock,
                 'quantity_after' => $data['new_quantity'],
-                'reason' => $data['reason'] ?? 'Stock Adjustment',
-                'notes' => $data['notes'] ?? null,
-                'created_by' => auth()->id(),
-                'approved_by' => $data['approved_by'] ?? null,
-                'approved_at' => isset($data['approved_by']) ? now() : null,
+                'reference_type' => 'manual',
+                'note' => $data['reason'] ?? 'Stock Adjustment',
+                'user_id' => auth()->id(),
             ]);
 
             // Update variant stock
@@ -158,18 +154,17 @@ class StockService
             }
 
             $fromMovement = $this->stockMovementRepo->create([
-                'reference_number' => StockMovement::generateReferenceNumber('transfer'),
                 'product_id' => $data['product_id'],
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'],
                 'warehouse_id' => $data['from_warehouse_id'],
                 'type' => StockMovement::TYPE_TRANSFER,
                 'quantity' => -$data['quantity'],
                 'quantity_before' => $currentStockFrom,
                 'quantity_after' => $currentStockFrom - $data['quantity'],
-                'transfer_to_warehouse_id' => $data['to_warehouse_id'],
-                'reason' => 'Transfer to warehouse',
-                'notes' => $data['notes'] ?? null,
-                'created_by' => auth()->id(),
+                'reference_type' => 'transfer',
+                'reference_id' => $data['to_warehouse_id'],
+                'note' => 'Transfer to warehouse ID: ' . $data['to_warehouse_id'],
+                'user_id' => auth()->id(),
             ]);
 
             // Add to destination warehouse
@@ -180,18 +175,17 @@ class StockService
             );
 
             $toMovement = $this->stockMovementRepo->create([
-                'reference_number' => $fromMovement->reference_number,
                 'product_id' => $data['product_id'],
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'],
                 'warehouse_id' => $data['to_warehouse_id'],
                 'type' => StockMovement::TYPE_TRANSFER,
                 'quantity' => $data['quantity'],
                 'quantity_before' => $currentStockTo,
                 'quantity_after' => $currentStockTo + $data['quantity'],
-                'transfer_to_warehouse_id' => $data['from_warehouse_id'],
-                'reason' => 'Transfer from warehouse',
-                'notes' => $data['notes'] ?? null,
-                'created_by' => auth()->id(),
+                'reference_type' => 'transfer',
+                'reference_id' => $data['from_warehouse_id'],
+                'note' => 'Transfer from warehouse ID: ' . $data['from_warehouse_id'],
+                'user_id' => auth()->id(),
             ]);
 
             return ['from' => $fromMovement, 'to' => $toMovement];
