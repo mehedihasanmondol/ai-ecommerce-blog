@@ -19,18 +19,6 @@
         </a>
     </div>
 
-    <!-- Success/Error Messages -->
-    @if(session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
-            {{ session('error') }}
-        </div>
-    @endif
 
     <!-- Warehouses Table -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
