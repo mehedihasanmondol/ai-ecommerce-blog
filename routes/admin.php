@@ -168,4 +168,28 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
     Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
     Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
+    
+    // Stock Management Routes
+    Route::prefix('stock')->name('stock.')->group(function () {
+        Route::get('/', [\App\Modules\Stock\Controllers\StockController::class, 'index'])->name('index');
+        Route::get('/movements', [\App\Modules\Stock\Controllers\StockController::class, 'movements'])->name('movements');
+        Route::get('/add', [\App\Modules\Stock\Controllers\StockController::class, 'createAddStock'])->name('add');
+        Route::post('/add', [\App\Modules\Stock\Controllers\StockController::class, 'storeAddStock'])->name('add.store');
+        Route::get('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'createRemoveStock'])->name('remove');
+        Route::post('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'storeRemoveStock'])->name('remove.store');
+        Route::get('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'createAdjustStock'])->name('adjust');
+        Route::post('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'storeAdjustStock'])->name('adjust.store');
+        Route::get('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'createTransfer'])->name('transfer');
+        Route::post('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'storeTransfer'])->name('transfer.store');
+        Route::get('/alerts', [\App\Modules\Stock\Controllers\StockController::class, 'alerts'])->name('alerts');
+        Route::post('/alerts/{id}/resolve', [\App\Modules\Stock\Controllers\StockController::class, 'resolveAlert'])->name('alerts.resolve');
+        Route::get('/current-stock', [\App\Modules\Stock\Controllers\StockController::class, 'getCurrentStock'])->name('current-stock');
+    });
+
+    // Warehouse Management Routes
+    Route::resource('warehouses', \App\Modules\Stock\Controllers\WarehouseController::class)->names('warehouses');
+    Route::post('warehouses/{id}/set-default', [\App\Modules\Stock\Controllers\WarehouseController::class, 'setDefault'])->name('warehouses.set-default');
+
+    // Supplier Management Routes
+    Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
 });

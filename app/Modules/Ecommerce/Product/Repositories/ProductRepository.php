@@ -122,4 +122,12 @@ class ProductRepository
             ->active()
             ->paginate($perPage);
     }
+
+    public function getAllActive(): Collection
+    {
+        return Product::with(['defaultVariant'])
+            ->active()
+            ->orderBy('name')
+            ->get();
+    }
 }
