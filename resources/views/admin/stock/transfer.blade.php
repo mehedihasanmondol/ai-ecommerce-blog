@@ -34,7 +34,7 @@
                 @csrf
 
                 <div class="mb-6">
-                    @livewire('stock.product-selector')
+                    @livewire('stock.product-selector', ['preSelectedProductId' => old('product_id'), 'preSelectedVariantId' => old('variant_id')])
                     @error('product_id')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror

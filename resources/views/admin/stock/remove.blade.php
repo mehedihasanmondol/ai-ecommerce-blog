@@ -34,7 +34,7 @@
                 @csrf
 
                 <div class="mb-6">
-                    @livewire('stock.product-selector')
+                    @livewire('stock.product-selector', ['preSelectedProductId' => old('product_id'), 'preSelectedVariantId' => old('variant_id')])
                     @error('product_id')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -49,7 +49,7 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                         <option value="">Select warehouse</option>
                         @foreach($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                     @error('warehouse_id')
@@ -61,7 +61,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Removal Type *</label>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition">
-                            <input type="radio" name="type" value="out" required class="sr-only peer">
+                            <input type="radio" name="type" value="out" {{ old('type') == 'out' ? 'checked' : '' }} required class="sr-only peer">
                             <div class="peer-checked:border-blue-600 peer-checked:bg-blue-50 absolute inset-0 rounded-lg border-2"></div>
                             <div class="relative flex flex-col items-center justify-center w-full">
                                 <svg class="w-8 h-8 text-gray-600 peer-checked:text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
                         </label>
 
                         <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-orange-500 transition">
-                            <input type="radio" name="type" value="damaged" required class="sr-only peer">
+                            <input type="radio" name="type" value="damaged" {{ old('type') == 'damaged' ? 'checked' : '' }} required class="sr-only peer">
                             <div class="peer-checked:border-orange-600 peer-checked:bg-orange-50 absolute inset-0 rounded-lg border-2"></div>
                             <div class="relative flex flex-col items-center justify-center w-full">
                                 <svg class="w-8 h-8 text-gray-600 peer-checked:text-orange-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@
                         </label>
 
                         <label class="relative flex items-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 transition">
-                            <input type="radio" name="type" value="lost" required class="sr-only peer">
+                            <input type="radio" name="type" value="lost" {{ old('type') == 'lost' ? 'checked' : '' }} required class="sr-only peer">
                             <div class="peer-checked:border-gray-600 peer-checked:bg-gray-50 absolute inset-0 rounded-lg border-2"></div>
                             <div class="relative flex flex-col items-center justify-center w-full">
                                 <svg class="w-8 h-8 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@
 
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                    <input type="number" name="quantity" min="1" required
+                    <input type="number" name="quantity" value="{{ old('quantity') }}" min="1" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                            placeholder="Enter quantity to remove">
                     @error('quantity')

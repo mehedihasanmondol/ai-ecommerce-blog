@@ -21,8 +21,23 @@ class ProductSelector extends Component
     public $variantName;
     public $currentStock = 0;
     public $sku = '';
+    
+    // Pre-selection parameters
+    public $preSelectedProductId = null;
+    public $preSelectedVariantId = null;
 
     protected $listeners = ['resetSelector'];
+    
+    public function mount($preSelectedProductId = null, $preSelectedVariantId = null)
+    {
+        $this->preSelectedProductId = $preSelectedProductId;
+        $this->preSelectedVariantId = $preSelectedVariantId;
+        
+        // Pre-select if values exist (from validation errors)
+        if ($this->preSelectedProductId) {
+            $this->selectProduct($this->preSelectedProductId, $this->preSelectedVariantId);
+        }
+    }
 
     public function updatedSearch()
     {

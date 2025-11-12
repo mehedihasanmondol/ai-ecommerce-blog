@@ -39,7 +39,7 @@
 
                 <!-- Product Selection with Livewire -->
                 <div class="mb-6">
-                    @livewire('stock.product-selector')
+                    @livewire('stock.product-selector', ['preSelectedProductId' => old('product_id'), 'preSelectedVariantId' => old('variant_id')])
                     @error('product_id')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
@@ -55,7 +55,7 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select warehouse</option>
                         @foreach($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                            <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                     @error('warehouse_id')
@@ -66,7 +66,7 @@
                 <!-- Quantity -->
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
-                    <input type="number" name="quantity" x-model="quantity" @input="calculateTotal" min="1" required
+                    <input type="number" name="quantity" value="{{ old('quantity') }}" x-model="quantity" @input="calculateTotal" min="1" required
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            placeholder="Enter quantity">
                     @error('quantity')
@@ -79,7 +79,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Unit Cost</label>
                     <div class="relative">
                         <span class="absolute left-3 top-2.5 text-gray-500">৳</span>
-                        <input type="number" name="unit_cost" x-model="unitCost" @input="calculateTotal" step="0.01" min="0"
+                        <input type="number" name="unit_cost" value="{{ old('unit_cost') }}" x-model="unitCost" @input="calculateTotal" step="0.01" min="0"
                                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                placeholder="0.00">
                     </div>
@@ -103,7 +103,7 @@
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select supplier (optional)</option>
                         @foreach($suppliers as $supplier)
-                            <option value="{{ $supplier->id }}">{{ $supplier->name }} ({{ $supplier->code }})</option>
+                            <option value="{{ $supplier->id }}" {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }} ({{ $supplier->code }})</option>
                         @endforeach
                     </select>
                     @error('supplier_id')
