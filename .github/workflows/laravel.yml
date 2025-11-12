@@ -1,0 +1,44 @@
+name: 🚀 Auto Deploy Laravel to FTP (Hardcoded Local Use)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Install Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader
+          npm ci && npm run build
+
+      - name: 🧹 Prepare Laravel for Production
+        run: |
+          php artisan config:cache || true
+          php artisan route:cache || true
+          php artisan view:cache || true
+
+      - name: 🚀 Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: websitelimited.com          # <- Your domain
+          username: admin_prokriti            # <- Your FTP username
+          password: '#OGEdzLD^tjF7i1J'    # <- Paste it locally, not in GitHub
+          protocol: ftp
+          port: 21
+          local-dir: ./
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.github*
+            **/node_modules/**
+            **/vendor/**
+            **/.env
+            **/storage/logs/**
+            **/storage/framework/**
