@@ -1,10 +1,52 @@
 <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <!-- Search Bar (Mobile & Desktop) -->
+    <div class="mb-4">
+        <div class="relative">
+            <input 
+                type="text" 
+                wire:model.live.debounce.500ms="search"
+                placeholder="Search products..." 
+                class="w-full px-4 py-2.5 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            >
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+                @if($search)
+                    <button 
+                        wire:click="$set('search', '')"
+                        class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                @endif
+                <div class="bg-green-600 text-white p-2 rounded-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <!-- Results Count -->
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">All Products</h1>
+            <h1 class="text-2xl font-bold text-gray-900">
+                @if($search)
+                    Search Results
+                @elseif($category)
+                    {{ $category->name }}
+                @elseif($brand)
+                    {{ $brand->name }}
+                @else
+                    All Products
+                @endif
+            </h1>
             <p class="text-sm text-gray-600 mt-1">
-                Showing {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results
+                @if($search)
+                    Showing {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results for "{{ $search }}"
+                @else
+                    Showing {{ $products->firstItem() ?? 0 }} - {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results
+                @endif
             </p>
         </div>
 

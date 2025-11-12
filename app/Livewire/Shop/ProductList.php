@@ -203,10 +203,26 @@ class ProductList extends Component
 
         // Search
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('name', 'like', "%{$this->search}%")
-                  ->orWhere('description', 'like', "%{$this->search}%")
-                  ->orWhere('sku', 'like', "%{$this->search}%");
+            $searchTerms = explode(' ', $this->search);
+            $query->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $term = trim($term);
+                    if (strlen($term) >= 2) {
+                        $q->where(function($subQuery) use ($term) {
+                            $subQuery->where('name', 'like', "%{$term}%")
+                                    ->orWhere('description', 'like', "%{$term}%")
+                                    ->orWhereHas('variants', function($variantQuery) use ($term) {
+                                        $variantQuery->where('sku', 'like', "%{$term}%");
+                                    })
+                                    ->orWhereHas('brand', function($brandQuery) use ($term) {
+                                        $brandQuery->where('name', 'like', "%{$term}%");
+                                    })
+                                    ->orWhereHas('categories', function($catQuery) use ($term) {
+                                        $catQuery->where('name', 'like', "%{$term}%");
+                                    });
+                        });
+                    }
+                }
             });
         }
 
