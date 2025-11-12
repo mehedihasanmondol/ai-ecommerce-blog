@@ -166,5 +166,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Site Settings Routes
     Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
     Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
+    Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
     Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
 });

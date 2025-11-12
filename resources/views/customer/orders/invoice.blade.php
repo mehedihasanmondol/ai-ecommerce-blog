@@ -1,3 +1,13 @@
+@php
+    use App\Models\SiteSetting;
+    $invoiceHeaderBanner = SiteSetting::get('invoice_header_banner');
+    $invoiceCompanyName = SiteSetting::get('invoice_company_name', config('app.name'));
+    $invoiceCompanyAddress = SiteSetting::get('invoice_company_address', 'Your Business Address Here');
+    $invoiceCompanyPhone = SiteSetting::get('invoice_company_phone', '+880 XXX-XXXXXX');
+    $invoiceCompanyEmail = SiteSetting::get('invoice_company_email', 'info@example.com');
+    $invoiceFooterText = SiteSetting::get('invoice_footer_text', 'Thank you for your business!');
+    $invoiceFooterNote = SiteSetting::get('invoice_footer_note', 'This is a computer-generated invoice and does not require a signature.');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +20,7 @@
         .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
         .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #333; }
         .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .header-banner { max-width: 100%; height: auto; margin-bottom: 20px; }
         .invoice-info { display: flex; justify-content: space-between; margin-bottom: 30px; }
         .invoice-info div { flex: 1; }
         .invoice-info h3 { font-size: 16px; margin-bottom: 10px; color: #666; }
@@ -38,10 +49,13 @@
 
         <!-- Header -->
         <div class="header">
+            @if($invoiceHeaderBanner)
+                <img src="{{ Storage::url($invoiceHeaderBanner) }}" alt="{{ $invoiceCompanyName }}" class="header-banner">
+            @endif
             <h1>INVOICE</h1>
-            <p><strong>{{ config('app.name') }}</strong></p>
-            <p>Your Business Address Here</p>
-            <p>Phone: +880 XXX-XXXXXX | Email: info@example.com</p>
+            <p><strong>{{ $invoiceCompanyName }}</strong></p>
+            <p style="white-space: pre-line;">{{ $invoiceCompanyAddress }}</p>
+            <p>Phone: {{ $invoiceCompanyPhone }} | Email: {{ $invoiceCompanyEmail }}</p>
         </div>
 
         <!-- Invoice Info -->
@@ -133,10 +147,12 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p>Thank you for your business!</p>
-            <p style="margin-top: 10px; font-size: 12px;">
-                This is a computer-generated invoice and does not require a signature.
-            </p>
+            <p>{{ $invoiceFooterText }}</p>
+            @if($invoiceFooterNote)
+                <p style="margin-top: 10px; font-size: 12px;">
+                    {{ $invoiceFooterNote }}
+                </p>
+            @endif
         </div>
     </div>
 </body>

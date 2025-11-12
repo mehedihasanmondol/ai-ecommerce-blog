@@ -72,6 +72,59 @@ class SiteSettingController extends Controller
     }
 
     /**
+     * Update specific group settings
+     */
+    public function updateGroup(Request $request, string $group)
+    {
+        $validated = $request->validate([
+            'settings' => 'required|array',
+            'settings.*' => 'nullable',
+        ]);
+
+        foreach ($validated['settings'] as $key => $value) {
+            $setting = SiteSetting::where('key', $key)
+                ->where('group', $group)
+                ->first();
+            
+            if ($setting) {
+                // Handle image uploads
+                if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
+                    // Delete old image
+                    if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
+                        Storage::disk('public')->delete($setting->value);
+                    }
+                    
+                    // Store new image
+                    $path = $request->file("settings.{$key}")->store('site-settings', 'public');
+                    $value = $path;
+                } 
+                // Handle boolean values
+                elseif ($setting->type === 'boolean') {
+                    $value = $request->has("settings.{$key}") ? '1' : '0';
+                }
+                // Handle textarea and text
+                else {
+                    $value = $value ?? '';
+                }
+
+                $setting->update(['value' => $value]);
+            }
+        }
+
+        SiteSetting::clearCache();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => ucfirst(str_replace('_', ' ', $group)) . ' settings updated successfully!'
+            ]);
+        }
+
+        return redirect()->route('admin.site-settings.index')
+            ->with('success', ucfirst(str_replace('_', ' ', $group)) . ' settings updated successfully!');
+    }
+
+    /**
      * Remove logo image
      */
     public function removeLogo(Request $request)
