@@ -68,6 +68,17 @@ x-on:click.away="if (!maintainFocus) $wire.hideResults()"
             class="hidden lg:block absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 overflow-hidden max-w-3xl"
             style="display: none;"
             
+            <!-- Close Button (Desktop) -->
+            <div class="absolute top-2 right-2 z-10">
+                <button 
+                    @click="focused = false; $wire.hideResults()"
+                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
             <!-- Search Suggestions List (Left Side) -->
             <div class="flex">
                 <!-- Suggestions Column -->
@@ -130,26 +141,9 @@ x-on:click.away="if (!maintainFocus) $wire.hideResults()"
                             <div class="flex border-b border-gray-200 bg-gray-50">
                                 <button 
                                     wire:click="setTab('all')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'all' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
+                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2 text-orange-600 border-orange-500 bg-white">
                                     All Results ({{ $searchCounts['total'] }})
                                 </button>
-                                @if($searchCounts['products'] > 0)
-                                <button 
-                                    wire:click="setTab('products')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'products' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
-                                    Products ({{ $searchCounts['products'] }})
-                                </button>
-                                @endif
-                                @if($searchCounts['blogs'] > 0)
-                                <button 
-                                    wire:click="setTab('blogs')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'blogs' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
-                                    Blogs ({{ $searchCounts['blogs'] }})
-                                </button>
-                                @endif
                             </div>
 
                             <!-- Results Content -->
@@ -389,6 +383,17 @@ x-on:click.away="if (!maintainFocus) $wire.hideResults()"
             class="lg:hidden absolute top-full left-0 mt-1 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 overflow-hidden w-screen"
             style="display: none; margin-left: calc(-61vw + 50%);"
             
+            <!-- Close Button (Mobile) -->
+            <div class="absolute top-2 right-2 z-10">
+                <button 
+                    @click="focused = false; $wire.hideResults()"
+                    class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
             <!-- Search Suggestions List (Left Side) -->
             <div class="flex">
                 <!-- Suggestions Column -->
@@ -451,26 +456,9 @@ x-on:click.away="if (!maintainFocus) $wire.hideResults()"
                             <div class="flex border-b border-gray-200 bg-gray-50">
                                 <button 
                                     wire:click="setTab('all')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'all' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
+                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2 text-orange-600 border-orange-500 bg-white">
                                     All Results ({{ $searchCounts['total'] }})
                                 </button>
-                                @if($searchCounts['products'] > 0)
-                                <button 
-                                    wire:click="setTab('products')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'products' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
-                                    Products ({{ $searchCounts['products'] }})
-                                </button>
-                                @endif
-                                @if($searchCounts['blogs'] > 0)
-                                <button 
-                                    wire:click="setTab('blogs')"
-                                    class="px-4 py-3 text-sm font-medium transition-colors border-b-2"
-                                    :class="selectedTab === 'blogs' ? 'text-orange-600 border-orange-500 bg-white' : 'text-gray-600 border-transparent hover:text-gray-800'">
-                                    Blogs ({{ $searchCounts['blogs'] }})
-                                </button>
-                                @endif
                             </div>
 
                             <!-- Results Content -->
