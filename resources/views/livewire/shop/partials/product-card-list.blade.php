@@ -8,7 +8,11 @@
                      loading="lazy">
             </a>
             
-            @if($hasDiscount)
+            @if($variant && $variant->stock_quantity <= 0)
+            <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded">
+                Out of Stock
+            </div>
+            @elseif($hasDiscount)
             <div class="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
                 SALE
             </div>

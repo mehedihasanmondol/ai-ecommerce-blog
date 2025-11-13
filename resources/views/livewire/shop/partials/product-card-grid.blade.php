@@ -31,15 +31,13 @@
             </button>
         </div>
 
-        @if($hasDiscount)
+        @if($variant && $variant->stock_quantity <= 0)
+        <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
+            Out of Stock
+        </div>
+        @elseif($hasDiscount)
         <div class="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
             SALE
-        </div>
-        @endif
-
-        @if($variant && $variant->stock_quantity <= 0)
-        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <span class="bg-white text-gray-900 px-4 py-2 rounded-lg font-semibold">Out of Stock</span>
         </div>
         @endif
     </div>

@@ -44,5 +44,66 @@
 
     @stack('scripts')
     @livewireScripts
+    
+    <script>
+        // Function to add to cart and update button state without page reload
+        function addToCartAndUpdate(button, productId, variantId, quantity, currentQuantity) {
+            // Dispatch the Livewire event
+            Livewire.dispatch('add-to-cart', { 
+                productId: productId, 
+                variantId: variantId, 
+                quantity: quantity 
+            });
+            
+            // Update button state immediately for better UX
+            updateButtonState(button, currentQuantity + quantity);
+            
+            // Also update any other buttons for the same variant
+            updateAllButtonsForVariant(variantId, currentQuantity + quantity);
+        }
+        
+        // Function to update a single button's state
+        function updateButtonState(button, newQuantity) {
+            const isInCart = newQuantity > 0;
+            
+            // Update data attributes
+            button.setAttribute('data-is-in-cart', isInCart ? 'true' : 'false');
+            button.setAttribute('data-cart-quantity', newQuantity);
+            
+            // Update button classes
+            if (isInCart) {
+                button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                button.classList.add('bg-green-600', 'hover:bg-green-700');
+            }
+            
+            // Update button content
+            const svg = button.querySelector('svg');
+            const textNode = button.childNodes[button.childNodes.length - 1];
+            
+            if (isInCart) {
+                // Change to "Add More" state
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>';
+                textNode.textContent = ` Add More (${newQuantity})`;
+            } else {
+                // Change to "Add to Cart" state
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>';
+                textNode.textContent = ' Add to Cart';
+            }
+            
+            // Update onclick function
+            button.setAttribute('onclick', `addToCartAndUpdate(this, ${button.getAttribute('data-product-id')}, ${button.getAttribute('data-variant-id')}, 1, ${newQuantity})`);
+        }
+        
+        // Function to update all buttons for the same variant across the page
+        function updateAllButtonsForVariant(variantId, newQuantity) {
+            const buttons = document.querySelectorAll(`button[data-variant-id="${variantId}"]`);
+            buttons.forEach(button => {
+                updateButtonState(button, newQuantity);
+            });
+        }
+    </script>
 </body>
 </html>

@@ -171,56 +171,34 @@
                 <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Recommended for you</h2>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @foreach($recommendedProducts as $product)
-                        <div class="border border-gray-200 rounded-lg p-3 hover:border-green-500 transition">
-                            <a href="{{ route('products.show', $product['slug']) }}">
-                                <img src="{{ $product['image'] ? asset('storage/' . $product['image']) : asset('images/placeholder.png') }}" 
-                                     alt="{{ $product['name'] }}"
-                                     class="w-full h-32 object-cover rounded-lg mb-2">
-                            </a>
-                            
-                            @if($product['brand'])
-                            <p class="text-xs text-gray-600 mb-1">{{ $product['brand'] }}</p>
-                            @endif
-                            
-                            <h3 class="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-                                <a href="{{ route('products.show', $product['slug']) }}" class="hover:text-green-600">
-                                    {{ $product['name'] }}
-                                </a>
-                            </h3>
-                            
-                            @if($product['rating'] > 0)
-                            <div class="flex items-center mb-2">
-                                <div class="flex text-yellow-400">
-                                    @for($i = 0; $i < 5; $i++)
-                                        @if($i < floor($product['rating']))
-                                        <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20">
-                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                        </svg>
-                                        @else
-                                        <svg class="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 20 20">
-                                            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                                        </svg>
-                                        @endif
-                                    @endfor
-                                </div>
-                                <span class="text-xs text-gray-600 ml-1">{{ number_format($product['reviews']) }}</span>
-                            </div>
-                            @endif
-                            
-                            <div class="mb-2">
-                                <span class="text-base font-bold text-gray-900">${{ number_format($product['price'], 2) }}</span>
-                                @if($product['original_price'] > $product['price'])
-                                <span class="text-xs text-gray-500 line-through ml-1">${{ number_format($product['original_price'], 2) }}</span>
-                                @endif
-                            </div>
-                            
-                            <button @click="addToCart({{ json_encode($product) }})"
-                                    class="w-full px-3 py-2 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition">
-                                Add to Cart
-                            </button>
-                        </div>
+                            @php
+                                // Convert array data to object-like structure for the unified component
+                                $productObj = (object) $product;
+                                $productObj->slug = $product['slug'];
+                                $productObj->name = $product['name'];
+                                $productObj->brand = $product['brand'] ? (object) ['name' => $product['brand']] : null;
+                                $productObj->average_rating = $product['rating'] ?? 0;
+                                $productObj->review_count = $product['reviews'] ?? 0;
+                                
+                                // Create a mock variant for the unified component
+                                $variant = (object) [
+                                    'id' => $product['variant_id'] ?? 1,
+                                    'price' => $product['original_price'] ?? $product['price'],
+                                    'sale_price' => $product['price'],
+                                    'stock_quantity' => 10 // Assume in stock
+                                ];
+                                $productObj->variants = collect([$variant]);
+                                
+                                // Create a mock image for the unified component
+                                $image = (object) [
+                                    'image_path' => $product['image'],
+                                    'is_primary' => true
+                                ];
+                                $productObj->images = collect($product['image'] ? [$image] : []);
+                            @endphp
+                            <x-product-card-unified :product="$productObj" size="default" />
                         @endforeach
                     </div>
                 </div>

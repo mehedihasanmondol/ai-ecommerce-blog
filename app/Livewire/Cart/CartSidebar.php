@@ -50,6 +50,76 @@ class CartSidebar extends Component
     }
 
     /**
+     * Listen for add-to-cart event from product cards
+     */
+    #[On('add-to-cart')]
+    public function addToCart($productId, $variantId, $quantity = 1)
+    {
+        $product = Product::with(['variants', 'images', 'brand'])->find($productId);
+        
+        if (!$product) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'Product not found'
+            ]);
+            return;
+        }
+        
+        $variant = $product->variants->where('id', $variantId)->first();
+        
+        if (!$variant) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'Product variant not found'
+            ]);
+            return;
+        }
+        
+        // Check stock
+        if ($variant->stock_quantity < $quantity) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'Insufficient stock'
+            ]);
+            return;
+        }
+        
+        $cart = session()->get('cart', []);
+        $cartKey = 'variant_' . $variant->id;
+        
+        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+        
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] += $quantity;
+        } else {
+            $cart[$cartKey] = [
+                'product_id' => $product->id,
+                'variant_id' => $variant->id,
+                'product_name' => $product->name,
+                'slug' => $product->slug,
+                'brand' => $product->brand ? $product->brand->name : null,
+                'price' => $variant->sale_price ?? $variant->price,
+                'original_price' => $variant->price,
+                'quantity' => $quantity,
+                'image' => $primaryImage ? $primaryImage->image_path : null,
+                'sku' => $variant->sku,
+                'stock_quantity' => $variant->stock_quantity,
+            ];
+        }
+        
+        session()->put('cart', $cart);
+        
+        $this->loadCart();
+        $this->isOpen = true; // Show cart sidebar when item is added
+        
+        $this->dispatch('cart-updated');
+        $this->dispatch('show-toast', [
+            'type' => 'success',
+            'message' => 'Product added to cart!'
+        ]);
+    }
+
+    /**
      * Hide cart sidebar
      */
     public function hideCart()

@@ -2,7 +2,7 @@
     <button 
         wire:click="toggleWishlist"
         type="button"
-        class="group relative inline-flex items-center justify-center transition-all duration-200
+        class="group relative inline-flex items-center justify-center bg-white rounded-full shadow-md hover:scale-110 transition-all duration-200
                @if($size === 'sm') p-1.5
                @elseif($size === 'lg') p-3
                @else p-2
