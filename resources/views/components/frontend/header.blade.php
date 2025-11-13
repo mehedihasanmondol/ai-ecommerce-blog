@@ -323,7 +323,7 @@ function topbarSlider() {
         </div>
 
         <!-- Navigation Container -->
-        <div class="border-t border-gray-200 flex items-center justify-between">
+        <div class="border-t border-gray-200 hidden lg:flex items-center justify-between">
             <!-- Primary Mega Menu (Left) -->
             <x-frontend.mega-menu 
                 :megaMenuCategories="$megaMenuCategories ?? collect()" 
