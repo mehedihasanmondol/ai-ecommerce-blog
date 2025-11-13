@@ -59,6 +59,52 @@ class HomepageSettingController extends Controller
     }
 
     /**
+     * Update specific group settings
+     */
+    public function updateGroup(Request $request, string $group)
+    {
+        $validated = $request->validate([
+            'settings' => 'required|array',
+            'settings.*' => 'nullable',
+        ]);
+
+        foreach ($validated['settings'] as $key => $value) {
+            $setting = HomepageSetting::where('key', $key)
+                ->where('group', $group)
+                ->first();
+            
+            if ($setting) {
+                // Handle image uploads
+                if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
+                    // Delete old image
+                    if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
+                        Storage::disk('public')->delete($setting->value);
+                    }
+                    
+                    // Store new image
+                    $path = $request->file("settings.{$key}")->store('homepage-settings', 'public');
+                    $value = $path;
+                } 
+                // Handle boolean values
+                elseif ($setting->type === 'boolean') {
+                    $value = $request->has("settings.{$key}") ? '1' : '0';
+                }
+                // Handle textarea and text
+                else {
+                    $value = $value ?? '';
+                }
+
+                $setting->update(['value' => $value]);
+            }
+        }
+
+        HomepageSetting::clearCache();
+
+        return redirect()->route('admin.homepage-settings.index')
+            ->with('success', ucfirst(str_replace('_', ' ', $group)) . ' settings updated successfully!');
+    }
+
+    /**
      * Store new slider
      */
     public function storeSlider(Request $request)

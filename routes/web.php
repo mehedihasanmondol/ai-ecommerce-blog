@@ -110,6 +110,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Homepage Settings Routes
     Route::get('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
     Route::put('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
+    Route::put('/homepage-settings/group/{group}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateGroup'])->name('homepage-settings.update-group');
     
     // Hero Slider Routes
     Route::post('/homepage-settings/slider', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'storeSlider'])->name('homepage-settings.slider.store');
