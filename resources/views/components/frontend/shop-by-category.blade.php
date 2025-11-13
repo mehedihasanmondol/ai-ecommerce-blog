@@ -1,5 +1,41 @@
 @props(['categories'])
 
+<style>
+.category-slider {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: grab;
+}
+
+.category-slider:active {
+    cursor: grabbing;
+}
+
+.category-item {
+    min-width: calc((100% - 2 * 16px) / 3); /* Mobile: 3 items */
+}
+
+@media (min-width: 640px) {
+    .category-item {
+        min-width: calc((100% - 3 * 16px) / 4); /* SM: 4 items */
+    }
+}
+
+@media (min-width: 768px) {
+    .category-item {
+        min-width: calc((100% - 5 * 16px) / 6); /* MD: 6 items */
+    }
+}
+
+@media (min-width: 1024px) {
+    .category-item {
+        min-width: calc((100% - 7 * 16px) / 8); /* LG: 8 items */
+    }
+}
+</style>
+
 <section class="py-12 bg-white">
     <div class="container mx-auto px-4">
         <!-- Section Header -->
@@ -9,10 +45,10 @@
 
         <!-- Main Categories Slider -->
         <div class="relative mb-8" x-data="categorySlider()">
-            <!-- Previous Button -->
+            <!-- Previous Button (Hidden on mobile) -->
             <button 
                 @click="prev()" 
-                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition -ml-5"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition -ml-5 hidden md:flex"
                 :class="{ 'opacity-50 cursor-not-allowed': atStart }"
                 :disabled="atStart"
             >
@@ -25,35 +61,41 @@
             <div class="overflow-hidden">
                 <div 
                     x-ref="slider"
-                    class="flex gap-4 transition-transform duration-300 ease-in-out"
+                    class="flex gap-4 transition-transform duration-300 ease-in-out category-slider"
                     :style="`transform: translateX(-${currentIndex * slideWidth}px)`"
+                    @touchstart="handleTouchStart($event)"
+                    @touchmove="handleTouchMove($event)"
+                    @touchend="handleTouchEnd($event)"
+                    @mousedown="handleMouseDown($event)"
+                    @mousemove="handleMouseMove($event)"
+                    @mouseup="handleMouseUp($event)"
+                    @mouseleave="handleMouseUp($event)"
                 >
                     @foreach($categories as $category)
                         <a href="{{ route('categories.show', $category->slug) }}" 
-                           class="flex-shrink-0 flex flex-col items-center p-4 rounded-lg hover:bg-gray-50 transition group"
-                           style="width: calc((100% - 7 * 16px) / 8);">
+                           class="flex-shrink-0 flex flex-col items-center p-2 sm:p-4 rounded-lg hover:bg-gray-50 transition group category-item">
                             <!-- Icon Circle -->
-                            <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-3 group-hover:bg-green-100 transition overflow-hidden">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-50 rounded-full flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-green-100 transition overflow-hidden">
                                 @if($category->image)
                                     <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
                                 @else
                                     <!-- Default SVG Icon -->
-                                    <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-8 h-8 sm:w-12 sm:h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                     </svg>
                                 @endif
                             </div>
                             <!-- Category Name -->
-                            <span class="text-sm font-medium text-gray-900 text-center">{{ $category->name }}</span>
+                            <span class="text-xs sm:text-sm font-medium text-gray-900 text-center line-clamp-2">{{ $category->name }}</span>
                         </a>
                     @endforeach
                 </div>
             </div>
 
-            <!-- Next Button -->
+            <!-- Next Button (Hidden on mobile) -->
             <button 
                 @click="next()" 
-                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition -mr-5"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition -mr-5 hidden md:flex"
                 :class="{ 'opacity-50 cursor-not-allowed': atEnd }"
                 :disabled="atEnd"
             >
@@ -61,6 +103,18 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
             </button>
+
+            <!-- Mobile Scroll Indicator -->
+            <div class="flex justify-center mt-4 md:hidden">
+                <div class="flex space-x-2">
+                    <template x-for="i in Math.ceil(totalItems / itemsPerView)" :key="i">
+                        <div 
+                            class="w-2 h-2 rounded-full transition-colors duration-200"
+                            :class="Math.floor(currentIndex / itemsPerView) === (i - 1) ? 'bg-green-600' : 'bg-gray-300'"
+                        ></div>
+                    </template>
+                </div>
+            </div>
         </div>
 
         <!-- Subcategories / Tags -->
@@ -102,21 +156,51 @@ function categorySlider() {
         atStart: true,
         atEnd: false,
         
+        // Touch/Swipe variables
+        startX: 0,
+        startY: 0,
+        currentX: 0,
+        currentY: 0,
+        isDragging: false,
+        isMouseDown: false,
+        startTime: 0,
+        
         init() {
-            this.calculateSlideWidth();
+            this.calculateResponsiveSettings();
             this.updateButtonStates();
             
             window.addEventListener('resize', () => {
-                this.calculateSlideWidth();
+                this.calculateResponsiveSettings();
                 this.updateButtonStates();
             });
         },
         
-        calculateSlideWidth() {
+        calculateResponsiveSettings() {
             const container = this.$refs.slider;
-            if (container && container.children.length > 0) {
-                const item = container.children[0];
-                this.slideWidth = item.offsetWidth + 16; // item width + gap
+            if (!container || !container.children.length) return;
+            
+            const screenWidth = window.innerWidth;
+            
+            // Responsive items per view
+            if (screenWidth < 640) { // mobile
+                this.itemsPerView = 3;
+            } else if (screenWidth < 768) { // sm
+                this.itemsPerView = 4;
+            } else if (screenWidth < 1024) { // md
+                this.itemsPerView = 6;
+            } else { // lg and above
+                this.itemsPerView = 8;
+            }
+            
+            // Calculate slide width
+            const containerWidth = container.offsetWidth;
+            const gap = 16; // 1rem gap
+            this.slideWidth = (containerWidth + gap) / this.itemsPerView;
+            
+            // Adjust current index if needed
+            const maxIndex = Math.max(0, this.totalItems - this.itemsPerView);
+            if (this.currentIndex > maxIndex) {
+                this.currentIndex = maxIndex;
             }
         },
         
@@ -138,6 +222,91 @@ function categorySlider() {
         updateButtonStates() {
             this.atStart = this.currentIndex === 0;
             this.atEnd = this.currentIndex >= Math.max(0, this.totalItems - this.itemsPerView);
+        },
+        
+        // Touch event handlers
+        handleTouchStart(e) {
+            this.startX = e.touches[0].clientX;
+            this.startY = e.touches[0].clientY;
+            this.currentX = this.startX;
+            this.currentY = this.startY;
+            this.isDragging = true;
+            this.startTime = Date.now();
+        },
+        
+        handleTouchMove(e) {
+            if (!this.isDragging) return;
+            
+            this.currentX = e.touches[0].clientX;
+            this.currentY = e.touches[0].clientY;
+            
+            // Prevent default scrolling if horizontal swipe
+            const deltaX = Math.abs(this.currentX - this.startX);
+            const deltaY = Math.abs(this.currentY - this.startY);
+            
+            if (deltaX > deltaY) {
+                e.preventDefault();
+            }
+        },
+        
+        handleTouchEnd(e) {
+            if (!this.isDragging) return;
+            
+            const deltaX = this.currentX - this.startX;
+            const deltaY = this.currentY - this.startY;
+            const deltaTime = Date.now() - this.startTime;
+            
+            // Check if it's a horizontal swipe
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 0 && deltaTime < 300) {
+                    // Swipe right - go to previous
+                    this.prev();
+                } else if (deltaX < 0 && deltaTime < 300) {
+                    // Swipe left - go to next
+                    this.next();
+                }
+            }
+            
+            this.isDragging = false;
+        },
+        
+        // Mouse event handlers (for desktop drag)
+        handleMouseDown(e) {
+            this.startX = e.clientX;
+            this.startY = e.clientY;
+            this.currentX = this.startX;
+            this.currentY = this.startY;
+            this.isMouseDown = true;
+            this.startTime = Date.now();
+            e.preventDefault();
+        },
+        
+        handleMouseMove(e) {
+            if (!this.isMouseDown) return;
+            
+            this.currentX = e.clientX;
+            this.currentY = e.clientY;
+        },
+        
+        handleMouseUp(e) {
+            if (!this.isMouseDown) return;
+            
+            const deltaX = this.currentX - this.startX;
+            const deltaY = this.currentY - this.startY;
+            const deltaTime = Date.now() - this.startTime;
+            
+            // Check if it's a horizontal drag
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 0 && deltaTime < 300) {
+                    // Drag right - go to previous
+                    this.prev();
+                } else if (deltaX < 0 && deltaTime < 300) {
+                    // Drag left - go to next
+                    this.next();
+                }
+            }
+            
+            this.isMouseDown = false;
         }
     }
 }
