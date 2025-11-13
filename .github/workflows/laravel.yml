@@ -24,6 +24,7 @@ jobs:
           php artisan config:cache || true
           php artisan route:cache || true
           php artisan view:cache || true
+          php artisan cache:clear || true
 
       - name: 🚀 Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
