@@ -176,36 +176,37 @@ function topbarSlider() {
             $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
         @endphp
         
-        <!-- Mobile Header Layout -->
-        <div class="lg:hidden flex items-center justify-between py-3">
+        <!-- Mobile Header Layout - iHerb Clone -->
+        <div class="lg:hidden flex items-center py-2.5 px-1">
             <!-- Hamburger Menu (Left) -->
             <button 
                 onclick="Livewire.dispatch('openMenu')"
-                class="flex items-center justify-center w-10 h-10 text-gray-700 hover:text-green-600 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="flex items-center justify-center w-10 h-10 text-gray-700 hover:text-green-600 transition flex-shrink-0 mr-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
 
-            <!-- Logo (Center) -->
-            <a href="{{ route('home') }}" class="flex items-center absolute left-1/2 transform -translate-x-1/2">
+            <!-- Logo -->
+            <a href="{{ route('home') }}" class="flex items-center flex-shrink-0 mr-3">
                 @if($siteLogo)
                     <img src="{{ asset('storage/' . $siteLogo) }}" 
                          alt="{{ $siteName }}" 
-                         class="h-10 w-auto">
+                         class="h-8 w-auto">
                 @else
-                    <div class="bg-green-600 text-white font-bold text-xl px-3 py-1.5 rounded">
-                        {{ $siteName }}
+                    <div class="bg-green-600 text-white font-bold text-lg px-2.5 py-1 rounded">
+                        iHerb
                     </div>
                 @endif
             </a>
 
-            <!-- Actions (Right) -->
-            <div class="flex items-center space-x-2">
-                <!-- Mobile Search -->
-                @livewire('search.mobile-search')
-                
-                <!-- Cart -->
+            <!-- Search Field (Flexible width) -->
+            <div class="flex-1 min-w-0 mr-3">
+                @livewire('search.global-search')
+            </div>
+
+            <!-- Cart (Right) -->
+            <div class="flex items-center flex-shrink-0">
                 @livewire('cart.cart-counter')
             </div>
         </div>
