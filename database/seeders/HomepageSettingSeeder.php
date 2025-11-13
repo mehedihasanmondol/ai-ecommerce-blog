@@ -95,6 +95,64 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 3,
                 'description' => 'Promotional banner text',
             ],
+            
+            // Top Header Settings
+            [
+                'key' => 'top_header_link1_text',
+                'value' => 'Special Offers & Coupons',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 1,
+                'description' => 'Text for first top header link',
+            ],
+            [
+                'key' => 'top_header_link1_url',
+                'value' => '/coupons',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 2,
+                'description' => 'URL for first top header link',
+            ],
+            [
+                'key' => 'top_header_link1_icon',
+                'value' => 'tag',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 3,
+                'description' => 'Icon for first top header link (tag, clock, gift, etc.)',
+            ],
+            [
+                'key' => 'top_header_link2_text',
+                'value' => 'Shop Now',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 4,
+                'description' => 'Text for second top header link',
+            ],
+            [
+                'key' => 'top_header_link2_url',
+                'value' => '/shop',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 5,
+                'description' => 'URL for second top header link',
+            ],
+            [
+                'key' => 'top_header_link2_icon',
+                'value' => 'clock',
+                'type' => 'text',
+                'group' => 'top_header',
+                'order' => 6,
+                'description' => 'Icon for second top header link (tag, clock, gift, etc.)',
+            ],
+            [
+                'key' => 'top_header_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'top_header',
+                'order' => 7,
+                'description' => 'Show top header announcement bar',
+            ],
         ];
 
         foreach ($generalSettings as $setting) {

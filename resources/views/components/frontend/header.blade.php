@@ -22,25 +22,50 @@
         <!-- Desktop View -->
         <div class="hidden md:flex items-center justify-between py-2">
             <div class="flex items-center space-x-4">
-                <a href="{{ route('coupons.index') }}" class="flex items-center hover:text-green-100 transition">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
-                    <span class="font-medium">Special Offers & Coupons</span>
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
+                @php
+                    $topHeaderEnabled = \App\Models\HomepageSetting::get('top_header_enabled', true);
+                    $link1Text = \App\Models\HomepageSetting::get('top_header_link1_text', 'Special Offers & Coupons');
+                    $link1Url = \App\Models\HomepageSetting::get('top_header_link1_url', '/coupons');
+                    $link1Icon = \App\Models\HomepageSetting::get('top_header_link1_icon', 'tag');
+                    $link2Text = \App\Models\HomepageSetting::get('top_header_link2_text', 'Shop Now');
+                    $link2Url = \App\Models\HomepageSetting::get('top_header_link2_url', '/shop');
+                    $link2Icon = \App\Models\HomepageSetting::get('top_header_link2_icon', 'clock');
+                    
+                    $getIconPath = function($iconName) {
+                        return match($iconName) {
+                            'tag' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z',
+                            'clock' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+                            'gift' => 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7',
+                            'shopping-bag' => 'M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 12H6L5 9z',
+                            'star' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z',
+                            default => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'
+                        };
+                    };
+                @endphp
                 
-                <a href="{{ route('shop') }}" class="flex items-center hover:text-green-100 transition">
+                @if($topHeaderEnabled && $link1Text && $link1Url)
+                <a href="{{ $link1Url }}" class="flex items-center hover:text-green-100 transition">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getIconPath($link1Icon) }}"></path>
                     </svg>
-                    <span class="font-medium">Shop Now</span>
+                    <span class="font-medium">{{ $link1Text }}</span>
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </a>
+                @endif
+                
+                @if($topHeaderEnabled && $link2Text && $link2Url)
+                <a href="{{ $link2Url }}" class="flex items-center hover:text-green-100 transition">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getIconPath($link2Icon) }}"></path>
+                    </svg>
+                    <span class="font-medium">{{ $link2Text }}</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+                @endif
             </div>
             
             <div class="flex items-center space-x-4">
@@ -91,31 +116,35 @@
                     class="flex transition-transform duration-300 ease-in-out"
                     :style="`transform: translateX(-${currentSlide * 100}%)`">
                     
-                    <!-- Slide 1: Special Offers -->
+                    @if($topHeaderEnabled && $link1Text && $link1Url)
+                    <!-- Slide 1: First Link -->
                     <div class="w-full flex-shrink-0 flex justify-center">
-                        <a href="{{ route('coupons.index') }}" class="flex items-center hover:text-green-100 transition">
+                        <a href="{{ $link1Url }}" class="flex items-center hover:text-green-100 transition">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getIconPath($link1Icon) }}"></path>
                             </svg>
-                            <span class="font-medium text-xs sm:text-sm">Special Offers & Coupons</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $link1Text }}</span>
                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
                     </div>
+                    @endif
 
-                    <!-- Slide 2: Shop Now -->
+                    @if($topHeaderEnabled && $link2Text && $link2Url)
+                    <!-- Slide 2: Second Link -->
                     <div class="w-full flex-shrink-0 flex justify-center">
-                        <a href="{{ route('shop') }}" class="flex items-center hover:text-green-100 transition">
+                        <a href="{{ $link2Url }}" class="flex items-center hover:text-green-100 transition">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $getIconPath($link2Icon) }}"></path>
                             </svg>
-                            <span class="font-medium text-xs sm:text-sm">Shop Now</span>
+                            <span class="font-medium text-xs sm:text-sm">{{ $link2Text }}</span>
                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                             </svg>
                         </a>
                     </div>
+                    @endif
                 </div>
             </div>
 
