@@ -106,12 +106,12 @@
                             </div>
 
                             <!-- Quantity Controls & Actions -->
-                            <div class="flex items-center space-x-4 mt-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-4">
                                 <!-- Quantity Selector -->
-                                <div class="flex items-center border border-gray-300 rounded-lg">
+                                <div class="flex items-center border border-gray-300 rounded-lg flex-shrink-0">
                                     <button @click="updateQuantity('{{ $key }}', quantity - 1)" 
                                             :disabled="quantity <= 1"
-                                            class="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            class="px-2 sm:px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                                         </svg>
@@ -120,33 +120,37 @@
                                            x-model="quantity"
                                            @change="updateQuantity('{{ $key }}', quantity)"
                                            min="1"
-                                           class="w-16 text-center border-0 focus:ring-0 py-2">
+                                           class="w-12 sm:w-16 text-center border-0 focus:ring-0 py-2 text-sm">
                                     <button @click="updateQuantity('{{ $key }}', quantity + 1)"
-                                            class="px-3 py-2 text-gray-600 hover:bg-gray-100">
+                                            class="px-2 sm:px-3 py-2 text-gray-600 hover:bg-gray-100">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                         </svg>
                                     </button>
                                 </div>
 
-                                <!-- Remove Button -->
-                                <button @click="removeItem('{{ $key }}')"
-                                        class="p-2 text-gray-400 hover:text-red-600 transition"
-                                        title="Remove from cart">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
+                                <!-- Action Buttons Container -->
+                                <div class="flex items-center gap-3 sm:gap-4">
+                                    <!-- Remove Button -->
+                                    <button @click="removeItem('{{ $key }}')"
+                                            class="p-2 text-gray-400 hover:text-red-600 transition flex-shrink-0"
+                                            title="Remove from cart">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
 
-                                <!-- Save for Later / Add to Wishlist Button -->
-                                <button @click="saveForLater('{{ $key }}', {{ json_encode($item) }})"
-                                        class="flex items-center text-sm text-gray-600 hover:text-green-600 transition"
-                                        title="Save to wishlist">
-                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                    </svg>
-                                    Save for later
-                                </button>
+                                    <!-- Save for Later / Add to Wishlist Button -->
+                                    <button @click="saveForLater('{{ $key }}', {{ json_encode($item) }})"
+                                            class="flex items-center text-sm text-gray-600 hover:text-green-600 transition flex-shrink-0"
+                                            title="Save to wishlist">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                        </svg>
+                                        <span class="hidden xs:inline sm:inline">Save for later</span>
+                                        <span class="xs:hidden sm:hidden">Save</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
