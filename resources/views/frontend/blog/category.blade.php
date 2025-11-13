@@ -183,22 +183,51 @@
                                     <p class="text-gray-600 mb-4">{{ Str::limit($post->excerpt, 150) }}</p>
                                     @endif
                                     
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <span>{{ $post->author->name }}</span>
-                                            <span class="mx-2">•</span>
-                                            <span>{{ $post->published_at->format('M d, Y') }}</span>
-                                            <span class="mx-2">•</span>
-                                            <span>{{ $post->reading_time_text }}</span>
-                                            @if($post->views_count > 0)
-                                            <span class="mx-2">•</span>
-                                            <span>{{ number_format($post->views_count) }} views</span>
-                                            @endif
+                                    <!-- Mobile-Optimized Metadata & Actions -->
+                                    <div class="space-y-3">
+                                        <!-- Author & Date Info -->
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                    {{ substr($post->author->name, 0, 1) }}
+                                                </div>
+                                                <span class="font-medium">{{ $post->author->name }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-4 text-xs sm:text-sm">
+                                                <span class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    {{ $post->published_at->format('M d, Y') }}
+                                                </span>
+                                                <span class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    {{ $post->reading_time_text }}
+                                                </span>
+                                                @if($post->views_count > 0)
+                                                <span class="flex items-center gap-1">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                    {{ number_format($post->views_count) }}
+                                                </span>
+                                                @endif
+                                            </div>
                                         </div>
-                                        <a href="{{ route('products.show', $post->slug) }}" 
-                                           class="text-blue-600 hover:text-blue-800 font-medium">
-                                            Read More →
-                                        </a>
+                                        
+                                        <!-- Read More Button -->
+                                        <div class="pt-2">
+                                            <a href="{{ route('products.show', $post->slug) }}" 
+                                               class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                                                <span>Read More</span>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                                </svg>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
