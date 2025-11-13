@@ -14,7 +14,17 @@
 <aside class="lg:col-span-3">
     <div class="lg:sticky lg:top-8 space-y-6">
         <!-- Collapsible Sidebar Card -->
-        <div class="bg-white rounded-lg shadow-sm" x-data="{ sidebarOpen: false }">
+        <div class="bg-white rounded-lg shadow-sm" x-data="{ 
+            sidebarOpen: window.innerWidth >= 1024,
+            init() {
+                this.sidebarOpen = window.innerWidth >= 1024;
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 1024) {
+                        this.sidebarOpen = true;
+                    }
+                });
+            }
+        }">
             <!-- Header with Toggle Button -->
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex-1">

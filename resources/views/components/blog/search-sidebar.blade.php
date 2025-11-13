@@ -5,7 +5,17 @@
 
 <div class="space-y-8">
     <!-- Search Tips -->
-    <div class="bg-blue-50 rounded-lg shadow-md border border-blue-100" x-data="{ tipsOpen: false }">
+    <div class="bg-blue-50 rounded-lg shadow-md border border-blue-100" x-data="{ 
+        tipsOpen: window.innerWidth >= 1024,
+        init() {
+            this.tipsOpen = window.innerWidth >= 1024;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    this.tipsOpen = true;
+                }
+            });
+        }
+    }">
         <!-- Header with Toggle Button -->
         <div class="p-6 flex items-center justify-between">
             <h3 class="text-lg font-bold text-gray-900">Search Tips</h3>
@@ -64,7 +74,17 @@
     </div>
 
     <!-- Categories -->
-    <div class="bg-white rounded-lg shadow-md" x-data="{ categoriesOpen: false }">
+    <div class="bg-white rounded-lg shadow-md" x-data="{ 
+        categoriesOpen: window.innerWidth >= 1024,
+        init() {
+            this.categoriesOpen = window.innerWidth >= 1024;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    this.categoriesOpen = true;
+                }
+            });
+        }
+    }">
         <!-- Header with Toggle Button -->
         <div class="p-6 flex items-center justify-between">
             <h3 class="text-lg font-bold text-gray-900">Browse by Category</h3>
@@ -116,7 +136,17 @@
     </div>
 
     <!-- Back to Blog -->
-    <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg shadow-md border border-gray-200" x-data="{ backOpen: false }">
+    <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg shadow-md border border-gray-200" x-data="{ 
+        backOpen: window.innerWidth >= 1024,
+        init() {
+            this.backOpen = window.innerWidth >= 1024;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    this.backOpen = true;
+                }
+            });
+        }
+    }">
         <!-- Header with Toggle Button -->
         <div class="p-6 flex items-center justify-between">
             <h3 class="text-lg font-bold text-gray-900">Browse All Posts</h3>
