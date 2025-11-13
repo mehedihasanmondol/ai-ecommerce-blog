@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $category->meta_title ?? $category->name . ' - Blog')
+@section('title', $category->meta_title ?? $category->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
 @section('meta_description', $category->meta_description ?? $category->description)
 
 @section('content')
@@ -9,8 +9,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Sidebar - Collapsible -->
             <x-blog.sidebar 
-                :title="$category->parent_id ? $category->parent->name : 'Wellness Hub'"
-                :subtitle="$category->parent_id ? 'Subcategories' : 'Health & Lifestyle Blog'"
+                :title="$category->parent_id ? $category->parent->name : \App\Models\SiteSetting::get('blog_title', 'Wellness Hub')"
+                :subtitle="$category->parent_id ? 'Subcategories' : \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog')"
                 :categories="$categories"
                 :currentCategory="$category"
                 :showBackLink="$category->parent_id"

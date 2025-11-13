@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Blog - Wellness Hub')
+@section('title', \App\Models\SiteSetting::get('blog_title', 'Blog') . ' - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('meta')
+    <meta name="description" content="{{ \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips') }}">
+    <meta name="keywords" content="{{ \App\Models\SiteSetting::get('blog_keywords', 'health blog, wellness tips') }}">
+@endsection
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">
@@ -8,8 +13,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Sidebar - Collapsible -->
             <x-blog.sidebar 
-                title="Wellness Hub"
-                subtitle="Health & Lifestyle Blog"
+                title="{{ \App\Models\SiteSetting::get('blog_title', 'Wellness Hub') }}"
+                subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
             />
 

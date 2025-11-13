@@ -48,8 +48,18 @@
             
             <!-- Wellness Hub Badge -->
             <a href="{{ route('blog.index') }}" class="block bg-yellow-400 rounded-lg p-6 text-center hover:bg-yellow-500 transition">
-                <h3 class="text-lg font-bold text-gray-900 mb-1">WELLBEING</h3>
-                <h2 class="text-2xl font-bold text-gray-900">HUB</h2>
+                @php
+                    $blogTitle = \App\Models\SiteSetting::get('blog_title', 'WELLBEING HUB');
+                    $titleParts = explode(' ', strtoupper($blogTitle));
+                    $firstPart = array_slice($titleParts, 0, -1);
+                    $lastPart = end($titleParts);
+                @endphp
+                @if(count($titleParts) > 1)
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">{{ implode(' ', $firstPart) }}</h3>
+                    <h2 class="text-2xl font-bold text-gray-900">{{ $lastPart }}</h2>
+                @else
+                    <h2 class="text-2xl font-bold text-gray-900">{{ $blogTitle }}</h2>
+                @endif
             </a>
             
             @foreach($featuredPosts->slice(3, 3) as $post)

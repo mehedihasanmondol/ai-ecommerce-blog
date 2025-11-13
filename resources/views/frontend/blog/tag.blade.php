@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $tag->meta_title ?? $tag->name . ' - Blog')
+@section('title', $tag->meta_title ?? $tag->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
 @section('meta_description', $tag->meta_description ?? $tag->description ?? 'Posts tagged with ' . $tag->name)
 
 @section('content')

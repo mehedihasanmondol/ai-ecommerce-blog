@@ -10,8 +10,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Sidebar - Collapsible -->
             <x-blog.sidebar 
-                title="Wellness Hub"
-                subtitle="Health & Lifestyle Blog"
+                title="{{ \App\Models\SiteSetting::get('blog_title', 'Wellness Hub') }}"
+                subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
                 :currentCategory="$post->category"
             />

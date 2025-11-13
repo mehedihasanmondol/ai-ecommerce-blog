@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Search Results: ' . $query . ' - Blog')
+@section('title', 'Search Results: ' . $query . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">
