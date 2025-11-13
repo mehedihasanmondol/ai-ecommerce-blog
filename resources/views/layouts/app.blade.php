@@ -21,6 +21,9 @@
     @stack('styles')
 </head>
 <body class="antialiased bg-gray-50">
+    <!-- Promotional Banner -->
+    <x-frontend.promo-banner />
+    
     <!-- Header -->
     <x-frontend.header />
 

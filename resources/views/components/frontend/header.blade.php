@@ -43,25 +43,32 @@
             </div>
             
             <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>BD</span>
-                </div>
-                <span>|</span>
-                <div class="flex items-center space-x-1">
-                    <span>EN</span>
-                </div>
-                <span>|</span>
-                <div class="flex items-center space-x-1">
-                    <span>USD</span>
-                </div>
-                <button class="hover:text-green-100 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
-                    </svg>
-                </button>
+                @php
+                    $sitePhone = \App\Models\SiteSetting::get('site_phone');
+                    $siteEmail = \App\Models\SiteSetting::get('site_email');
+                @endphp
+                
+                @if($sitePhone)
+                    <a href="tel:{{ $sitePhone }}" class="flex items-center space-x-2 hover:text-green-100 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        <span>{{ $sitePhone }}</span>
+                    </a>
+                @endif
+                
+                @if($sitePhone && $siteEmail)
+                    <span>|</span>
+                @endif
+                
+                @if($siteEmail)
+                    <a href="mailto:{{ $siteEmail }}" class="flex items-center space-x-2 hover:text-green-100 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>{{ $siteEmail }}</span>
+                    </a>
+                @endif
             </div>
         </div>
     </div>
@@ -70,15 +77,50 @@
 <!-- Main Header -->
 <header class="bg-white shadow-sm sticky top-0 z-50">
     <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between py-4">
+        @php
+            $siteLogo = \App\Models\SiteSetting::get('site_logo');
+            $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
+        @endphp
+        
+        <!-- Mobile Header Layout -->
+        <div class="lg:hidden flex items-center justify-between py-3">
+            <!-- Hamburger Menu (Left) -->
+            <button 
+                onclick="Livewire.dispatch('openMenu')"
+                class="flex items-center justify-center w-10 h-10 text-gray-700 hover:text-green-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Logo (Center) -->
+            <a href="{{ route('home') }}" class="flex items-center absolute left-1/2 transform -translate-x-1/2">
+                @if($siteLogo)
+                    <img src="{{ asset('storage/' . $siteLogo) }}" 
+                         alt="{{ $siteName }}" 
+                         class="h-10 w-auto">
+                @else
+                    <div class="bg-green-600 text-white font-bold text-xl px-3 py-1.5 rounded">
+                        {{ $siteName }}
+                    </div>
+                @endif
+            </a>
+
+            <!-- Actions (Right) -->
+            <div class="flex items-center space-x-2">
+                <!-- Mobile Search -->
+                @livewire('search.mobile-search')
+                
+                <!-- Cart -->
+                @livewire('cart.cart-counter')
+            </div>
+        </div>
+
+        <!-- Desktop Header Layout -->
+        <div class="hidden lg:flex items-center justify-between py-4">
             <!-- Logo -->
             <div class="flex items-center">
                 <a href="{{ route('home') }}" class="flex items-center">
-                    @php
-                        $siteLogo = \App\Models\SiteSetting::get('site_logo');
-                        $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
-                    @endphp
-                    
                     @if($siteLogo)
                         <img src="{{ asset('storage/' . $siteLogo) }}" 
                              alt="{{ $siteName }}" 
@@ -92,14 +134,12 @@
             </div>
 
             <!-- Search Bar (Desktop) -->
-            <div class="hidden lg:flex flex-1 max-w-3xl mx-8">
+            <div class="flex-1 max-w-3xl mx-8">
                 @livewire('search.global-search')
             </div>
 
             <!-- User Actions -->
             <div class="flex items-center space-x-6">
-                <!-- Mobile Search -->
-                @livewire('search.mobile-search')
                 @auth
                     <!-- User Dropdown -->
                     <div x-data="{ userMenuOpen: false }" class="relative">
@@ -201,122 +241,5 @@
     </div>
 </header>
 
-<!-- Mobile Menu Overlay -->
-<div x-data="{ mobileMenuOpen: false }">
-    <!-- Mobile Menu Button (Visible on small screens) -->
-    <button 
-        @click="mobileMenuOpen = true"
-        class="lg:hidden fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg z-40 hover:bg-green-700 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-    </button>
-
-    <!-- Mobile Menu Backdrop -->
-    <div 
-        x-show="mobileMenuOpen"
-        @click="mobileMenuOpen = false"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40"
-        style="display: none;"
-    ></div>
-
-    <!-- Mobile Menu Sidebar -->
-    <div 
-        x-show="mobileMenuOpen"
-        x-transition:enter="transition ease-out duration-200"
-        x-transition:enter-start="translate-x-full"
-        x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in duration-150"
-        x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="translate-x-full"
-        class="fixed top-0 right-0 bottom-0 w-80 bg-white shadow-xl z-50 overflow-y-auto"
-        style="display: none;">
-        <div class="p-4">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Menu</h2>
-                <button @click="mobileMenuOpen = false" class="text-gray-500 hover:text-gray-700">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <nav class="space-y-2">
-                <!-- User Section -->
-                @auth
-                    <div class="bg-green-50 rounded-md p-4 mb-4">
-                        <div class="flex items-center mb-3">
-                            @if(auth()->user()->avatar)
-                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
-                                     alt="{{ auth()->user()->name }}"
-                                     class="w-12 h-12 rounded-full object-cover border-2 border-green-200">
-                            @else
-                                <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-lg">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                </div>
-                            @endif
-                            <div class="ml-3">
-                                <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
-                                <p class="text-xs text-gray-600">{{ auth()->user()->email }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <a href="{{ route('customer.orders.index') }}" 
-                               class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white rounded transition">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                                </svg>
-                                My Orders
-                            </a>
-                            
-                            <a href="{{ route('customer.profile') }}" 
-                               class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-white rounded transition">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                Profile
-                            </a>
-                            
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" 
-                                        class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-white rounded transition">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                    Logout
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @else
-                    <a href="{{ route('login') }}" 
-                       class="flex items-center px-4 py-3 text-white bg-green-600 hover:bg-green-700 rounded-md transition font-medium mb-4">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                        </svg>
-                        Sign In
-                    </a>
-                @endauth
-
-                <!-- Blog Link -->
-                <a href="{{ route('blog.index') }}" 
-                   class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition font-medium">
-                    📝 Blog
-                </a>
-                
-                <div class="border-t border-gray-200 my-2"></div>
-                
-                @forelse($megaMenuCategories ?? collect() as $category)
-                    <a href="{{ $category->getUrl() }}" 
-                       class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition">
-                        {{ $category->name }}
-                    </a>
-                @empty
-                    <p class="px-4 py-3 text-gray-500">No categories available</p>
-                @endforelse
-            </nav>
-        </div>
-    </div>
-</div>
+<!-- Mobile Menu Component -->
+@livewire('mobile-menu')

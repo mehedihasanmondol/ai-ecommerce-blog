@@ -102,6 +102,57 @@
             </div>
 
             <div wire:loading.remove wire:target="query">
+                <!-- Trending Now Section (when no search query) -->
+                @if(!$query)
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Trending now</h3>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse(\App\Models\TrendingProduct::with('product')->where('is_active', true)->orderBy('sort_order')->limit(8)->get() as $trendingProduct)
+                                @if($trendingProduct->product && $trendingProduct->product->is_active)
+                                    <a href="{{ route('products.show', $trendingProduct->product->slug) }}" 
+                                       class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-800 transition-colors">
+                                        {{ $trendingProduct->product->name }}
+                                    </a>
+                                @endif
+                            @empty
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-800">Vitamins</span>
+                                    <span class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-800">Supplements</span>
+                                    <span class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-800">Protein Powder</span>
+                                    <span class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-800">Omega-3</span>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    <!-- Browse Section -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Browse</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <a href="{{ route('shop', ['on_sale' => 1]) }}" 
+                               class="p-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center">
+                                <div class="text-2xl mb-1">🏷️</div>
+                                <span class="text-sm font-medium text-gray-800">Sale Offers!</span>
+                            </a>
+                            <a href="{{ route('brands.index') }}" 
+                               class="p-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center">
+                                <div class="text-2xl mb-1">⭐</div>
+                                <span class="text-sm font-medium text-gray-800">Brands of the week</span>
+                            </a>
+                            <a href="{{ route('shop', ['on_sale' => 1]) }}" 
+                               class="p-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center">
+                                <div class="text-2xl mb-1">💰</div>
+                                <span class="text-sm font-medium text-gray-800">Sales & Offers</span>
+                            </a>
+                            <a href="{{ route('shop', ['sort' => 'latest']) }}" 
+                               class="p-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center">
+                                <div class="text-2xl mb-1">✨</div>
+                                <span class="text-sm font-medium text-gray-800">Try</span>
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Quick Suggestions -->
                 @if($query && $quickSuggestions->count() > 0)
                     <div class="mb-6">

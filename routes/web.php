@@ -40,6 +40,14 @@ Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishl
 // Coupon Routes
 Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
 
+// Promotional Banner Routes
+Route::post('/promo-banners/dismiss', function(\Illuminate\Http\Request $request) {
+    $dismissedBanners = session()->get('dismissed_banners', []);
+    $dismissedBanners[] = $request->input('banner_id');
+    session()->put('dismissed_banners', $dismissedBanners);
+    return response()->json(['success' => true]);
+})->name('promo-banners.dismiss');
+
 // Public Category Routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{slug}', \App\Livewire\Shop\ProductList::class)->name('categories.show');
