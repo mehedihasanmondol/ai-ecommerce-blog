@@ -32,6 +32,7 @@
             currentSlide: 0,
             autoplayInterval: null,
             isPlaying: true,
+            showModal: false,
             slides: @js($sliders->map(function($slider) {
                 return [
                     'id' => $slider->id,
@@ -68,6 +69,18 @@
             },
             goToSlide(index) {
                 this.currentSlide = index;
+            },
+            openModal() {
+                this.showModal = true;
+                document.body.style.overflow = 'hidden';
+            },
+            closeModal() {
+                this.showModal = false;
+                document.body.style.overflow = 'auto';
+            },
+            selectSlide(index) {
+                this.currentSlide = index;
+                this.closeModal();
             }
          }"
          @mouseenter="stopAutoplay()"
@@ -109,10 +122,11 @@
             </svg>
         </button>
         
-        <!-- Slide Name Indicators (over 50% overlaying slider) -->
-        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20">
-            <div class="bg-gray-50/98 shadow-lg rounded-lg px-4 py-2.5">
-                <div class="flex items-center gap-2">
+        <!-- Slide Name Indicators (Responsive) -->
+        <div class="absolute -bottom-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-[calc(100vw-2rem)] px-4">
+            <div class="bg-gray-50/98 shadow-lg rounded-lg px-2 md:px-4 py-2.5 mx-auto w-fit max-w-full">
+                <!-- Desktop Layout -->
+                <div class="hidden md:flex items-center gap-2">
                     <!-- Navigation Buttons -->
                     <div class="flex items-center gap-2">
                         <template x-for="(slide, index) in slides" :key="index">
@@ -126,12 +140,33 @@
                     </div>
                     
                     <!-- View All Link -->
-                    <a href="#" class="text-blue-600 hover:text-blue-700 font-medium text-sm whitespace-nowrap flex items-center gap-1 px-3 border-l border-gray-300">
+                    <button @click="openModal()" class="text-blue-600 hover:text-blue-700 font-medium text-sm whitespace-nowrap flex items-center gap-1 px-3 border-l border-gray-300">
                         View All
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
-                    </a>
+                    </button>
+                </div>
+                
+                <!-- Mobile Layout -->
+                <div class="md:hidden">
+                    <div class="flex items-center justify-between">
+                        <!-- Current Slide Info -->
+                        <div class="flex-1">
+                            <div class="text-sm font-semibold text-gray-900" x-text="slides[currentSlide]?.title"></div>
+                            <div class="text-xs text-gray-600 mt-0.5" x-text="slides[currentSlide]?.subtitle"></div>
+                        </div>
+                        
+                        <!-- View All Link (Mobile - Right Side) -->
+                        <div class="ml-4">
+                            <button @click="openModal()" class="text-blue-600 hover:text-blue-700 font-medium text-xs inline-flex items-center gap-1">
+                                View All
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -148,5 +183,109 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
     </button>
+
+    <!-- View All Slides Modal -->
+    <div x-show="showModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto"
+         style="display: none;">
+        
+        <!-- Backdrop -->
+        <div class="fixed inset-0" 
+             style="background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"
+             @click="closeModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
+            <div class="relative bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+                 @click.stop>
+                
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-900">All Slides</h2>
+                    <button @click="closeModal()" 
+                            class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                    <div class="space-y-6">
+                        <template x-for="(slide, index) in slides" :key="index">
+                            <div class="border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all duration-200 overflow-hidden">
+                                
+                                <!-- Full Width Slide Image -->
+                                <a :href="slide.link || '#'" class="block w-full">
+                                    <img :src="slide.image" 
+                                         :alt="slide.title" 
+                                         class="w-full h-48 md:h-64 object-cover">
+                                </a>
+                                
+                                <!-- Slide Content -->
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between gap-4">
+                                        <!-- Slide Info -->
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="font-semibold text-gray-900 mb-1" x-text="slide.title"></h3>
+                                            <p class="text-sm text-gray-600" x-text="slide.subtitle"></p>
+                                            
+                                            <!-- Current Slide Indicator -->
+                                            <div x-show="currentSlide === index" class="mt-3">
+                                                <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    Currently Showing
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Action Link -->
+                                        <div class="flex-shrink-0">
+                                            <template x-if="slide.link && slide.link !== '#'">
+                                                <a :href="slide.link" 
+                                                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                                    <span x-text="slide.button_text || 'Visit'"></span>
+                                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                    </svg>
+                                                </a>
+                                            </template>
+                                            <template x-if="!slide.link || slide.link === '#'">
+                                                <button @click="selectSlide(index)"
+                                                        class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                                    View Slide
+                                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                
+                <!-- Modal Footer -->
+                <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+                    <button @click="closeModal()" 
+                            class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 @endif
