@@ -15,34 +15,36 @@
         <div class="relative">
             <!-- Navigation Buttons -->
             <button 
-                id="sale-prev" 
-                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 z-10 bg-white shadow-lg rounded-full p-1.5 md:p-2 hover:bg-gray-50 transition"
-                aria-label="Previous"
+                onclick="scrollCarousel('sale-slider', 'left')" 
+                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-all border border-gray-200"
+                aria-label="Previous products"
             >
-                <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
             
             <button 
-                id="sale-next" 
-                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 z-10 bg-white shadow-lg rounded-full p-1.5 md:p-2 hover:bg-gray-50 transition"
-                aria-label="Next"
+                onclick="scrollCarousel('sale-slider', 'right')" 
+                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-all border border-gray-200"
+                aria-label="Next products"
             >
-                <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
             </button>
 
-            <!-- Products Container -->
-            <div class="overflow-hidden">
-                <div id="sale-slider" class="flex gap-4 transition-transform duration-300 ease-in-out">
-                    @foreach($products as $product)
-                        <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
-                            <x-product-card-unified :product="$product" size="default" />
-                        </div>
-                    @endforeach
-                </div>
+            <!-- Products Slider -->
+            <div 
+                id="sale-slider" 
+                class="flex gap-4 overflow-x-auto scroll-smooth pb-4 scrollbar-hide"
+                style="scrollbar-width: none; -ms-overflow-style: none;"
+            >
+                @foreach($products as $product)
+                    <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+                        <x-product-card-unified :product="$product" size="default" />
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

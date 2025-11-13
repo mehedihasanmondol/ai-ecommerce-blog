@@ -104,6 +104,31 @@
                 updateButtonState(button, newQuantity);
             });
         }
+
+        // Global carousel scroll function for all homepage sliders
+        function scrollCarousel(carouselId, direction) {
+            const carousel = document.getElementById(carouselId);
+            if (!carousel) return;
+            
+            const scrollAmount = 220; // Card width + gap
+            
+            if (direction === 'left') {
+                carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // Hide scrollbar for webkit browsers
+        document.addEventListener('DOMContentLoaded', function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `;
+            document.head.appendChild(style);
+        });
     </script>
 </body>
 </html>
