@@ -81,10 +81,59 @@
             selectSlide(index) {
                 this.currentSlide = index;
                 this.closeModal();
-            }
+            },
+            // Touch/Swipe functionality
+            handleTouchStart(e) {
+                this.touchStartX = e.touches[0].clientX;
+                this.isDragging = true;
+                this.stopAutoplay();
+            },
+            handleTouchMove(e) {
+                if (!this.isDragging) return;
+                
+                this.touchEndX = e.touches[0].clientX;
+                const diff = this.touchStartX - this.touchEndX;
+                
+                // Check if we should prevent browser swipe
+                const canScrollLeft = this.currentSlide > 0;
+                const canScrollRight = this.currentSlide < this.slides.length - 1;
+                const isSwipingLeft = diff > 0;
+                const isSwipingRight = diff < 0;
+                
+                // Prevent browser swipe only if slider can handle the gesture
+                if ((isSwipingLeft && canScrollRight) || (isSwipingRight && canScrollLeft)) {
+                    e.preventDefault();
+                }
+            },
+            handleTouchEnd(e) {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                const diff = this.touchStartX - this.touchEndX;
+                const threshold = 50; // Minimum swipe distance
+                
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0 && this.currentSlide < this.slides.length - 1) {
+                        // Swipe left - go to next slide
+                        this.nextSlide();
+                    } else if (diff < 0 && this.currentSlide > 0) {
+                        // Swipe right - go to previous slide
+                        this.prevSlide();
+                    }
+                }
+                
+                this.startAutoplay();
+            },
+            // Initialize touch properties
+            touchStartX: 0,
+            touchEndX: 0,
+            isDragging: false
          }"
          @mouseenter="stopAutoplay()"
-         @mouseleave="startAutoplay()">
+         @mouseleave="startAutoplay()"
+         @touchstart="handleTouchStart($event)"
+         @touchmove="handleTouchMove($event)"
+         @touchend="handleTouchEnd($event)">
     
     <!-- Slider Container with Overlay Navigation -->
     <div class="relative h-[300px] md:h-[400px]">
