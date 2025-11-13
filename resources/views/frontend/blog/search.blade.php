@@ -138,63 +138,10 @@
             </div>
 
             <!-- Sidebar -->
-            <div class="space-y-8">
-                <!-- Search Tips -->
-                <div class="bg-blue-50 rounded-lg shadow-md p-6 border border-blue-100">
-                    <h3 class="text-lg font-bold text-gray-900 mb-3">Search Tips</h3>
-                    <ul class="space-y-2 text-sm text-gray-700">
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Use specific keywords</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Try different word variations</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Check spelling</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Categories -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Browse by Category</h3>
-                    <ul class="space-y-2">
-                        @foreach($categories as $category)
-                        <li>
-                            <a href="{{ route('blog.category', $category->slug) }}" 
-                               class="flex items-center justify-between text-gray-700 hover:text-blue-600">
-                                <span>{{ $category->name }}</span>
-                                @if($category->published_posts_count > 0)
-                                <span class="text-sm text-gray-500">{{ $category->published_posts_count }}</span>
-                                @endif
-                            </a>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <!-- Back to Blog -->
-                <div class="bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg shadow-md p-6 border border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">Browse All Posts</h3>
-                    <p class="text-sm text-gray-600 mb-4">Explore our complete collection of articles</p>
-                    <a href="{{ route('blog.index') }}" 
-                       class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                        View All Posts
-                    </a>
-                </div>
-            </div>
+            <x-blog.search-sidebar 
+                :query="$query"
+                :categories="$categories"
+            />
         </div>
     </div>
 </div>

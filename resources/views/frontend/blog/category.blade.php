@@ -7,95 +7,19 @@
 <div class="bg-gray-50 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left Sidebar - Sticky -->
-            <aside class="lg:col-span-3">
-                <div class="lg:sticky lg:top-8 space-y-6">
-                    <!-- Wellness Hub + Categories Combined -->
-                    <div class="bg-white rounded-lg shadow-sm">
-                        <!-- Logo/Brand Header -->
-                        <div class="px-6 py-4 border-b border-gray-200">
-                            <h2 class="text-2xl font-bold text-gray-900">
-                                @if($category->parent_id)
-                                    {{ $category->parent->name }}
-                                @else
-                                    Wellness Hub
-                                @endif
-                            </h2>
-                            @if($category->parent_id)
-                            <p class="text-xs text-gray-500 mt-1">Subcategories</p>
-                            @endif
-                        </div>
-                        
-                        <!-- Categories Navigation -->
-                        <nav class="py-2">
-                            <!-- Home Link -->
-                            <a href="{{ route('home') }}" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                </svg>
-                                <span class="font-medium">Home</span>
-                            </a>
-
-                            <!-- Back to Parent Category (if viewing subcategory) -->
-                            @if($category->parent_id)
-                            <a href="{{ route('blog.category', $category->parent->slug) }}" 
-                               class="flex items-center gap-3 px-6 py-3 text-blue-600 hover:bg-blue-50 transition-colors group border-b border-gray-100">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
-                                <span class="font-medium">Back to {{ $category->parent->name }}</span>
-                            </a>
-                            @endif
-
-                            <!-- View All in Parent Category (if has subcategories) -->
-                            @if($category->children()->where('is_active', true)->count() > 0)
-                            <a href="{{ route('blog.category', $category->slug) }}" 
-                               class="flex items-center gap-3 px-6 py-3 bg-green-50 text-green-700 transition-colors group">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-                                </svg>
-                                <span class="font-medium">All {{ $category->name }}</span>
-                            </a>
-                            @endif
-
-                            <!-- Dynamic Categories from Database -->
-                            @foreach($categories as $cat)
-                                <a href="{{ route('blog.category', $cat->slug) }}" 
-                                   class="flex items-center justify-between gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group {{ $cat->id === $category->id ? 'bg-green-50 text-green-700' : '' }}">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                                        <!-- Category Image or Fallback Icon -->
-                                        @if($cat->image_path)
-                                            <div class="w-8 h-8 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
-                                                <img 
-                                                    src="{{ asset('storage/' . $cat->image_path) }}" 
-                                                    alt="{{ $cat->name }}"
-                                                    class="w-full h-full object-cover"
-                                                >
-                                            </div>
-                                        @else
-                                            <div class="w-8 h-8 flex-shrink-0 rounded-md bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center">
-                                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                                </svg>
-                                            </div>
-                                        @endif
-                                        <span class="font-medium truncate">{{ $cat->name }}</span>
-                                    </div>
-                                    @if(isset($cat->posts_count) && $cat->posts_count > 0)
-                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                                            {{ $cat->posts_count }}
-                                        </span>
-                                    @elseif(isset($cat->published_posts_count) && $cat->published_posts_count > 0)
-                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                                            {{ $cat->published_posts_count }}
-                                        </span>
-                                    @endif
-                                </a>
-                            @endforeach
-                        </nav>
-                    </div>
-                </div>
-            </aside>
+            <!-- Left Sidebar - Collapsible -->
+            <x-blog.sidebar 
+                :title="$category->parent_id ? $category->parent->name : 'Wellness Hub'"
+                :subtitle="$category->parent_id ? 'Subcategories' : 'Health & Lifestyle Blog'"
+                :categories="$categories"
+                :currentCategory="$category"
+                :showBackLink="$category->parent_id"
+                :backLinkUrl="$category->parent_id ? route('blog.category', $category->parent->slug) : null"
+                :backLinkText="$category->parent_id ? 'Back to ' . $category->parent->name : null"
+                :showAllLink="$category->children()->where('is_active', true)->count() > 0"
+                :allLinkUrl="$category->children()->where('is_active', true)->count() > 0 ? route('blog.category', $category->slug) : null"
+                :allLinkText="$category->children()->where('is_active', true)->count() > 0 ? 'All ' . $category->name : null"
+            />
 
             <!-- Main Content -->
             <div class="lg:col-span-9">
