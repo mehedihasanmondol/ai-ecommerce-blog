@@ -38,7 +38,6 @@ jobs:
             **/.git*
             **/.github*
             **/node_modules/**
-            **/vendor/**
             **/.env
             **/storage/logs/**
             **/storage/framework/**
