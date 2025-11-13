@@ -17,9 +17,10 @@
 --}}
 
 <!-- Top Announcement Bar -->
-<div class="bg-gradient-to-r from-green-600 to-green-700 text-white text-sm">
+<div class="bg-gradient-to-r from-green-600 to-green-700 text-white text-sm" x-data="topbarSlider()">
     <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between py-2">
+        <!-- Desktop View -->
+        <div class="hidden md:flex items-center justify-between py-2">
             <div class="flex items-center space-x-4">
                 <a href="{{ route('coupons.index') }}" class="flex items-center hover:text-green-100 transition">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,8 +72,101 @@
                 @endif
             </div>
         </div>
+
+        <!-- Mobile View - Slider -->
+        <div class="md:hidden relative py-2">
+            <!-- Previous Button -->
+            <button 
+                @click="prev()" 
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-green-800/50 hover:bg-green-800 p-1.5 rounded-r transition-colors"
+                aria-label="Previous">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+
+            <!-- Slider Container -->
+            <div class="overflow-hidden mx-8">
+                <div 
+                    class="flex transition-transform duration-300 ease-in-out"
+                    :style="`transform: translateX(-${currentSlide * 100}%)`">
+                    
+                    <!-- Slide 1: Special Offers -->
+                    <div class="w-full flex-shrink-0 flex justify-center">
+                        <a href="{{ route('coupons.index') }}" class="flex items-center hover:text-green-100 transition">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            <span class="font-medium text-xs sm:text-sm">Special Offers & Coupons</span>
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Slide 2: Shop Now -->
+                    <div class="w-full flex-shrink-0 flex justify-center">
+                        <a href="{{ route('shop') }}" class="flex items-center hover:text-green-100 transition">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium text-xs sm:text-sm">Shop Now</span>
+                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Button -->
+            <button 
+                @click="next()" 
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-green-800/50 hover:bg-green-800 p-1.5 rounded-l transition-colors"
+                aria-label="Next">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
+        </div>
     </div>
 </div>
+
+<script>
+function topbarSlider() {
+    return {
+        currentSlide: 0,
+        totalSlides: 2,
+        autoplayInterval: null,
+        
+        init() {
+            this.startAutoplay();
+        },
+        
+        next() {
+            this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
+            this.resetAutoplay();
+        },
+        
+        prev() {
+            this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+            this.resetAutoplay();
+        },
+        
+        startAutoplay() {
+            this.autoplayInterval = setInterval(() => {
+                this.next();
+            }, 4000); // Change slide every 4 seconds
+        },
+        
+        resetAutoplay() {
+            clearInterval(this.autoplayInterval);
+            this.startAutoplay();
+        }
+    }
+}
+</script>
 
 <!-- Main Header -->
 <header class="bg-white shadow-sm sticky top-0 z-50">
