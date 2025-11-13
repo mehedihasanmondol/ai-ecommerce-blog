@@ -9,8 +9,8 @@
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-        style="display: none;">
+        class="fixed inset-0 z-40 lg:hidden"
+        style="display: none; background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
     </div>
 
     <!-- Mobile Menu Sidebar -->
@@ -35,16 +35,22 @@
             
             <!-- Header -->
             <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
-                @auth
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <h2 class="text-lg font-semibold text-gray-900">Welcome!</h2>
-                    </div>
-                @else
-                    <h2 class="text-lg font-semibold text-gray-900">Menu</h2>
-                @endauth
+                @php
+                    $siteLogo = \App\Models\SiteSetting::get('site_logo');
+                    $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
+                @endphp
+                
+                <div class="flex items-center">
+                    @if($siteLogo)
+                        <img src="{{ asset('storage/' . $siteLogo) }}" 
+                             alt="{{ $siteName }}" 
+                             class="h-8 w-auto">
+                    @else
+                        <div class="bg-green-600 text-white font-bold text-lg px-2.5 py-1 rounded">
+                            {{ $siteName }}
+                        </div>
+                    @endif
+                </div>
                 
                 <button wire:click="closeMenu" class="text-gray-500 hover:text-gray-700 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,8 +125,13 @@
                     <p class="px-4 py-3 text-gray-500">No categories available</p>
                 @endforelse
 
-                <!-- Additional Links -->
+                <!-- Secondary Menu Links -->
+                @php
+                    $secondaryMenuItems = \App\Models\SecondaryMenuItem::active()->ordered()->get();
+                @endphp
+                
                 <div class="border-t border-gray-200 my-2 pt-2">
+                    <!-- Blog Link -->
                     <a href="{{ route('blog.index') }}" 
                        class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition font-medium">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,13 +140,36 @@
                         Blog
                     </a>
                     
-                    <a href="{{ route('brands.index') }}" 
-                       class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition font-medium">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                        </svg>
-                        Brands
-                    </a>
+                    @if($secondaryMenuItems->isNotEmpty())
+                        @foreach($secondaryMenuItems as $item)
+                            @if($item->type === 'link')
+                                <a href="{{ $item->url }}" 
+                                   class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition font-medium"
+                                   @if($item->open_new_tab) target="_blank" rel="noopener noreferrer" @endif>
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                    </svg>
+                                    {{ $item->label }}
+                                </a>
+                            @elseif($item->type === 'dropdown')
+                                <!-- Dropdown items as individual links for mobile -->
+                                <div class="ml-4 border-l-2 border-gray-100 pl-4 space-y-1">
+                                    <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        {{ $item->label }}
+                                    </div>
+                                    <a href="/about" class="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded transition">
+                                        About Us
+                                    </a>
+                                    <a href="/contact" class="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded transition">
+                                        Contact
+                                    </a>
+                                    <a href="/faq" class="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-green-50 hover:text-green-600 rounded transition">
+                                        FAQ
+                                    </a>
+                                </div>
+                            @endif
+                        @endforeach
+                    @endif
                 </div>
 
                 @auth
