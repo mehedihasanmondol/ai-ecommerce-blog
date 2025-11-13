@@ -169,37 +169,68 @@
                 <!-- Recommended Products -->
                 @if($recommendedProducts->count() > 0)
                 <div class="bg-white rounded-lg shadow-sm p-6 mt-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Recommended for you</h2>
+                    <h2 class="text-xl font-bold text-gray-900 mb-6">Recommended for you</h2>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        @foreach($recommendedProducts as $product)
-                            @php
-                                // Convert array data to object-like structure for the unified component
-                                $productObj = (object) $product;
-                                $productObj->slug = $product['slug'];
-                                $productObj->name = $product['name'];
-                                $productObj->brand = $product['brand'] ? (object) ['name' => $product['brand']] : null;
-                                $productObj->average_rating = $product['rating'] ?? 0;
-                                $productObj->review_count = $product['reviews'] ?? 0;
-                                
-                                // Create a mock variant for the unified component
-                                $variant = (object) [
-                                    'id' => $product['variant_id'] ?? 1,
-                                    'price' => $product['original_price'] ?? $product['price'],
-                                    'sale_price' => $product['price'],
-                                    'stock_quantity' => 10 // Assume in stock
-                                ];
-                                $productObj->variants = collect([$variant]);
-                                
-                                // Create a mock image for the unified component
-                                $image = (object) [
-                                    'image_path' => $product['image'],
-                                    'is_primary' => true
-                                ];
-                                $productObj->images = collect($product['image'] ? [$image] : []);
-                            @endphp
-                            <x-product-card-unified :product="$productObj" size="default" />
-                        @endforeach
+                    <!-- Products Carousel -->
+                    <div class="relative">
+                        <!-- Navigation Buttons -->
+                        <button 
+                            onclick="scrollCarousel('cart-recommended', 'left')" 
+                            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-all border border-gray-200"
+                            aria-label="Previous products"
+                        >
+                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        
+                        <button 
+                            onclick="scrollCarousel('cart-recommended', 'right')" 
+                            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50 transition-all border border-gray-200"
+                            aria-label="Next products"
+                        >
+                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Products Slider -->
+                        <div 
+                            id="cart-recommended" 
+                            class="flex gap-4 overflow-x-auto scroll-smooth pb-4 scrollbar-hide"
+                            style="scrollbar-width: none; -ms-overflow-style: none;"
+                        >
+                            @foreach($recommendedProducts as $product)
+                                @php
+                                    // Convert array data to object-like structure for the unified component
+                                    $productObj = (object) $product;
+                                    $productObj->slug = $product['slug'];
+                                    $productObj->name = $product['name'];
+                                    $productObj->brand = $product['brand'] ? (object) ['name' => $product['brand']] : null;
+                                    $productObj->average_rating = $product['rating'] ?? 0;
+                                    $productObj->review_count = $product['reviews'] ?? 0;
+                                    
+                                    // Create a mock variant for the unified component
+                                    $variant = (object) [
+                                        'id' => $product['variant_id'] ?? 1,
+                                        'price' => $product['original_price'] ?? $product['price'],
+                                        'sale_price' => $product['price'],
+                                        'stock_quantity' => 10 // Assume in stock
+                                    ];
+                                    $productObj->variants = collect([$variant]);
+                                    
+                                    // Create a mock image for the unified component
+                                    $image = (object) [
+                                        'image_path' => $product['image'],
+                                        'is_primary' => true
+                                    ];
+                                    $productObj->images = collect($product['image'] ? [$image] : []);
+                                @endphp
+                                <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+                                    <x-product-card-unified :product="$productObj" size="default" />
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
                 @endif
@@ -660,6 +691,29 @@ function cartPage() {
         }
     }
 }
+
+// Carousel scroll function for recommended products
+function scrollCarousel(carouselId, direction) {
+    const carousel = document.getElementById(carouselId);
+    const scrollAmount = 220; // Card width + gap
+    
+    if (direction === 'left') {
+        carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+        carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+
+// Hide scrollbar for webkit browsers
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    `;
+    document.head.appendChild(style);
+});
 </script>
 @endpush
 @endsection
