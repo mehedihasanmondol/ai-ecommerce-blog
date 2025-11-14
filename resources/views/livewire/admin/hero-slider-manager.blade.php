@@ -47,15 +47,15 @@
                 </button>
             </div>
         @else
-            <div class="space-y-4" wire:sortable="updateOrder">
+            <div class="space-y-4" id="sliders-list">
                 @foreach($sliders as $slider)
                     <div 
+                        data-slider-id="{{ $slider->id }}"
                         wire:key="slider-{{ $slider->id }}"
-                        wire:sortable.item="{{ $slider->id }}"
-                        class="group relative bg-white border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all duration-200"
+                        class="slider-item group relative bg-white border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all duration-200"
                     >
                         <!-- Drag Handle -->
-                        <div wire:sortable.handle class="absolute left-2 top-1/2 -translate-y-1/2 cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="drag-handle absolute left-2 top-1/2 -translate-y-1/2 cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
                             </svg>
@@ -160,6 +160,95 @@
             </div>
         @endif
     </div>
+
+    <!-- SortableJS Script -->
+    @push('styles')
+    <style>
+        /* Drag and Drop Styles */
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #f3e8ff !important;
+            border: 2px dashed #a855f7 !important;
+        }
+        
+        .sortable-drag {
+            opacity: 0.9;
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.3);
+            transform: rotate(3deg) scale(1.02);
+            cursor: grabbing !important;
+        }
+        
+        .sortable-chosen {
+            background: #faf5ff;
+            border-color: #a855f7 !important;
+        }
+        
+        .sortable-chosen .drag-handle {
+            opacity: 1 !important;
+            color: #9333ea !important;
+        }
+        
+        .drag-handle {
+            cursor: grab;
+            user-select: none;
+        }
+        
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        
+        .slider-item {
+            transition: all 0.2s ease;
+        }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            initializeSortable();
+            
+            Livewire.hook('morph.updated', () => {
+                initializeSortable();
+            });
+        });
+
+        function initializeSortable() {
+            const slidersList = document.getElementById('sliders-list');
+            if (slidersList && !slidersList.sortableInstance) {
+                slidersList.sortableInstance = new Sortable(slidersList, {
+                    handle: '.drag-handle',
+                    animation: 200,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    chosenClass: 'sortable-chosen',
+                    forceFallback: false,
+                    fallbackTolerance: 3,
+                    scroll: true,
+                    scrollSensitivity: 60,
+                    scrollSpeed: 10,
+                    bubbleScroll: true,
+                    onStart: function(evt) {
+                        evt.item.style.cursor = 'grabbing';
+                    },
+                    onEnd: function(evt) {
+                        evt.item.style.cursor = '';
+                        
+                        const orderedIds = Array.from(slidersList.children)
+                            .map(item => item.getAttribute('data-slider-id'))
+                            .filter(id => id !== null);
+                        
+                        if (orderedIds.length > 0) {
+                            @this.call('updateOrder', orderedIds);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    @endpush
 
     <!-- Modal for Create/Edit -->
     @if($showModal)
