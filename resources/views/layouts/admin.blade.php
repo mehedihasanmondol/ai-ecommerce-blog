@@ -684,5 +684,74 @@
     <x-confirm-modal />
 
     @stack('scripts')
+
+    <!-- Auto-scroll to active menu item -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to scroll sidebar to active menu item
+            function scrollToActiveMenuItem(sidebar) {
+                if (!sidebar) return;
+                
+                // Find the active menu item within this sidebar
+                const activeMenuItem = sidebar.querySelector('nav a.bg-blue-50');
+                
+                if (activeMenuItem) {
+                    // Small delay to ensure sidebar is fully rendered
+                    setTimeout(() => {
+                        // Calculate the position to scroll to
+                        const sidebarRect = sidebar.getBoundingClientRect();
+                        const menuItemRect = activeMenuItem.getBoundingClientRect();
+                        
+                        // Calculate the offset from the top of the sidebar
+                        const offsetTop = menuItemRect.top - sidebarRect.top + sidebar.scrollTop;
+                        
+                        // Calculate the center position (subtract half of sidebar height)
+                        const sidebarHeight = sidebar.clientHeight;
+                        const scrollPosition = offsetTop - (sidebarHeight / 2) + (activeMenuItem.offsetHeight / 2);
+                        
+                        // Smooth scroll to the active menu item
+                        sidebar.scrollTo({
+                            top: Math.max(0, scrollPosition),
+                            behavior: 'smooth'
+                        });
+                    }, 100);
+                }
+            }
+            
+            // Handle desktop sidebar (always visible on desktop)
+            const desktopSidebar = document.querySelector('aside.hidden.lg\\:block');
+            if (desktopSidebar) {
+                scrollToActiveMenuItem(desktopSidebar);
+            }
+            
+            // Handle mobile sidebar (when it becomes visible)
+            const mobileSidebar = document.querySelector('aside.lg\\:hidden');
+            if (mobileSidebar) {
+                // Create a MutationObserver to watch for when mobile sidebar becomes visible
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            // Check if sidebar is now visible (not display: none)
+                            const isVisible = !mobileSidebar.style.display || mobileSidebar.style.display !== 'none';
+                            if (isVisible && mobileSidebar.offsetParent !== null) {
+                                scrollToActiveMenuItem(mobileSidebar);
+                            }
+                        }
+                    });
+                });
+                
+                // Start observing
+                observer.observe(mobileSidebar, {
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+                
+                // Also scroll immediately if mobile sidebar is already visible
+                if (mobileSidebar.offsetParent !== null) {
+                    scrollToActiveMenuItem(mobileSidebar);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
