@@ -195,20 +195,45 @@
             @endif
 
             <!-- Mobile Apps -->
+            @php
+                $mobileAppsEnabled = \App\Models\FooterSetting::get('mobile_apps_enabled', '1');
+                $mobileAppsTitle = \App\Models\FooterSetting::get('mobile_apps_title', 'MOBILE APPS');
+                $qrCodeEnabled = \App\Models\FooterSetting::get('qr_code_enabled', '1');
+                $qrCodeImage = \App\Models\FooterSetting::get('qr_code_image', '');
+                $googlePlayEnabled = \App\Models\FooterSetting::get('google_play_enabled', '1');
+                $googlePlayUrl = \App\Models\FooterSetting::get('google_play_url', '#');
+                $appStoreEnabled = \App\Models\FooterSetting::get('app_store_enabled', '1');
+                $appStoreUrl = \App\Models\FooterSetting::get('app_store_url', '#');
+            @endphp
+            
+            @if($mobileAppsEnabled)
             <div>
-                <h4 class="font-bold text-gray-900 mb-4 uppercase text-sm">MOBILE APPS</h4>
+                <h4 class="font-bold text-gray-900 mb-4 uppercase text-sm">{{ $mobileAppsTitle }}</h4>
                 <div class="space-y-3">
-                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <span class="text-xs text-gray-500">QR Code</span>
-                    </div>
-                    <a href="#" class="block">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" class="h-10">
-                    </a>
-                    <a href="#" class="block">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" class="h-10">
-                    </a>
+                    @if($qrCodeEnabled)
+                        <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                            @if($qrCodeImage)
+                                <img src="{{ asset('storage/' . $qrCodeImage) }}" alt="QR Code" class="w-full h-full object-cover rounded-lg">
+                            @else
+                                <span class="text-xs text-gray-500">QR Code</span>
+                            @endif
+                        </div>
+                    @endif
+                    
+                    @if($googlePlayEnabled && $googlePlayUrl !== '#')
+                        <a href="{{ $googlePlayUrl }}" class="block" target="_blank" rel="noopener">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="h-10">
+                        </a>
+                    @endif
+                    
+                    @if($appStoreEnabled && $appStoreUrl !== '#')
+                        <a href="{{ $appStoreUrl }}" class="block" target="_blank" rel="noopener">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" class="h-10">
+                        </a>
+                    @endif
                 </div>
             </div>
+            @endif
         </div>
     </div>
 

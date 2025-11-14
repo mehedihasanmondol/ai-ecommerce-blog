@@ -20,8 +20,22 @@ class FooterManagementController extends Controller
 
     public function updateSettings(Request $request)
     {
-        foreach ($request->except('_token') as $key => $value) {
+        foreach ($request->except(['_token', 'qr_code_image']) as $key => $value) {
+            // Handle checkbox values
+            if (in_array($key, ['mobile_apps_enabled', 'qr_code_enabled', 'google_play_enabled', 'app_store_enabled'])) {
+                $value = $request->has($key) ? '1' : '0';
+            }
+            
             FooterSetting::where('key', $key)->update(['value' => $value]);
+        }
+
+        // Handle QR code image upload
+        if ($request->hasFile('qr_code_image')) {
+            $file = $request->file('qr_code_image');
+            $filename = time() . '_qr_code.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('footer/qr-codes', $filename, 'public');
+            
+            FooterSetting::where('key', 'qr_code_image')->update(['value' => $path]);
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully!');

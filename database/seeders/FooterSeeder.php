@@ -26,6 +26,16 @@ class FooterSeeder extends Seeder
         
         // Legal
         FooterSetting::create(['key' => 'copyright_text', 'value' => 'iHerb.com  Copyright 1997-2025 iHerb, Ltd. All rights reserved.', 'type' => 'html', 'group' => 'legal']);
+        
+        // Mobile Apps
+        FooterSetting::create(['key' => 'mobile_apps_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'mobile_apps_title', 'value' => 'MOBILE APPS', 'type' => 'text', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'qr_code_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'qr_code_image', 'value' => '', 'type' => 'image', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'google_play_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'google_play_url', 'value' => '#', 'type' => 'url', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'app_store_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'mobile_apps']);
+        FooterSetting::create(['key' => 'app_store_url', 'value' => '#', 'type' => 'url', 'group' => 'mobile_apps']);
 
         // Footer Links - About Section
         FooterLink::create(['section' => 'about', 'title' => 'About us', 'url' => '#', 'sort_order' => 1]);

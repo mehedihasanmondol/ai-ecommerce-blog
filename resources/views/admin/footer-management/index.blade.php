@@ -45,6 +45,9 @@
                 <button onclick="showTab('social')" id="tab-social" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-share-alt mr-2"></i>Social Media
                 </button>
+                <button onclick="showTab('mobile')" id="tab-mobile" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-mobile-alt mr-2"></i>Mobile Apps
+                </button>
             </nav>
         </div>
 
@@ -154,6 +157,134 @@
                     </button>
                 </form>
             </div>
+
+            <!-- Mobile Apps Tab -->
+            <div id="content-mobile" class="tab-content hidden">
+                <form action="{{ route('admin.footer-management.update-settings') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="space-y-6">
+                        <!-- Mobile Apps Section Toggle -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Mobile Apps Section</h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="mobile_apps_enabled" value="1" 
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'mobile_apps_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Enable Mobile Apps Section</span>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Section Title</label>
+                                <input type="text" name="mobile_apps_title" 
+                                       value="{{ $settings['mobile_apps']->firstWhere('key', 'mobile_apps_title')->value ?? 'MOBILE APPS' }}" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="MOBILE APPS">
+                            </div>
+                        </div>
+
+                        <!-- QR Code Settings -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">QR Code</h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="qr_code_enabled" value="1" 
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'qr_code_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Show QR Code</span>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">QR Code Image</label>
+                                <input type="file" name="qr_code_image" id="qr_code_image" accept="image/*" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       onchange="previewQRCode(this)">
+                                <p class="text-xs text-gray-500 mt-1">Upload a QR code image (PNG, JPG, SVG). Recommended size: 96x96px</p>
+                                
+                                <!-- QR Code Preview Container -->
+                                <div class="mt-3 flex items-start space-x-4">
+                                    @php
+                                        $qrCodeImage = $settings['mobile_apps']->firstWhere('key', 'qr_code_image')->value ?? '';
+                                    @endphp
+                                    
+                                    <!-- Current QR Code -->
+                                    @if($qrCodeImage)
+                                        <div id="current-qr-container">
+                                            <img src="{{ asset('storage/' . $qrCodeImage) }}" alt="Current QR Code" class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200">
+                                            <p class="text-xs text-gray-500 mt-1 text-center">Current</p>
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Preview QR Code (Hidden by default) -->
+                                    <div id="preview-qr-container" class="hidden">
+                                        <img id="qr-preview" src="" alt="QR Code Preview" class="w-24 h-24 object-cover rounded-lg border-2 border-blue-500">
+                                        <p class="text-xs text-blue-600 mt-1 text-center font-medium">New Preview</p>
+                                        <button type="button" onclick="clearQRPreview()" class="text-xs text-red-600 hover:text-red-800 mt-1 block mx-auto">
+                                            <i class="fas fa-times mr-1"></i>Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Play Store -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <i class="fab fa-google-play mr-2 text-green-600"></i>Google Play Store
+                                </h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="google_play_enabled" value="1" 
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'google_play_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Show Google Play Button</span>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Google Play Store URL</label>
+                                <input type="text" name="google_play_url" 
+                                       value="{{ $settings['mobile_apps']->firstWhere('key', 'google_play_url')->value ?? '#' }}" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="https://play.google.com/store/apps/details?id=your.app.id">
+                            </div>
+                        </div>
+
+                        <!-- Apple App Store -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <i class="fab fa-apple mr-2 text-gray-800"></i>Apple App Store
+                                </h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="app_store_enabled" value="1" 
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'app_store_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Show App Store Button</span>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Apple App Store URL</label>
+                                <input type="text" name="app_store_url" 
+                                       value="{{ $settings['mobile_apps']->firstWhere('key', 'app_store_url')->value ?? '#' }}" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="https://apps.apple.com/app/your-app-name/id123456789">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                            <i class="fas fa-save mr-2"></i>Save Mobile Apps Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -236,6 +367,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// QR Code Preview Functions
+function previewQRCode(input) {
+    const previewContainer = document.getElementById('preview-qr-container');
+    const previewImage = document.getElementById('qr-preview');
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file type
+        if (!file.type.match('image.*')) {
+            alert('Please select a valid image file.');
+            input.value = '';
+            return;
+        }
+        
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size must be less than 2MB.');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function clearQRPreview() {
+    const input = document.getElementById('qr_code_image');
+    const previewContainer = document.getElementById('preview-qr-container');
+    const previewImage = document.getElementById('qr-preview');
+    
+    // Clear the file input
+    input.value = '';
+    
+    // Hide preview container
+    previewContainer.classList.add('hidden');
+    
+    // Clear preview image source
+    previewImage.src = '';
+}
 </script>
 @endpush
 @endsection
