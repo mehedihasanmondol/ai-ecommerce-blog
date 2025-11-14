@@ -21,11 +21,6 @@ class FooterManagementController extends Controller
     public function updateSettings(Request $request)
     {
         foreach ($request->except(['_token', 'qr_code_image']) as $key => $value) {
-            // Handle checkbox values
-            if (in_array($key, ['mobile_apps_enabled', 'qr_code_enabled', 'google_play_enabled', 'app_store_enabled'])) {
-                $value = $request->has($key) ? '1' : '0';
-            }
-            
             FooterSetting::where('key', $key)->update(['value' => $value]);
         }
 

@@ -48,6 +48,9 @@
                 <button onclick="showTab('mobile')" id="tab-mobile" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                     <i class="fas fa-mobile-alt mr-2"></i>Mobile Apps
                 </button>
+                <button onclick="showTab('rewards')" id="tab-rewards" class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-gift mr-2"></i>Rewards
+                </button>
             </nav>
         </div>
 
@@ -160,6 +163,7 @@
 
             <!-- Mobile Apps Tab -->
             <div id="content-mobile" class="tab-content hidden">
+                
                 <form action="{{ route('admin.footer-management.update-settings') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="space-y-6">
@@ -168,8 +172,9 @@
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-semibold text-gray-900">Mobile Apps Section</h3>
                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="mobile_apps_enabled" value="0">
                                     <input type="checkbox" name="mobile_apps_enabled" value="1" 
-                                           {{ ($settings['mobile_apps']->firstWhere('key', 'mobile_apps_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'mobile_apps_enabled')->value ?? '1') == '1' ? 'checked' : '' }}
                                            class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     <span class="ml-3 text-sm font-medium text-gray-700">Enable Mobile Apps Section</span>
@@ -190,8 +195,9 @@
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="text-lg font-semibold text-gray-900">QR Code</h3>
                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="qr_code_enabled" value="0">
                                     <input type="checkbox" name="qr_code_enabled" value="1" 
-                                           {{ ($settings['mobile_apps']->firstWhere('key', 'qr_code_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'qr_code_enabled')->value ?? '1') == '1' ? 'checked' : '' }}
                                            class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     <span class="ml-3 text-sm font-medium text-gray-700">Show QR Code</span>
@@ -238,8 +244,9 @@
                                     <i class="fab fa-google-play mr-2 text-green-600"></i>Google Play Store
                                 </h3>
                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="google_play_enabled" value="0">
                                     <input type="checkbox" name="google_play_enabled" value="1" 
-                                           {{ ($settings['mobile_apps']->firstWhere('key', 'google_play_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'google_play_enabled')->value ?? '1') == '1' ? 'checked' : '' }}
                                            class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     <span class="ml-3 text-sm font-medium text-gray-700">Show Google Play Button</span>
@@ -262,8 +269,9 @@
                                     <i class="fab fa-apple mr-2 text-gray-800"></i>Apple App Store
                                 </h3>
                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="app_store_enabled" value="0">
                                     <input type="checkbox" name="app_store_enabled" value="1" 
-                                           {{ ($settings['mobile_apps']->firstWhere('key', 'app_store_enabled')->value ?? '1') ? 'checked' : '' }}
+                                           {{ ($settings['mobile_apps']->firstWhere('key', 'app_store_enabled')->value ?? '1') == '1' ? 'checked' : '' }}
                                            class="sr-only peer">
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     <span class="ml-3 text-sm font-medium text-gray-700">Show App Store Button</span>
@@ -281,6 +289,108 @@
 
                         <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
                             <i class="fas fa-save mr-2"></i>Save Mobile Apps Settings
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Rewards Tab -->
+            <div id="content-rewards" class="tab-content hidden">
+                @php
+                    // Debug: Check what's in settings
+                    $rewardsSettings = $settings['rewards'] ?? collect();
+                    $mobileAppsSettings = $settings['mobile_apps'] ?? collect();
+                @endphp
+                
+                
+                <form action="{{ route('admin.footer-management.update-settings') }}" method="POST">
+                    @csrf
+                    <div class="space-y-6">
+                        <!-- Rewards Section Toggle -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Rewards Section</h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="rewards_section_enabled" value="0">
+                                    <input type="checkbox" name="rewards_section_enabled" value="1" 
+                                           {{ (isset($settings['rewards']) && $settings['rewards']->firstWhere('key', 'rewards_section_enabled') ? $settings['rewards']->firstWhere('key', 'rewards_section_enabled')->value : '1') == '1' ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Enable Rewards Section</span>
+                                </label>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Brand Name</label>
+                                    <input type="text" name="rewards_brand_name" 
+                                           value="{{ isset($settings['rewards']) && $settings['rewards']->firstWhere('key', 'rewards_brand_name') ? $settings['rewards']->firstWhere('key', 'rewards_brand_name')->value : 'iHerb' }}" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                           placeholder="iHerb">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Section Title</label>
+                                    <input type="text" name="rewards_section_title" 
+                                           value="{{ $settings['rewards']->firstWhere('key', 'rewards_section_title')->value ?? 'REWARDS' }}" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                           placeholder="REWARDS">
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                <input type="text" name="rewards_description" 
+                                       value="{{ $settings['rewards']->firstWhere('key', 'rewards_description')->value ?? 'Enjoy free products, insider access and exclusive offers' }}" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Enjoy free products, insider access and exclusive offers">
+                            </div>
+                        </div>
+
+                        <!-- Rewards Link Settings -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <i class="fas fa-link mr-2 text-blue-600"></i>Rewards Link
+                                </h3>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="hidden" name="rewards_link_enabled" value="0">
+                                    <input type="checkbox" name="rewards_link_enabled" value="1" 
+                                           {{ ($settings['rewards']->firstWhere('key', 'rewards_link_enabled')->value ?? '1') == '1' ? 'checked' : '' }}
+                                           class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-3 text-sm font-medium text-gray-700">Make Rewards Section Clickable</span>
+                                </label>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rewards Page URL</label>
+                                <input type="text" name="rewards_link_url" 
+                                       value="{{ $settings['rewards']->firstWhere('key', 'rewards_link_url')->value ?? '#' }}" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="/rewards or https://example.com/rewards">
+                                <p class="text-xs text-gray-500 mt-1">URL where users will be redirected when clicking the rewards section</p>
+                            </div>
+                        </div>
+
+                        <!-- Preview Section -->
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                                <i class="fas fa-eye mr-2 text-green-600"></i>Preview
+                            </h3>
+                            <div class="bg-green-100 rounded-lg py-4 px-6 text-center">
+                                <div class="flex items-center justify-center gap-3">
+                                    <span class="text-2xl font-bold text-green-700" id="preview-brand-name">iHerb</span>
+                                    <span class="text-xl text-gray-600">|</span>
+                                    <span class="text-lg font-bold text-gray-900" id="preview-section-title">REWARDS</span>
+                                    <span class="text-gray-700 ml-4" id="preview-description">Enjoy free products, insider access and exclusive offers</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2 text-center">This is how the rewards section will appear in the footer</p>
+                        </div>
+
+                        <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                            <i class="fas fa-save mr-2"></i>Save Rewards Settings
                         </button>
                     </div>
                 </form>
@@ -413,6 +523,38 @@ function clearQRPreview() {
     // Clear preview image source
     previewImage.src = '';
 }
+
+// Rewards Preview Functions
+document.addEventListener('DOMContentLoaded', function() {
+    // Get input elements
+    const brandNameInput = document.querySelector('input[name="rewards_brand_name"]');
+    const sectionTitleInput = document.querySelector('input[name="rewards_section_title"]');
+    const descriptionInput = document.querySelector('input[name="rewards_description"]');
+    
+    // Get preview elements
+    const previewBrandName = document.getElementById('preview-brand-name');
+    const previewSectionTitle = document.getElementById('preview-section-title');
+    const previewDescription = document.getElementById('preview-description');
+    
+    // Update preview on input change
+    if (brandNameInput && previewBrandName) {
+        brandNameInput.addEventListener('input', function() {
+            previewBrandName.textContent = this.value || 'iHerb';
+        });
+    }
+    
+    if (sectionTitleInput && previewSectionTitle) {
+        sectionTitleInput.addEventListener('input', function() {
+            previewSectionTitle.textContent = this.value || 'REWARDS';
+        });
+    }
+    
+    if (descriptionInput && previewDescription) {
+        descriptionInput.addEventListener('input', function() {
+            previewDescription.textContent = this.value || 'Enjoy free products, insider access and exclusive offers';
+        });
+    }
+});
 </script>
 @endpush
 @endsection

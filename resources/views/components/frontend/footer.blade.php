@@ -85,18 +85,37 @@
         </div>
 
         <!-- Rewards Banner -->
-        <div class="bg-green-100 rounded-lg py-4 px-6 text-center">
-            <div class="flex items-center justify-center gap-3">
-                @php
-                    $siteName = \App\Models\SiteSetting::get('site_name', 'iHerb');
-                    $rewardsText = \App\Models\FooterSetting::get('rewards_text', 'Enjoy free products, insider access and exclusive offers');
-                @endphp
-                <span class="text-2xl font-bold text-green-700">{{ $siteName }}</span>
-                <span class="text-xl text-gray-600">|</span>
-                <span class="text-lg font-bold text-gray-900">REWARDS</span>
-                <span class="text-gray-700 ml-4">{{ $rewardsText }}</span>
-            </div>
-        </div>
+        @php
+            $rewardsSectionEnabled = \App\Models\FooterSetting::get('rewards_section_enabled', '1');
+            $rewardsBrandName = \App\Models\FooterSetting::get('rewards_brand_name', 'iHerb');
+            $rewardsSectionTitle = \App\Models\FooterSetting::get('rewards_section_title', 'REWARDS');
+            $rewardsDescription = \App\Models\FooterSetting::get('rewards_description', 'Enjoy free products, insider access and exclusive offers');
+            $rewardsLinkEnabled = \App\Models\FooterSetting::get('rewards_link_enabled', '1');
+            $rewardsLinkUrl = \App\Models\FooterSetting::get('rewards_link_url', '#');
+        @endphp
+        
+        
+        @if($rewardsSectionEnabled == '1')
+            @if($rewardsLinkEnabled == '1' && $rewardsLinkUrl !== '#')
+                <a href="{{ $rewardsLinkUrl }}" class="block bg-green-100 rounded-lg py-4 px-6 text-center hover:bg-green-200 transition-colors">
+                    <div class="flex items-center justify-center gap-3">
+                        <span class="text-2xl font-bold text-green-700">{{ $rewardsBrandName }}</span>
+                        <span class="text-xl text-gray-600">|</span>
+                        <span class="text-lg font-bold text-gray-900">{{ $rewardsSectionTitle }}</span>
+                        <span class="text-gray-700 ml-4">{{ $rewardsDescription }}</span>
+                    </div>
+                </a>
+            @else
+                <div class="bg-green-100 rounded-lg py-4 px-6 text-center">
+                    <div class="flex items-center justify-center gap-3">
+                        <span class="text-2xl font-bold text-green-700">{{ $rewardsBrandName }}</span>
+                        <span class="text-xl text-gray-600">|</span>
+                        <span class="text-lg font-bold text-gray-900">{{ $rewardsSectionTitle }}</span>
+                        <span class="text-gray-700 ml-4">{{ $rewardsDescription }}</span>
+                    </div>
+                </div>
+            @endif
+        @endif
     </div>
 </section>
 
@@ -206,11 +225,11 @@
                 $appStoreUrl = \App\Models\FooterSetting::get('app_store_url', '#');
             @endphp
             
-            @if($mobileAppsEnabled)
+            @if($mobileAppsEnabled == '1')
             <div>
                 <h4 class="font-bold text-gray-900 mb-4 uppercase text-sm">{{ $mobileAppsTitle }}</h4>
                 <div class="space-y-3">
-                    @if($qrCodeEnabled)
+                    @if($qrCodeEnabled == '1')
                         <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
                             @if($qrCodeImage)
                                 <img src="{{ asset('storage/' . $qrCodeImage) }}" alt="QR Code" class="w-full h-full object-cover rounded-lg">
@@ -220,13 +239,13 @@
                         </div>
                     @endif
                     
-                    @if($googlePlayEnabled && $googlePlayUrl !== '#')
+                    @if($googlePlayEnabled == '1' && $googlePlayUrl !== '#')
                         <a href="{{ $googlePlayUrl }}" class="block" target="_blank" rel="noopener">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get it on Google Play" class="h-10">
                         </a>
                     @endif
                     
-                    @if($appStoreEnabled && $appStoreUrl !== '#')
+                    @if($appStoreEnabled == '1' && $appStoreUrl !== '#')
                         <a href="{{ $appStoreUrl }}" class="block" target="_blank" rel="noopener">
                             <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="Download on the App Store" class="h-10">
                         </a>

@@ -36,6 +36,14 @@ class FooterSeeder extends Seeder
         FooterSetting::create(['key' => 'google_play_url', 'value' => '#', 'type' => 'url', 'group' => 'mobile_apps']);
         FooterSetting::create(['key' => 'app_store_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'mobile_apps']);
         FooterSetting::create(['key' => 'app_store_url', 'value' => '#', 'type' => 'url', 'group' => 'mobile_apps']);
+        
+        // Rewards Section
+        FooterSetting::create(['key' => 'rewards_section_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'rewards']);
+        FooterSetting::create(['key' => 'rewards_brand_name', 'value' => 'iHerb', 'type' => 'text', 'group' => 'rewards']);
+        FooterSetting::create(['key' => 'rewards_section_title', 'value' => 'REWARDS', 'type' => 'text', 'group' => 'rewards']);
+        FooterSetting::create(['key' => 'rewards_description', 'value' => 'Enjoy free products, insider access and exclusive offers', 'type' => 'text', 'group' => 'rewards']);
+        FooterSetting::create(['key' => 'rewards_link_url', 'value' => '#', 'type' => 'url', 'group' => 'rewards']);
+        FooterSetting::create(['key' => 'rewards_link_enabled', 'value' => '1', 'type' => 'boolean', 'group' => 'rewards']);
 
         // Footer Links - About Section
         FooterLink::create(['section' => 'about', 'title' => 'About us', 'url' => '#', 'sort_order' => 1]);
