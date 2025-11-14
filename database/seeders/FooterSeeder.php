@@ -13,7 +13,7 @@ class FooterSeeder extends Seeder
     {
         // General Settings
         FooterSetting::create(['key' => 'newsletter_title', 'value' => 'BE THE FIRST TO GET PROMO OFFERS AND REWARD PERKS STRAIGHT TO YOUR INBOX', 'type' => 'text', 'group' => 'general']);
-        FooterSetting::create(['key' => 'newsletter_description', 'value' => 'Your email address will be used to send you Health Newsletters and emails about our products, services, sales, and special offers.', 'type' => 'textarea', 'group' => 'general']);
+        FooterSetting::create(['key' => 'newsletter_description', 'value' => 'Your email address will be used to send you Health Newsletters and emails about our products, services, sales, and special offers.', 'type' => 'html', 'group' => 'general']);
         FooterSetting::create(['key' => 'value_guarantee', 'value' => 'World\'s best value - guaranteed!', 'type' => 'text', 'group' => 'general']);
         FooterSetting::create(['key' => 'rewards_text', 'value' => 'Enjoy free products, insider access and exclusive offers', 'type' => 'text', 'group' => 'general']);
         
@@ -25,7 +25,7 @@ class FooterSeeder extends Seeder
         FooterSetting::create(['key' => 'instagram_url', 'value' => '#', 'type' => 'url', 'group' => 'social']);
         
         // Legal
-        FooterSetting::create(['key' => 'copyright_text', 'value' => 'iHerb.com  Copyright 1997-2025 iHerb, Ltd. All rights reserved.', 'type' => 'textarea', 'group' => 'legal']);
+        FooterSetting::create(['key' => 'copyright_text', 'value' => 'iHerb.com  Copyright 1997-2025 iHerb, Ltd. All rights reserved.', 'type' => 'html', 'group' => 'legal']);
 
         // Footer Links - About Section
         FooterLink::create(['section' => 'about', 'title' => 'About us', 'url' => '#', 'sort_order' => 1]);
