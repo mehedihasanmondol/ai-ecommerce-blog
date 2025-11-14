@@ -43,7 +43,10 @@
         $settingsGroups = \App\Models\HomepageSetting::getAllGrouped();
         $firstGroup = array_key_first($settingsGroups);
     @endphp
-    <div class="flex flex-col lg:flex-row gap-6" x-data="{ activeTab: '{{ $firstGroup ?? 'general' }}', mobileMenuOpen: false }">
+    <div class="flex flex-col lg:flex-row gap-6" x-data="{ 
+                activeTab: 'hero_sliders',
+                mobileMenuOpen: false
+            }">
         <!-- Mobile Dropdown Navigation -->
         <div class="lg:hidden mb-4">
             <button 
@@ -71,6 +74,23 @@
                 @click.away="mobileMenuOpen = false"
                 class="mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
             >
+                <!-- Hero Sliders Mobile Menu Item -->
+                <button
+                    @click="activeTab = 'hero_sliders'; mobileMenuOpen = false;"
+                    :class="activeTab === 'hero_sliders' ? 'bg-purple-50 text-purple-700' : 'text-gray-700 hover:bg-gray-50'"
+                    class="w-full flex items-center space-x-3 px-4 py-3 border-b border-gray-100 transition-colors"
+                >
+                    <div :class="activeTab === 'hero_sliders' ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'" class="w-8 h-8 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1 text-left">
+                        <div class="font-medium capitalize text-sm">Hero Sliders</div>
+                        <div class="text-xs opacity-75">Manage sliders</div>
+                    </div>
+                </button>
+
                 @foreach($settingsGroups as $group => $groupSettings)
                     @php
                         $icons = [
@@ -110,9 +130,26 @@
                         </svg>
                         Settings Sections
                     </h3>
-                    <p class="text-xs text-gray-500 mt-1">{{ count($settingsGroups) }} sections available</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ count($settingsGroups) + 1 }} sections available</p>
                 </div>
                 <nav class="p-2 space-y-1">
+                    <!-- Hero Sliders Navigation -->
+                    <button
+                        @click="activeTab = 'hero_sliders'"
+                        :class="activeTab === 'hero_sliders' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'text-gray-700 hover:bg-gray-50 border-transparent'"
+                        class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all border-2 text-left group"
+                    >
+                        <div :class="activeTab === 'hero_sliders' ? 'bg-purple-100' : 'bg-gray-100 group-hover:bg-purple-50'" class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+                            <svg :class="activeTab === 'hero_sliders' ? 'text-purple-600' : 'text-gray-600 group-hover:text-purple-600'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-medium capitalize text-sm">Hero Sliders</div>
+                            <div class="text-xs opacity-75">Manage sliders</div>
+                        </div>
+                    </button>
+
                     @foreach($settingsGroups as $group => $groupSettings)
                         @php
                             $icons = [
@@ -153,6 +190,19 @@
 
         <!-- Main Content Area (Tab Panels) -->
         <div class="flex-1">
+            <!-- Hero Sliders Section -->
+            <div 
+                x-show="activeTab === 'hero_sliders'"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform scale-95"
+                x-transition:enter-end="opacity-100 transform scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 transform scale-100"
+                x-transition:leave-end="opacity-0 transform scale-95"
+            >
+                @livewire('admin.hero-slider-manager')
+            </div>
+
             @foreach($settingsGroups as $group => $groupSettings)
                 <div 
                     x-show="activeTab === '{{ $group }}'"
@@ -175,6 +225,11 @@
     // Toast Notification System
     document.addEventListener('livewire:init', () => {
         Livewire.on('setting-saved', (event) => {
+            const data = event[0] || event;
+            showToast(data.message, data.type);
+        });
+
+        Livewire.on('slider-saved', (event) => {
             const data = event[0] || event;
             showToast(data.message, data.type);
         });
@@ -232,5 +287,9 @@
         }, 4000);
     }
 </script>
+
+<!-- Livewire Sortable Scripts -->
+@livewireScripts
+<script src="https://cdn.jsdelivr.net/gh/livewire/sortable@v1.x.x/dist/livewire-sortable.js"></script>
 @endpush
 @endsection
