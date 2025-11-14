@@ -17,7 +17,11 @@ jobs:
         run: |
           composer install --no-dev --optimize-autoloader
           npm ci && npm run build
-
+          
+      - name: 📦 Publish Livewire Assets
+        run: |
+          php artisan livewire:publish --assets
+          
       - name: 🧹 Prepare Laravel for Production
         run: |
           php artisan key:generate || true
