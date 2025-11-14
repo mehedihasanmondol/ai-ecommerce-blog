@@ -89,41 +89,7 @@
 
             <!-- Footer Links Tab -->
             <div id="content-links" class="tab-content hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    @foreach(['about' => 'About', 'company' => 'Company', 'resources' => 'Resources', 'customer_support' => 'Customer Support'] as $section => $title)
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ $title }}</h3>
-                        
-                        <div class="space-y-2 mb-4">
-                            @foreach($links[$section] ?? [] as $link)
-                            <div class="flex items-center justify-between bg-white p-3 rounded border">
-                                <div class="flex-1">
-                                    <p class="font-medium text-gray-900">{{ $link->title }}</p>
-                                    <p class="text-xs text-gray-500">{{ $link->url }}</p>
-                                </div>
-                                <form action="{{ route('admin.footer-management.delete-link', $link) }}" method="POST" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('Delete this link?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                            @endforeach
-                        </div>
-
-                        <form action="{{ route('admin.footer-management.store-link') }}" method="POST" class="space-y-2">
-                            @csrf
-                            <input type="hidden" name="section" value="{{ $section }}">
-                            <input type="text" name="title" placeholder="Link Title" required class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
-                            <input type="text" name="url" placeholder="URL" required class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
-                            <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded">
-                                <i class="fas fa-plus mr-1"></i>Add Link
-                            </button>
-                        </form>
-                    </div>
-                    @endforeach
-                </div>
+                @livewire('admin.footer-links-manager')
             </div>
 
             <!-- Blog Posts Tab -->

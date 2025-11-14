@@ -13,10 +13,9 @@ class FooterManagementController extends Controller
     public function index()
     {
         $settings = FooterSetting::all()->groupBy('group');
-        $links = FooterLink::orderBy('section')->orderBy('sort_order')->get()->groupBy('section');
         $blogPosts = FooterBlogPost::orderBy('sort_order')->get();
 
-        return view('admin.footer-management.index', compact('settings', 'links', 'blogPosts'));
+        return view('admin.footer-management.index', compact('settings', 'blogPosts'));
     }
 
     public function updateSettings(Request $request)
@@ -28,36 +27,6 @@ class FooterManagementController extends Controller
         return redirect()->back()->with('success', 'Settings updated successfully!');
     }
 
-    public function storeLink(Request $request)
-    {
-        $validated = $request->validate([
-            'section' => 'required|string',
-            'title' => 'required|string|max:255',
-            'url' => 'required|string|max:255',
-        ]);
-
-        $validated['sort_order'] = FooterLink::where('section', $request->section)->max('sort_order') + 1;
-        FooterLink::create($validated);
-
-        return redirect()->back()->with('success', 'Link added successfully!');
-    }
-
-    public function updateLink(Request $request, FooterLink $link)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'url' => 'required|string|max:255',
-        ]);
-
-        $link->update($validated);
-        return response()->json(['success' => true]);
-    }
-
-    public function deleteLink(FooterLink $link)
-    {
-        $link->delete();
-        return redirect()->back()->with('success', 'Link deleted successfully!');
-    }
 
     public function storeBlogPost(Request $request)
     {
