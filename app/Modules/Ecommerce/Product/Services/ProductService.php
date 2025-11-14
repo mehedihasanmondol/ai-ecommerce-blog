@@ -114,10 +114,22 @@ class ProductService
             }
         }
         
-        $variant = $product->defaultVariant->first();
+        // Fix Issue 2: Use the correct relationship method to get the default variant
+        $variant = $product->defaultVariant;
         
         if ($variant) {
-            $variant->update($variantData);
+            // Fix Issue 1: Compare SKU and only update if it has changed
+            $updateData = $variantData;
+            
+            // If SKU is provided and it's the same as current SKU, remove it from update data
+            if (isset($variantData['sku']) && $variant->sku === $variantData['sku']) {
+                unset($updateData['sku']);
+            }
+            
+            // Only update if there's actually data to update
+            if (!empty($updateData)) {
+                $variant->update($updateData);
+            }
         } else {
             $this->createDefaultVariant($product, $variantData);
         }
@@ -199,7 +211,19 @@ class ProductService
 
     public function updateVariant(ProductVariant $variant, array $data): ProductVariant
     {
-        $variant->update($data);
+        // Apply the same SKU comparison logic to prevent duplicate entry errors
+        $updateData = $data;
+        
+        // If SKU is provided and it's the same as current SKU, remove it from update data
+        if (isset($data['sku']) && $variant->sku === $data['sku']) {
+            unset($updateData['sku']);
+        }
+        
+        // Only update if there's actually data to update
+        if (!empty($updateData)) {
+            $variant->update($updateData);
+        }
+        
         return $variant->fresh();
     }
 
