@@ -18,22 +18,22 @@ x-on:click.away="if (!maintainFocus) $wire.hideResults()"
     <!-- Search Input Container -->
     <div class="relative">
         <!-- Main Search Input -->
-        <div class="relative bg-white rounded-full lg:rounded-lg border border-gray-300 focus-within:border-green-500 lg:focus-within:border-orange-500 transition-all duration-200 shadow-sm lg:border-2">
+        <div class="relative bg-white rounded-full border border-gray-300 focus-within:border-gray-400 lg:focus-within:border-gray-400 transition-all duration-200">
             <input 
                 type="text" 
                 wire:model.live.debounce.300ms="query"
                 x-ref="searchInput"
                 x-on:focus="focused = true"
                 x-on:blur="setTimeout(() => { if (!maintainFocus) focused = false; }, 200)"
-                placeholder="Search" 
-                class="w-full px-4 py-2 lg:py-3 pr-10 lg:pr-16 text-sm lg:text-lg border-0 rounded-full lg:rounded-lg focus:outline-none focus:ring-0 bg-transparent"
+                placeholder="Search products, brands, categories..." 
+                class="w-full px-4 py-2 lg:py-3 pr-10 lg:pr-16 text-sm lg:text-lg border-0 rounded-full focus:outline-none focus:ring-0 bg-transparent"
                 autocomplete="off"
             >
             
             <!-- Search Button -->
             <button 
                 wire:click="search"
-                class="absolute right-1 lg:right-2 top-1/2 -translate-y-1/2 bg-transparent lg:bg-orange-500 hover:bg-gray-100 lg:hover:bg-orange-600 text-gray-500 lg:text-white p-1.5 lg:px-4 lg:py-2 rounded-full lg:rounded-md transition-colors flex items-center">
+                class="absolute right-1 lg:right-2 top-1/2 -translate-y-1/2 bg-transparent hover:bg-gray-100 text-gray-500 hover:text-gray-600 p-1.5 rounded-full transition-colors flex items-center">
                 <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
