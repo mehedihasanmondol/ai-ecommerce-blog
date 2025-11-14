@@ -153,9 +153,6 @@
                             Parent
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Slug
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Children
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -201,9 +198,6 @@
                             @else
                                 <span class="text-sm text-gray-400">—</span>
                             @endif
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-600 font-mono">{{ $category->slug }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm text-gray-900">{{ $category->children_count }}</span>
@@ -258,7 +252,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
+                        <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <i class="fas fa-tags text-4xl text-gray-300 mb-4"></i>
                                 <p class="text-gray-500 text-lg font-medium">No categories found</p>

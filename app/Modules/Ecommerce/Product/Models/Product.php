@@ -248,4 +248,13 @@ class Product extends Model
     {
         return $this->product_type === 'affiliate';
     }
+
+    /**
+     * Disable automatic slug updates during editing
+     * Users must manually generate slugs using the "Generate" button
+     */
+    public function shouldAutoUpdateSlug(): bool
+    {
+        return false;
+    }
 }

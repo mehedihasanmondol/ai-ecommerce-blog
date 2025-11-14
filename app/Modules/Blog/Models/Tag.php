@@ -2,6 +2,8 @@
 
 namespace App\Modules\Blog\Models;
 
+use App\Traits\HasSeo;
+use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -28,7 +30,7 @@ use Illuminate\Support\Str;
  */
 class Tag extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSeo, HasUniqueSlug;
 
     protected $table = 'blog_tags';
 
@@ -49,17 +51,12 @@ class Tag extends Model
     ];
 
     /**
-     * Boot method to handle model events
+     * Disable automatic slug updates during editing
+     * Users must manually generate slugs using the "Generate" button
      */
-    protected static function boot()
+    public function shouldAutoUpdateSlug(): bool
     {
-        parent::boot();
-
-        static::creating(function ($tag) {
-            if (empty($tag->slug)) {
-                $tag->slug = Str::slug($tag->name);
-            }
-        });
+        return false;
     }
 
     /**

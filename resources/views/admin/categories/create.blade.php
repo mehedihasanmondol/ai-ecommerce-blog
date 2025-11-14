@@ -46,13 +46,24 @@
                     <!-- Slug -->
                     <div>
                         <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">
-                            Slug <span class="text-xs text-gray-500">(Auto-generated if empty)</span>
+                            Slug
                         </label>
-                        <input type="text" 
-                               name="slug" 
-                               id="slug" 
-                               value="{{ old('slug') }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('slug') border-red-500 @enderror">
+                        <div class="flex gap-2">
+                            <input type="text" 
+                                   name="slug" 
+                                   id="slug" 
+                                   value="{{ old('slug') }}"
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('slug') border-red-500 @enderror">
+                            <button type="button" 
+                                    onclick="generateSlug()"
+                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Generate
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Manually edit the slug or click "Generate" to create from category name</p>
                         @error('slug')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -308,6 +319,33 @@
 
 @push('scripts')
 <script>
+function generateSlug() {
+    const nameInput = document.getElementById('name');
+    const slugInput = document.getElementById('slug');
+    
+    if (!nameInput.value.trim()) {
+        alert('Please enter a category name first.');
+        nameInput.focus();
+        return;
+    }
+    
+    // Generate slug from name
+    let slug = nameInput.value
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+        .replace(/[\s_-]+/g, '-') // Replace spaces, underscores, and multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, ''); // Remove leading and trailing hyphens
+    
+    slugInput.value = slug;
+    
+    // Add visual feedback
+    slugInput.classList.add('ring-2', 'ring-green-500');
+    setTimeout(() => {
+        slugInput.classList.remove('ring-2', 'ring-green-500');
+    }, 1000);
+}
+
 function previewImage(event) {
     const file = event.target.files[0];
     const preview = document.getElementById('imagePreview');

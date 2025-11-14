@@ -64,10 +64,22 @@
                 {{-- Slug --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Slug *</label>
-                    <input type="text" 
-                           wire:model="slug" 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                           placeholder="product-slug">
+                    <div class="flex gap-2">
+                        <input type="text" 
+                               wire:model="slug" 
+                               id="product-slug"
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="product-slug">
+                        <button type="button" 
+                                onclick="generateProductSlug()"
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Generate
+                        </button>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Manually edit the slug or click "Generate" to create from product name</p>
                     @error('slug') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
@@ -442,3 +454,35 @@
         </form>
     </div>
 </div>
+
+<script>
+function generateProductSlug() {
+    // Get the name input from Livewire
+    const nameInput = document.querySelector('input[wire\\:model\\.live\\.debounce\\.300ms="name"]');
+    const slugInput = document.getElementById('product-slug');
+    
+    if (!nameInput || !nameInput.value.trim()) {
+        alert('Please enter a product name first.');
+        if (nameInput) nameInput.focus();
+        return;
+    }
+    
+    // Generate slug from name
+    let slug = nameInput.value
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+        .replace(/[\s_-]+/g, '-') // Replace spaces, underscores, and multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, ''); // Remove leading and trailing hyphens
+    
+    // Update the slug input and trigger Livewire update
+    slugInput.value = slug;
+    slugInput.dispatchEvent(new Event('input', { bubbles: true }));
+    
+    // Add visual feedback
+    slugInput.classList.add('ring-2', 'ring-green-500');
+    setTimeout(() => {
+        slugInput.classList.remove('ring-2', 'ring-green-500');
+    }, 1000);
+}
+</script>

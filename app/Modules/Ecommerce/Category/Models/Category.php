@@ -221,4 +221,13 @@ class Category extends Model
     {
         return $this->image ? asset('storage/' . $this->image) : null;
     }
+
+    /**
+     * Disable automatic slug updates during editing
+     * Users must manually generate slugs using the "Generate" button
+     */
+    public function shouldAutoUpdateSlug(): bool
+    {
+        return false;
+    }
 }

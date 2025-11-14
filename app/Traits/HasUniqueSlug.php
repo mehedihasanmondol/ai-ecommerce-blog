@@ -25,6 +25,11 @@ trait HasUniqueSlug
         });
 
         static::updating(function ($model) {
+            // Check if model wants to disable auto-slug updates
+            if (method_exists($model, 'shouldAutoUpdateSlug') && !$model->shouldAutoUpdateSlug()) {
+                return;
+            }
+            
             if ($model->isDirty('name') && !$model->isDirty('slug')) {
                 $model->slug = $model->generateUniqueSlug($model->name);
             }

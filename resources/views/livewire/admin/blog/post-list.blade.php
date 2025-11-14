@@ -219,7 +219,21 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $post->author->name }}</div>
+                            <div class="flex justify-center">
+                                @if($post->author->avatar)
+                                    <img src="{{ asset('storage/' . $post->author->avatar) }}" 
+                                         alt="{{ $post->author->name }}"
+                                         title="{{ $post->author->name }}"
+                                         class="h-8 w-8 rounded-full object-cover">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center"
+                                         title="{{ $post->author->name }}">
+                                        <span class="text-xs font-medium text-gray-600">
+                                            {{ strtoupper(substr($post->author->name, 0, 2)) }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">{{ $post->category->name ?? 'Uncategorized' }}</div>

@@ -115,6 +115,15 @@ class Brand extends Model
     }
 
     /**
+     * Disable automatic slug updates during editing
+     * Users must manually generate slugs using the "Generate" button
+     */
+    public function shouldAutoUpdateSlug(): bool
+    {
+        return false;
+    }
+
+    /**
      * Get website URL with protocol
      */
     public function getWebsiteUrl(): ?string

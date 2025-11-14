@@ -137,4 +137,13 @@ class BlogCategory extends Model
     {
         return ['blog_categories'];
     }
+
+    /**
+     * Disable automatic slug updates during editing
+     * Users must manually generate slugs using the "Generate" button
+     */
+    public function shouldAutoUpdateSlug(): bool
+    {
+        return false;
+    }
 }
