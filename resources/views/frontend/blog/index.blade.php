@@ -40,7 +40,7 @@
                         <div class="flex items-center gap-3 w-full lg:w-auto">
                             <!-- Sort Filter -->
                             <select name="sort" 
-                                    onchange="window.location.href='{{ route('blog.index') }}?sort=' + this.value + '{{ request('q') ? '&q=' . request('q') : '' }}'"
+                                    onchange="window.location.href='{{ route('blog.index') }}?sort=' + this.value + '{{ request('q') ? '&q=' . request('q') : '' }}{{ request('filter') ? '&filter=' . request('filter') : '' }}'"
                                     class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm">
                                 <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest First</option>
                                 <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
@@ -50,7 +50,7 @@
 
                             <!-- Per Page Filter -->
                             <select name="per_page" 
-                                    onchange="window.location.href='{{ route('blog.index') }}?per_page=' + this.value + '{{ request('q') ? '&q=' . request('q') : '' }}{{ request('sort') ? '&sort=' . request('sort') : '' }}'"
+                                    onchange="window.location.href='{{ route('blog.index') }}?per_page=' + this.value + '{{ request('q') ? '&q=' . request('q') : '' }}{{ request('sort') ? '&sort=' . request('sort') : '' }}{{ request('filter') ? '&filter=' . request('filter') : '' }}'"
                                     class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm">
                                 <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 per page</option>
                                 <option value="20" {{ request('per_page', 10) == 20 ? 'selected' : '' }}>20 per page</option>
@@ -88,7 +88,7 @@
                     </div>
 
                     <!-- Active Filters Display -->
-                    @if(request('q') || request('sort'))
+                    @if(request('q') || request('sort') || request('filter'))
                     <div class="mt-4 flex flex-wrap items-center gap-2">
                         <span class="text-sm text-gray-600">Active filters:</span>
                         @if(request('q'))
@@ -107,6 +107,24 @@
                             Sort: {{ ucfirst(request('sort')) }}
                             <a href="{{ route('blog.index') }}?{{ http_build_query(array_filter(request()->except('sort'))) }}" 
                                class="hover:text-blue-900">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </a>
+                        </span>
+                        @endif
+                        @if(request('filter'))
+                        <span class="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-sm px-3 py-1 rounded-full">
+                            Filter: 
+                            @if(request('filter') === 'popular')
+                                Most Popular
+                            @elseif(request('filter') === 'articles')
+                                Articles Only
+                            @elseif(request('filter') === 'videos')
+                                Videos Only
+                            @endif
+                            <a href="{{ route('blog.index') }}?{{ http_build_query(array_filter(request()->except('filter'))) }}" 
+                               class="hover:text-purple-900">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>

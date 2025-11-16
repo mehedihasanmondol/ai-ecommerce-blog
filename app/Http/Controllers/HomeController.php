@@ -66,7 +66,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    protected function showDefaultHomepage()
+    public function showDefaultHomepage()
     {
         // Get featured products (limit 12 for slider)
         $featuredProducts = Product::with(['variants', 'category', 'brand', 'images'])

@@ -40,9 +40,70 @@ class BlogController extends Controller
     /**
      * Blog listing page
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = $this->postService->getPublishedPosts(config('app.paginate', 10));
+        // Get filter parameters
+        $filter = $request->input('filter');
+        $sort = $request->input('sort', 'latest');
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('q');
+        
+        // Build query
+        $query = \App\Modules\Blog\Models\Post::where('status', 'published')
+            ->where('published_at', '<=', now());
+        
+        // Apply filters
+        switch ($filter) {
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+                
+            case 'articles':
+                // Posts without YouTube video
+                $query->where(function($q) {
+                    $q->whereNull('youtube_url')
+                      ->orWhere('youtube_url', '');
+                });
+                break;
+                
+            case 'videos':
+                // Posts with YouTube video
+                $query->whereNotNull('youtube_url')
+                      ->where('youtube_url', '!=', '');
+                break;
+        }
+        
+        // Apply search
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('excerpt', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply sorting (if not already sorted by filter)
+        if ($filter !== 'popular') {
+            switch ($sort) {
+                case 'oldest':
+                    $query->orderBy('published_at', 'asc');
+                    break;
+                case 'popular':
+                    $query->orderBy('views_count', 'desc');
+                    break;
+                case 'title':
+                    $query->orderBy('title', 'asc');
+                    break;
+                case 'latest':
+                default:
+                    $query->orderBy('published_at', 'desc');
+                    break;
+            }
+        }
+        
+        // Paginate
+        $posts = $query->with(['author', 'category', 'tags'])->paginate($perPage)->appends($request->query());
+        
         $featuredPosts = $this->postService->getFeaturedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
@@ -53,7 +114,8 @@ class BlogController extends Controller
             'featuredPosts',
             'popularPosts',
             'categories',
-            'popularTags'
+            'popularTags',
+            'filter'
         ));
     }
 

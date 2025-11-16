@@ -14,6 +14,9 @@ use App\Http\Controllers\PaymentController;
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/ecommerce', function() {
+    return app(HomeController::class)->showDefaultHomepage();
+})->name('ecommerce');
 Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');

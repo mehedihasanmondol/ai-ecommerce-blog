@@ -64,13 +64,29 @@
                 x-transition:leave-start="opacity-100 max-h-screen"
                 x-transition:leave-end="opacity-0 max-h-0"
             >
-                <!-- Home Link -->
-                <a href="{{ route('home') }}" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group">
+                <!-- Ecommerce Link -->
+                <a href="{{ route('ecommerce') }}" class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group">
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
                     <span class="font-medium">Home</span>
                 </a>
+                
+                <!-- Most Popular Link -->
+                <a href="{{ route('blog.index', ['sort' => 'popular']) }}" 
+                   class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group {{ request('filter') === 'popular' ? 'bg-green-50 text-green-700' : '' }}">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <span class="font-medium">Most Popular</span>
+                </a>
+
+                <!-- Categories Section -->
+                <div class="border-t border-gray-200 mt-2 pt-2">
+                    <div class="px-6 py-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Categories</h3>
+                    </div>
+                </div>
 
                 <!-- Back Link (if provided) -->
                 @if($showBackLink && $backLinkUrl)
@@ -130,6 +146,34 @@
                         @endif
                     </a>
                 @endforeach
+                
+                <!-- Articles & Videos Section -->
+                <div class="border-t border-gray-200 mt-2 pt-2">
+                    <div class="px-6 py-2">
+                        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Content Type</h3>
+                    </div>
+                    
+                    <!-- Articles Filter -->
+                    <a href="{{ route('blog.index', ['filter' => 'articles']) }}" 
+                       class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group {{ request('filter') === 'articles' ? 'bg-green-50 text-green-700' : '' }}">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="font-medium">Articles</span>
+                    </a>
+                    
+                    <!-- Videos Filter -->
+                    <a href="{{ route('blog.index', ['filter' => 'videos']) }}" 
+                       class="flex items-center gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group {{ request('filter') === 'videos' ? 'bg-green-50 text-green-700' : '' }}">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-medium">Videos</span>
+                    </a>
+                </div>
+                
+                
             </nav>
         </div>
     </div>
