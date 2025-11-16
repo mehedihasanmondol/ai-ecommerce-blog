@@ -4,6 +4,7 @@ namespace App\Modules\User\Services;
 
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\Models\UserActivity;
+use App\Services\AuthorProfileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -29,10 +30,14 @@ use Illuminate\Support\Facades\Storage;
 class UserService
 {
     protected UserRepository $userRepository;
+    protected AuthorProfileService $authorProfileService;
 
-    public function __construct(UserRepository $userRepository)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        AuthorProfileService $authorProfileService
+    ) {
         $this->userRepository = $userRepository;
+        $this->authorProfileService = $authorProfileService;
     }
 
     /**
@@ -77,6 +82,12 @@ class UserService
                 $this->userRepository->syncRoles($user->id, $data['roles']);
             }
 
+            // Create author profile if user has author role
+            $user->load('roles'); // Reload user with roles
+            if ($this->authorProfileService->userHasAuthorRole($user)) {
+                $this->authorProfileService->createOrUpdateAuthorProfile($user->id, $data);
+            }
+
             // Log activity
             $this->logActivity($user->id, 'user_created', 'User account created');
 
@@ -107,6 +118,9 @@ class UserService
                 ];
             }
 
+            // Store old role for comparison
+            $oldRole = $user->role;
+
             // Hash password if provided
             if (isset($data['password']) && !empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
@@ -128,6 +142,23 @@ class UserService
             // Sync roles if provided
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $this->userRepository->syncRoles($id, $data['roles']);
+            }
+
+            // Reload user with updated roles
+            $user->refresh();
+            $user->load('roles');
+
+            // Handle author profile based on role change
+            $newRole = $data['role'] ?? $oldRole;
+            $this->authorProfileService->handleRoleChange($user, $oldRole, $newRole);
+
+            // If user is author, update or create author profile
+            if ($this->authorProfileService->userHasAuthorRole($user)) {
+                $this->authorProfileService->createOrUpdateAuthorProfile($user->id, $data);
+            } elseif ($oldRole === 'author' && $newRole !== 'author') {
+                // User is no longer an author - optionally delete profile
+                // Commented out to preserve author data
+                // $this->authorProfileService->deleteAuthorProfile($user->id);
             }
 
             // Log activity

@@ -129,3 +129,42 @@ Host not accessible
 Fix:
 
 npm run dev -- --host
+
+
+
+Since your **mobile doesn’t know “localhost” on your PC**, those CSS/JS files fail to load.
+
+---
+
+## ✅ **Fix (for Vite)**
+
+### 1️⃣ Edit your `vite.config.js`
+Open your project root file `vite.config.js`  
+and **add this server configuration**:
+
+```js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    server: {
+        host: '0.0.0.0',        // allow network access
+        port: 5173,             // or any port you like
+        hmr: {
+            host: '192.168.x.x', // your computer's local IP
+        },
+    },
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+    ],
+});
+
+🧩 Step 2 — Run Laravel server bound to that IP
+
+By default, Laravel’s artisan server only listens on 127.0.0.1 (localhost).
+You need to tell it to listen on all network interfaces (0.0.0.0).
+
+php artisan serve --host=0.0.0.0 --port=8000

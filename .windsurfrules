@@ -19,7 +19,7 @@ This is a Laravel-based ecommerce and blog platform with stock management, finan
 
 
 ### All documentation tasks must follow this rule**
-- Whenever we create or update or read any documentation file, it must be saved inside the development-docs folder.
+- Whenever we create or update or read any documentation file, it must be saved inside the 'development-docs' folder.
 - No documentation should be placed outside this folder except 'editor-task-management.md' .
 
 
@@ -236,6 +236,10 @@ app/Repositories/
  * @updated  [Date]
  */
 ```
+
+### All documentation tasks must follow this rule**
+- Whenever we create or update or read any documentation file, it must be saved inside the 'development-docs' folder.
+- No documentation should be placed outside this folder except 'editor-task-management.md' .
 
 **Update CHANGELOG.md after every feature:**
 ```markdown

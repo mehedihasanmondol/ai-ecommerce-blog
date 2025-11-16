@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('mobile', 255)->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255);
-            $table->enum('role', ['admin','customer'])->default('customer');
+            $table->enum('role', ['admin','customer','author'])->default('customer');
             $table->string('google_id', 255)->nullable();
             $table->string('facebook_id', 255)->nullable();
             $table->string('apple_id', 255)->nullable();

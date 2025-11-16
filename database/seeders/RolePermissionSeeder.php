@@ -87,6 +87,13 @@ class RolePermissionSeeder extends Seeder
             'is_active' => true,
         ]);
 
+        $authorRole = Role::create([
+            'name' => 'Author',
+            'slug' => 'author',
+            'description' => 'Write and manage own blog posts',
+            'is_active' => true,
+        ]);
+
         $customerRole = Role::create([
             'name' => 'Customer',
             'slug' => 'customer',
@@ -104,6 +111,10 @@ class RolePermissionSeeder extends Seeder
         // Assign specific permissions to Editor
         $editorPermissions = Permission::where('module', 'blog')->get();
         $editorRole->permissions()->attach($editorPermissions);
+
+        // Assign blog permissions to Author (create and edit own posts)
+        $authorPermissions = Permission::whereIn('slug', ['posts.view', 'posts.create', 'posts.edit'])->get();
+        $authorRole->permissions()->attach($authorPermissions);
 
         $this->command->info('Roles and permissions seeded successfully!');
     }

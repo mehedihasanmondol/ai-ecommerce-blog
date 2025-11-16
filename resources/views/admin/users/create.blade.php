@@ -137,10 +137,13 @@
                                 </span>
                             </label>
                             <select name="role" 
+                                    id="user-role-select"
                                     class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('role') border-red-500 @enderror"
+                                    onchange="toggleAuthorSection()"
                                     required>
                                 <option value="">Select Role</option>
                                 <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="author" {{ old('role') == 'author' ? 'selected' : '' }}>Author</option>
                                 <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Customer</option>
                             </select>
                             @error('role')
@@ -292,6 +295,223 @@
                 </div>
                 @endif
 
+                <!-- Author Information (Only visible for Author role) -->
+                <div id="author-info-section" 
+                     class="space-y-6 {{ old('role') == 'author' ? '' : 'hidden' }}">
+                    <div class="flex items-center gap-3 pb-4 border-b-2 border-orange-100">
+                        <div class="p-2 bg-orange-100 rounded-lg">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900">Author Profile Information</h3>
+                        <span class="ml-auto text-xs bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">
+                            Author-Specific Fields
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Bio -->
+                        <div class="md:col-span-2 group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-orange-600 transition-colors">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                    </svg>
+                                    Author Bio
+                                </span>
+                            </label>
+                            <textarea name="author_bio" 
+                                      rows="4"
+                                      placeholder="Write a brief bio about this author"
+                                      class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">{{ old('author_bio') }}</textarea>
+                        </div>
+
+                        <!-- Job Title -->
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-orange-600 transition-colors">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    Job Title
+                                </span>
+                            </label>
+                            <input type="text" 
+                                   name="author_job_title" 
+                                   value="{{ old('author_job_title') }}"
+                                   placeholder="e.g., Health Writer, Nutritionist"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                        </div>
+
+                        <!-- Website -->
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-orange-600 transition-colors">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                    </svg>
+                                    Website URL
+                                </span>
+                            </label>
+                            <input type="url" 
+                                   name="author_website" 
+                                   value="{{ old('author_website') }}"
+                                   placeholder="https://example.com"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="md:col-span-2">
+                            <h4 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                </svg>
+                                Social Media Links
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Twitter -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Twitter Handle</label>
+                                    <div class="flex items-center">
+                                        <span class="px-3 py-3 bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-lg text-gray-600 text-sm">@</span>
+                                        <input type="text" 
+                                               name="author_twitter" 
+                                               value="{{ old('author_twitter') }}"
+                                               placeholder="username"
+                                               class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                    </div>
+                                </div>
+
+                                <!-- Facebook -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Facebook Username</label>
+                                    <input type="text" 
+                                           name="author_facebook" 
+                                           value="{{ old('author_facebook') }}"
+                                           placeholder="username"
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                </div>
+
+                                <!-- LinkedIn -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">LinkedIn Username</label>
+                                    <input type="text" 
+                                           name="author_linkedin" 
+                                           value="{{ old('author_linkedin') }}"
+                                           placeholder="username"
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                </div>
+
+                                <!-- Instagram -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Instagram Handle</label>
+                                    <div class="flex items-center">
+                                        <span class="px-3 py-3 bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-lg text-gray-600 text-sm">@</span>
+                                        <input type="text" 
+                                               name="author_instagram" 
+                                               value="{{ old('author_instagram') }}"
+                                               placeholder="username"
+                                               class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                    </div>
+                                </div>
+
+                                <!-- GitHub -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">GitHub Username</label>
+                                    <input type="text" 
+                                           name="author_github" 
+                                           value="{{ old('author_github') }}"
+                                           placeholder="username"
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                </div>
+
+                                <!-- YouTube -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">YouTube Channel</label>
+                                    <div class="flex items-center">
+                                        <span class="px-3 py-3 bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-lg text-gray-600 text-sm">@</span>
+                                        <input type="text" 
+                                               name="author_youtube" 
+                                               value="{{ old('author_youtube') }}"
+                                               placeholder="channelname"
+                                               class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Author Avatar -->
+                        <div class="md:col-span-2 group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 group-hover:text-orange-600 transition-colors">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Author Profile Picture
+                                    <span class="text-xs text-gray-500 font-normal">(Optional - separate from user avatar)</span>
+                                </span>
+                            </label>
+                            <div class="flex items-center gap-4">
+                                <div class="h-24 w-24 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center border-4 border-orange-100 shadow-md" id="author-avatar-placeholder">
+                                    <svg class="w-12 h-12 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <input type="file" 
+                                           name="author_avatar" 
+                                           accept="image/*"
+                                           id="author-avatar-upload"
+                                           class="hidden"
+                                           onchange="previewAuthorAvatar(event)">
+                                    <label for="author-avatar-upload" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-orange-500 cursor-pointer transition-all duration-200">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                        Choose Author Image
+                                    </label>
+                                    <p class="mt-2 text-xs text-gray-500">JPG, PNG or GIF (MAX. 2MB). This image will appear on blog posts.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Featured Author -->
+                        <div class="md:col-span-2 bg-gradient-to-r from-orange-50 to-yellow-50 p-4 rounded-xl border-2 border-orange-100">
+                            <label class="flex items-center space-x-3 cursor-pointer group">
+                                <input type="checkbox" 
+                                       name="author_is_featured" 
+                                       value="1"
+                                       {{ old('author_is_featured') ? 'checked' : '' }}
+                                       class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 w-5 h-5">
+                                <div>
+                                    <span class="text-sm font-bold text-gray-900 group-hover:text-orange-700 transition-colors">Featured Author</span>
+                                    <p class="text-xs text-gray-600 mt-0.5">Display this author in the featured authors section</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <!-- Display Order -->
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2 group-hover:text-orange-600 transition-colors">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                    </svg>
+                                    Display Order
+                                </span>
+                            </label>
+                            <input type="number" 
+                                   name="author_display_order" 
+                                   value="{{ old('author_display_order', 0) }}"
+                                   min="0"
+                                   placeholder="0"
+                                   class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                            <p class="mt-1 text-xs text-gray-500">Lower numbers appear first in lists</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Status -->
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-100">
                     <label class="flex items-center space-x-4 cursor-pointer group">
@@ -364,5 +584,46 @@ function previewAvatar(event) {
         reader.readAsDataURL(file);
     }
 }
+
+function previewAuthorAvatar(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Find the author avatar preview
+            const placeholder = document.getElementById('author-avatar-placeholder');
+            
+            if (placeholder) {
+                // Replace placeholder with new image
+                placeholder.outerHTML = `
+                    <div class="h-24 w-24">
+                        <img src="${e.target.result}" alt="Author Preview" id="author-avatar-preview" class="h-24 w-24 rounded-full object-cover border-4 border-orange-100 shadow-md hover:border-orange-300 transition-all">
+                    </div>
+                `;
+            }
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function toggleAuthorSection() {
+    const roleSelect = document.getElementById('user-role-select');
+    const authorSection = document.getElementById('author-info-section');
+    
+    if (roleSelect && authorSection) {
+        const selectedRole = roleSelect.value;
+        
+        if (selectedRole === 'author') {
+            authorSection.classList.remove('hidden');
+        } else {
+            authorSection.classList.add('hidden');
+        }
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAuthorSection();
+});
 </script>
 @endpush
