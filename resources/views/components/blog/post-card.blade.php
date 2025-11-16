@@ -1,74 +1,43 @@
 @props([
     'post',
-    'showSlider' => true,
     'class' => ''
 ])
 
-<article class="bg-white overflow-hidden  group {{ $class }}">
-    <!-- Media Section (Image/Video) -->
-    <a href="{{ route('products.show', $post->slug) }}" class="block">
-        @if($showSlider && $post->featured_image && $post->youtube_url)
-            <!-- Slider with both image and video -->
-            <div class="aspect-video overflow-hidden relative media-slider" id="slider-{{ $post->id }}">
-                <div class="slider-container relative w-full h-full">
-                    <!-- Featured Image Slide -->
-                    <div class="slider-slide active absolute inset-0 transition-opacity duration-500">
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                             alt="{{ $post->featured_image_alt }}"
-                             class="w-full h-full object-cover">
-                    </div>
-                    
-                    <!-- YouTube Video Slide -->
-                    <div class="slider-slide absolute inset-0 opacity-0 transition-opacity duration-500">
-                        <iframe src="{{ $post->youtube_embed_url }}" 
-                                class="w-full h-full"
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                loading="lazy">
-                        </iframe>
+<article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group {{ $class }}">
+    <!-- Media Section (Thumbnail with Video Badge) -->
+    <a href="{{ route('products.show', $post->slug) }}" class="block relative">
+        @if($post->youtube_url)
+            <!-- YouTube Video Thumbnail (Priority) -->
+            <div class="aspect-video overflow-hidden relative">
+                <img src="https://img.youtube.com/vi/{{ $post->youtube_video_id }}/maxresdefault.jpg" 
+                     alt="{{ $post->title }}"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                     onerror="this.src='https://img.youtube.com/vi/{{ $post->youtube_video_id }}/hqdefault.jpg'">
+                
+                <!-- Video Play Badge -->
+                <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+                    <div class="bg-red-600 rounded-full p-4 group-hover:scale-110 transition-transform shadow-lg">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                        </svg>
                     </div>
                 </div>
                 
-                <!-- Slider Navigation -->
-                <div class="absolute bottom-3 right-3 flex gap-2 z-10">
-                    <button type="button" onclick="changeSlide({{ $post->id }}, 'prev')" 
-                            class="bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all hover:scale-110">
-                        <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <button type="button" onclick="changeSlide({{ $post->id }}, 'next')" 
-                            class="bg-white/90 hover:bg-white p-2 rounded-full shadow-lg transition-all hover:scale-110">
-                        <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Slide Indicators -->
-                <div class="absolute bottom-3 left-3 flex gap-2 z-10">
-                    <div class="w-2 h-2 rounded-full bg-white shadow-lg" data-indicator="0"></div>
-                    <div class="w-2 h-2 rounded-full bg-white/50 shadow-lg" data-indicator="1"></div>
+                <!-- YouTube Badge -->
+                <div class="absolute top-3 right-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                    </svg>
+                    VIDEO
                 </div>
             </div>
         @elseif($post->featured_image)
-            <!-- Only Featured Image -->
+            <!-- Featured Image -->
             <div class="aspect-video overflow-hidden">
                 <img src="{{ asset('storage/' . $post->featured_image) }}" 
                      alt="{{ $post->featured_image_alt }}"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-            </div>
-        @elseif($post->youtube_url)
-            <!-- Only YouTube Video -->
-            <div class="aspect-video overflow-hidden">
-                <iframe src="{{ $post->youtube_embed_url }}" 
-                        class="w-full h-full"
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen
-                        loading="lazy">
-                </iframe>
             </div>
         @else
             <!-- Placeholder -->

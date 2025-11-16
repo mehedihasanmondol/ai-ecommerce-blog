@@ -234,7 +234,7 @@
                     <!-- Grid View with Masonry Layout -->
                     <div x-show="viewMode === 'grid'" class="masonry-grid">
                         @forelse($posts as $post)
-                            <x-blog.post-card :post="$post" :showSlider="true" />
+                            <x-blog.post-card :post="$post" />
                         @empty
                         <div class="bg-white rounded-lg shadow-md p-12 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,89 +259,32 @@
 
 @push('styles')
 <style>
-    /* Masonry Grid Layout */
+    /* Masonry Layout using CSS Columns */
     .masonry-grid {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        gap: 1.5rem;
-        grid-auto-flow: dense;
+        column-count: 1;
+        column-gap: 1.5rem;
     }
     
     @media (min-width: 768px) {
         .masonry-grid {
-            grid-template-columns: repeat(2, 1fr);
+            column-count: 2;
         }
     }
     
     @media (min-width: 1024px) {
         .masonry-grid {
-            grid-template-columns: repeat(3, 1fr);
+            column-count: 3;
         }
     }
     
-    /* Ensure items fit naturally */
+    /* Prevent items from breaking across columns */
     .masonry-grid > * {
-        grid-row: span 1;
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        width: 100%;
     }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-    // Media Slider Functionality - Global for all post cards
-    window.sliders = window.sliders || {};
-    
-    window.changeSlide = function(postId, direction) {
-        const slider = document.getElementById('slider-' + postId);
-        if (!slider) return;
-        
-        const slides = slider.querySelectorAll('.slider-slide');
-        const indicators = slider.querySelectorAll('[data-indicator]');
-        
-        // Initialize slider state if not exists
-        if (!window.sliders[postId]) {
-            window.sliders[postId] = { currentSlide: 0 };
-        }
-        
-        // Hide current slide
-        slides[window.sliders[postId].currentSlide].classList.remove('active');
-        slides[window.sliders[postId].currentSlide].classList.add('opacity-0');
-        indicators[window.sliders[postId].currentSlide].classList.remove('bg-white');
-        indicators[window.sliders[postId].currentSlide].classList.add('bg-white/50');
-        
-        // Calculate next slide
-        if (direction === 'next') {
-            window.sliders[postId].currentSlide = (window.sliders[postId].currentSlide + 1) % slides.length;
-        } else {
-            window.sliders[postId].currentSlide = (window.sliders[postId].currentSlide - 1 + slides.length) % slides.length;
-        }
-        
-        // Show new slide
-        slides[window.sliders[postId].currentSlide].classList.add('active');
-        slides[window.sliders[postId].currentSlide].classList.remove('opacity-0');
-        indicators[window.sliders[postId].currentSlide].classList.add('bg-white');
-        indicators[window.sliders[postId].currentSlide].classList.remove('bg-white/50');
-    };
-    
-    // Initialize sliders on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeSliders();
-    });
-    
-    function initializeSliders() {
-        const mediaSliders = document.querySelectorAll('.media-slider');
-        
-        mediaSliders.forEach(slider => {
-            const postId = slider.id.replace('slider-', '');
-            window.sliders[postId] = { currentSlide: 0 };
-            
-            // Auto-advance every 5 seconds (optional)
-            setInterval(() => {
-                window.changeSlide(postId, 'next');
-            }, 5000);
-        });
-    }
-</script>
 @endpush
 
 @endsection
