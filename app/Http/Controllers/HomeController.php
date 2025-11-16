@@ -10,6 +10,8 @@ use App\Models\SaleOffer;
 use App\Models\TrendingProduct;
 use App\Models\BestSellerProduct;
 use App\Models\NewArrivalProduct;
+use App\Models\SiteSetting;
+use App\Models\User;
 
 /**
  * ModuleName: Home Controller
@@ -33,9 +35,38 @@ class HomeController extends Controller
     /**
      * Display the homepage
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index()
+    {
+        // Check homepage type setting
+        $homepageType = SiteSetting::get('homepage_type', config('homepage.default_type', 'default'));
+        
+        // Handle different homepage types
+        switch ($homepageType) {
+            case 'author_profile':
+                return $this->showAuthorHomepage();
+                
+            // Future extensible types can be added here:
+            // case 'category_page':
+            //     return $this->showCategoryHomepage();
+            // case 'blog_index':
+            //     return redirect()->route('blog.index');
+            // case 'custom_page':
+            //     return $this->showCustomPageHomepage();
+                
+            case 'default':
+            default:
+                return $this->showDefaultHomepage();
+        }
+    }
+    
+    /**
+     * Display default homepage with products
+     *
+     * @return \Illuminate\View\View
+     */
+    protected function showDefaultHomepage()
     {
         // Get featured products (limit 12 for slider)
         $featuredProducts = Product::with(['variants', 'category', 'brand', 'images'])
@@ -113,6 +144,38 @@ class HomeController extends Controller
             'bestSellerProducts',
             'newArrivalProducts'
         ));
+    }
+    
+    /**
+     * Display author profile as homepage
+     *
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    protected function showAuthorHomepage()
+    {
+        $authorId = SiteSetting::get('homepage_author_id');
+        
+        if (!$authorId) {
+            // If no author is selected, fall back to default homepage
+            return $this->showDefaultHomepage();
+        }
+        
+        $author = User::with('authorProfile')->find($authorId);
+        
+        if (!$author || !$author->authorProfile) {
+            // If author not found or has no profile, fall back to default
+            return $this->showDefaultHomepage();
+        }
+        
+        // Get categories for sidebar
+        $categories = Category::whereNull('parent_id')
+            ->where('is_active', true)
+            ->withCount('activeChildren')
+            ->orderBy('name')
+            ->get();
+        
+        // Render author profile page as homepage
+        return view('frontend.blog.author', compact('author', 'categories'));
     }
 
     /**

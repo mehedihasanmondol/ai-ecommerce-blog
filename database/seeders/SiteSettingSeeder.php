@@ -229,6 +229,26 @@ class SiteSettingSeeder extends Seeder
                 'order' => 8,
             ],
 
+            // Homepage Settings
+            [
+                'key' => 'homepage_type',
+                'value' => 'default',
+                'type' => 'select',
+                'group' => 'homepage',
+                'label' => 'Homepage Type',
+                'description' => 'Select what content to display on the homepage',
+                'order' => 1,
+            ],
+            [
+                'key' => 'homepage_author_id',
+                'value' => null,
+                'type' => 'select',
+                'group' => 'homepage',
+                'label' => 'Featured Author',
+                'description' => 'Select an author to display (only for Author Profile homepage type)',
+                'order' => 2,
+            ],
+
             // Invoice Settings
             [
                 'key' => 'invoice_header_banner',

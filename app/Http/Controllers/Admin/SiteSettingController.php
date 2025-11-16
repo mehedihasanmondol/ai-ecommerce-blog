@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,7 +25,17 @@ class SiteSettingController extends Controller
     {
         $settings = SiteSetting::getAllGrouped();
         
-        return view('admin.site-settings.index', compact('settings'));
+        // Get authors for homepage settings
+        $authors = User::where('role', 'author')
+            ->orWhereHas('authorProfile')
+            ->with('authorProfile')
+            ->orderBy('name')
+            ->get();
+        
+        // Get homepage types from config
+        $homepageTypes = config('homepage.types', []);
+        
+        return view('admin.site-settings.index', compact('settings', 'authors', 'homepageTypes'));
     }
 
     /**

@@ -11,6 +11,8 @@
                         'social' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>',
                         'seo' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>',
                         'invoice' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>',
+                        'homepage' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>',
+                        'blog' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>',
                     ];
                     $icon = $icons[$group] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>';
                 @endphp
@@ -71,6 +73,74 @@
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="Enter {{ strtolower($setting->label) }}"
                         ></textarea>
+
+                    @elseif($setting->type === 'select')
+                        @if($setting->key === 'homepage_type' && isset($homepageTypes))
+                            <!-- Homepage Type Select -->
+                            <select 
+                                wire:model="settings.{{ $setting->key }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
+                                <option value="">Select homepage type...</option>
+                                @foreach($homepageTypes as $type)
+                                    <option value="{{ $type['key'] }}">
+                                        {{ $type['label'] }} - {{ $type['description'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            
+                            <!-- Show description for selected type -->
+                            @if(isset($settings['homepage_type']) && $settings['homepage_type'])
+                                @php
+                                    $selectedType = collect($homepageTypes)->firstWhere('key', $settings['homepage_type']);
+                                @endphp
+                                @if($selectedType)
+                                    <div class="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                        <div class="flex items-start">
+                                            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <div>
+                                                <p class="text-sm font-medium text-blue-900">{{ $selectedType['label'] }}</p>
+                                                <p class="text-xs text-blue-700 mt-1">{{ $selectedType['description'] }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
+                            
+                        @elseif($setting->key === 'homepage_author_id' && isset($authors))
+                            <!-- Author Select -->
+                            <select 
+                                wire:model="settings.{{ $setting->key }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
+                                @if(!isset($settings['homepage_type']) || $settings['homepage_type'] !== 'author_profile') disabled @endif>
+                                <option value="">Select an author...</option>
+                                @foreach($authors as $author)
+                                    <option value="{{ $author->id }}">
+                                        {{ $author->name }}
+                                        @if($author->authorProfile && $author->authorProfile->job_title)
+                                            - {{ $author->authorProfile->job_title }}
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            
+                            @if(!isset($settings['homepage_type']) || $settings['homepage_type'] !== 'author_profile')
+                                <p class="mt-2 text-xs text-gray-500 flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                    Select "Author Profile" as homepage type to enable this option
+                                </p>
+                            @endif
+                        @else
+                            <!-- Generic Select -->
+                            <select 
+                                wire:model="settings.{{ $setting->key }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
+                                <option value="">Select an option...</option>
+                            </select>
+                        @endif
 
                     @elseif($setting->type === 'image')
                         <div class="space-y-4">
@@ -175,8 +245,9 @@
                 <button 
                     type="button"
                     wire:click="resetForm"
-                    class="px-5 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium flex items-center"
-                    :disabled="loading">
+                    wire:loading.attr="disabled"
+                    wire:target="save,resetForm"
+                    class="px-5 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>

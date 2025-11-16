@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -144,6 +145,18 @@ class SettingSection extends Component
 
     public function render()
     {
-        return view('livewire.admin.setting-section');
+        $data = [];
+        
+        // Pass additional data for homepage settings
+        if ($this->group === 'homepage') {
+            $data['authors'] = User::where('role', 'author')
+                ->orWhereHas('authorProfile')
+                ->with('authorProfile')
+                ->orderBy('name')
+                ->get();
+            $data['homepageTypes'] = config('homepage.types', []);
+        }
+        
+        return view('livewire.admin.setting-section', $data);
     }
 }
