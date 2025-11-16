@@ -7,7 +7,7 @@ export default defineConfig({
         host: '0.0.0.0',        // allow network access
         port: 5173,             // or any port you like
         hmr: {
-            host: '192.168.0.125', // your computer's local IP
+            host: '192.168.0.118', // your computer's local IP
         },
     },
     plugins: [

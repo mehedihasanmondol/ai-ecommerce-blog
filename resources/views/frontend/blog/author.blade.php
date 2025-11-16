@@ -20,7 +20,7 @@
                 <!-- Author Header Card -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
                     <!-- Cover Background -->
-                    <div class="h-16"></div>
+                    <div class="h-20"></div>
                     
                     <!-- Author Info -->
                     <div class="px-8 pb-8">
@@ -134,7 +134,7 @@
                         @endif
 
                         <!-- Stats -->
-                        <div class="mt-6 pt-6 border-t border-gray-200">
+                        <!-- <div class="mt-6 pt-6 border-t border-gray-200">
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center">
                                     <div class="text-3xl font-bold text-blue-600 mb-1">{{ number_format($totalPosts) }}</div>
@@ -149,7 +149,7 @@
                                     <div class="text-sm text-gray-600 font-medium">Comments Received</div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -159,7 +159,7 @@
                         <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                         </svg>
-                        <span>Articles <span class="text-gray-500 font-normal">({{ number_format($totalPosts) }})</span></span>
+                        <span><span class="text-gray-500 font-normal">({{ number_format($totalPosts) }})</span> </span> Articles by {{ $author->name }}
                     </h2>
                     
                     <!-- Sorting Dropdown -->
