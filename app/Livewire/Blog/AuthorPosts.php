@@ -32,7 +32,8 @@ class AuthorPosts extends Component
     {
         $query = Post::where('author_id', $this->authorId)
             ->where('status', 'published')
-            ->where('published_at', '<=', now());
+            ->where('published_at', '<=', now())
+            ->with(['category', 'tags', 'tickMarks']); // Eager load relationships
 
         // Apply sorting
         switch ($this->sort) {

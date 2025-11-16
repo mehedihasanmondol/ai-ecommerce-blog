@@ -102,7 +102,7 @@ class BlogController extends Controller
         }
         
         // Paginate
-        $posts = $query->with(['author', 'category', 'tags'])->paginate($perPage)->appends($request->query());
+        $posts = $query->with(['author', 'category', 'tags', 'tickMarks'])->paginate($perPage)->appends($request->query());
         
         $featuredPosts = $this->postService->getFeaturedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);

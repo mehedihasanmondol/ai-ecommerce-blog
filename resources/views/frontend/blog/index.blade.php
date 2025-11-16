@@ -21,8 +21,8 @@
             <!-- Main Content -->
             <div class="lg:col-span-9">
                 <!-- Search, Filter & View Mode Bar -->
-                <div class="bg-white rounded-lg shadow-sm mb-6 p-6" x-data="{ viewMode: 'grid' }">
-                    <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                <div class="  mb-6 " x-data="{ viewMode: 'grid' }">
+                    <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                         <!-- Search Form -->
                         <form action="{{ route('blog.search') }}" method="GET" class="flex-1 w-full lg:max-w-md">
                             <div class="relative">
@@ -231,60 +231,10 @@
                         @endforelse
                     </div>
 
-                    <!-- Grid View -->
-                    <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Grid View with Masonry Layout -->
+                    <div x-show="viewMode === 'grid'" class="masonry-grid">
                         @forelse($posts as $post)
-                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
-                            @if($post->featured_image)
-                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                 alt="{{ $post->featured_image_alt }}" 
-                                 class="w-full h-48 object-cover">
-                            @endif
-                            <div class="p-6">
-                                <div class="flex items-center gap-2 mb-3">
-                                    @if($post->category)
-                                    <a href="{{ route('blog.category', $post->category->slug) }}" 
-                                       class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-gray-200">
-                                        {{ $post->category->name }}
-                                    </a>
-                                    @endif
-                                    @if($post->is_featured)
-                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
-                                        Featured
-                                    </span>
-                                    @endif
-                                </div>
-                                
-                                <h3 class="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 line-clamp-2">
-                                    <a href="{{ route('products.show', $post->slug) }}">{{ $post->title }}</a>
-                                </h3>
-                                
-                                @if($post->excerpt)
-                                <p class="text-gray-600 mb-4 text-sm line-clamp-3">{{ $post->excerpt }}</p>
-                                @endif
-                                
-                                <!-- Tick Marks -->
-                                @if($post->hasTickMarks())
-                                <div class="mb-3">
-                                    <x-blog.tick-marks :post="$post" />
-                                </div>
-                                @endif
-                                
-                                <div class="flex items-center text-xs text-gray-500 mb-4">
-                                    <span>{{ $post->author->name }}</span>
-                                    <span class="mx-2">•</span>
-                                    <span>{{ $post->published_at->format('M d, Y') }}</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-500">{{ $post->reading_time_text }}</span>
-                                    <a href="{{ route('products.show', $post->slug) }}" 
-                                       class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                                        Read More →
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
+                            <x-blog.post-card :post="$post" :showSlider="true" />
                         @empty
                         <div class="bg-white rounded-lg shadow-md p-12 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,4 +256,92 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    /* Masonry Grid Layout */
+    .masonry-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 1.5rem;
+        grid-auto-flow: dense;
+    }
+    
+    @media (min-width: 768px) {
+        .masonry-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .masonry-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    /* Ensure items fit naturally */
+    .masonry-grid > * {
+        grid-row: span 1;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+    // Media Slider Functionality - Global for all post cards
+    window.sliders = window.sliders || {};
+    
+    window.changeSlide = function(postId, direction) {
+        const slider = document.getElementById('slider-' + postId);
+        if (!slider) return;
+        
+        const slides = slider.querySelectorAll('.slider-slide');
+        const indicators = slider.querySelectorAll('[data-indicator]');
+        
+        // Initialize slider state if not exists
+        if (!window.sliders[postId]) {
+            window.sliders[postId] = { currentSlide: 0 };
+        }
+        
+        // Hide current slide
+        slides[window.sliders[postId].currentSlide].classList.remove('active');
+        slides[window.sliders[postId].currentSlide].classList.add('opacity-0');
+        indicators[window.sliders[postId].currentSlide].classList.remove('bg-white');
+        indicators[window.sliders[postId].currentSlide].classList.add('bg-white/50');
+        
+        // Calculate next slide
+        if (direction === 'next') {
+            window.sliders[postId].currentSlide = (window.sliders[postId].currentSlide + 1) % slides.length;
+        } else {
+            window.sliders[postId].currentSlide = (window.sliders[postId].currentSlide - 1 + slides.length) % slides.length;
+        }
+        
+        // Show new slide
+        slides[window.sliders[postId].currentSlide].classList.add('active');
+        slides[window.sliders[postId].currentSlide].classList.remove('opacity-0');
+        indicators[window.sliders[postId].currentSlide].classList.add('bg-white');
+        indicators[window.sliders[postId].currentSlide].classList.remove('bg-white/50');
+    };
+    
+    // Initialize sliders on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSliders();
+    });
+    
+    function initializeSliders() {
+        const mediaSliders = document.querySelectorAll('.media-slider');
+        
+        mediaSliders.forEach(slider => {
+            const postId = slider.id.replace('slider-', '');
+            window.sliders[postId] = { currentSlide: 0 };
+            
+            // Auto-advance every 5 seconds (optional)
+            setInterval(() => {
+                window.changeSlide(postId, 'next');
+            }, 5000);
+        });
+    }
+</script>
+@endpush
+
 @endsection
