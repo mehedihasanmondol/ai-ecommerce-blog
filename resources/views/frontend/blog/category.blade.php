@@ -245,61 +245,21 @@
                         @endforelse
                     </div>
 
-                    <!-- Grid View -->
-                    <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Grid View with Masonry Layout -->
+                    <div x-show="viewMode === 'grid'" class="masonry-grid">
                         @forelse($posts as $post)
-                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
-                            @if($post->featured_image)
-                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                 alt="{{ $post->featured_image_alt }}" 
-                                 class="w-full h-48 object-cover">
-                            @endif
-                            <div class="p-6">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="inline-block bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">
-                                        {{ $category->name }}
-                                    </span>
-                                    @if($post->is_featured)
-                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
-                                        Featured
-                                    </span>
-                                    @endif
-                                </div>
-                                
-                                <h3 class="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 line-clamp-2">
-                                    <a href="{{ route('products.show', $post->slug) }}">{{ $post->title }}</a>
-                                </h3>
-                                
-                                @if($post->excerpt)
-                                <p class="text-gray-600 mb-4 text-sm line-clamp-3">{{ $post->excerpt }}</p>
-                                @endif
-                                
-                                <div class="flex items-center text-xs text-gray-500 mb-4">
-                                    <span>{{ $post->author->name }}</span>
-                                    <span class="mx-2">•</span>
-                                    <span>{{ $post->published_at->format('M d, Y') }}</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-500">{{ $post->reading_time_text }}</span>
-                                    <a href="{{ route('products.show', $post->slug) }}" 
-                                       class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                                        Read More →
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
+                            <x-blog.post-card :post="$post" />
                         @empty
-                    <div class="bg-white rounded-lg shadow-md p-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <p class="mt-4 text-gray-500 text-lg">No posts found in this category yet.</p>
-                        <a href="{{ route('blog.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
-                            Browse all posts →
-                        </a>
-                    </div>
-                    @endforelse
+                            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="mt-4 text-gray-500 text-lg">No posts found in this category yet.</p>
+                                <a href="{{ route('blog.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+                                    Browse all posts →
+                                </a>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -313,4 +273,35 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    /* Masonry Layout using CSS Columns */
+    .masonry-grid {
+        column-count: 1;
+        column-gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .masonry-grid {
+            column-count: 2;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .masonry-grid {
+            column-count: 3;
+        }
+    }
+    
+    /* Prevent items from breaking across columns */
+    .masonry-grid > * {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        width: 100%;
+    }
+</style>
+@endpush
+
 @endsection

@@ -188,7 +188,7 @@ class PostRepository
     {
         return $this->model->published()
             ->byTag($tagId)
-            ->with(['author', 'category', 'tags'])
+            ->with(['author', 'category', 'tags', 'tickMarks'])
             ->latest('published_at')
             ->paginate($perPage);
     }

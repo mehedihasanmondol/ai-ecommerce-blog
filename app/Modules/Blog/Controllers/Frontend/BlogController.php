@@ -195,7 +195,7 @@ class BlogController extends Controller
         }
         
         // Paginate
-        $posts = $query->with(['author', 'tags'])->paginate($perPage)->appends($request->query());
+        $posts = $query->with(['author', 'tags', 'tickMarks'])->paginate($perPage)->appends($request->query());
 
         return view('frontend.blog.category', compact('category', 'posts', 'categories'));
     }

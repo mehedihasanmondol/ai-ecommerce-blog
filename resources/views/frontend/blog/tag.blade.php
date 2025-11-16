@@ -8,8 +8,9 @@
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Sidebar - Collapsible -->
-            <x-blog.tag-sidebar 
-                :tag="$tag"
+            <x-blog.sidebar 
+                title="{{ \App\Models\SiteSetting::get('blog_title', 'Wellness Hub') }}"
+                subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
             />
 
@@ -240,64 +241,21 @@
                     @endforelse
                     </div>
 
-                    <!-- Grid View -->
-                    <div x-show="viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Grid View with Masonry Layout -->
+                    <div x-show="viewMode === 'grid'" class="masonry-grid">
                         @forelse($posts as $post)
-                        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
-                            @if($post->featured_image)
-                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                 alt="{{ $post->featured_image_alt }}" 
-                                 class="w-full h-48 object-cover">
-                            @endif
-                            <div class="p-6">
-                                <div class="flex items-center gap-2 mb-3">
-                                    @if($post->category)
-                                    <a href="{{ route('blog.category', $post->category->slug) }}" 
-                                       class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-gray-200">
-                                        {{ $post->category->name }}
-                                    </a>
-                                    @endif
-                                    @if($post->is_featured)
-                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
-                                        Featured
-                                    </span>
-                                    @endif
-                                </div>
-                                
-                                <h3 class="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 line-clamp-2">
-                                    <a href="{{ route('products.show', $post->slug) }}">{{ $post->title }}</a>
-                                </h3>
-                                
-                                @if($post->excerpt)
-                                <p class="text-gray-600 mb-4 text-sm line-clamp-3">{{ $post->excerpt }}</p>
-                                @endif
-                                
-                                <div class="flex items-center text-xs text-gray-500 mb-4">
-                                    <span>{{ $post->author->name }}</span>
-                                    <span class="mx-2">•</span>
-                                    <span>{{ $post->published_at->format('M d, Y') }}</span>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-500">{{ $post->reading_time_text }}</span>
-                                    <a href="{{ route('products.show', $post->slug) }}" 
-                                       class="text-blue-600 hover:text-blue-800 font-medium text-sm">
-                                        Read More →
-                                    </a>
-                                </div>
-                            </div>
-                        </article>
+                            <x-blog.post-card :post="$post" />
                         @empty
-                    <div class="bg-white rounded-lg shadow-md p-12 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
-                        <p class="mt-4 text-gray-500 text-lg">No posts found with this tag yet.</p>
-                        <a href="{{ route('blog.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
-                            Browse all posts →
-                        </a>
-                    </div>
-                    @endforelse
+                            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                <p class="mt-4 text-gray-500 text-lg">No posts found with this tag yet.</p>
+                                <a href="{{ route('blog.index') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+                                    Browse all posts →
+                                </a>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -311,4 +269,35 @@
         </div>
     </div>
 </div>
+
+@push('styles')
+<style>
+    /* Masonry Layout using CSS Columns */
+    .masonry-grid {
+        column-count: 1;
+        column-gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .masonry-grid {
+            column-count: 2;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .masonry-grid {
+            column-count: 3;
+        }
+    }
+    
+    /* Prevent items from breaking across columns */
+    .masonry-grid > * {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+        width: 100%;
+    }
+</style>
+@endpush
+
 @endsection
