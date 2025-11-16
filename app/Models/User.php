@@ -224,4 +224,31 @@ class User extends Authenticatable
         $wishlist = session()->get('wishlist', []);
         return count($wishlist);
     }
+
+    /**
+     * Get blog posts authored by this user
+     */
+    public function posts(): HasMany
+    {
+        return $this->hasMany(\App\Modules\Blog\Models\Post::class, 'author_id');
+    }
+
+    /**
+     * Get published blog posts authored by this user
+     */
+    public function publishedPosts(): HasMany
+    {
+        return $this->posts()
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+    }
+
+    /**
+     * Get the author profile for this user
+     */
+    public function authorProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\AuthorProfile::class);
+    }
 }

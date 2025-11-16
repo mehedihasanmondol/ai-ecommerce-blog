@@ -63,6 +63,7 @@ class BlogController extends Controller
     public function show($slug)
     {
         $post = $this->postService->getPostBySlug($slug);
+        $post->load('author.authorProfile'); // Eager load author profile
         $relatedPosts = $post->relatedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
@@ -178,5 +179,69 @@ class BlogController extends Controller
         $comment = $this->commentService->createComment($validated);
 
         return back()->with('success', 'আপনার মন্তব্য সফলভাবে জমা হয়েছে। অনুমোদনের অপেক্ষায় রয়েছে।');
+    }
+
+    /**
+     * Author profile page
+     */
+    public function author(Request $request, $id)
+    {
+        $author = \App\Models\User::with('authorProfile')->findOrFail($id);
+        
+        // If no author profile exists, create a default one
+        if (!$author->authorProfile) {
+            $author->authorProfile()->create([
+                'bio' => null,
+                'job_title' => null,
+            ]);
+            $author->load('authorProfile');
+        }
+        
+        // Get sorting parameter
+        $sort = $request->get('sort', 'newest');
+        
+        // Get published posts by this author with sorting
+        $postsQuery = $author->publishedPosts()
+            ->with(['category', 'tags']);
+        
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $postsQuery->oldest('published_at');
+                break;
+            case 'most_viewed':
+                $postsQuery->orderBy('views_count', 'desc');
+                break;
+            case 'most_popular':
+                // Most popular = combination of views and comments
+                $postsQuery->withCount('comments')
+                    ->orderByRaw('(views_count + comments_count * 10) DESC');
+                break;
+            case 'newest':
+            default:
+                $postsQuery->latest('published_at');
+                break;
+        }
+        
+        $posts = $postsQuery->paginate(config('app.paginate', 12))->appends(['sort' => $sort]);
+        
+        // Get author stats
+        $totalPosts = $author->publishedPosts()->count();
+        $totalViews = $author->publishedPosts()->sum('views_count');
+        $totalComments = \App\Modules\Blog\Models\Comment::whereHas('post', function($query) use ($author) {
+            $query->where('author_id', $author->id);
+        })->where('status', 'approved')->count();
+        
+        $categories = $this->categoryRepository->getRoots();
+        
+        return view('frontend.blog.author', compact(
+            'author',
+            'posts',
+            'totalPosts',
+            'totalViews',
+            'totalComments',
+            'categories',
+            'sort'
+        ));
     }
 }

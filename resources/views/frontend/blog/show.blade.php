@@ -52,11 +52,17 @@
 
                         <!-- Author Info -->
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
-                                {{ substr($post->author->name, 0, 1) }}
-                            </div>
+                            @if($post->author->authorProfile?->avatar_or_fallback)
+                                <img src="{{ asset('storage/' . $post->author->authorProfile->avatar_or_fallback) }}" 
+                                     alt="{{ $post->author->name }}"
+                                     class="w-12 h-12 rounded-full object-cover">
+                            @else
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                                    {{ substr($post->author->name, 0, 1) }}
+                                </div>
+                            @endif
                             <div>
-                                <a href="#" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
+                                <a href="{{ route('blog.author', $post->author->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
                                 <p class="text-sm text-gray-500">Posted on {{ $post->published_at->format('F j, Y') }}</p>
                             </div>
                         </div>
@@ -133,18 +139,42 @@
 
                 <!-- Author Bio -->
                 <div class="bg-white rounded-lg shadow-sm mt-8 p-8">
-                <div class="flex items-start space-x-4">
-                    <div class="flex-shrink-0">
-                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                            {{ substr($post->author->name, 0, 1) }}
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            @if($post->author->authorProfile?->avatar_or_fallback)
+                                <img src="{{ asset('storage/' . $post->author->authorProfile->avatar_or_fallback) }}" 
+                                     alt="{{ $post->author->name }}"
+                                     class="w-16 h-16 rounded-full object-cover">
+                            @else
+                                <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                    {{ substr($post->author->name, 0, 1) }}
+                                </div>
+                            @endif
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-1">
+                                <a href="{{ route('blog.author', $post->author->id) }}" class="hover:text-blue-600 transition-colors">
+                                    {{ $post->author->name }}
+                                </a>
+                            </h3>
+                            @if($post->author->authorProfile?->job_title)
+                                <p class="text-sm text-gray-500 mb-2">{{ $post->author->authorProfile->job_title }}</p>
+                            @endif
+                            @if($post->author->authorProfile?->bio)
+                                <p class="text-gray-600 mb-3">{{ \Illuminate\Support\Str::limit($post->author->authorProfile->bio, 200) }}</p>
+                            @else
+                                <p class="text-gray-600 mb-3">Content writer and blogger passionate about sharing knowledge.</p>
+                            @endif
+                            <a href="{{ route('blog.author', $post->author->id) }}" 
+                               class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm">
+                                View author profile
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
                         </div>
                     </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $post->author->name }}</h3>
-                        <p class="text-gray-600">Author bio goes here...</p>
-                    </div>
                 </div>
-            </div>
 
                 <!-- Related Posts -->
                 @if($relatedPosts->count() > 0)
