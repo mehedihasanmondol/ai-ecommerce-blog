@@ -218,7 +218,44 @@ class BlogController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('q');
-        $posts = $this->postService->searchPosts($query, config('app.paginate', 10));
+        $sort = $request->input('sort', 'latest');
+        $perPage = $request->input('per_page', 10);
+        
+        // Build query
+        $postsQuery = \App\Modules\Blog\Models\Post::where('status', 'published')
+            ->where('published_at', '<=', now());
+        
+        // Apply search
+        if ($query) {
+            $postsQuery->where(function($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('excerpt', 'like', "%{$query}%")
+                  ->orWhere('content', 'like', "%{$query}%");
+            });
+        }
+        
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $postsQuery->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $postsQuery->orderBy('views_count', 'desc');
+                break;
+            case 'title':
+                $postsQuery->orderBy('title', 'asc');
+                break;
+            case 'latest':
+            default:
+                $postsQuery->orderBy('published_at', 'desc');
+                break;
+        }
+        
+        // Paginate
+        $posts = $postsQuery->with(['author', 'category', 'tags', 'tickMarks'])
+            ->paginate($perPage)
+            ->appends($request->query());
+        
         $categories = $this->categoryRepository->getRoots();
 
         return view('frontend.blog.search', compact('query', 'posts', 'categories'));

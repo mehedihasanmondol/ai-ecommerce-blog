@@ -14,7 +14,7 @@
 
 @php
 // Ensure we're always using blog categories on blog pages
-if ($categoryType === 'blog' && $categories->isEmpty()) {
+if ($categoryType === 'blog') {
     $categories = app(\App\Modules\Blog\Repositories\BlogCategoryRepository::class)->getRoots();
 }
 @endphp

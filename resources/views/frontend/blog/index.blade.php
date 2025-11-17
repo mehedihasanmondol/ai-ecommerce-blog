@@ -16,6 +16,7 @@
                 title="{{ \App\Models\SiteSetting::get('blog_title', 'Wellness Hub') }}"
                 subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
+                categoryType="blog"
             />
 
             <!-- Main Content -->
@@ -25,15 +26,20 @@
                     <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                         <!-- Search Form -->
                         <form action="{{ route('blog.search') }}" method="GET" class="flex-1 w-full lg:max-w-md">
-                            <div class="relative">
-                                <input type="text" 
-                                       name="q" 
-                                       value="{{ request('q') }}"
-                                       placeholder="Search all posts..." 
-                                       class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                                <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                </svg>
+                            <div class="relative flex gap-2">
+                                <div class="relative flex-1">
+                                    <input type="text" 
+                                           name="q" 
+                                           value="{{ request('q') }}"
+                                           placeholder="Search all posts..." 
+                                           class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                    </svg>
+                                </div>
+                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap">
+                                    Search
+                                </button>
                             </div>
                         </form>
 
@@ -144,14 +150,40 @@
                         @forelse($posts as $post)
                         <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
                             <div class="md:flex">
-                                @if($post->featured_image)
-                                <div class="md:w-1/3">
-                                    <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                         alt="{{ $post->featured_image_alt }}" 
-                                         class="w-full h-48 md:h-full object-cover">
+                                @if($post->youtube_url || $post->featured_image)
+                                <div class="md:w-1/3 relative">
+                                    @if($post->youtube_url)
+                                        <!-- YouTube Video Thumbnail -->
+                                        <img src="https://img.youtube.com/vi/{{ $post->youtube_video_id }}/maxresdefault.jpg" 
+                                             alt="{{ $post->title }}"
+                                             class="w-full h-48 md:h-full object-cover"
+                                             onerror="this.src='https://img.youtube.com/vi/{{ $post->youtube_video_id }}/hqdefault.jpg'">
+                                        
+                                        <!-- Video Play Badge -->
+                                        <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                            <div class="bg-red-600 rounded-full p-3 shadow-lg">
+                                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- YouTube Badge -->
+                                        <div class="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                            VIDEO
+                                        </div>
+                                    @elseif($post->featured_image)
+                                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                                             alt="{{ $post->featured_image_alt }}" 
+                                             class="w-full h-48 md:h-full object-cover">
+                                    @endif
                                 </div>
                                 @endif
-                                <div class="p-6 {{ $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
+                                <div class="p-6 {{ $post->youtube_url || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
                                     @if($post->category)
                                     <a href="{{ route('blog.category', $post->category->slug) }}" 
                                        class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full mb-3 hover:bg-gray-200">

@@ -14,6 +14,7 @@
                 subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
                 :currentCategory="$post->category"
+                categoryType="blog"
             />
 
             <!-- Main Content -->
