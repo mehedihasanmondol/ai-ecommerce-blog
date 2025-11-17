@@ -129,6 +129,34 @@
             `;
             document.head.appendChild(style);
         });
+
+        // Refresh CSRF token periodically to prevent Livewire session expiry warnings
+        // Refresh every 2 hours (before the 12-hour session expires)
+        setInterval(function() {
+            fetch('/refresh-csrf', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    // Update CSRF token in meta tag
+                    document.querySelector('meta[name="csrf-token"]').setAttribute('content', data.token);
+                    // Update all CSRF inputs
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = data.token;
+                    });
+                    // Update Livewire CSRF token if available
+                    if (window.Livewire) {
+                        window.Livewire.rescan();
+                    }
+                }
+            })
+            .catch(error => console.error('CSRF token refresh failed:', error));
+        }, 7200000); // 2 hours in milliseconds
     </script>
 </body>
 </html>

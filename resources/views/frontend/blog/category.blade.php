@@ -56,8 +56,8 @@
                 </div>
 
                 <!-- Search, Filter & View Mode Bar -->
-                <div class="bg-white rounded-lg shadow-sm mb-6 p-6" x-data="{ viewMode: 'grid' }">
-                    <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                <div class=" mb-6" x-data="{ viewMode: 'grid' }">
+                    <div class="bg-white rounded-lg shadow-sm p-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                         <!-- Search Form -->
                         <form action="{{ route('blog.category', $category->slug) }}" method="GET" class="flex-1 w-full lg:max-w-md">
                             <div class="relative">

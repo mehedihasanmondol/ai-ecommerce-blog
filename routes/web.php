@@ -12,6 +12,11 @@ use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as Customer
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\PaymentController;
 
+// CSRF Token Refresh Route (for Livewire session maintenance)
+Route::get('/refresh-csrf', function() {
+    return response()->json(['token' => csrf_token()]);
+})->name('refresh-csrf');
+
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/ecommerce', function() {

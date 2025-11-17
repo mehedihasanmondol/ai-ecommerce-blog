@@ -4,7 +4,7 @@
 @section('meta_description', $author->authorProfile?->bio ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
 
 @section('content')
-<div class="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+<div class="bg-gradient-to-b from-gray-50  min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <!-- Left Sidebar -->
@@ -18,12 +18,13 @@
             <!-- Main Content -->
             <div class="lg:col-span-9">
                 <!-- Author Profile Card -->
-                <div class="bg-white rounded-2xl  overflow-hidden mb-8">
-                    <!-- Cover Background -->
-                    <div class="h-20 "></div>
-                    
-                    <!-- Author Info -->
-                    <div class="px-8 pb-8">
+                <div class="  mb-8">
+                    <div class="bg-white rounded-tl-2xl rounded-tr-2xl  overflow-hidden">
+                        <!-- Cover Background -->
+                        <div class="h-20 "></div>
+                        
+                        <!-- Author Info -->
+                        <div class="px-8 pb-8">
                         <div class="flex flex-col md:flex-row items-start gap-6 -mt-16">
                             <!-- Avatar (Top Aligned) -->
                             <div class="flex-shrink-0 self-start">
@@ -125,6 +126,7 @@
                                 @endif
                             </div>
                         </div>
+</div>
                     </div>
 
                     <!-- Posts Section with Livewire (Border Separation) -->

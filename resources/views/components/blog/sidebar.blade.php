@@ -8,8 +8,16 @@
     'backLinkText' => null,
     'showAllLink' => false,
     'allLinkUrl' => null,
-    'allLinkText' => null
+    'allLinkText' => null,
+    'categoryType' => 'blog' // 'blog' or 'ecommerce'
 ])
+
+@php
+// Ensure we're always using blog categories on blog pages
+if ($categoryType === 'blog' && $categories->isEmpty()) {
+    $categories = app(\App\Modules\Blog\Repositories\BlogCategoryRepository::class)->getRoots();
+}
+@endphp
 
 <aside class="lg:col-span-3">
     <div class="lg:sticky lg:top-8 space-y-6">

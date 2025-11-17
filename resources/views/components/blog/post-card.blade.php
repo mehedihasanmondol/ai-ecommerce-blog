@@ -4,7 +4,8 @@
 ])
 
 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group {{ $class }}">
-    <!-- Media Section (Thumbnail with Video Badge) -->
+    <!-- Media Section (Thumbnail with Video Badge) - Only show if media exists -->
+    @if($post->youtube_url || $post->featured_image)
     <a href="{{ route('products.show', $post->slug) }}" class="block relative">
         @if($post->youtube_url)
             <!-- YouTube Video Thumbnail (Priority) -->
@@ -39,15 +40,9 @@
                      alt="{{ $post->featured_image_alt }}"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
             </div>
-        @else
-            <!-- Placeholder -->
-            <div class="aspect-video bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                <svg class="w-16 h-16 text-white opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-            </div>
         @endif
     </a>
+    @endif
 
     <!-- Content Section -->
     <div class="p-5">
