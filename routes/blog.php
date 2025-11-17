@@ -81,8 +81,8 @@ Route::get('/blog/search', [BlogController::class, 'search'])->name('blog.search
 // Comment Submission
 Route::post('/blog/{post}/comments', [BlogController::class, 'storeComment'])->name('blog.comments.store');
 
-// Author Profile
-Route::get('/blog/author/{id}', [BlogController::class, 'author'])->name('blog.author');
+// Author Profile (slug-based)
+Route::get('/author/{slug}', [BlogController::class, 'author'])->name('blog.author');
 
 // ============================================
 // SINGLE POST ROUTE (NO /blog PREFIX)

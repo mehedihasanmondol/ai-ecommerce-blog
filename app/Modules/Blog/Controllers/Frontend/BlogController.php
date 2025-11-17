@@ -283,17 +283,15 @@ class BlogController extends Controller
     /**
      * Author profile page
      */
-    public function author(Request $request, $id)
+    public function author(Request $request, $slug)
     {
-        $author = \App\Models\User::with('authorProfile')->findOrFail($id);
+        // Find author profile by slug
+        $authorProfile = \App\Models\AuthorProfile::where('slug', $slug)->firstOrFail();
+        $author = $authorProfile->user;
         
-        // If no author profile exists, create a default one
-        if (!$author->authorProfile) {
-            $author->authorProfile()->create([
-                'bio' => null,
-                'job_title' => null,
-            ]);
-            $author->load('authorProfile');
+        // Ensure author exists
+        if (!$author) {
+            abort(404, 'Author not found');
         }
         
         // Get sorting parameter

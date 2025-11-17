@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 /**
  * ModuleName: Blog
@@ -25,10 +27,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AuthorProfile extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUniqueSlug;
 
     protected $fillable = [
         'user_id',
+        'slug',
         'bio',
         'job_title',
         'website',
@@ -175,5 +178,42 @@ class AuthorProfile extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('display_order');
+    }
+
+    /**
+     * Override boot method to generate slug from user's name
+     */
+    protected static function bootHasUniqueSlug(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->slug)) {
+                // Generate slug from user's name if user exists
+                $slugSource = $model->user ? $model->user->name : 'author';
+                $model->slug = $model->generateUniqueSlug($slugSource);
+            }
+        });
+
+        static::updating(function ($model) {
+            // Only auto-update slug if explicitly requested
+            if ($model->isDirty('slug') && !empty($model->slug)) {
+                $model->slug = $model->generateUniqueSlug($model->slug);
+            }
+        });
+    }
+
+    /**
+     * Get route key name for slug-based routing
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    /**
+     * Scope to find by slug
+     */
+    public function scopeBySlug($query, string $slug)
+    {
+        return $query->where('slug', $slug);
     }
 }

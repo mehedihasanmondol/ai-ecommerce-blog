@@ -63,7 +63,7 @@
                                 </div>
                             @endif
                             <div>
-                                <a href="{{ route('blog.author', $post->author->id) }}" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
+                                <a href="{{ route('blog.author', $post->author->authorProfile->slug) }}" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
                                 <p class="text-sm text-gray-500">Posted on {{ $post->published_at->format('F j, Y') }}</p>
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                         </div>
                         <div class="flex-1">
                             <h3 class="text-xl font-bold text-gray-900 mb-1">
-                                <a href="{{ route('blog.author', $post->author->id) }}" class="hover:text-blue-600 transition-colors">
+                                <a href="{{ route('blog.author', $post->author->authorProfile->slug) }}" class="hover:text-blue-600 transition-colors">
                                     {{ $post->author->name }}
                                 </a>
                             </h3>
@@ -166,7 +166,7 @@
                             @else
                                 <p class="text-gray-600 mb-3">Content writer and blogger passionate about sharing knowledge.</p>
                             @endif
-                            <a href="{{ route('blog.author', $post->author->id) }}" 
+                            <a href="{{ route('blog.author', $post->author->authorProfile->slug) }}" 
                                class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm">
                                 View author profile
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
