@@ -126,6 +126,7 @@
                 </a>
 
                 <!-- User Management Section -->
+                @if(auth()->user()->hasPermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">User Management</p>
                 </div>
@@ -147,8 +148,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- E-commerce Section (Placeholder) -->
+                @if(auth()->user()->hasPermission('products.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
@@ -215,7 +218,9 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('orders.view'))
                 <a href="{{ route('admin.coupons.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.coupons.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-ticket-alt w-5 mr-3"></i>
@@ -256,8 +261,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- Payments Section -->
+                @if(auth()->user()->hasPermission('orders.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments</p>
                 </div>
@@ -270,8 +277,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- Inventory Section -->
+                @if(auth()->user()->hasPermission('stock.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                 </div>
@@ -308,8 +317,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- Content Section (Placeholder) -->
+                @if(auth()->user()->hasPermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                 </div>
@@ -376,8 +387,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- Blog Section -->
+                @if(auth()->user()->hasPermission('posts.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
                 </div>
@@ -417,8 +430,10 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
 
                 <!-- Finance Section (Placeholder) -->
+                @if(auth()->user()->hasPermission('finance.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Finance</p>
                 </div>
@@ -434,8 +449,10 @@
                     <span>Reports</span>
                     <span class="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
                 </a>
+                @endif
 
                 <!-- Settings Section -->
+                @if(auth()->user()->hasPermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
                 </div>
@@ -448,6 +465,7 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
             </nav>
         </aside>
 
@@ -469,6 +487,7 @@
                     <span>Dashboard</span>
                 </a>
 
+                @if(auth()->user()->hasPermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">User Management</p>
                 </div>
@@ -484,7 +503,9 @@
                     <i class="fas fa-shield-alt w-5 mr-3"></i>
                     <span>Roles & Permissions</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('products.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
@@ -530,7 +551,9 @@
                     <i class="fas fa-star w-5 mr-3"></i>
                     <span>Product Reviews</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('orders.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipping & Delivery</p>
                 </div>
@@ -552,7 +575,9 @@
                     <i class="fas fa-dollar-sign w-5 mr-3"></i>
                     <span>Delivery Rates</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('stock.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                 </div>
@@ -574,7 +599,9 @@
                     <i class="fas fa-truck w-5 mr-3"></i>
                     <span>Suppliers</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                 </div>
@@ -590,7 +617,9 @@
                     <i class="fas fa-bars w-5 mr-3"></i>
                     <span>Secondary Menu</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('posts.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
                 </div>
@@ -618,6 +647,7 @@
                     <i class="fas fa-comments w-5 mr-3"></i>
                     <span>Comments</span>
                 </a>
+                @endif
             </nav>
         </aside>
 

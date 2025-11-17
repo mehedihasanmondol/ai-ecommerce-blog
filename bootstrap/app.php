@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,
             'user.active' => \App\Http\Middleware\CheckUserActive::class,
+            'admin.access' => \App\Http\Middleware\CheckAdminAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

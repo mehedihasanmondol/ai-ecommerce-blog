@@ -25,113 +25,140 @@ use Illuminate\Support\Facades\Route;
  * ModuleName: Admin Panel
  * Purpose: Admin routes for dashboard, user, role, category, and brand management
  * 
+ * Access Control:
+ * - admin.access: Allows admin and author roles (not customer)
+ * - Public routes: Accessible to all users (defined in web.php and blog.php)
+ * 
  * @author AI Assistant
  * @date 2025-11-04
+ * @updated 2025-11-17
  */
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Dashboard
+    // Dashboard - Accessible to all admin panel users
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // User Management Routes
-    Route::resource('users', UserController::class);
-    Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
-        ->name('users.toggle-status');
+    // User Management Routes - Only Super Admin
+    Route::middleware(['permission:users.view'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
+            ->name('users.toggle-status');
+    });
 
-    // Role Management Routes
-    Route::resource('roles', RoleController::class);
+    // Role Management Routes - Only Super Admin
+    Route::middleware(['permission:roles.view'])->group(function () {
+        Route::resource('roles', RoleController::class);
+    });
     
-    // Category Management Routes
-    Route::resource('categories', CategoryController::class);
-    Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
-        ->name('categories.toggle-status');
-    Route::post('categories/{category}/duplicate', [CategoryController::class, 'duplicate'])
-        ->name('categories.duplicate');
+    // Category Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::resource('categories', CategoryController::class);
+        Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
+            ->name('categories.toggle-status');
+        Route::post('categories/{category}/duplicate', [CategoryController::class, 'duplicate'])
+            ->name('categories.duplicate');
+    });
     
-    // Brand Management Routes
-    Route::resource('brands', BrandController::class);
-    Route::post('brands/{brand}/toggle-status', [BrandController::class, 'toggleStatus'])
-        ->name('brands.toggle-status');
-    Route::post('brands/{brand}/toggle-featured', [BrandController::class, 'toggleFeatured'])
-        ->name('brands.toggle-featured');
-    Route::post('brands/{brand}/duplicate', [BrandController::class, 'duplicate'])
-        ->name('brands.duplicate');
+    // Brand Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::resource('brands', BrandController::class);
+        Route::post('brands/{brand}/toggle-status', [BrandController::class, 'toggleStatus'])
+            ->name('brands.toggle-status');
+        Route::post('brands/{brand}/toggle-featured', [BrandController::class, 'toggleFeatured'])
+            ->name('brands.toggle-featured');
+        Route::post('brands/{brand}/duplicate', [BrandController::class, 'duplicate'])
+            ->name('brands.duplicate');
+    });
     
-    // Order Management Routes (explicit routes to avoid authorization issues)
-    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
-    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::get('orders/{order}/edit', function (\App\Modules\Ecommerce\Order\Models\Order $order) {
-        return view('admin.orders.edit-livewire', compact('order'));
-    })->name('orders.edit');
-    Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
-    Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
-    Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
-        ->name('orders.update-status');
-    Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
-        ->name('orders.cancel');
-    Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
-        ->name('orders.invoice');
+    // Order Management Routes - Requires order permissions
+    Route::middleware(['permission:orders.view'])->group(function () {
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('orders/{order}/edit', function (\App\Modules\Ecommerce\Order\Models\Order $order) {
+            return view('admin.orders.edit-livewire', compact('order'));
+        })->name('orders.edit');
+        Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
+            ->name('orders.update-status');
+        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
+            ->name('orders.cancel');
+        Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
+            ->name('orders.invoice');
+    });
     
     // Customer Management Routes
     Route::post('customers/{id}/update-info', [CustomerController::class, 'updateInfo'])
         ->name('customers.update-info');
     
-    // Trending Products Management Routes
-    Route::get('trending-products/search', [TrendingProductController::class, 'searchProducts'])->name('trending-products.search');
-    Route::get('trending-products', [TrendingProductController::class, 'index'])->name('trending-products.index');
-    Route::post('trending-products', [TrendingProductController::class, 'store'])->name('trending-products.store');
-    Route::post('trending-products/update-order', [TrendingProductController::class, 'updateOrder'])->name('trending-products.update-order');
-    Route::post('trending-products/{trendingProduct}/toggle-status', [TrendingProductController::class, 'toggleStatus'])->name('trending-products.toggle-status');
-    Route::delete('trending-products/{trendingProduct}', [TrendingProductController::class, 'destroy'])->name('trending-products.destroy');
+    // Trending Products Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::get('trending-products/search', [TrendingProductController::class, 'searchProducts'])->name('trending-products.search');
+        Route::get('trending-products', [TrendingProductController::class, 'index'])->name('trending-products.index');
+        Route::post('trending-products', [TrendingProductController::class, 'store'])->name('trending-products.store');
+        Route::post('trending-products/update-order', [TrendingProductController::class, 'updateOrder'])->name('trending-products.update-order');
+        Route::post('trending-products/{trendingProduct}/toggle-status', [TrendingProductController::class, 'toggleStatus'])->name('trending-products.toggle-status');
+        Route::delete('trending-products/{trendingProduct}', [TrendingProductController::class, 'destroy'])->name('trending-products.destroy');
+    });
     
-    // Best Seller Products Management Routes
-    Route::get('best-seller-products/search', [BestSellerProductController::class, 'searchProducts'])->name('best-seller-products.search');
-    Route::get('best-seller-products', [BestSellerProductController::class, 'index'])->name('best-seller-products.index');
-    Route::post('best-seller-products', [BestSellerProductController::class, 'store'])->name('best-seller-products.store');
-    Route::post('best-seller-products/update-order', [BestSellerProductController::class, 'updateOrder'])->name('best-seller-products.update-order');
-    Route::post('best-seller-products/{bestSellerProduct}/toggle-status', [BestSellerProductController::class, 'toggleStatus'])->name('best-seller-products.toggle-status');
-    Route::delete('best-seller-products/{bestSellerProduct}', [BestSellerProductController::class, 'destroy'])->name('best-seller-products.destroy');
+    // Best Seller Products Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::get('best-seller-products/search', [BestSellerProductController::class, 'searchProducts'])->name('best-seller-products.search');
+        Route::get('best-seller-products', [BestSellerProductController::class, 'index'])->name('best-seller-products.index');
+        Route::post('best-seller-products', [BestSellerProductController::class, 'store'])->name('best-seller-products.store');
+        Route::post('best-seller-products/update-order', [BestSellerProductController::class, 'updateOrder'])->name('best-seller-products.update-order');
+        Route::post('best-seller-products/{bestSellerProduct}/toggle-status', [BestSellerProductController::class, 'toggleStatus'])->name('best-seller-products.toggle-status');
+        Route::delete('best-seller-products/{bestSellerProduct}', [BestSellerProductController::class, 'destroy'])->name('best-seller-products.destroy');
+    });
     
-    // New Arrival Products Management Routes
-    Route::get('new-arrival-products/search', [NewArrivalProductController::class, 'searchProducts'])->name('new-arrival-products.search');
-    Route::get('new-arrival-products', [NewArrivalProductController::class, 'index'])->name('new-arrival-products.index');
-    Route::post('new-arrival-products', [NewArrivalProductController::class, 'store'])->name('new-arrival-products.store');
-    Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
-    Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
-    Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
+    // New Arrival Products Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::get('new-arrival-products/search', [NewArrivalProductController::class, 'searchProducts'])->name('new-arrival-products.search');
+        Route::get('new-arrival-products', [NewArrivalProductController::class, 'index'])->name('new-arrival-products.index');
+        Route::post('new-arrival-products', [NewArrivalProductController::class, 'store'])->name('new-arrival-products.store');
+        Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
+        Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
+        Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
+    });
     
-    // Product Q&A Management Routes
-    Route::resource('product-questions', ProductQuestionController::class);
-    Route::post('questions/{id}/approve', [ProductQuestionController::class, 'approve'])->name('questions.approve');
-    Route::post('questions/{id}/reject', [ProductQuestionController::class, 'reject'])->name('questions.reject');
-    Route::post('answers/{id}/approve', [ProductQuestionController::class, 'approveAnswer'])->name('answers.approve');
-    Route::post('answers/{id}/reject', [ProductQuestionController::class, 'rejectAnswer'])->name('answers.reject');
-    Route::post('answers/{id}/best', [ProductQuestionController::class, 'markBestAnswer'])->name('answers.best');
+    // Product Q&A Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::resource('product-questions', ProductQuestionController::class);
+        Route::post('questions/{id}/approve', [ProductQuestionController::class, 'approve'])->name('questions.approve');
+        Route::post('questions/{id}/reject', [ProductQuestionController::class, 'reject'])->name('questions.reject');
+        Route::post('answers/{id}/approve', [ProductQuestionController::class, 'approveAnswer'])->name('answers.approve');
+        Route::post('answers/{id}/reject', [ProductQuestionController::class, 'rejectAnswer'])->name('answers.reject');
+        Route::post('answers/{id}/best', [ProductQuestionController::class, 'markBestAnswer'])->name('answers.best');
+    });
     
-    // Product Review Management Routes
-    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
-    Route::get('reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
-    Route::get('reviews/{id}', [ReviewController::class, 'show'])->name('reviews.show');
-    Route::post('reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
-    Route::post('reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
-    Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
-    Route::post('reviews/bulk-approve', [ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
-    Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
+    // Product Review Management Routes - Requires product permissions
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::get('reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
+        Route::get('reviews/{id}', [ReviewController::class, 'show'])->name('reviews.show');
+        Route::post('reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+        Route::post('reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+        Route::delete('reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+        Route::post('reviews/bulk-approve', [ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+        Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
+    });
     
-    // Footer Management Routes
-    Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
-    Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
-    Route::post('footer-management/links', [FooterManagementController::class, 'storeLink'])->name('footer-management.store-link');
-    Route::put('footer-management/links/{link}', [FooterManagementController::class, 'updateLink'])->name('footer-management.update-link');
-    Route::delete('footer-management/links/{link}', [FooterManagementController::class, 'deleteLink'])->name('footer-management.delete-link');
-    Route::post('footer-management/blog-posts', [FooterManagementController::class, 'storeBlogPost'])->name('footer-management.store-blog');
-    Route::delete('footer-management/blog-posts/{blogPost}', [FooterManagementController::class, 'deleteBlogPost'])->name('footer-management.delete-blog');
+    // Footer Management Routes - Only Super Admin
+    Route::middleware(['permission:users.view'])->group(function () {
+        Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
+        Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
+        Route::post('footer-management/links', [FooterManagementController::class, 'storeLink'])->name('footer-management.store-link');
+        Route::put('footer-management/links/{link}', [FooterManagementController::class, 'updateLink'])->name('footer-management.update-link');
+        Route::delete('footer-management/links/{link}', [FooterManagementController::class, 'deleteLink'])->name('footer-management.delete-link');
+        Route::post('footer-management/blog-posts', [FooterManagementController::class, 'storeBlogPost'])->name('footer-management.store-blog');
+        Route::delete('footer-management/blog-posts/{blogPost}', [FooterManagementController::class, 'deleteBlogPost'])->name('footer-management.delete-blog');
+    });
     
-    // Blog Tick Marks Management Routes
-    Route::prefix('blog')->name('blog.')->group(function () {
+    // Blog Tick Marks Management Routes - Accessible to authors (posts.view permission)
+    Route::middleware(['permission:posts.view'])->prefix('blog')->name('blog.')->group(function () {
         Route::resource('tick-marks', TickMarkController::class);
         Route::patch('tick-marks/{tick_mark}/toggle-active', [TickMarkController::class, 'toggleActive'])
             ->name('tick-marks.toggle-active');
@@ -139,8 +166,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             ->name('tick-marks.update-sort-order');
     });
     
-    // Delivery Management Routes
-    Route::prefix('delivery')->name('delivery.')->group(function () {
+    // Delivery Management Routes - Requires order permissions
+    Route::middleware(['permission:orders.view'])->prefix('delivery')->name('delivery.')->group(function () {
         // Delivery Zones
         Route::resource('zones', DeliveryZoneController::class);
         Route::post('zones/{zone}/toggle-status', [DeliveryZoneController::class, 'toggleStatus'])
@@ -157,20 +184,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             ->name('rates.toggle-status');
     });
     
-    // Coupon Management Routes
-    Route::get('coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
-    Route::get('coupons/create', [AdminCouponController::class, 'create'])->name('coupons.create');
-    Route::get('coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
-    Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
+    // Coupon Management Routes - Requires order permissions
+    Route::middleware(['permission:orders.view'])->group(function () {
+        Route::get('coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
+        Route::get('coupons/create', [AdminCouponController::class, 'create'])->name('coupons.create');
+        Route::get('coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
+        Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
+    });
     
-    // Site Settings Routes
-    Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
-    Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
-    Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
-    Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
+    // Site Settings Routes - Only Super Admin
+    Route::middleware(['permission:users.view'])->group(function () {
+        Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
+        Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
+        Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
+        Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
+    });
     
-    // Stock Management Routes
-    Route::prefix('stock')->name('stock.')->group(function () {
+    // Stock Management Routes - Requires stock permissions
+    Route::middleware(['permission:stock.view'])->prefix('stock')->name('stock.')->group(function () {
         Route::get('/', [\App\Modules\Stock\Controllers\StockController::class, 'index'])->name('index');
         Route::get('/movements', [\App\Modules\Stock\Controllers\StockController::class, 'movements'])->name('movements');
         Route::get('/add', [\App\Modules\Stock\Controllers\StockController::class, 'createAddStock'])->name('add');
@@ -186,10 +217,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/current-stock', [\App\Modules\Stock\Controllers\StockController::class, 'getCurrentStock'])->name('current-stock');
     });
 
-    // Warehouse Management Routes
-    Route::resource('warehouses', \App\Modules\Stock\Controllers\WarehouseController::class)->names('warehouses');
-    Route::post('warehouses/{id}/set-default', [\App\Modules\Stock\Controllers\WarehouseController::class, 'setDefault'])->name('warehouses.set-default');
+    // Warehouse Management Routes - Requires stock permissions
+    Route::middleware(['permission:stock.view'])->group(function () {
+        Route::resource('warehouses', \App\Modules\Stock\Controllers\WarehouseController::class)->names('warehouses');
+        Route::post('warehouses/{id}/set-default', [\App\Modules\Stock\Controllers\WarehouseController::class, 'setDefault'])->name('warehouses.set-default');
+    });
 
-    // Supplier Management Routes
-    Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
+    // Supplier Management Routes - Requires stock permissions
+    Route::middleware(['permission:stock.view'])->group(function () {
+        Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
+    });
 });

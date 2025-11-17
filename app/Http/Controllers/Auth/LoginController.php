@@ -66,14 +66,26 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Update keep_signed_in preference
-            Auth::user()->update(['keep_signed_in' => $remember]);
+            // Update keep_signed_in preference and last login time
+            Auth::user()->update([
+                'keep_signed_in' => $remember,
+                'last_login_at' => now(),
+            ]);
 
             // Redirect based on role
-            if (Auth::user()->role === 'admin') {
+            $user = Auth::user();
+            
+            // Customer role redirects to frontend profile
+            if ($user->role === 'customer') {
+                return redirect()->intended('/my-account/profile');
+            }
+            
+            // Admin, Author, and other roles redirect to admin panel
+            if (in_array($user->role, ['admin', 'author'])) {
                 return redirect()->intended('/admin/dashboard');
             }
 
+            // Default fallback to homepage
             return redirect()->intended('/');
         }
 

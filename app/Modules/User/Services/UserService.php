@@ -4,6 +4,7 @@ namespace App\Modules\User\Services;
 
 use App\Modules\User\Repositories\UserRepository;
 use App\Modules\User\Models\UserActivity;
+use App\Modules\User\Models\Role;
 use App\Services\AuthorProfileService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
@@ -77,6 +78,11 @@ class UserService
 
             $user = $this->userRepository->create($data);
 
+            // Auto-assign role-based permissions
+            if (isset($data['role'])) {
+                $this->autoAssignRolePermissions($user->id, $data['role']);
+            }
+
             // Assign roles if provided
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $this->userRepository->syncRoles($user->id, $data['roles']);
@@ -138,6 +144,11 @@ class UserService
             }
 
             $this->userRepository->update($id, $data);
+
+            // Auto-assign role-based permissions if role changed
+            if (isset($data['role']) && $data['role'] !== $oldRole) {
+                $this->autoAssignRolePermissions($id, $data['role']);
+            }
 
             // Sync roles if provided
             if (isset($data['roles']) && is_array($data['roles'])) {
@@ -318,6 +329,46 @@ class UserService
     protected function uploadAvatar($file): string
     {
         return $file->store('avatars', 'public');
+    }
+
+    /**
+     * Auto-assign permissions based on user role type
+     * 
+     * @param int $userId
+     * @param string $roleType (admin, author, customer)
+     * @return void
+     */
+    protected function autoAssignRolePermissions(int $userId, string $roleType): void
+    {
+        // Map role types to role slugs
+        $roleSlugMap = [
+            'admin' => 'admin',
+            'author' => 'author',
+            'customer' => 'customer',
+        ];
+
+        // Get the role slug from the role type
+        $roleSlug = $roleSlugMap[$roleType] ?? null;
+
+        if (!$roleSlug) {
+            return; // No matching role found
+        }
+
+        // Find the role by slug
+        $role = Role::where('slug', $roleSlug)->where('is_active', true)->first();
+
+        if (!$role) {
+            return; // Role not found
+        }
+
+        // Clear existing roles first
+        $this->userRepository->syncRoles($userId, []);
+
+        // Assign the new role
+        $this->userRepository->assignRole($userId, $role->id);
+
+        // Log the auto-assignment
+        $this->logActivity($userId, 'role_auto_assigned', "Auto-assigned {$role->name} role with permissions");
     }
 
     /**
