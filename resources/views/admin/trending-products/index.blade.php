@@ -93,14 +93,14 @@
                                             <span class="text-sm text-gray-600">Order: {{ $trending->sort_order }}</span>
                                             @if($trending->product->sale_price)
                                                 <span class="text-sm font-semibold text-green-600">
-                                                    ${{ number_format($trending->product->sale_price, 2) }}
+                                                    {{ currency_format($trending->product->sale_price) }}
                                                 </span>
                                                 <span class="text-sm text-gray-400 line-through">
-                                                    ${{ number_format($trending->product->price, 2) }}
+                                                    {{ currency_format($trending->product->price) }}
                                                 </span>
                                             @else
                                                 <span class="text-sm font-semibold text-gray-900">
-                                                    ${{ number_format($trending->product->price, 2) }}
+                                                    {{ currency_format($trending->product->price) }}
                                                 </span>
                                             @endif
                                             @if($trending->product->variants->first())

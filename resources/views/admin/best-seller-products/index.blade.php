@@ -93,14 +93,14 @@
                                             <span class="text-sm text-gray-600">Order: {{ $bestSeller->sort_order }}</span>
                                             @if($bestSeller->product->sale_price)
                                                 <span class="text-sm font-semibold text-green-600">
-                                                    ${{ number_format($bestSeller->product->sale_price, 2) }}
+                                                    {{ currency_format($bestSeller->product->sale_price) }}
                                                 </span>
                                                 <span class="text-sm text-gray-400 line-through">
-                                                    ${{ number_format($bestSeller->product->price, 2) }}
+                                                    {{ currency_format($bestSeller->product->price) }}
                                                 </span>
                                             @else
                                                 <span class="text-sm font-semibold text-gray-900">
-                                                    ${{ number_format($bestSeller->product->price, 2) }}
+                                                    {{ currency_format($bestSeller->product->price) }}
                                                 </span>
                                             @endif
                                             @if($bestSeller->product->variants->first())

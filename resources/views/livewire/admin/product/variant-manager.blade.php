@@ -114,9 +114,9 @@
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $variant['sku'] }}</td>
                     <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">${{ number_format($variant['price'], 2) }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ currency_format($variant['price']) }}</div>
                         @if($variant['sale_price'])
-                        <div class="text-xs text-gray-500">${{ number_format($variant['sale_price'], 2) }}</div>
+                        <div class="text-xs text-gray-500">{{ currency_format($variant['sale_price']) }}</div>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">{{ $variant['stock_quantity'] }}</td>

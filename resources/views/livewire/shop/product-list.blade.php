@@ -297,7 +297,7 @@
                                 </div>
                                 @if($priceRange)
                                 <p class="text-xs text-gray-500">
-                                    Range: ${{ number_format($priceRange->min_price, 2) }} - ${{ number_format($priceRange->max_price, 2) }}
+                                    Range: {{ currency_format($priceRange->min_price) }} - {{ currency_format($priceRange->max_price) }}
                                 </p>
                                 @endif
                             </div>

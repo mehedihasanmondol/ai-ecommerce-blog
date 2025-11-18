@@ -129,7 +129,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="font-semibold text-gray-900">${{ number_format($order->total_amount, 2) }}</p>
+                                    <p class="font-semibold text-gray-900">{{ currency_format($order->total_amount) }}</p>
                                     <a href="{{ route('customer.orders.show', $order) }}" 
                                        class="text-sm text-green-600 hover:text-green-700 font-medium">
                                         View Details →

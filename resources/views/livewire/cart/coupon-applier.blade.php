@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 ml-2">
-                    <span class="font-bold text-green-900 text-sm whitespace-nowrap">-${{ number_format($discountAmount, 2) }}</span>
+                    <span class="font-bold text-green-900 text-sm whitespace-nowrap">-{{ currency_format($discountAmount) }}</span>
                     <button wire:click="removeCoupon" 
                             type="button"
                             class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition"
@@ -137,7 +137,7 @@
                                             @endif
                                             @if($coupon['min_purchase_amount'])
                                                 <p class="text-xs text-gray-500 mt-1">
-                                                    Min: ${{ number_format($coupon['min_purchase_amount'], 2) }}
+                                                    Min: {{ currency_format($coupon['min_purchase_amount']) }}
                                                 </p>
                                             @endif
                                             @if($coupon['expires_at'])

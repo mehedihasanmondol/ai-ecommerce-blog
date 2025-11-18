@@ -8,17 +8,27 @@
 
 @php
     // Calculate product data exactly like Shop Page
-    $variant = $product->variants->first();
+    // Ensure we get a proper ProductVariant model instance
+    $variant = null;
+    if ($product->variants && $product->variants->count() > 0) {
+        $firstVariant = $product->variants->first();
+        // If it's a stdClass, get the proper model by ID
+        if ($firstVariant instanceof stdClass && isset($firstVariant->id)) {
+            $variant = \App\Modules\Ecommerce\Product\Models\ProductVariant::find($firstVariant->id);
+        } elseif ($firstVariant instanceof \App\Modules\Ecommerce\Product\Models\ProductVariant) {
+            $variant = $firstVariant;
+        }
+    }
+    
     $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-    $price = $variant->sale_price ?? $variant->price ?? 0;
-    $originalPrice = $variant->price ?? 0;
+    $price = $variant ? ($variant->sale_price ?? $variant->price ?? 0) : 0;
+    $originalPrice = $variant ? ($variant->price ?? 0) : 0;
     $hasDiscount = $originalPrice > $price;
     
-    // Stock restriction setting
-    $restrictionEnabled = \App\Models\SiteSetting::get('enable_out_of_stock_restriction', '1') === '1';
-    $canAddToCart = $variant ? $variant->canAddToCart() : false;
-    $showStockInfo = $variant ? $variant->shouldShowStock() : false;
-    $stockText = $variant ? $variant->getStockDisplayText() : null;
+    // Stock restriction setting - use model methods only if we have a proper model
+    $canAddToCart = ($variant && method_exists($variant, 'canAddToCart')) ? $variant->canAddToCart() : false;
+    $showStockInfo = ($variant && method_exists($variant, 'shouldShowStock')) ? $variant->shouldShowStock() : false;
+    $stockText = ($variant && method_exists($variant, 'getStockDisplayText')) ? $variant->getStockDisplayText() : null;
     
     // Size-based classes
     $sizeClasses = [
@@ -113,9 +123,9 @@
         <!-- Price -->
         <div class="mb-3">
             <div class="flex items-baseline space-x-2">
-                <span class="{{ $classes['price'] }} font-bold text-gray-900">${{ number_format($price, 2) }}</span>
+                <span class="{{ $classes['price'] }} font-bold text-gray-900">{{ currency_format($price) }}</span>
                 @if($hasDiscount)
-                <span class="text-sm text-gray-500 line-through">${{ number_format($originalPrice, 2) }}</span>
+                <span class="text-sm text-gray-500 line-through">{{ currency_format($originalPrice) }}</span>
                 @endif
             </div>
         </div>
@@ -220,14 +230,14 @@
                     <div class="flex items-center space-x-4">
                         <div>
                             <div class="flex items-baseline space-x-2">
-                                <span class="text-2xl font-bold text-gray-900">${{ number_format($price, 2) }}</span>
+                                <span class="text-2xl font-bold text-gray-900">{{ currency_format($price) }}</span>
                                 @if($hasDiscount)
-                                <span class="text-lg text-gray-500 line-through">${{ number_format($originalPrice, 2) }}</span>
+                                <span class="text-lg text-gray-500 line-through">{{ currency_format($originalPrice) }}</span>
                                 @endif
                             </div>
                             @if($hasDiscount)
                             <p class="text-sm text-green-600 font-medium">
-                                Save ${{ number_format($originalPrice - $price, 2) }}
+                                Save {{ currency_format($originalPrice - $price) }}
                             </p>
                             @endif
                         </div>

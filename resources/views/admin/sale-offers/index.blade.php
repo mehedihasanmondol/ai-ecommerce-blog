@@ -93,14 +93,14 @@
                                             <span class="text-sm text-gray-600">Order: {{ $offer->display_order }}</span>
                                             @if($offer->product->sale_price)
                                                 <span class="text-sm font-semibold text-green-600">
-                                                    ${{ number_format($offer->product->sale_price, 2) }}
+                                                    {{ currency_format($offer->product->sale_price) }}
                                                 </span>
                                                 <span class="text-sm text-gray-400 line-through">
-                                                    ${{ number_format($offer->product->price, 2) }}
+                                                    {{ currency_format($offer->product->price) }}
                                                 </span>
                                             @else
                                                 <span class="text-sm font-semibold text-gray-900">
-                                                    ${{ number_format($offer->product->price, 2) }}
+                                                    {{ currency_format($offer->product->price) }}
                                                 </span>
                                             @endif
                                         </div>

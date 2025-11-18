@@ -86,17 +86,17 @@
                             <div class="flex items-center gap-2 mt-1">
                                 @if($product->sale_price)
                                     <span class="text-sm font-semibold text-green-600">
-                                        ${{ number_format($product->sale_price, 2) }}
+                                        {{ currency_format($product->sale_price) }}
                                     </span>
                                     <span class="text-xs text-gray-400 line-through">
-                                        ${{ number_format($product->price, 2) }}
+                                        {{ currency_format($product->price) }}
                                     </span>
                                     <span class="text-xs font-medium text-red-600">
                                         -{{ $product->discount_percentage }}%
                                     </span>
                                 @else
                                     <span class="text-sm font-semibold text-gray-900">
-                                        ${{ number_format($product->price, 2) }}
+                                        {{ currency_format($product->price) }}
                                     </span>
                                 @endif
                             </div>

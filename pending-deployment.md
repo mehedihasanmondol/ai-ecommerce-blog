@@ -10,4 +10,7 @@ php artisan migrate --path=database/migrations/2025_11_18_000001_add_homepage_se
 
 php artisan migrate --path=database/migrations/2025_11_18_000002_add_footer_section_enable_disable_settings.php
 
+php artisan migrate --path=database/migrations/2025_11_18_064000_add_currency_settings_to_site_settings.php
+
+
 php artisan db:seed --class=SiteSettingSeeder

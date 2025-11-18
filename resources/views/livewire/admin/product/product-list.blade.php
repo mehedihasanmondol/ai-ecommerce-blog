@@ -170,9 +170,9 @@
                             {{ $product->category?->name ?? '-' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">${{ number_format($product->price, 2) }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ currency_format($product->price) }}</div>
                             @if($product->sale_price)
-                            <div class="text-xs text-gray-500 line-through">${{ number_format($product->sale_price, 2) }}</div>
+                            <div class="text-xs text-gray-500 line-through">{{ currency_format($product->sale_price) }}</div>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

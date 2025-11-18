@@ -326,11 +326,11 @@
                             <div class="mb-3">
                                 <div class="flex items-baseline space-x-2">
                                     <span class="text-3xl font-bold text-red-600">
-                                        ${{ number_format($minPrice, 2) }}
+                                        {{ currency_format($minPrice) }}
                                     </span>
                                     @if($minPrice != $maxPrice)
                                         <span class="text-lg text-gray-600">
-                                            - ${{ number_format($maxPrice, 2) }}
+                                            - {{ currency_format($maxPrice) }}
                                         </span>
                                     @endif
                                 </div>
@@ -347,7 +347,7 @@
                                     @if($variant->sale_price && $variant->sale_price < $variant->price)
                                         <div class="flex items-baseline space-x-2 mb-1">
                                             <span class="text-3xl font-bold text-red-600">
-                                                ${{ number_format($variant->sale_price, 2) }}
+                                                {{ currency_format($variant->sale_price) }}
                                             </span>
                                             <span class="text-sm font-semibold text-red-600">
                                                 ({{ round((($variant->price - $variant->sale_price) / $variant->price) * 100) }}% off)
@@ -355,23 +355,23 @@
                                         </div>
                                         <div class="flex items-baseline space-x-2">
                                             <span class="text-sm text-gray-500 line-through">
-                                                ${{ number_format($variant->price, 2) }}
+                                                {{ currency_format($variant->price) }}
                                             </span>
                                             @if($variant->weight)
                                             <span class="text-sm text-gray-600">
-                                                ${{ number_format($variant->sale_price / $variant->weight, 2) }}/unit
+                                                {{ currency_format($variant->sale_price / $variant->weight) }}/unit
                                             </span>
                                             @endif
                                         </div>
                                     @else
                                         <div class="mb-1">
                                             <span class="text-3xl font-bold text-red-600">
-                                                ${{ number_format($variant->price, 2) }}
+                                                {{ currency_format($variant->price) }}
                                             </span>
                                         </div>
                                         @if($variant->weight)
                                         <div class="text-sm text-gray-600">
-                                            ${{ number_format($variant->price / $variant->weight, 2) }}/unit
+                                            {{ currency_format($variant->price / $variant->weight) }}/unit
                                         </div>
                                         @endif
                                     @endif

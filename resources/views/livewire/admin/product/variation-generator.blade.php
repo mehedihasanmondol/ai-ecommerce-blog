@@ -139,7 +139,7 @@
                         <div class="flex-1">
                             <div class="font-medium text-gray-900">{{ $variation['name'] }}</div>
                             <div class="text-sm text-gray-500">
-                                Price: ${{ $variation['price'] ?? '0.00' }} | Stock: {{ $variation['stock_quantity'] ?? '0' }}
+                                Price: @currencySymbol{{ $variation['price'] ?? '0.00' }} | Stock: {{ $variation['stock_quantity'] ?? '0' }}
                             </div>
                         </div>
 

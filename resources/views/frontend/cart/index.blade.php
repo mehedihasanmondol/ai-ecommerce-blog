@@ -92,14 +92,14 @@
                                 <!-- Price -->
                                 <div class="text-right ml-4">
                                     <p class="text-lg font-bold text-gray-900">
-                                        ${{ number_format($item['price'], 2) }}
+                                        {{ currency_format($item['price']) }}
                                     </p>
                                     @if(isset($item['original_price']) && $item['original_price'] > $item['price'])
                                     <p class="text-sm text-gray-500 line-through">
-                                        ${{ number_format($item['original_price'], 2) }}
+                                        {{ currency_format($item['original_price']) }}
                                     </p>
                                     <p class="text-xs text-green-600 font-medium">
-                                        Special! -${{ number_format($item['original_price'] - $item['price'], 2) }}
+                                        Special! -{{ currency_format($item['original_price'] - $item['price']) }}
                                     </p>
                                     @endif
                                 </div>

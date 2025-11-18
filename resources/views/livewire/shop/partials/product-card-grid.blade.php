@@ -75,9 +75,9 @@
         <!-- Price -->
         <div class="mb-3">
             <div class="flex items-baseline space-x-2">
-                <span class="text-lg font-bold text-gray-900">${{ number_format($price, 2) }}</span>
+                <span class="text-lg font-bold text-gray-900">{{ currency_format($price) }}</span>
                 @if($hasDiscount)
-                <span class="text-sm text-gray-500 line-through">${{ number_format($originalPrice, 2) }}</span>
+                <span class="text-sm text-gray-500 line-through">{{ currency_format($originalPrice) }}</span>
                 @endif
             </div>
         </div>

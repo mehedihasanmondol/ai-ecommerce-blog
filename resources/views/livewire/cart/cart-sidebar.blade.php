@@ -86,13 +86,13 @@
                                 <!-- Price Info -->
                                 <div class="flex items-center space-x-2 mb-2">
                                     @if(isset($item['original_price']) && $item['original_price'] > $item['price'])
-                                        <span class="text-xs text-gray-400 line-through">${{ number_format($item['original_price'], 2) }}</span>
-                                        <span class="text-sm font-bold text-red-600">${{ number_format($item['price'], 2) }}</span>
+                                        <span class="text-xs text-gray-400 line-through">{{ currency_format($item['original_price']) }}</span>
+                                        <span class="text-sm font-bold text-red-600">{{ currency_format($item['price']) }}</span>
                                         <span class="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded font-medium">
                                             {{ round((($item['original_price'] - $item['price']) / $item['original_price']) * 100) }}% OFF
                                         </span>
                                     @else
-                                        <span class="text-sm font-bold text-gray-900">${{ number_format($item['price'], 2) }}</span>
+                                        <span class="text-sm font-bold text-gray-900">{{ currency_format($item['price']) }}</span>
                                     @endif
                                 </div>
                                 
@@ -119,7 +119,7 @@
                                         </button>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-base font-bold text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
+                                        <p class="text-base font-bold text-gray-900">{{ currency_format($item['price'] * $item['quantity']) }}</p>
                                     </div>
                                 </div>
 
@@ -201,10 +201,10 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-1">
                                         @if($product['original_price'] > $product['price'])
-                                            <span class="text-xs text-gray-400 line-through">${{ number_format($product['original_price'], 2) }}</span>
-                                            <span class="text-sm font-bold text-red-600">${{ number_format($product['price'], 2) }}</span>
+                                            <span class="text-xs text-gray-400 line-through">{{ currency_format($product['original_price']) }}</span>
+                                            <span class="text-sm font-bold text-red-600">{{ currency_format($product['price']) }}</span>
                                         @else
-                                            <span class="text-sm font-bold text-gray-900">${{ number_format($product['price'], 2) }}</span>
+                                            <span class="text-sm font-bold text-gray-900">{{ currency_format($product['price']) }}</span>
                                         @endif
                                     </div>
                                     
@@ -241,7 +241,7 @@
                     <p class="text-sm font-bold text-gray-900">Subtotal ({{ count($cartItems) }} Items)</p>
                     <p class="text-xs text-gray-500">Includes all discounts</p>
                 </div>
-                <p class="text-xl font-bold text-gray-900">${{ number_format($subtotal, 2) }}</p>
+                <p class="text-xl font-bold text-gray-900">{{ currency_format($subtotal) }}</p>
             </div>
 
             <!-- Action Buttons -->

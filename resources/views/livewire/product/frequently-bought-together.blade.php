@@ -92,7 +92,7 @@
                                             </a>
                                         </div>
                                         <span class="text-sm font-semibold text-gray-900 whitespace-nowrap ml-2">
-                                            ${{ number_format($item['price'], 2) }}
+                                            {{ currency_format($item['price']) }}
                                         </span>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                         <div class="pt-4 border-t border-gray-200">
                             <div class="flex items-center justify-between mb-4">
                                 <span class="text-base font-semibold text-gray-900">Total:</span>
-                                <span class="text-2xl font-bold text-gray-900">${{ $this->totalPrice }}</span>
+                                <span class="text-2xl font-bold text-gray-900">{{ currency_format($this->totalPrice) }}</span>
                             </div>
                             
                             <!-- Add Selected to Cart Button -->

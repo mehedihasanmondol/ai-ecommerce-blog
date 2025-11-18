@@ -115,7 +115,7 @@
                                                 @endif
                                                 @if($product->defaultVariant)
                                                     <span class="text-xs text-green-600 font-semibold">
-                                                        ${{ number_format($product->defaultVariant->sale_price ?? $product->defaultVariant->price, 2) }}
+                                                        {{ currency_format($product->defaultVariant->sale_price ?? $product->defaultVariant->price) }}
                                                     </span>
                                                 @endif
                                             </div>

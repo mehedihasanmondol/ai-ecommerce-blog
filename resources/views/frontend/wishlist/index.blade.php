@@ -60,14 +60,14 @@
                     <!-- Price -->
                     <div class="mb-3">
                         <div class="flex items-baseline space-x-2">
-                            <span class="text-lg font-bold text-gray-900">${{ number_format($item['price'], 2) }}</span>
+                            <span class="text-lg font-bold text-gray-900">{{ currency_format($item['price']) }}</span>
                             @if(isset($item['original_price']) && $item['original_price'] > $item['price'])
-                            <span class="text-sm text-gray-500 line-through">${{ number_format($item['original_price'], 2) }}</span>
+                            <span class="text-sm text-gray-500 line-through">{{ currency_format($item['original_price']) }}</span>
                             @endif
                         </div>
                         @if(isset($item['original_price']) && $item['original_price'] > $item['price'])
                         <p class="text-xs text-green-600 font-medium">
-                            Save ${{ number_format($item['original_price'] - $item['price'], 2) }}
+                            Save {{ currency_format($item['original_price'] - $item['price']) }}
                         </p>
                         @endif
                     </div>

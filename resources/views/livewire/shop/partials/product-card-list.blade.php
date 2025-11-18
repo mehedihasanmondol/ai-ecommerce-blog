@@ -57,14 +57,14 @@
                     <div class="flex items-center space-x-4">
                         <div>
                             <div class="flex items-baseline space-x-2">
-                                <span class="text-2xl font-bold text-gray-900">${{ number_format($price, 2) }}</span>
+                                <span class="text-2xl font-bold text-gray-900">{{ currency_format($price) }}</span>
                                 @if($hasDiscount)
-                                <span class="text-lg text-gray-500 line-through">${{ number_format($originalPrice, 2) }}</span>
+                                <span class="text-lg text-gray-500 line-through">{{ currency_format($originalPrice) }}</span>
                                 @endif
                             </div>
                             @if($hasDiscount)
                             <p class="text-sm text-green-600 font-medium">
-                                Save ${{ number_format($originalPrice - $price, 2) }}
+                                Save {{ currency_format($originalPrice - $price) }}
                             </p>
                             @endif
                         </div>

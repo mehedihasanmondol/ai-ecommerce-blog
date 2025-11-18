@@ -154,10 +154,10 @@
                                             @if($product->defaultVariant)
                                                 <div class="mt-2">
                                                     @if($product->defaultVariant->sale_price)
-                                                        <span class="text-lg font-bold text-orange-600">${{ number_format($product->defaultVariant->sale_price, 2) }}</span>
-                                                        <span class="text-sm text-gray-500 line-through ml-2">${{ number_format($product->defaultVariant->price, 2) }}</span>
+                                                        <span class="text-lg font-bold text-orange-600">{{ currency_format($product->defaultVariant->sale_price) }}</span>
+                                                        <span class="text-sm text-gray-500 line-through ml-2">{{ currency_format($product->defaultVariant->price) }}</span>
                                                     @else
-                                                        <span class="text-lg font-bold text-gray-900">${{ number_format($product->defaultVariant->price, 2) }}</span>
+                                                        <span class="text-lg font-bold text-gray-900">{{ currency_format($product->defaultVariant->price) }}</span>
                                                     @endif
                                                 </div>
                                             @endif
