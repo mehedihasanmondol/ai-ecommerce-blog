@@ -63,4 +63,43 @@ class FooterManagementController extends Controller
         $blogPost->delete();
         return redirect()->back()->with('success', 'Blog post deleted successfully!');
     }
+
+    /**
+     * Toggle footer section visibility
+     */
+    public function toggleSection(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'section_key' => 'required|string',
+                'enabled' => 'required|boolean',
+            ]);
+
+            FooterSetting::updateOrCreate(
+                ['key' => $validated['section_key']],
+                [
+                    'value' => $validated['enabled'] ? '1' : '0',
+                    'group' => 'footer_sections',
+                    'type' => 'boolean',
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Section visibility updated successfully',
+                'enabled' => $validated['enabled']
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(', ', $e->errors())
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Footer toggle error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

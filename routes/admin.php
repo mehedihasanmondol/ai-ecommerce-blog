@@ -156,6 +156,7 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     Route::middleware(['permission:users.view'])->group(function () {
         Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
         Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
+        Route::post('footer-management/toggle-section', [FooterManagementController::class, 'toggleSection'])->name('footer-management.toggle-section');
         Route::post('footer-management/links', [FooterManagementController::class, 'storeLink'])->name('footer-management.store-link');
         Route::put('footer-management/links/{link}', [FooterManagementController::class, 'updateLink'])->name('footer-management.update-link');
         Route::delete('footer-management/links/{link}', [FooterManagementController::class, 'deleteLink'])->name('footer-management.delete-link');

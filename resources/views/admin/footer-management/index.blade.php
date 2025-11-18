@@ -58,6 +58,23 @@
         <div class="p-6">
             <!-- General Settings Tab -->
             <div id="content-settings" class="tab-content">
+                <!-- Newsletter Section Toggle -->
+                <x-admin.footer-section-toggle
+                    sectionKey="newsletter_section_enabled"
+                    sectionName="Newsletter Section"
+                    description="Email signup form with promotional offers"
+                    :enabled="\App\Models\FooterSetting::get('newsletter_section_enabled', '1')"
+                />
+
+                <!-- Value Guarantee Toggle -->
+                <x-admin.footer-section-toggle
+                    sectionKey="value_guarantee_section_enabled"
+                    sectionName="Value Guarantee Banner"
+                    description="Yellow banner with guarantee message"
+                    :enabled="\App\Models\FooterSetting::get('value_guarantee_section_enabled', '1')"
+                />
+
+                <!-- General Settings Form -->
                 <form action="{{ route('admin.footer-management.update-settings') }}" method="POST">
                     @csrf
                     <div class="space-y-6">
@@ -95,11 +112,27 @@
 
             <!-- Footer Links Tab -->
             <div id="content-links" class="tab-content hidden">
+                <!-- Footer Links Section Toggle -->
+                <x-admin.footer-section-toggle
+                    sectionKey="footer_links_section_enabled"
+                    sectionName="Footer Links Section"
+                    description="About, Company, Resources, Customer Support, Mobile Apps columns"
+                    :enabled="\App\Models\FooterSetting::get('footer_links_section_enabled', '1')"
+                />
+                
                 @livewire('admin.footer-links-manager')
             </div>
 
             <!-- Blog Posts Tab -->
             <div id="content-blog" class="tab-content hidden">
+                <!-- Wellness Hub Section Toggle -->
+                <x-admin.footer-section-toggle
+                    sectionKey="wellness_hub_section_enabled"
+                    sectionName="Wellness Hub / Blog Section"
+                    description="Featured blog articles grid displayed at top of footer"
+                    :enabled="\App\Models\FooterSetting::get('wellness_hub_section_enabled', '1')"
+                />
+                
                 <div class="mb-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Add New Blog Post</h3>
                     <form action="{{ route('admin.footer-management.store-blog') }}" method="POST" enctype="multipart/form-data" class="bg-gray-50 p-4 rounded-lg">
@@ -143,6 +176,14 @@
 
             <!-- Social Media Tab -->
             <div id="content-social" class="tab-content hidden">
+                <!-- Social Media Section Toggle -->
+                <x-admin.footer-section-toggle
+                    sectionKey="social_media_section_enabled"
+                    sectionName="Social Media Section"
+                    description="Social media icons (Facebook, Twitter, YouTube, Pinterest, Instagram)"
+                    :enabled="\App\Models\FooterSetting::get('social_media_section_enabled', '1')"
+                />
+                
                 <form action="{{ route('admin.footer-management.update-settings') }}" method="POST">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

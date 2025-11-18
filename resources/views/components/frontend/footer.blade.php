@@ -13,6 +13,7 @@
 --}}
 
 <!-- Wellness Hub / Blog Section -->
+@if(\App\Models\FooterSetting::get('wellness_hub_section_enabled', '1') === '1')
 <section class="bg-white py-8 border-t border-gray-200">
     <div class="container mx-auto px-4">
         <!-- Blog Articles Grid -->
@@ -118,8 +119,10 @@
         @endif
     </div>
 </section>
+@endif
 
 <!-- Value Guarantee Banner -->
+@if(\App\Models\FooterSetting::get('value_guarantee_section_enabled', '1') === '1')
 <section class="bg-yellow-50 py-4 border-y border-yellow-200">
     <div class="container mx-auto px-4">
         @php
@@ -148,6 +151,7 @@
 
 <footer class="bg-white">
     <!-- Main Footer Links -->
+    @if(\App\Models\FooterSetting::get('footer_links_section_enabled', '1') === '1')
     <div class="container mx-auto px-4 py-12">
         @php
             $footerLinks = \App\Models\FooterLink::where('is_active', true)
@@ -255,6 +259,7 @@
             @endif
         </div>
     </div>
+    @endif
 
     <!-- Social Media -->
     <div class="border-t border-gray-200 py-6">
@@ -287,8 +292,10 @@
             
         </div>
     </div>
+    @endif
 
     <!-- Newsletter Signup Section -->
+    @if(\App\Models\FooterSetting::get('newsletter_section_enabled', '1') === '1')
     <div class="border-t border-gray-200 py-12 bg-gray-50">
         <div class="container mx-auto px-4">
             <div class="max-w-2xl mx-auto text-center">
@@ -321,6 +328,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <!-- Copyright -->
     <div class="border-t border-gray-200 py-6">
