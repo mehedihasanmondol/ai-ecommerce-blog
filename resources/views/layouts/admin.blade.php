@@ -20,6 +20,10 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
+    
+    <!-- Alpine.js Collapse Plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: true, mobileMenuOpen: false }">
@@ -176,6 +180,49 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+
+                <!-- Reports Section -->
+                <div x-data="{ open: {{ request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }" class="space-y-1">
+                    <button @click="open = !open" 
+                            class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                        <i class="fas fa-chart-line w-5 mr-3"></i>
+                        <span class="flex-1 text-left">Reports & Analytics</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse class="ml-4 space-y-1 border-l-2 border-gray-200 pl-2">
+                        <a href="{{ route('admin.reports.index') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.index') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-tachometer-alt w-4 mr-2 text-xs"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ route('admin.reports.sales') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.sales') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-dollar-sign w-4 mr-2 text-xs"></i>
+                            <span>Sales Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.products') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.products') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-box w-4 mr-2 text-xs"></i>
+                            <span>Product Performance</span>
+                        </a>
+                        <a href="{{ route('admin.reports.inventory') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.inventory') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-warehouse w-4 mr-2 text-xs"></i>
+                            <span>Inventory Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.customers') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.customers') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-users w-4 mr-2 text-xs"></i>
+                            <span>Customer Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.delivery') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg transition-colors {{ request()->routeIs('admin.reports.delivery') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-truck w-4 mr-2 text-xs"></i>
+                            <span>Delivery Report</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a href="{{ route('admin.categories.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -524,6 +571,49 @@
                     <i class="fas fa-shopping-cart w-5 mr-3"></i>
                     <span>Orders</span>
                 </a>
+
+                <!-- Reports Section (Mobile) -->
+                <div x-data="{ open: {{ request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }" class="space-y-1">
+                    <button @click="open = !open" 
+                            class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                        <i class="fas fa-chart-line w-5 mr-3"></i>
+                        <span class="flex-1 text-left">Reports & Analytics</span>
+                        <i class="fas fa-chevron-down text-xs transition-transform" :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+                    
+                    <div x-show="open" x-collapse class="ml-4 space-y-1 border-l-2 border-gray-200 pl-2">
+                        <a href="{{ route('admin.reports.index') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.index') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-tachometer-alt w-4 mr-2 text-xs"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ route('admin.reports.sales') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.sales') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-dollar-sign w-4 mr-2 text-xs"></i>
+                            <span>Sales Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.products') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.products') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-box w-4 mr-2 text-xs"></i>
+                            <span>Product Performance</span>
+                        </a>
+                        <a href="{{ route('admin.reports.inventory') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.inventory') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-warehouse w-4 mr-2 text-xs"></i>
+                            <span>Inventory Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.customers') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.customers') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-users w-4 mr-2 text-xs"></i>
+                            <span>Customer Report</span>
+                        </a>
+                        <a href="{{ route('admin.reports.delivery') }}" 
+                           class="flex items-center px-3 py-2 text-sm rounded-lg {{ request()->routeIs('admin.reports.delivery') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:bg-gray-50' }}">
+                            <i class="fas fa-truck w-4 mr-2 text-xs"></i>
+                            <span>Delivery Report</span>
+                        </a>
+                    </div>
+                </div>
 
                 <a href="{{ route('admin.categories.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">

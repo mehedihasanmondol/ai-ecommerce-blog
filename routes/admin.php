@@ -234,4 +234,21 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     Route::middleware(['permission:stock.view'])->group(function () {
         Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
     });
+
+    // Reports Routes - Accessible to all admin users
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('index');
+        Route::get('/sales', [\App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('sales');
+        Route::get('/products', [\App\Http\Controllers\Admin\ReportController::class, 'products'])->name('products');
+        Route::get('/inventory', [\App\Http\Controllers\Admin\ReportController::class, 'inventory'])->name('inventory');
+        Route::get('/customers', [\App\Http\Controllers\Admin\ReportController::class, 'customers'])->name('customers');
+        Route::get('/delivery', [\App\Http\Controllers\Admin\ReportController::class, 'delivery'])->name('delivery');
+        
+        // Export routes
+        Route::get('/export/sales-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportSalesPdf'])->name('export-sales-pdf');
+        Route::get('/export/inventory-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportInventoryPdf'])->name('export-inventory-pdf');
+        Route::get('/export/products-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProductsPdf'])->name('export-products-pdf');
+        Route::get('/export/customers-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCustomersPdf'])->name('export-customers-pdf');
+        Route::get('/export/delivery-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportDeliveryPdf'])->name('export-delivery-pdf');
+    });
 });

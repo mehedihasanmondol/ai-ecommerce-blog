@@ -217,6 +217,17 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage New Arrivals', 'slug' => 'new-arrivals.manage', 'module' => 'content'],
             
             // ===================================
+            // REPORTS & ANALYTICS MODULE
+            // ===================================
+            ['name' => 'View Reports', 'slug' => 'reports.view', 'module' => 'reports'],
+            ['name' => 'View Sales Reports', 'slug' => 'reports.sales', 'module' => 'reports'],
+            ['name' => 'View Inventory Reports', 'slug' => 'reports.inventory', 'module' => 'reports'],
+            ['name' => 'View Product Reports', 'slug' => 'reports.products', 'module' => 'reports'],
+            ['name' => 'View Customer Reports', 'slug' => 'reports.customers', 'module' => 'reports'],
+            ['name' => 'View Delivery Reports', 'slug' => 'reports.delivery', 'module' => 'reports'],
+            ['name' => 'Export Reports', 'slug' => 'reports.export', 'module' => 'reports'],
+            
+            // ===================================
             // PAYMENT & FINANCE MODULE
             // ===================================
             ['name' => 'View Payment Gateways', 'slug' => 'payment-gateways.view', 'module' => 'finance'],
@@ -307,8 +318,8 @@ class RolePermissionSeeder extends Seeder
         $adminRole->permissions()->sync($adminPermissions);
         $this->command->info('✓ Admin: ' . $adminPermissions->count() . ' permissions');
 
-        // 3. MANAGER - Business Operations (Product, Order, Stock, Delivery)
-        $managerPermissions = Permission::whereIn('module', ['product', 'order', 'stock', 'delivery'])
+        // 3. MANAGER - Business Operations (Product, Order, Stock, Delivery, Reports)
+        $managerPermissions = Permission::whereIn('module', ['product', 'order', 'stock', 'delivery', 'reports'])
             ->where(function($query) {
                 // Exclude sensitive actions
                 $query->whereNotIn('slug', [
