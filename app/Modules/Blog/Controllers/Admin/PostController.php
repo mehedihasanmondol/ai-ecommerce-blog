@@ -52,13 +52,26 @@ class PostController extends Controller
     {
         $categories = $this->categoryRepository->getActive();
         $tags = $this->tagRepository->all();
+        $products = \App\Modules\Ecommerce\Product\Models\Product::where('status', 'published')
+            ->with('images')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.blog.posts.create', compact('categories', 'tags'));
+        return view('admin.blog.posts.create', compact('categories', 'tags', 'products'));
     }
 
     public function store(StorePostRequest $request)
     {
         $post = $this->postService->createPost($request->validated());
+
+        // Attach products for "Shop This Article" if provided
+        if ($request->has('products')) {
+            $productsWithOrder = [];
+            foreach ($request->products as $index => $productId) {
+                $productsWithOrder[$productId] = ['sort_order' => $index];
+            }
+            $post->products()->sync($productsWithOrder);
+        }
 
         return redirect()->route('admin.blog.posts.index')
             ->with('success', 'পোস্ট সফলভাবে তৈরি হয়েছে');
@@ -73,15 +86,32 @@ class PostController extends Controller
     public function edit($id)
     {
         $post = $this->postService->getPost($id);
+        $post->load('products'); // Load attached products
         $categories = $this->categoryRepository->getActive();
         $tags = $this->tagRepository->all();
+        $products = \App\Modules\Ecommerce\Product\Models\Product::where('status', 'published')
+            ->with('images')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.blog.posts.edit', compact('post', 'categories', 'tags'));
+        return view('admin.blog.posts.edit', compact('post', 'categories', 'tags', 'products'));
     }
 
     public function update(UpdatePostRequest $request, $id)
     {
         $post = $this->postService->updatePost($id, $request->validated());
+
+        // Sync products for "Shop This Article"
+        if ($request->has('products')) {
+            $productsWithOrder = [];
+            foreach ($request->products as $index => $productId) {
+                $productsWithOrder[$productId] = ['sort_order' => $index];
+            }
+            $post->products()->sync($productsWithOrder);
+        } else {
+            // If no products selected, detach all
+            $post->products()->detach();
+        }
 
         return redirect()->route('admin.blog.posts.index')
             ->with('success', 'পোস্ট সফলভাবে আপডেট হয়েছে');

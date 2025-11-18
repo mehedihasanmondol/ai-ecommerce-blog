@@ -31,19 +31,23 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.access'])->gr
             Route::get('posts', function() {
                 return view('admin.blog.posts.index-livewire');
             })->name('posts.index');
-            Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
         });
         
-        // Create Posts - Requires posts.create permission
+        // Create Posts - Requires posts.create permission (MUST BE BEFORE posts/{post})
         Route::middleware(['permission:posts.create'])->group(function () {
             Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
             Route::post('posts', [PostController::class, 'store'])->name('posts.store');
         });
         
-        // Edit Posts - Requires posts.edit permission
+        // Edit Posts - Requires posts.edit permission (MUST BE BEFORE posts/{post})
         Route::middleware(['permission:posts.edit'])->group(function () {
             Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
             Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+        });
+        
+        // Show Post - MUST BE AFTER create/edit routes
+        Route::middleware(['permission:posts.view'])->group(function () {
+            Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
         });
         
         // Delete Posts - Requires posts.delete permission

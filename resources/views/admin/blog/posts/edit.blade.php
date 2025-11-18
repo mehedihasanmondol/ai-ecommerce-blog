@@ -459,6 +459,96 @@
                         </div>
                     </div>
 
+                    <!-- Shop This Article Products -->
+                    <div class="bg-white rounded-lg shadow p-6" x-data="{ 
+                        showProducts: {{ $post->products->count() > 0 ? 'true' : 'false' }},
+                        filterProducts(query) {
+                            const labels = document.querySelectorAll('#product-list-container-edit label');
+                            labels.forEach(label => {
+                                const productName = label.querySelector('span').textContent.toLowerCase();
+                                if (productName.includes(query.toLowerCase())) {
+                                    label.style.display = 'flex';
+                                } else {
+                                    label.style.display = 'none';
+                                }
+                            });
+                        }
+                    }">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                </svg>
+                                Shop This Article
+                                @if($post->products->count() > 0)
+                                    <span class="ml-2 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                                        {{ $post->products->count() }} selected
+                                    </span>
+                                @endif
+                            </h3>
+                            <button type="button" 
+                                    @click="showProducts = !showProducts"
+                                    class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition flex items-center gap-1">
+                                <span x-text="showProducts ? 'Hide' : 'Show'"></span>
+                                <svg class="w-4 h-4 transform transition-transform" :class="showProducts ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <p class="text-sm text-gray-600 mb-3">Select products to feature in this article (optional). Products will appear in "Shop This Article" section.</p>
+
+                        <!-- Search Box -->
+                        <div x-show="showProducts" x-collapse class="mb-3">
+                            <input type="text" 
+                                   x-ref="productSearch"
+                                   @input="filterProducts($event.target.value)"
+                                   placeholder="Search products by name..."
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        </div>
+
+                        <!-- Product Selection -->
+                        <div x-show="showProducts" x-collapse class="space-y-2 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3" id="product-list-container-edit">
+                            @php
+                                $attachedProductIds = old('products', $post->products->pluck('id')->toArray());
+                            @endphp
+                            @forelse($products as $product)
+                                @php
+                                    $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+                                @endphp
+                                <label class="flex items-center hover:bg-gray-50 p-2 rounded cursor-pointer">
+                                    <input type="checkbox" 
+                                           name="products[]" 
+                                           value="{{ $product->id }}"
+                                           {{ in_array($product->id, $attachedProductIds) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                                    @if($primaryImage)
+                                        <img src="{{ asset('storage/' . $primaryImage->image_path) }}" 
+                                             alt="{{ $product->name }}"
+                                             class="w-10 h-10 object-cover rounded ml-2">
+                                    @else
+                                        <div class="w-10 h-10 bg-gray-200 rounded ml-2 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    <span class="ml-3 text-sm text-gray-700 flex-1">{{ $product->name }}</span>
+                                    <span class="text-xs text-gray-500">ID: {{ $product->id }}</span>
+                                </label>
+                            @empty
+                                <p class="text-sm text-gray-500 text-center py-4">No published products available.</p>
+                            @endforelse
+                        </div>
+
+                        <p class="text-xs text-gray-500 mt-2">
+                            <svg class="w-4 h-4 inline text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Tip: Products will be displayed in the order you select them. You can reorder by unchecking and rechecking.
+                        </p>
+                    </div>
+
                     <!-- Actions -->
                     <div class="bg-white rounded-lg shadow p-6 space-y-3">
                         <button type="submit" 

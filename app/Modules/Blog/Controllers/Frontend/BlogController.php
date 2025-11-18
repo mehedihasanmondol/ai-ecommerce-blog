@@ -126,6 +126,7 @@ class BlogController extends Controller
     {
         $post = $this->postService->getPostBySlug($slug);
         $post->load('author.authorProfile'); // Eager load author profile
+        $post->load('products.variants', 'products.images', 'products.brand'); // Eager load products for Shop This Article
         $relatedPosts = $post->relatedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();

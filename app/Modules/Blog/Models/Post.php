@@ -194,6 +194,22 @@ class Post extends Model
     }
 
     /**
+     * Get the products associated with the post (Shop This Article)
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            \App\Modules\Ecommerce\Product\Models\Product::class,
+            'blog_post_product',
+            'blog_post_id',
+            'product_id'
+        )
+        ->withPivot(['sort_order'])
+        ->withTimestamps()
+        ->orderBy('blog_post_product.sort_order');
+    }
+
+    /**
      * Increment views count
      */
     public function incrementViews(): void
