@@ -78,7 +78,7 @@
                         @if($setting->key === 'homepage_type' && isset($homepageTypes))
                             <!-- Homepage Type Select -->
                             <select 
-                                wire:model="settings.{{ $setting->key }}"
+                                wire:model.live="settings.{{ $setting->key }}"
                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
                                 <option value="">Select homepage type...</option>
                                 @foreach($homepageTypes as $type)
@@ -107,6 +107,16 @@
                                     </div>
                                 @endif
                             @endif
+                            
+                        @elseif($setting->key === 'currency_position')
+                            <!-- Currency Position Select -->
+                            <select 
+                                wire:model="settings.{{ $setting->key }}"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
+                                <option value="">Select position...</option>
+                                <option value="before">Before Amount (e.g., $29.99)</option>
+                                <option value="after">After Amount (e.g., 29.99$)</option>
+                            </select>
                             
                         @elseif($setting->key === 'homepage_author_id' && isset($authors))
                             <!-- Author Select -->
