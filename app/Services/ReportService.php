@@ -225,7 +225,7 @@ class ReportService
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
-            ->where('products.status', 'active')
+            ->where('products.status', 'published')
             ->groupBy('products.id', 'products.name', 'categories.name', 'brands.name')
             ->orderBy('total_stock', 'asc')
             ->get();
@@ -251,7 +251,7 @@ class ReportService
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->where('product_variants.stock_quantity', '<=', $threshold)
             ->where('product_variants.stock_quantity', '>', 0)
-            ->where('products.status', 'active')
+            ->where('products.status', 'published')
             ->orderBy('product_variants.stock_quantity', 'asc')
             ->get();
 
@@ -274,7 +274,7 @@ class ReportService
             ->join('products', 'product_variants.product_id', '=', 'products.id')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->where('product_variants.stock_quantity', 0)
-            ->where('products.status', 'active')
+            ->where('products.status', 'published')
             ->get();
 
         return $outOfStock;
