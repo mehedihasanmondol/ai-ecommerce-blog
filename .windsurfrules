@@ -1590,12 +1590,12 @@ php artisan activitylog:clean
 - `.windsurfrules` - This file (AI guidelines)
 - `DEVELOPMENT.md` - Detailed development guide
 
-### Documentation folder (`/docs`):
-- `/docs/database-schema.md` - Database structure
-- `/docs/api-documentation.md` - API endpoints
-- `/docs/ui-ux-guidelines.md` - Design system
-- `/docs/delete-rules.md` - Soft delete standards
-- `/docs/deployment.md` - Deployment instructions
+### Documentation folder (`/development-docs`):
+- `/development-docs/database-schema.md` - Database structure
+- `/development-docs/api-documentation.md` - API endpoints
+- `/development-docs/ui-ux-guidelines.md` - Design system
+- `/development-docs/delete-rules.md` - Soft delete standards
+- `/development-docs/deployment.md` - Deployment instructions
 
 ---
 
@@ -1630,5 +1630,10 @@ php artisan activitylog:clean
 - Verify column name alternatives before adding new migrations
 
 ---
+
+**deploymnet docs:**
+- update pending-deployment.md file with all pending migrations and seeders .
+
+
 
 **Remember**: This project prioritizes clean, maintainable, and well-documented code. Always think about future developers who will work on this codebase. Every decision should make the codebase easier to understand and extend.

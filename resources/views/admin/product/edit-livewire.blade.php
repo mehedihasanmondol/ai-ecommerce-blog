@@ -18,7 +18,7 @@
 
 @push('scripts')
 <!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/8wacbe3zs5mntet5c9u50n4tenlqvgqm9bn1k6uctyqo3o7m/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/{{ \App\Models\SiteSetting::get('tinymce_api_key', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
 let tinyMCERetryCount = 0;

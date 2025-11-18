@@ -11,8 +11,10 @@
                         'social' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>',
                         'seo' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>',
                         'invoice' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>',
+                        'login' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>',
                         'homepage' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>',
                         'blog' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>',
+                        'stock' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>',
                     ];
                     $icon = $icons[$group] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>';
                 @endphp
@@ -47,6 +49,8 @@
                                 <span class="text-xs font-normal px-2 py-1 bg-purple-100 text-purple-700 rounded">Image Upload</span>
                             @elseif($setting->type === 'boolean')
                                 <span class="text-xs font-normal px-2 py-1 bg-green-100 text-green-700 rounded">Toggle</span>
+                            @elseif($setting->type === 'tinymce')
+                                <span class="text-xs font-normal px-2 py-1 bg-orange-100 text-orange-700 rounded">Rich Editor</span>
                             @elseif($setting->type === 'textarea')
                                 <span class="text-xs font-normal px-2 py-1 bg-blue-100 text-blue-700 rounded">Long Text</span>
                             @else
@@ -73,6 +77,40 @@
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="Enter {{ strtolower($setting->label) }}"
                         ></textarea>
+
+                    @elseif($setting->type === 'tinymce')
+                        <div wire:ignore>
+                            <textarea 
+                                id="tinymce-{{ $setting->key }}"
+                                class="tinymce-editor"
+                                x-data="{
+                                    init() {
+                                        const textarea = this.$el;
+                                        tinymce.init({
+                                            target: textarea,
+                                            height: 500,
+                                            menubar: false,
+                                            plugins: [
+                                                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                                            ],
+                                            toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code | help',
+                                            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                                            setup: function(editor) {
+                                                editor.on('init', function() {
+                                                    editor.setContent(@js($settings[$setting->key] ?? ''));
+                                                });
+                                                editor.on('blur', function() {
+                                                    @this.set('settings.{{ $setting->key }}', editor.getContent());
+                                                });
+                                            }
+                                        });
+                                    }
+                                }"
+                                x-init="init()"
+                            ></textarea>
+                        </div>
 
                     @elseif($setting->type === 'select')
                         @if($setting->key === 'homepage_type' && isset($homepageTypes))

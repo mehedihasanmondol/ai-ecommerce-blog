@@ -72,6 +72,11 @@ class SettingSection extends Component
                     $value = !empty($this->settings[$setting->key]) ? '1' : '0';
                     $setting->update(['value' => $value]);
                 }
+                // Handle tinymce (rich text)
+                elseif ($setting->type === 'tinymce') {
+                    $value = $this->settings[$setting->key] ?? '';
+                    $setting->update(['value' => $value]);
+                }
                 // Handle text and textarea
                 else {
                     $value = $this->settings[$setting->key] ?? '';
