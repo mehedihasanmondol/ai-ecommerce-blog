@@ -97,13 +97,17 @@ class CheckoutController extends Controller
             }
         }
 
+        // Get active payment gateways
+        $paymentGateways = \App\Models\PaymentGateway::active()->get();
+
         return view('frontend.checkout.index', compact(
             'cart',
             'subtotal',
             'totalWeight',
             'defaultShipping',
             'savedAddresses',
-            'userProfile'
+            'userProfile',
+            'paymentGateways'
         ));
     }
 
@@ -181,6 +185,10 @@ class CheckoutController extends Controller
     {
         \Log::info('Place order attempt', ['request_data' => $request->except(['_token'])]);
         
+        // Get valid payment methods (cod + active gateway slugs)
+        $activeGateways = \App\Models\PaymentGateway::active()->pluck('slug')->toArray();
+        $validPaymentMethods = array_merge(['cod'], $activeGateways);
+        
         $validated = $request->validate([
             'shipping_name' => 'required|string|max:255',
             'shipping_first_name' => 'nullable|string|max:255',
@@ -190,7 +198,7 @@ class CheckoutController extends Controller
             'shipping_address_line_1' => 'required|string|max:255',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'delivery_method_id' => 'required|exists:delivery_methods,id',
-            'payment_method' => 'required|in:cod,online',
+            'payment_method' => 'required|in:' . implode(',', $validPaymentMethods),
             'order_notes' => 'nullable|string|max:500',
         ], [
             'delivery_zone_id.required' => 'Please select a delivery zone',
@@ -387,11 +395,40 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Clear cart and coupon session
+            // Handle payment method
+            $paymentMethod = $validated['payment_method'];
+            
+            // Check if online payment gateway
+            if ($paymentMethod !== 'cod') {
+                // Find payment gateway
+                $gateway = \App\Models\PaymentGateway::where('slug', $paymentMethod)
+                    ->where('is_active', true)
+                    ->first();
+                
+                if (!$gateway) {
+                    throw new \Exception('Invalid payment gateway selected');
+                }
+                
+                // Store cart and coupon in session for potential restore
+                Session::put('pending_order_id', $order->id);
+                
+                // Clear cart (will be restored if payment fails)
+                Session::forget('cart');
+                Session::forget('applied_coupon');
+                
+                // Redirect to payment processing
+                return redirect()->route('payment.process', [
+                    'gateway' => $gateway->slug,
+                    'order' => $order->id
+                ]);
+            }
+
+            // Clear cart and coupon session for COD
             Session::forget('cart');
             Session::forget('applied_coupon');
+            Session::forget('pending_order_id');
 
-            // Redirect based on authentication
+            // Redirect based on authentication for COD orders
             if (Auth::check()) {
                 return redirect()->route('customer.orders.show', $order->id)
                     ->with('success', 'Order placed successfully! Order number: ' . $order->order_number);

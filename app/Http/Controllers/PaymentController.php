@@ -22,6 +22,41 @@ class PaymentController extends Controller
     }
 
     /**
+     * Process payment from checkout (direct)
+     */
+    public function process($gateway, $orderId)
+    {
+        $order = Order::findOrFail($orderId);
+        
+        // Verify order belongs to user (allow guest orders)
+        if (Auth::check() && $order->user_id && $order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Check if order is already paid
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('customer.orders.show', $order->id)
+                ->with('error', 'This order is already paid');
+        }
+
+        try {
+            $result = $this->paymentService->initiatePayment($order, $gateway);
+
+            if ($result['success']) {
+                return redirect($result['payment_url']);
+            }
+
+            return redirect()->route('cart.index')
+                ->with('error', $result['message'] ?? 'Payment initiation failed');
+
+        } catch (\Exception $e) {
+            \Log::error('Payment processing error: ' . $e->getMessage());
+            return redirect()->route('cart.index')
+                ->with('error', 'Payment processing failed. Please try again.');
+        }
+    }
+
+    /**
      * Initiate payment for an order
      */
     public function initiate(Request $request, Order $order)

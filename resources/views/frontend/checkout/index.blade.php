@@ -145,6 +145,7 @@
                         </h2>
                         
                         <div class="space-y-1.5">
+                            <!-- Cash on Delivery -->
                             <label class="flex items-center gap-2 p-2 border-2 rounded-md cursor-pointer transition-all"
                                    :class="paymentMethod === 'cod' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'">
                                 <input type="radio" name="payment_method" value="cod" x-model="paymentMethod" required
@@ -160,19 +161,55 @@
                                 </div>
                             </label>
 
-                            <label class="flex items-center gap-2 p-2 border-2 border-gray-200 rounded-md opacity-50 cursor-not-allowed">
-                                <input type="radio" name="payment_method" value="online" disabled
-                                       class="w-3.5 h-3.5 text-gray-400 border-gray-300">
-                                <div class="flex items-center justify-between flex-1">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-600">Online Payment</p>
-                                        <p class="text-xs text-gray-400">Coming soon</p>
+                            <!-- Online Payment Gateways -->
+                            @if($paymentGateways->count() > 0)
+                                @foreach($paymentGateways as $gateway)
+                                <label class="flex items-center gap-2 p-2 border-2 rounded-md cursor-pointer transition-all"
+                                       :class="paymentMethod === '{{ $gateway->slug }}' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-green-300'">
+                                    <input type="radio" name="payment_method" value="{{ $gateway->slug }}" x-model="paymentMethod"
+                                           class="w-3.5 h-3.5 text-green-600 border-gray-300 focus:ring-green-500">
+                                    <div class="flex items-center justify-between flex-1">
+                                        <div class="flex items-center gap-2">
+                                            @if($gateway->logo)
+                                                <img src="{{ asset('storage/' . $gateway->logo) }}" 
+                                                     alt="{{ $gateway->name }}" 
+                                                     class="h-6 w-auto object-contain">
+                                            @else
+                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                                </svg>
+                                            @endif
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">{{ $gateway->name }}</p>
+                                                @if($gateway->description)
+                                                    <p class="text-xs text-gray-500">{{ Str::limit($gateway->description, 40) }}</p>
+                                                @else
+                                                    <p class="text-xs text-gray-500">Pay securely online</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @if($gateway->is_test_mode)
+                                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-medium">Test</span>
+                                        @endif
                                     </div>
-                                    <svg class="w-4 h-4 text-gray-300 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                                    </svg>
-                                </div>
-                            </label>
+                                </label>
+                                @endforeach
+                            @else
+                                <!-- Fallback if no gateways configured -->
+                                <label class="flex items-center gap-2 p-2 border-2 border-gray-200 rounded-md opacity-50 cursor-not-allowed">
+                                    <input type="radio" name="payment_method" value="online" disabled
+                                           class="w-3.5 h-3.5 text-gray-400 border-gray-300">
+                                    <div class="flex items-center justify-between flex-1">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-600">Online Payment</p>
+                                            <p class="text-xs text-gray-400">No payment gateways configured</p>
+                                        </div>
+                                        <svg class="w-4 h-4 text-gray-300 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                        </svg>
+                                    </div>
+                                </label>
+                            @endif
                         </div>
                         @error('payment_method')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

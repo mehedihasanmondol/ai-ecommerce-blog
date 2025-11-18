@@ -182,6 +182,7 @@ Route::get('track-order', [CustomerOrderController::class, 'track'])->name('orde
 Route::post('track-order', [CustomerOrderController::class, 'track']);
 
 // Payment Routes
+Route::get('/payment/process/{gateway}/{order}', [PaymentController::class, 'process'])->name('payment.process');
 Route::post('/payment/initiate/{order}', [PaymentController::class, 'initiate'])->name('payment.initiate');
 Route::get('/payment/bkash/callback', [PaymentController::class, 'bkashCallback'])->name('payment.bkash.callback');
 Route::post('/payment/bkash/callback', [PaymentController::class, 'bkashCallback']);
