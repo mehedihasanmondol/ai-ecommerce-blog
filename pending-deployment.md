@@ -14,3 +14,5 @@ php artisan migrate --path=database/migrations/2025_11_18_064000_add_currency_se
 
 
 php artisan db:seed --class=SiteSettingSeeder
+
+php artisan migrate --path=database/migrations/2025_11_18_105344_create_blog_post_product_table.php
