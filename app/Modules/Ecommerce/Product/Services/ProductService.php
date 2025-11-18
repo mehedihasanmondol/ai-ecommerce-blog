@@ -93,6 +93,17 @@ class ProductService
             $variantData['sku'] = $this->generateSku($product);
         }
         
+        // Set default stock values if manual stock update is disabled
+        $manualStockEnabled = \App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1';
+        if (!$manualStockEnabled) {
+            if (!isset($variantData['stock_quantity'])) {
+                $variantData['stock_quantity'] = 0;
+            }
+            if (!isset($variantData['low_stock_alert'])) {
+                $variantData['low_stock_alert'] = 5;
+            }
+        }
+        
         // Convert empty strings to null for nullable fields
         $nullableFields = ['sale_price', 'cost_price', 'weight', 'length', 'width', 'height', 'shipping_class'];
         foreach ($nullableFields as $field) {
@@ -112,6 +123,13 @@ class ProductService
             if (isset($variantData[$field]) && $variantData[$field] === '') {
                 $variantData[$field] = null;
             }
+        }
+        
+        // Remove stock fields if manual stock update is disabled
+        $manualStockEnabled = \App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1';
+        if (!$manualStockEnabled) {
+            unset($variantData['stock_quantity']);
+            unset($variantData['low_stock_alert']);
         }
         
         // Fix Issue 2: Use the correct relationship method to get the default variant
@@ -213,6 +231,13 @@ class ProductService
     {
         // Apply the same SKU comparison logic to prevent duplicate entry errors
         $updateData = $data;
+        
+        // Remove stock fields if manual stock update is disabled
+        $manualStockEnabled = \App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1';
+        if (!$manualStockEnabled) {
+            unset($updateData['stock_quantity']);
+            unset($updateData['low_stock_alert']);
+        }
         
         // If SKU is provided and it's the same as current SKU, remove it from update data
         if (isset($data['sku']) && $variant->sku === $data['sku']) {

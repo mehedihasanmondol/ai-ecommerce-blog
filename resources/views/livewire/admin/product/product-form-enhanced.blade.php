@@ -307,6 +307,7 @@
                                     <p class="text-xs text-gray-500 mt-1">Leave empty for auto-generation</p>
                                 </div>
 
+                                @if(\App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1')
                                 <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-2">Stock Quantity *</label>
                                     <input type="number" 
@@ -323,6 +324,21 @@
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                            placeholder="5">
                                 </div>
+                                @else
+                                <div class="col-span-2">
+                                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <div class="flex items-start gap-3">
+                                            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-blue-900 mb-1">Stock Management via Stock System Only</h4>
+                                                <p class="text-sm text-blue-800">Manual stock updates are currently disabled. Stock can only be managed through the Stock Management system. Contact your administrator to enable manual stock updates.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
 
                             {{-- Cost Price --}}

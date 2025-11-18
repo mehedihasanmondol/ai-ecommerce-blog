@@ -100,10 +100,16 @@ class ProductForm extends Component
         if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
             $rules['variant.price'] = 'required|numeric|min:0';
             $rules['variant.sale_price'] = 'nullable|numeric|min:0|lt:variant.price';
-            $rules['variant.stock_quantity'] = 'required|integer|min:0';
+            
+            // Only require stock validation if manual stock updates are enabled
+            $manualStockEnabled = \App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1';
+            if ($manualStockEnabled) {
+                $rules['variant.stock_quantity'] = 'required|integer|min:0';
+                $rules['variant.low_stock_alert'] = 'nullable|integer|min:0';
+            }
+            
             $rules['variant.sku'] = 'nullable|string|max:100';
             $rules['variant.cost_price'] = 'nullable|numeric|min:0';
-            $rules['variant.low_stock_alert'] = 'nullable|integer|min:0';
             $rules['variant.weight'] = 'nullable|numeric|min:0';
             $rules['variant.length'] = 'nullable|numeric|min:0';
             $rules['variant.width'] = 'nullable|numeric|min:0';
@@ -274,7 +280,16 @@ class ProductForm extends Component
             ];
 
             if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
-                $data['variant'] = $this->variant;
+                $variantData = $this->variant;
+                
+                // Remove stock fields if manual stock update is disabled
+                $manualStockEnabled = \App\Models\SiteSetting::get('manual_stock_update_enabled', '0') === '1';
+                if (!$manualStockEnabled) {
+                    unset($variantData['stock_quantity']);
+                    unset($variantData['low_stock_alert']);
+                }
+                
+                $data['variant'] = $variantData;
             }
 
             if ($this->product_type === 'grouped') {

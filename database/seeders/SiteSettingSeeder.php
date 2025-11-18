@@ -249,6 +249,17 @@ class SiteSettingSeeder extends Seeder
                 'order' => 2,
             ],
 
+            // Stock Settings
+            [
+                'key' => 'manual_stock_update_enabled',
+                'value' => '0',
+                'type' => 'boolean',
+                'group' => 'stock',
+                'label' => 'Enable Manual Stock Updates',
+                'description' => 'Allow manual stock updates in product edit form. If disabled, stock can only be managed via Stock Management system.',
+                'order' => 1,
+            ],
+
             // Invoice Settings
             [
                 'key' => 'invoice_header_banner',
