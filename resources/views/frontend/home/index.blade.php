@@ -23,17 +23,33 @@
 <x-frontend.recommended-slider :products="$recommendedProducts" />
 
 <!-- Sale Offers Slider -->
-<x-frontend.sale-offers-slider :products="$saleOffers" />
+@if(\App\Models\SiteSetting::get('sale_offers_section_enabled', '1') === '1')
+    <x-frontend.sale-offers-slider 
+        :products="$saleOffers" 
+        :title="\App\Models\SiteSetting::get('sale_offers_section_title', 'Sale Offers')" />
+@endif
 
 <!-- Shop by Category Section -->
 <x-frontend.shop-by-category :categories="$featuredCategories" />
 
 <!-- Trending Products Section -->
-<x-frontend.trending-products :products="$trendingProducts" />
+@if(\App\Models\SiteSetting::get('trending_section_enabled', '1') === '1')
+    <x-frontend.trending-products 
+        :products="$trendingProducts" 
+        :title="\App\Models\SiteSetting::get('trending_section_title', 'Trending Now')" />
+@endif
 
 <!-- Best Sellers Section -->
-<x-frontend.best-sellers :products="$bestSellerProducts" />
+@if(\App\Models\SiteSetting::get('best_sellers_section_enabled', '1') === '1')
+    <x-frontend.best-sellers 
+        :products="$bestSellerProducts" 
+        :title="\App\Models\SiteSetting::get('best_sellers_section_title', 'Best Sellers')" />
+@endif
 
 <!-- New Arrivals Section -->
-<x-frontend.new-arrivals :products="$newArrivalProducts" />
+@if(\App\Models\SiteSetting::get('new_arrivals_section_enabled', '1') === '1')
+    <x-frontend.new-arrivals 
+        :products="$newArrivalProducts" 
+        :title="\App\Models\SiteSetting::get('new_arrivals_section_title', 'New Arrivals')" />
+@endif
 @endsection

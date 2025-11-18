@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\SaleOffer;
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\Product;
 use Illuminate\Http\Request;
 
@@ -41,7 +42,11 @@ class SaleOfferController extends Controller
             ->ordered()
             ->get();
 
-        return view('admin.sale-offers.index', compact('saleOffers'));
+        // Get section settings
+        $sectionEnabled = SiteSetting::get('sale_offers_section_enabled', '1');
+        $sectionTitle = SiteSetting::get('sale_offers_section_title', 'Sale Offers');
+
+        return view('admin.sale-offers.index', compact('saleOffers', 'sectionEnabled', 'sectionTitle'));
     }
 
     /**
@@ -127,5 +132,35 @@ class SaleOfferController extends Controller
         return redirect()
             ->route('admin.sale-offers.index')
             ->with('success', "Sale offer {$status} successfully!");
+    }
+
+    /**
+     * Toggle section visibility on homepage
+     */
+    public function toggleSection(Request $request)
+    {
+        SiteSetting::updateOrCreate(
+            ['key' => 'sale_offers_section_enabled'],
+            ['value' => $request->enabled ? '1' : '0']
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update section title
+     */
+    public function updateSectionTitle(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        SiteSetting::updateOrCreate(
+            ['key' => 'sale_offers_section_title'],
+            ['value' => $validated['title']]
+        );
+
+        return response()->json(['success' => true]);
     }
 }

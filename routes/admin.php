@@ -101,6 +101,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('trending-products', [TrendingProductController::class, 'store'])->name('trending-products.store');
         Route::post('trending-products/update-order', [TrendingProductController::class, 'updateOrder'])->name('trending-products.update-order');
         Route::post('trending-products/{trendingProduct}/toggle-status', [TrendingProductController::class, 'toggleStatus'])->name('trending-products.toggle-status');
+        Route::post('trending-products/toggle-section', [TrendingProductController::class, 'toggleSection'])->name('trending-products.toggle-section');
+        Route::post('trending-products/update-title', [TrendingProductController::class, 'updateSectionTitle'])->name('trending-products.update-title');
         Route::delete('trending-products/{trendingProduct}', [TrendingProductController::class, 'destroy'])->name('trending-products.destroy');
     });
     
@@ -111,6 +113,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('best-seller-products', [BestSellerProductController::class, 'store'])->name('best-seller-products.store');
         Route::post('best-seller-products/update-order', [BestSellerProductController::class, 'updateOrder'])->name('best-seller-products.update-order');
         Route::post('best-seller-products/{bestSellerProduct}/toggle-status', [BestSellerProductController::class, 'toggleStatus'])->name('best-seller-products.toggle-status');
+        Route::post('best-seller-products/toggle-section', [BestSellerProductController::class, 'toggleSection'])->name('best-seller-products.toggle-section');
+        Route::post('best-seller-products/update-title', [BestSellerProductController::class, 'updateSectionTitle'])->name('best-seller-products.update-title');
         Route::delete('best-seller-products/{bestSellerProduct}', [BestSellerProductController::class, 'destroy'])->name('best-seller-products.destroy');
     });
     
@@ -121,6 +125,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('new-arrival-products', [NewArrivalProductController::class, 'store'])->name('new-arrival-products.store');
         Route::post('new-arrival-products/update-order', [NewArrivalProductController::class, 'updateOrder'])->name('new-arrival-products.update-order');
         Route::post('new-arrival-products/{newArrivalProduct}/toggle-status', [NewArrivalProductController::class, 'toggleStatus'])->name('new-arrival-products.toggle-status');
+        Route::post('new-arrival-products/toggle-section', [NewArrivalProductController::class, 'toggleSection'])->name('new-arrival-products.toggle-section');
+        Route::post('new-arrival-products/update-title', [NewArrivalProductController::class, 'updateSectionTitle'])->name('new-arrival-products.update-title');
         Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
     });
     

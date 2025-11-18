@@ -139,6 +139,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/sale-offers/{saleOffer}', [\App\Http\Controllers\Admin\SaleOfferController::class, 'destroy'])->name('sale-offers.destroy');
     Route::post('/sale-offers/reorder', [\App\Http\Controllers\Admin\SaleOfferController::class, 'reorder'])->name('sale-offers.reorder');
     Route::patch('/sale-offers/{saleOffer}/toggle', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleStatus'])->name('sale-offers.toggle');
+    Route::post('/sale-offers/toggle-section', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleSection'])->name('sale-offers.toggle-section');
+    Route::post('/sale-offers/update-title', [\App\Http\Controllers\Admin\SaleOfferController::class, 'updateSectionTitle'])->name('sale-offers.update-title');
     
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);

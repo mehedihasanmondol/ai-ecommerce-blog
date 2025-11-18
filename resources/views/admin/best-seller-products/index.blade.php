@@ -4,6 +4,15 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+    <!-- Section Settings -->
+    <x-admin.section-settings
+        :sectionEnabled="$sectionEnabled"
+        :sectionTitle="$sectionTitle"
+        toggleRoute="{{ route('admin.best-seller-products.toggle-section') }}"
+        updateTitleRoute="{{ route('admin.best-seller-products.update-title') }}"
+        sectionName="Best Seller Products"
+    />
+
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
         <div>

@@ -25,6 +25,10 @@ class SiteSettingController extends Controller
     {
         $settings = SiteSetting::getAllGrouped();
         
+        // Filter out internal groups that are managed elsewhere
+        // Use forget() to remove specific groups from the collection
+        $settings->forget('internal_section_control');
+        
         // Get authors for homepage settings
         $authors = User::where('role', 'author')
             ->orWhereHas('authorProfile')

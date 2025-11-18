@@ -55,22 +55,8 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 3,
                 'description' => 'Number of featured products to display',
             ],
-            [
-                'key' => 'new_arrivals_enabled',
-                'value' => '1',
-                'type' => 'boolean',
-                'group' => 'featured',
-                'order' => 4,
-                'description' => 'Show new arrivals section on homepage',
-            ],
-            [
-                'key' => 'new_arrivals_title',
-                'value' => 'New Arrivals',
-                'type' => 'text',
-                'group' => 'featured',
-                'order' => 5,
-                'description' => 'Title for new arrivals section',
-            ],
+            // Note: new_arrivals settings moved to New Arrival Products management panel
+            // Managed via site_settings with keys: new_arrivals_section_enabled and new_arrivals_section_title
             [
                 'key' => 'banner_enabled',
                 'value' => '1',

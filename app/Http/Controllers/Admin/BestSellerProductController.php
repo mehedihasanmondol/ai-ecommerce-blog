@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BestSellerProduct;
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\Product;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,11 @@ class BestSellerProductController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.best-seller-products.index', compact('bestSellerProducts'));
+        // Get section settings
+        $sectionEnabled = SiteSetting::get('best_sellers_section_enabled', '1');
+        $sectionTitle = SiteSetting::get('best_sellers_section_title', 'Best Sellers');
+
+        return view('admin.best-seller-products.index', compact('bestSellerProducts', 'sectionEnabled', 'sectionTitle'));
     }
 
     /**
@@ -82,6 +87,36 @@ class BestSellerProductController extends Controller
 
         return redirect()->route('admin.best-seller-products.index')
             ->with('success', 'Product removed from best sellers successfully!');
+    }
+
+    /**
+     * Toggle section visibility on homepage
+     */
+    public function toggleSection(Request $request)
+    {
+        SiteSetting::updateOrCreate(
+            ['key' => 'best_sellers_section_enabled'],
+            ['value' => $request->enabled ? '1' : '0']
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update section title
+     */
+    public function updateSectionTitle(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        SiteSetting::updateOrCreate(
+            ['key' => 'best_sellers_section_title'],
+            ['value' => $validated['title']]
+        );
+
+        return response()->json(['success' => true]);
     }
 
     /**

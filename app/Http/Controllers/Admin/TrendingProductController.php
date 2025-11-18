@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrendingProduct;
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\Product;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,11 @@ class TrendingProductController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.trending-products.index', compact('trendingProducts'));
+        // Get section settings
+        $sectionEnabled = SiteSetting::get('trending_section_enabled', '1');
+        $sectionTitle = SiteSetting::get('trending_section_title', 'Trending Now');
+
+        return view('admin.trending-products.index', compact('trendingProducts', 'sectionEnabled', 'sectionTitle'));
     }
 
     /**
@@ -82,6 +87,36 @@ class TrendingProductController extends Controller
 
         return redirect()->route('admin.trending-products.index')
             ->with('success', 'Product removed from trending successfully!');
+    }
+
+    /**
+     * Toggle section visibility on homepage
+     */
+    public function toggleSection(Request $request)
+    {
+        SiteSetting::updateOrCreate(
+            ['key' => 'trending_section_enabled'],
+            ['value' => $request->enabled ? '1' : '0']
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update section title
+     */
+    public function updateSectionTitle(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        SiteSetting::updateOrCreate(
+            ['key' => 'trending_section_title'],
+            ['value' => $validated['title']]
+        );
+
+        return response()->json(['success' => true]);
     }
 
     /**

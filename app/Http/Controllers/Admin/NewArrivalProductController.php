@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\NewArrivalProduct;
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\Product;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,11 @@ class NewArrivalProductController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return view('admin.new-arrival-products.index', compact('newArrivalProducts'));
+        // Get section settings
+        $sectionEnabled = SiteSetting::get('new_arrivals_section_enabled', '1');
+        $sectionTitle = SiteSetting::get('new_arrivals_section_title', 'New Arrivals');
+
+        return view('admin.new-arrival-products.index', compact('newArrivalProducts', 'sectionEnabled', 'sectionTitle'));
     }
 
     /**
@@ -82,6 +87,36 @@ class NewArrivalProductController extends Controller
 
         return redirect()->route('admin.new-arrival-products.index')
             ->with('success', 'Product removed from new arrivals successfully!');
+    }
+
+    /**
+     * Toggle section visibility on homepage
+     */
+    public function toggleSection(Request $request)
+    {
+        SiteSetting::updateOrCreate(
+            ['key' => 'new_arrivals_section_enabled'],
+            ['value' => $request->enabled ? '1' : '0']
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Update section title
+     */
+    public function updateSectionTitle(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
+
+        SiteSetting::updateOrCreate(
+            ['key' => 'new_arrivals_section_title'],
+            ['value' => $validated['title']]
+        );
+
+        return response()->json(['success' => true]);
     }
 
     /**

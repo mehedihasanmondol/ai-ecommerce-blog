@@ -12,6 +12,15 @@
         </div>
     </div>
 
+    <!-- Section Settings -->
+    <x-admin.section-settings
+        :sectionEnabled="$sectionEnabled"
+        :sectionTitle="$sectionTitle"
+        toggleRoute="{{ route('admin.new-arrival-products.toggle-section') }}"
+        updateTitleRoute="{{ route('admin.new-arrival-products.update-title') }}"
+        sectionName="New Arrivals"
+    />
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Add Product Search -->
         <div class="lg:col-span-1">

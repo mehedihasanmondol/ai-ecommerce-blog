@@ -23,6 +23,9 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: true, mobileMenuOpen: false }">
+    <!-- Toast Notification -->
+    <x-toast-notification />
+    
     <div class="min-h-screen">
         <!-- Top Navigation Bar -->
         <nav class="bg-white shadow-sm border-b border-gray-200 fixed w-full z-30">

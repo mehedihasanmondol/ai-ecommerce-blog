@@ -1,11 +1,11 @@
-@props(['products'])
+@props(['products', 'title' => 'Sale Offers'])
 
 @if($products->count() > 0)
 <section class="py-8 bg-white border-t border-b border-gray-200">
     <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Sale offers picked for you</h2>
+            <h2 class="text-2xl font-bold text-gray-900">{{ $title }}</h2>
             <a href="#" class="text-blue-600 hover:text-blue-700 font-medium text-sm hover:underline">
                 Shop all
             </a>
