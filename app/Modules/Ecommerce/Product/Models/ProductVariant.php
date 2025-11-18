@@ -116,6 +116,60 @@ class ProductVariant extends Model
         return $this->manage_stock && $this->stock_quantity <= 0;
     }
 
+    /**
+     * Check if stock restriction is enabled globally
+     */
+    public static function isStockRestrictionEnabled(): bool
+    {
+        return \App\Models\SiteSetting::get('enable_out_of_stock_restriction', '1') === '1';
+    }
+
+    /**
+     * Check if product can be added to cart (considering global setting)
+     */
+    public function canAddToCart(): bool
+    {
+        // If restriction is disabled, always allow
+        if (!self::isStockRestrictionEnabled()) {
+            return true;
+        }
+
+        // If restriction is enabled, check stock
+        return !$this->is_out_of_stock;
+    }
+
+    /**
+     * Check if stock quantity should be displayed
+     */
+    public function shouldShowStock(): bool
+    {
+        return self::isStockRestrictionEnabled();
+    }
+
+    /**
+     * Get stock display text based on global setting
+     */
+    public function getStockDisplayText(): ?string
+    {
+        if (!self::isStockRestrictionEnabled()) {
+            return null; // Hide all stock info when restriction disabled
+        }
+
+        if ($this->is_out_of_stock) {
+            return 'Out of Stock';
+        }
+
+        if ($this->is_low_stock) {
+            return "Only {$this->stock_quantity} left";
+        }
+
+        if ($this->stock_quantity > 0 && $this->stock_quantity <= 10) {
+            return "Only {$this->stock_quantity} left";
+        }
+
+        return 'In Stock';
+    }
+
     // Methods
     public function decreaseStock(int $quantity): bool
     {

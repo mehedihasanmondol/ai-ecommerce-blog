@@ -33,7 +33,12 @@ class SettingSection extends Component
         // Initialize settings values
         foreach ($groupSettings as $setting) {
             if ($setting->type !== 'image') {
-                $this->settings[$setting->key] = $setting->value;
+                // Convert boolean string values to actual boolean for checkboxes
+                if ($setting->type === 'boolean') {
+                    $this->settings[$setting->key] = $setting->value === '1';
+                } else {
+                    $this->settings[$setting->key] = $setting->value;
+                }
             }
         }
     }
@@ -63,7 +68,8 @@ class SettingSection extends Component
                 }
                 // Handle boolean values
                 elseif ($setting->type === 'boolean') {
-                    $value = isset($this->settings[$setting->key]) && $this->settings[$setting->key] ? '1' : '0';
+                    // Livewire checkbox returns boolean true/false
+                    $value = !empty($this->settings[$setting->key]) ? '1' : '0';
                     $setting->update(['value' => $value]);
                 }
                 // Handle text and textarea
@@ -102,7 +108,12 @@ class SettingSection extends Component
     {
         foreach ($this->groupSettings as $setting) {
             if ($setting->type !== 'image') {
-                $this->settings[$setting->key] = $setting->value;
+                // Convert boolean string values to actual boolean for checkboxes
+                if ($setting->type === 'boolean') {
+                    $this->settings[$setting->key] = $setting->value === '1';
+                } else {
+                    $this->settings[$setting->key] = $setting->value;
+                }
             }
         }
         

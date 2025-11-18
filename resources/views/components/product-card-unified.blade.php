@@ -14,6 +14,12 @@
     $originalPrice = $variant->price ?? 0;
     $hasDiscount = $originalPrice > $price;
     
+    // Stock restriction setting
+    $restrictionEnabled = \App\Models\SiteSetting::get('enable_out_of_stock_restriction', '1') === '1';
+    $canAddToCart = $variant ? $variant->canAddToCart() : false;
+    $showStockInfo = $variant ? $variant->shouldShowStock() : false;
+    $stockText = $variant ? $variant->getStockDisplayText() : null;
+    
     // Size-based classes
     $sizeClasses = [
         'small' => [
@@ -61,7 +67,7 @@
             @livewire('wishlist.add-to-wishlist', ['productId' => $product->id, 'variantId' => $variant->id ?? null, 'size' => 'md'], key('wishlist-grid-'.$product->id.'-'.uniqid()))
         </div>
 
-        @if($variant && $variant->stock_quantity <= 0)
+        @if($showStockInfo && $variant && $variant->stock_quantity <= 0)
         <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
             Out of Stock
         </div>
@@ -115,7 +121,7 @@
         </div>
 
         <!-- Add to Cart Button -->
-        @if($variant && $variant->stock_quantity > 0)
+        @if($variant && $canAddToCart)
             @php
                 $cart = session()->get('cart', []);
                 $cartKey = 'variant_' . $variant->id;
@@ -140,14 +146,14 @@
                     Add to Cart
                 @endif
             </button>
-        @elseif($variant && $variant->stock_quantity <= 0)
+        @elseif($showStockInfo && $variant && !$canAddToCart)
         <button disabled class="w-full {{ $classes['button'] }} bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed flex items-center justify-center">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
             Out of Stock
         </button>
-        @else
+        @elseif(!$variant)
         <button disabled class="w-full {{ $classes['button'] }} bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed flex items-center justify-center">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -170,7 +176,7 @@
                      loading="lazy">
             </a>
             
-            @if($variant && $variant->stock_quantity <= 0)
+            @if($showStockInfo && $variant && $variant->stock_quantity <= 0)
             <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded">
                 Out of Stock
             </div>
@@ -231,7 +237,7 @@
                 <div class="ml-6 flex flex-col items-end space-y-2">
                     @livewire('wishlist.add-to-wishlist', ['productId' => $product->id, 'variantId' => $variant->id ?? null, 'size' => 'lg'], key('wishlist-list-'.$product->id.'-'.uniqid()))
                     
-                    @if($variant && $variant->stock_quantity > 0)
+                    @if($variant && $canAddToCart)
                         @php
                             $cart = session()->get('cart', []);
                             $cartKey = 'variant_' . $variant->id;
@@ -256,14 +262,14 @@
                                 Add to Cart
                             @endif
                         </button>
-                    @elseif($variant && $variant->stock_quantity <= 0)
+                    @elseif($showStockInfo && $variant && !$canAddToCart)
                     <button disabled class="px-6 py-3 bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed flex items-center justify-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                         Out of Stock
                     </button>
-                    @else
+                    @elseif(!$variant)
                     <button disabled class="px-6 py-3 bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed flex items-center justify-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

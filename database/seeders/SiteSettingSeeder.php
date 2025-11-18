@@ -259,6 +259,15 @@ class SiteSettingSeeder extends Seeder
                 'description' => 'Allow manual stock updates in product edit form. If disabled, stock can only be managed via Stock Management system.',
                 'order' => 1,
             ],
+            [
+                'key' => 'enable_out_of_stock_restriction',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'stock',
+                'label' => 'Enable Out of Stock Restriction',
+                'description' => 'When ENABLED: Users cannot add/order out-of-stock products, stock quantity is visible, "Out of Stock" messages shown. When DISABLED: Users can order out-of-stock products, stock quantity is completely hidden from frontend.',
+                'order' => 2,
+            ],
 
             // Invoice Settings
             [

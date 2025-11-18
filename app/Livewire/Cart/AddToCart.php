@@ -180,7 +180,17 @@ class AddToCart extends Component
             return;
         }
 
-        if ($variant->stock_quantity < $this->quantity) {
+        // Check if variant can be added to cart (considers global stock restriction setting)
+        if (!$variant->canAddToCart()) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'This product is currently out of stock'
+            ]);
+            return;
+        }
+
+        // Only check stock quantity if restriction is enabled
+        if (ProductVariant::isStockRestrictionEnabled() && $variant->stock_quantity < $this->quantity) {
             $this->dispatch('show-toast', [
                 'type' => 'error',
                 'message' => 'Insufficient stock available'

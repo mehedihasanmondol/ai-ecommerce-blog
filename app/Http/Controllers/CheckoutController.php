@@ -213,6 +213,27 @@ class CheckoutController extends Controller
                 ->with('error', 'Your cart is empty');
         }
 
+        // Validate stock availability if restriction is enabled
+        $restrictionEnabled = \App\Models\SiteSetting::get('enable_out_of_stock_restriction', '1') === '1';
+        if ($restrictionEnabled) {
+            foreach ($cart as $item) {
+                if (isset($item['variant_id'])) {
+                    $variant = \App\Modules\Ecommerce\Product\Models\ProductVariant::find($item['variant_id']);
+                    if ($variant && !$variant->canAddToCart()) {
+                        return back()
+                            ->withInput()
+                            ->with('error', "Product '{$item['product_name']}' is out of stock. Please remove it from your cart.");
+                    }
+                    
+                    if ($variant && $variant->stock_quantity < $item['quantity']) {
+                        return back()
+                            ->withInput()
+                            ->with('error', "Insufficient stock for '{$item['product_name']}'. Only {$variant->stock_quantity} available.");
+                    }
+                }
+            }
+        }
+
         try {
             // Calculate totals
             $subtotal = 0;

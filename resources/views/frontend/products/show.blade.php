@@ -225,33 +225,39 @@
                     </div>
                 </div>
 
-                <!-- Stock Status -->
-                @if($variant && $variant->stock_quantity > 0)
-                <div class="mb-4">
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-green-700 font-semibold">In stock</span>
-                    </div>
-                    @if($variant->stock_quantity <= $variant->low_stock_alert)
-                        <div class="mt-1 flex items-center text-sm text-orange-600">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                <!-- Stock Status (only shown when restriction is enabled) -->
+                @php
+                    $showStockInfo = $variant && $variant->shouldShowStock();
+                @endphp
+                
+                @if($showStockInfo)
+                    @if($variant->stock_quantity > 0)
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span class="font-medium">Only {{ $variant->stock_quantity }} left - Order soon!</span>
+                            <span class="text-green-700 font-semibold">In stock</span>
                         </div>
-                    @endif
-                </div>
-                @else
-                <div class="mb-4">
-                    <div class="flex items-center space-x-2">
-                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-red-700 font-semibold">Out of Stock</span>
+                        @if($variant->stock_quantity <= $variant->low_stock_alert)
+                            <div class="mt-1 flex items-center text-sm text-orange-600">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="font-medium">Only {{ $variant->stock_quantity }} left - Order soon!</span>
+                            </div>
+                        @endif
                     </div>
-                </div>
+                    @else
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-red-700 font-semibold">Out of Stock</span>
+                        </div>
+                    </div>
+                    @endif
                 @endif
 
 
