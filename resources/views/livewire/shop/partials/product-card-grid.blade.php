@@ -31,7 +31,12 @@
             </button>
         </div>
 
-        @if($variant && $variant->stock_quantity <= 0)
+        @php
+            $showStockInfo = $variant && $variant->shouldShowStock();
+            $canAddToCart = $variant && $variant->canAddToCart();
+        @endphp
+
+        @if($showStockInfo && $variant && $variant->stock_quantity <= 0)
         <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
             Out of Stock
         </div>
@@ -78,7 +83,7 @@
         </div>
 
         <!-- Add to Cart Button -->
-        @if($variant && $variant->stock_quantity > 0)
+        @if($variant && $canAddToCart)
             @php
                 $cart = session()->get('cart', []);
                 $cartKey = 'variant_' . $variant->id;
@@ -101,7 +106,7 @@
                     Add to Cart
                 @endif
             </button>
-        @else
+        @elseif($showStockInfo)
         <button disabled class="w-full px-4 py-2 bg-gray-300 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed flex items-center justify-center">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

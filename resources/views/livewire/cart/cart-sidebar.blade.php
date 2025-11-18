@@ -125,7 +125,11 @@
 
                                 <!-- Stock Info and Remove Button -->
                                 <div class="flex items-center justify-between mt-2">
-                                    @if(isset($item['stock_quantity']) && $item['stock_quantity'] <= 10)
+                                    @php
+                                        $showStockInfo = \App\Modules\Ecommerce\Product\Models\ProductVariant::isStockRestrictionEnabled();
+                                    @endphp
+                                    
+                                    @if($showStockInfo && isset($item['stock_quantity']) && $item['stock_quantity'] <= 10)
                                         <p class="text-xs text-orange-600 font-medium">Only {{ $item['stock_quantity'] }} left</p>
                                     @else
                                         <div></div>

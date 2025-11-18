@@ -409,7 +409,7 @@
 </div>
 
 <!-- Frequently Purchased Together -->
-<x-frequently-purchased-together :product="$product" :relatedProducts="$relatedProducts" />
+@livewire('product.frequently-bought-together', ['product' => $product, 'relatedProducts' => $relatedProducts])
 
 <!-- Inspired by Browsing -->
 <x-inspired-by-browsing :products="$inspiredByBrowsing" />

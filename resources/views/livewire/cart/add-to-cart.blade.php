@@ -44,7 +44,13 @@
     </div>
 
     <!-- Add to Cart Button (Exact iHerb Orange Style) -->
-    @if($maxQuantity > 0)
+    @php
+        $variant = $selectedVariantId ? \App\Modules\Ecommerce\Product\Models\ProductVariant::find($selectedVariantId) : null;
+        $canAddToCart = $variant && $variant->canAddToCart();
+        $showStockInfo = $variant && $variant->shouldShowStock();
+    @endphp
+
+    @if($variant && $canAddToCart)
     <button 
         wire:click="addToCart" 
         wire:loading.attr="disabled"
@@ -60,7 +66,7 @@
             Adding...
         </span>
     </button>
-    @else
+    @elseif($showStockInfo)
     <button 
         type="button"
         disabled

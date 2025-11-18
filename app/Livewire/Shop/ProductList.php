@@ -379,11 +379,21 @@ class ProductList extends Component
             return;
         }
         
-        // Check stock
-        if ($variant->stock_quantity < $quantity) {
+        // Check if variant can be added to cart (considers global stock restriction setting)
+        if (!$variant->canAddToCart()) {
             $this->dispatch('show-toast', [
                 'type' => 'error',
-                'message' => 'Insufficient stock'
+                'message' => 'This product is currently out of stock'
+            ]);
+            return;
+        }
+        
+        // Only check stock quantity if restriction is enabled
+        $restrictionEnabled = \App\Modules\Ecommerce\Product\Models\ProductVariant::isStockRestrictionEnabled();
+        if ($restrictionEnabled && $variant->stock_quantity < $quantity) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'Insufficient stock available'
             ]);
             return;
         }

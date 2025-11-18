@@ -278,12 +278,18 @@
                                 $originalPrice = null;
                                 $discount = 0;
                                 $inStock = false;
+                                $canAddToCart = false;
+                                $showStockInfo = false;
                                 
                                 if ($variant && is_object($variant)) {
                                     $price = $variant->sale_price ?? $variant->price ?? 0;
                                     $originalPrice = ($variant->sale_price ?? null) ? ($variant->price ?? null) : null;
                                     $discount = $originalPrice ? round((($originalPrice - $price) / $originalPrice) * 100) : 0;
                                     $inStock = ($variant->stock_quantity ?? 0) > 0;
+                                    
+                                    // Use global stock restriction methods
+                                    $canAddToCart = $variant->canAddToCart();
+                                    $showStockInfo = $variant->shouldShowStock();
                                 }
                                 
                                 $image = $product->images->first();
@@ -338,9 +344,21 @@
 
                                     <!-- Actions -->
                                     <div class="flex flex-col gap-2">
-                                        <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition {{ !$inStock ? 'opacity-50 cursor-not-allowed' : '' }}" {{ !$inStock ? 'disabled' : '' }}>
-                                            Add to Cart
-                                        </button>
+                                        @if($variant && is_object($variant))
+                                            @if($canAddToCart)
+                                                <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition">
+                                                    Add to Cart
+                                                </button>
+                                            @elseif($showStockInfo)
+                                                <button disabled class="px-4 py-2 bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed">
+                                                    Out of Stock
+                                                </button>
+                                            @endif
+                                        @else
+                                            <button disabled class="px-4 py-2 bg-gray-300 text-gray-500 font-medium rounded-lg cursor-not-allowed">
+                                                Unavailable
+                                            </button>
+                                        @endif
                                         <a href="{{ route('products.show', $product->slug) }}" class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition text-center">
                                             View Details
                                         </a>
