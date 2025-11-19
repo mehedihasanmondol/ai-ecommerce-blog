@@ -2,6 +2,10 @@
 
 ✅ php artisan db:seed --class=SiteSettingSeeder (Completed)
 
+
+.env setup for google cloud google+ api
+
+
 ## Login Page Settings Implemented
 - Login page title and content (TinyMCE)
 - Social login enable/disable toggles

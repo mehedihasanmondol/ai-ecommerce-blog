@@ -77,7 +77,7 @@ class LoginController extends Controller
             
             // Customer role redirects to frontend profile
             if ($user->role === 'customer') {
-                return redirect()->intended('/my-account/profile');
+                return redirect()->intended(route('customer.profile'));
             }
             
             // Admin, Author, and other roles redirect to admin panel
