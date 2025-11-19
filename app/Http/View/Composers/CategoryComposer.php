@@ -4,6 +4,7 @@ namespace App\Http\View\Composers;
 
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
+use App\Services\MegaMenuService;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Cache;
 
@@ -11,22 +12,41 @@ use Illuminate\Support\Facades\Cache;
  * CategoryComposer
  * Purpose: Provide category and brand data to views (especially for mega menu)
  * 
+ * Features:
+ * - Dynamic mega menu categories with nested children
+ * - Dynamic trending brands per category based on sales
+ * - Fallback to featured brands when no sales data
+ * 
  * @author AI Assistant
  * @date 2025-11-06
+ * @updated 2025-11-19
  */
 class CategoryComposer
 {
+    protected $megaMenuService;
+    
+    public function __construct(MegaMenuService $megaMenuService)
+    {
+        $this->megaMenuService = $megaMenuService;
+    }
+    
     /**
      * Bind data to the view.
      */
     public function compose(View $view): void
     {
         $megaMenuCategories = $this->getMegaMenuCategories();
-        $trendingBrands = $this->getTrendingBrands();
+        
+        // Calculate trending brands per category
+        $categoryTrendingBrands = $this->getCategoryTrendingBrands($megaMenuCategories);
+        
+        // Get global trending brands for "Brands A-Z" section
+        $globalTrendingBrands = $this->megaMenuService->getGlobalTrendingBrands();
         
         $view->with([
             'megaMenuCategories' => $megaMenuCategories,
-            'trendingBrands' => $trendingBrands,
+            'categoryTrendingBrands' => $categoryTrendingBrands,
+            'globalTrendingBrands' => $globalTrendingBrands,
         ]);
     }
 
@@ -53,17 +73,19 @@ class CategoryComposer
     }
 
     /**
-     * Get trending brands for mega menu
-     * Cached for performance
+     * Calculate trending brands for each category
+     * 
+     * @param \Illuminate\Support\Collection $categories
+     * @return array
      */
-    protected function getTrendingBrands()
+    protected function getCategoryTrendingBrands($categories)
     {
-        return Cache::remember('trending_brands', 3600, function () {
-            return Brand::where('is_active', true)
-                ->where('is_featured', true) // Assuming brands have is_featured column
-                ->orderBy('sort_order')
-                ->limit(6) // Show 6 trending brands
-                ->get();
-        });
+        $categoryTrendingBrands = [];
+        
+        foreach ($categories as $category) {
+            $categoryTrendingBrands[$category->id] = $this->megaMenuService->getTrendingBrandsByCategory($category->id);
+        }
+        
+        return $categoryTrendingBrands;
     }
 }

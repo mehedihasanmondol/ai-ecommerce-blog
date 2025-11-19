@@ -139,6 +139,40 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 7,
                 'description' => 'Show top header announcement bar',
             ],
+            
+            // Mega Menu Settings
+            [
+                'key' => 'mega_menu_trending_brands_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'mega_menu',
+                'order' => 1,
+                'description' => 'Show trending brands in mega menu based on sales',
+            ],
+            [
+                'key' => 'mega_menu_trending_brands_dynamic',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'mega_menu',
+                'order' => 2,
+                'description' => 'Calculate trending brands dynamically per category based on product sales',
+            ],
+            [
+                'key' => 'mega_menu_trending_brands_limit',
+                'value' => '6',
+                'type' => 'text',
+                'group' => 'mega_menu',
+                'order' => 3,
+                'description' => 'Number of trending brands to display per category (default: 6)',
+            ],
+            [
+                'key' => 'mega_menu_trending_brands_days',
+                'value' => '30',
+                'type' => 'text',
+                'group' => 'mega_menu',
+                'order' => 4,
+                'description' => 'Calculate trending brands based on sales from last X days (default: 30)',
+            ],
         ];
 
         foreach ($generalSettings as $setting) {

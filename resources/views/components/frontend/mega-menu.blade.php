@@ -7,7 +7,7 @@
  */
 --}}
 
-@props(['megaMenuCategories' => collect(), 'trendingBrands' => collect()])
+@props(['megaMenuCategories' => collect(), 'categoryTrendingBrands' => [], 'globalTrendingBrands' => collect()])
 
 <!-- Navigation Menu with Mega Dropdown -->
 <nav class="relative flex-1" x-data="{ activeMenu: null, closeTimeout: null }">
@@ -79,12 +79,15 @@
                             @endforeach
                             </div>
                             
-                            <!-- Trending Brands Section (Right) -->
-                            @if($trendingBrands->isNotEmpty())
+                            <!-- Trending Brands Section (Right) - Category Specific -->
+                            @php
+                                $categoryBrands = $categoryTrendingBrands[$category->id] ?? collect();
+                            @endphp
+                            @if($categoryBrands->isNotEmpty())
                             <div class="w-48 border-l border-gray-200 pl-8 flex-shrink-0">
                                 <h3 class="text-sm font-bold text-gray-900 mb-4">Trending brands</h3>
                                 <div class="space-y-3">
-                                    @foreach($trendingBrands->take(6) as $brand)
+                                    @foreach($categoryBrands->take(6) as $brand)
                                         <a href="{{ route('brands.show', $brand->slug) }}" 
                                            class="block group">
                                             @if($brand->logo)
@@ -183,12 +186,12 @@
                             </div>
                         </div>
                         
-                        <!-- Trending Brands Section (Right) -->
-                        @if($trendingBrands->isNotEmpty())
+                        <!-- Trending Brands Section (Right) - Global for Brands A-Z -->
+                        @if($globalTrendingBrands->isNotEmpty())
                         <div class="w-48 border-l border-gray-200 pl-8 flex-shrink-0">
                             <h3 class="text-sm font-bold text-gray-900 mb-4">Trending brands</h3>
                             <div class="space-y-3">
-                                @foreach($trendingBrands->take(6) as $brand)
+                                @foreach($globalTrendingBrands->take(6) as $brand)
                                     <a href="{{ route('brands.show', $brand->slug) }}" 
                                        class="block group">
                                         @if($brand->logo)

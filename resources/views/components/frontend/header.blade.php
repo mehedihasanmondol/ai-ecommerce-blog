@@ -368,7 +368,8 @@ function topbarSlider() {
             <!-- Primary Mega Menu (Left) -->
             <x-frontend.mega-menu 
                 :megaMenuCategories="$megaMenuCategories ?? collect()" 
-                :trendingBrands="$trendingBrands ?? collect()" 
+                :categoryTrendingBrands="$categoryTrendingBrands ?? []" 
+                :globalTrendingBrands="$globalTrendingBrands ?? collect()" 
             />
             
             <!-- Secondary Menu (Right) -->
