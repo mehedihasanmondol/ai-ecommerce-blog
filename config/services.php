@@ -45,39 +45,21 @@ return [
     */
 
     'google' => [
-        'client_id' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('google_client_id') ?: env('GOOGLE_CLIENT_ID')) 
-            : env('GOOGLE_CLIENT_ID'),
-        'client_secret' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('google_client_secret') ?: env('GOOGLE_CLIENT_SECRET')) 
-            : env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('google_redirect_url') ?: env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/login/google/callback')) 
-            : env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/login/google/callback'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/login/google/callback'),
     ],
 
     'facebook' => [
-        'client_id' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('facebook_client_id') ?: env('FACEBOOK_CLIENT_ID')) 
-            : env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('facebook_client_secret') ?: env('FACEBOOK_CLIENT_SECRET')) 
-            : env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('facebook_redirect_url') ?: env('FACEBOOK_REDIRECT_URL', env('APP_URL') . '/login/facebook/callback')) 
-            : env('FACEBOOK_REDIRECT_URL', env('APP_URL') . '/login/facebook/callback'),
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT_URL', env('APP_URL') . '/login/facebook/callback'),
     ],
 
     'apple' => [
-        'client_id' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('apple_client_id') ?: env('APPLE_CLIENT_ID')) 
-            : env('APPLE_CLIENT_ID'),
-        'client_secret' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('apple_client_secret') ?: env('APPLE_CLIENT_SECRET')) 
-            : env('APPLE_CLIENT_SECRET'),
-        'redirect' => function_exists('\App\Models\SiteSetting::get') 
-            ? (\App\Models\SiteSetting::get('apple_redirect_url') ?: env('APPLE_REDIRECT_URL', env('APP_URL') . '/login/apple/callback')) 
-            : env('APPLE_REDIRECT_URL', env('APP_URL') . '/login/apple/callback'),
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'redirect' => env('APPLE_REDIRECT_URL', env('APP_URL') . '/login/apple/callback'),
     ],
 
 ];
