@@ -166,8 +166,22 @@
                                 {{ ucfirst($product->product_type) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $product->category?->name ?? '-' }}
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            @if($product->categories->isNotEmpty())
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach($product->categories as $category)
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ $category->name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @elseif($product->category)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ $product->category->name }}
+                                </span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ currency_format($product->price) }}</div>

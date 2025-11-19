@@ -34,7 +34,8 @@ class ProductController extends Controller
         $product = Product::with([
             'variants.attributeValues.attribute', 
             'images', 
-            'category.parent', 
+            'category.parent',
+            'categories',
             'brand'
         ])
         ->where('slug', $slug)

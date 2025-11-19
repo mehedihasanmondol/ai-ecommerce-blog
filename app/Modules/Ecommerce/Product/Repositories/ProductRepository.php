@@ -15,7 +15,7 @@ class ProductRepository
 
     public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = Product::with(['category', 'brand', 'variants', 'images']);
+        $query = Product::with(['category', 'categories', 'brand', 'variants', 'images']);
 
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
@@ -25,7 +25,12 @@ class ProductRepository
         }
 
         if (!empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $query->where(function ($q) use ($filters) {
+                $q->whereHas('categories', function ($query) use ($filters) {
+                    $query->where('categories.id', $filters['category_id']);
+                })
+                ->orWhere('category_id', $filters['category_id']);
+            });
         }
 
         if (!empty($filters['brand_id'])) {
@@ -98,7 +103,10 @@ class ProductRepository
     public function getByCategory(int $categoryId, int $perPage = 12): LengthAwarePaginator
     {
         return Product::with(['defaultVariant', 'primaryImage'])
-            ->where('category_id', $categoryId)
+            ->whereHas('categories', function ($query) use ($categoryId) {
+                $query->where('categories.id', $categoryId);
+            })
+            ->orWhere('category_id', $categoryId)
             ->active()
             ->paginate($perPage);
     }

@@ -266,6 +266,28 @@
                     <div class="space-y-2 text-sm">
                         <!-- Best By Date - Removed as expires_at field doesn't exist in database -->
 
+                        <!-- Category -->
+                        @if($product->categories->isNotEmpty() || $product->category)
+                        <div class="flex items-start space-x-2">
+                            <span class="text-gray-700 font-medium min-w-[100px]">Category:</span>
+                            <div class="flex flex-wrap gap-2">
+                                @if($product->categories->isNotEmpty())
+                                    @foreach($product->categories as $category)
+                                        <a href="{{ route('categories.show', $category->slug) }}" 
+                                           class="text-blue-600 hover:text-blue-800 hover:underline transition">
+                                            {{ $category->name }}
+                                        </a>@if(!$loop->last)<span class="text-gray-400">,</span>@endif
+                                    @endforeach
+                                @elseif($product->category)
+                                    <a href="{{ route('categories.show', $product->category->slug) }}" 
+                                       class="text-blue-600 hover:text-blue-800 hover:underline transition">
+                                        {{ $product->category->name }}
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- First Available -->
                         <div class="flex items-start space-x-2">
                             <span class="text-gray-700 font-medium min-w-[100px]">First available:</span>
