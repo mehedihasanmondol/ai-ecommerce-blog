@@ -53,11 +53,17 @@ class MegaMenuService
             $categoryIds = $this->getCategoryWithDescendants($categoryId);
             
             // First, get brand IDs with sales totals using subquery
+            // Check both single category_id and many-to-many categories relationship
             $brandSales = DB::table('order_items')
                 ->select('products.brand_id', DB::raw('SUM(order_items.quantity) as total_sales'))
                 ->join('orders', 'orders.id', '=', 'order_items.order_id')
                 ->join('products', 'products.id', '=', 'order_items.product_id')
-                ->whereIn('products.category_id', $categoryIds)
+                ->leftJoin('category_product', 'category_product.product_id', '=', 'products.id')
+                ->where(function($query) use ($categoryIds) {
+                    $query->whereIn('products.category_id', $categoryIds)
+                          ->orWhereIn('category_product.category_id', $categoryIds);
+                })
+                ->whereNotNull('products.brand_id')
                 ->where('orders.status', '!=', 'cancelled')
                 ->where('orders.status', '!=', 'failed')
                 ->where('orders.created_at', '>=', now()->subDays($days))
@@ -206,13 +212,20 @@ class MegaMenuService
      */
     public function clearTrendingBrandsCache(): void
     {
-        // Clear all trending brands cache
-        Cache::forget('trending_brands_global_*');
+        // Get settings for cache key generation
+        $limit = (int) HomepageSetting::get('mega_menu_trending_brands_limit', 6);
+        $days = (int) HomepageSetting::get('mega_menu_trending_brands_days', 30);
+        
+        // Clear global trending brands cache
+        Cache::forget("trending_brands_global_{$limit}_{$days}");
         
         // Clear category-specific caches
         $categories = Category::pluck('id');
         foreach ($categories as $categoryId) {
-            Cache::forget("trending_brands_category_{$categoryId}_*");
+            Cache::forget("trending_brands_category_{$categoryId}_{$limit}_{$days}");
         }
+        
+        // Also clear mega menu categories cache
+        Cache::forget('mega_menu_categories');
     }
 }

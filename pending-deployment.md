@@ -6,6 +6,7 @@
 
 .env setup for google cloud google+ api
 
+php artisan cache:clear-megamenu
 
 ## Login Page Settings Implemented
 - Login page title and content (TinyMCE)
