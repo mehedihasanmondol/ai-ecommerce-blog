@@ -138,10 +138,10 @@
                         <div class="relative">
                             <input 
                                 :type="showConfirmPassword ? 'text' : 'password'" 
-                                wire:model.defer="passwordConfirmation"
+                                wire:model.defer="password_confirmation"
                                 id="password_confirmation"
                                 placeholder="Re-enter your password"
-                                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent @error('password_confirmation') border-red-500 @enderror"
                                 required
                             >
                             <button 
@@ -158,6 +158,9 @@
                                 </svg>
                             </button>
                         </div>
+                        @error('password_confirmation')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             @endif

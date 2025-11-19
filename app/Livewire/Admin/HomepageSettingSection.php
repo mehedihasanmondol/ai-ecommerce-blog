@@ -32,7 +32,12 @@ class HomepageSettingSection extends Component
         // Initialize settings values
         foreach ($groupSettings as $setting) {
             if ($setting['type'] !== 'image') {
-                $this->settings[$setting['key']] = $setting['value'];
+                // Convert boolean strings to actual booleans for proper checkbox binding
+                if ($setting['type'] === 'boolean') {
+                    $this->settings[$setting['key']] = filter_var($setting['value'], FILTER_VALIDATE_BOOLEAN);
+                } else {
+                    $this->settings[$setting['key']] = $setting['value'];
+                }
             }
         }
     }
@@ -64,9 +69,10 @@ class HomepageSettingSection extends Component
                     // Clear uploaded image from memory
                     unset($this->images[$setting['key']]);
                 }
-                // Handle boolean values
+                // Handle boolean values - Livewire removes unchecked checkboxes from array
                 elseif ($setting['type'] === 'boolean') {
-                    $value = isset($this->settings[$setting['key']]) && $this->settings[$setting['key']] ? '1' : '0';
+                    // Default to false if not in settings array (unchecked)
+                    $value = !empty($this->settings[$setting['key']]) ? '1' : '0';
                     $homepageSetting->update(['value' => $value]);
                 }
                 // Handle text and textarea
@@ -106,7 +112,12 @@ class HomepageSettingSection extends Component
     {
         foreach ($this->groupSettings as $setting) {
             if ($setting['type'] !== 'image') {
-                $this->settings[$setting['key']] = $setting['value'];
+                // Convert boolean strings to actual booleans for proper checkbox binding
+                if ($setting['type'] === 'boolean') {
+                    $this->settings[$setting['key']] = filter_var($setting['value'], FILTER_VALIDATE_BOOLEAN);
+                } else {
+                    $this->settings[$setting['key']] = $setting['value'];
+                }
             }
         }
         

@@ -173,6 +173,14 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 4,
                 'description' => 'Calculate trending brands based on sales from last X days (default: 30)',
             ],
+            [
+                'key' => 'mega_menu_trending_brands_fallback',
+                'value' => '0',
+                'type' => 'boolean',
+                'group' => 'mega_menu',
+                'order' => 5,
+                'description' => 'Show featured brands when no sales data available (if disabled, brands section will be hidden)',
+            ],
         ];
 
         foreach ($generalSettings as $setting) {

@@ -2,6 +2,7 @@
 
 ✅ php artisan db:seed --class=SiteSettingSeeder (Completed)
 
+✅ php artisan db:seed --class=HomepageSettingSeeder (Completed)
 
 .env setup for google cloud google+ api
 

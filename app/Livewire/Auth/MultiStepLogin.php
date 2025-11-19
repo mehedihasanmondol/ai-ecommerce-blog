@@ -28,7 +28,7 @@ class MultiStepLogin extends Component
 {
     public $emailOrMobile = '';
     public $password = '';
-    public $passwordConfirmation = '';
+    public $password_confirmation = ''; // Laravel expects snake_case for confirmed validation
     public $name = '';
     public $step = 1; // 1 = email/mobile, 2 = password (login or register)
     public $userExists = false;
@@ -208,7 +208,7 @@ class MultiStepLogin extends Component
     {
         $this->step = 1;
         $this->password = '';
-        $this->passwordConfirmation = '';
+        $this->password_confirmation = '';
         $this->name = '';
         $this->resetValidation();
     }
@@ -220,7 +220,7 @@ class MultiStepLogin extends Component
     {
         $this->emailOrMobile = '';
         $this->password = '';
-        $this->passwordConfirmation = '';
+        $this->password_confirmation = '';
         $this->name = '';
         $this->step = 1;
         $this->userExists = false;

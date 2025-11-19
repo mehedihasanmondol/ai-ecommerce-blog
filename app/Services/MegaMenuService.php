@@ -67,9 +67,10 @@ class MegaMenuService
                 ->limit($limit)
                 ->pluck('brand_id');
             
-            // If no sales data, fall back to featured brands
+            // If no sales data, check if fallback is enabled
             if ($brandSales->isEmpty()) {
-                return $this->getFallbackTrendingBrands($limit);
+                $useFallback = HomepageSetting::get('mega_menu_trending_brands_fallback', false);
+                return $useFallback ? $this->getFallbackTrendingBrands($limit) : collect();
             }
             
             // Fetch full brand records maintaining order
@@ -130,9 +131,10 @@ class MegaMenuService
                 ->limit($limit)
                 ->pluck('brand_id');
             
-            // If no sales data, fall back to featured brands
+            // If no sales data, check if fallback is enabled
             if ($brandSales->isEmpty()) {
-                return $this->getFallbackTrendingBrands($limit);
+                $useFallback = HomepageSetting::get('mega_menu_trending_brands_fallback', false);
+                return $useFallback ? $this->getFallbackTrendingBrands($limit) : collect();
             }
             
             // Fetch full brand records maintaining order
@@ -149,7 +151,8 @@ class MegaMenuService
     }
     
     /**
-     * Get category and all its descendants
+     * Get category and all its descendants (recursive)
+     * Includes parent category, children, grandchildren, and all deeper levels
      * 
      * @param int $categoryId
      * @return array
@@ -158,25 +161,24 @@ class MegaMenuService
     {
         $categoryIds = [$categoryId];
         
-        // Get all child categories
-        $childCategories = Category::where('parent_id', $categoryId)
-            ->where('is_active', true)
-            ->pluck('id')
-            ->toArray();
-        
-        $categoryIds = array_merge($categoryIds, $childCategories);
-        
-        // Get grandchildren categories
-        if (!empty($childCategories)) {
-            $grandchildCategories = Category::whereIn('parent_id', $childCategories)
+        // Recursive function to get all descendants
+        $getChildren = function($parentIds) use (&$getChildren, &$categoryIds) {
+            $children = Category::whereIn('parent_id', $parentIds)
                 ->where('is_active', true)
                 ->pluck('id')
                 ->toArray();
             
-            $categoryIds = array_merge($categoryIds, $grandchildCategories);
-        }
+            if (!empty($children)) {
+                $categoryIds = array_merge($categoryIds, $children);
+                // Recursively get children of children
+                $getChildren($children);
+            }
+        };
         
-        return $categoryIds;
+        // Start recursive search from the main category
+        $getChildren([$categoryId]);
+        
+        return array_unique($categoryIds);
     }
     
     /**
