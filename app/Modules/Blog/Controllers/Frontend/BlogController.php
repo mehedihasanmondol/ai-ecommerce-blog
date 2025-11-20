@@ -108,6 +108,20 @@ class BlogController extends Controller
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
         $popularTags = $this->tagRepository->getPopular(10);
+        
+        // Prepare SEO data for blog index page
+        $blogTitle = \App\Models\SiteSetting::get('blog_title', 'Blog');
+        $blogTagline = \App\Models\SiteSetting::get('blog_tagline', '');
+        $blogImage = \App\Models\SiteSetting::get('blog_image');
+        
+        $seoData = [
+            'title' => $blogTagline ? $blogTitle . ' | ' . $blogTagline : $blogTitle,
+            'description' => \App\Models\SiteSetting::get('blog_description', 'Discover the latest articles and tips'),
+            'keywords' => \App\Models\SiteSetting::get('blog_keywords', 'blog, articles, tips'),
+            'og_image' => $blogImage ? asset('storage/' . $blogImage) : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => route('blog.index'),
+        ];
 
         return view('frontend.blog.index', compact(
             'posts',
@@ -115,7 +129,8 @@ class BlogController extends Controller
             'popularPosts',
             'categories',
             'popularTags',
-            'filter'
+            'filter',
+            'seoData'
         ));
     }
 

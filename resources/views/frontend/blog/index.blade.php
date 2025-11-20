@@ -1,14 +1,21 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SiteSetting::get('blog_title', 'Blog') . ' - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+@section('title', $seoData['title'] ?? \App\Models\SiteSetting::get('blog_title', 'Blog'))
 
-@section('description', \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips, product reviews, and lifestyle advice.'))
+@section('description', $seoData['description'] ?? \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips'))
 
-@section('keywords', \App\Models\SiteSetting::get('blog_keywords', 'health blog, wellness tips, nutrition advice, fitness, supplements'))
+@section('keywords', $seoData['keywords'] ?? \App\Models\SiteSetting::get('blog_keywords', 'blog, articles, tips'))
 
-@section('og_type', 'website')
-@section('og_image', asset('images/blog-banner.jpg'))
-@section('canonical', route('blog.index'))
+@section('og_type', $seoData['og_type'] ?? 'website')
+@section('og_title', $seoData['title'] ?? \App\Models\SiteSetting::get('blog_title', 'Blog'))
+@section('og_description', $seoData['description'] ?? \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips'))
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? route('blog.index'))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? \App\Models\SiteSetting::get('blog_title', 'Blog'))
+@section('twitter_description', $seoData['description'] ?? \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips'))
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

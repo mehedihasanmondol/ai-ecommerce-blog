@@ -202,13 +202,22 @@ class SiteSettingSeeder extends Seeder
                 'order' => 4,
             ],
             [
+                'key' => 'blog_image',
+                'value' => null,
+                'type' => 'image',
+                'group' => 'blog',
+                'label' => 'Blog SEO Image',
+                'description' => 'Default image for blog page social media sharing (recommended size: 1200x630px)',
+                'order' => 5,
+            ],
+            [
                 'key' => 'blog_posts_per_page',
                 'value' => '12',
                 'type' => 'text',
                 'group' => 'blog',
                 'label' => 'Posts Per Page',
                 'description' => 'Number of blog posts to display per page',
-                'order' => 5,
+                'order' => 6,
             ],
             [
                 'key' => 'blog_show_author',
@@ -217,7 +226,7 @@ class SiteSettingSeeder extends Seeder
                 'group' => 'blog',
                 'label' => 'Show Author',
                 'description' => 'Display author information on blog posts',
-                'order' => 6,
+                'order' => 7,
             ],
             [
                 'key' => 'blog_show_date',
@@ -226,7 +235,7 @@ class SiteSettingSeeder extends Seeder
                 'group' => 'blog',
                 'label' => 'Show Date',
                 'description' => 'Display publication date on blog posts',
-                'order' => 7,
+                'order' => 8,
             ],
             [
                 'key' => 'blog_show_comments',
@@ -235,7 +244,7 @@ class SiteSettingSeeder extends Seeder
                 'group' => 'blog',
                 'label' => 'Enable Comments',
                 'description' => 'Allow comments on blog posts',
-                'order' => 8,
+                'order' => 9,
             ],
 
             // Homepage Settings
