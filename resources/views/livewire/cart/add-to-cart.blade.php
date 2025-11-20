@@ -1,6 +1,10 @@
 <div class="space-y-3">
-    <!-- Progress Bar & Claimed Text -->
-    @if($maxQuantity > 0)
+    <!-- Progress Bar & Claimed Text (Only show if stock validation is enabled) -->
+    @php
+        $stockValidationEnabled = \App\Modules\Ecommerce\Product\Models\ProductVariant::isStockRestrictionEnabled();
+    @endphp
+    
+    @if($stockValidationEnabled && $maxQuantity > 0)
     <div class="mb-1">
         <!-- Progress Bar -->
         <div class="w-full bg-gray-200 rounded-full h-2 mb-2">

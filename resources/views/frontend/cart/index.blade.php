@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Shopping Cart')
+@section('title', 'Shopping Cart - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('description', 'Review your cart items and proceed to checkout. Free shipping on orders over $40.')
+
+@section('keywords', 'shopping cart, cart, checkout, buy products')
+
+@section('robots', 'noindex, follow')
 
 @section('content')
 <div class="bg-gray-50 min-h-screen py-8" x-data="cartPage()" @shipping-updated.window="shippingCost = $event.detail.shippingCost || 0">

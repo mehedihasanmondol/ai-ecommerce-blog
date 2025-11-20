@@ -1,14 +1,37 @@
 @extends('layouts.app')
 
-@section('title', $product->meta_title ?? $product->name)
-@section('meta_description', $product->meta_description ?? $product->short_description)
-@section('meta_keywords', $product->meta_keywords ?? '')
+@section('title', !empty($product->meta_title) ? $product->meta_title : $product->name . ' - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
 
-@section('content')
+@section('description', !empty($product->meta_description) ? $product->meta_description : $product->short_description)
+
+@section('keywords', !empty($product->meta_keywords) ? $product->meta_keywords : (($product->brand ? $product->brand->name . ', ' : '') . ($product->category ? $product->category->name . ', ' : '') . 'buy online, shop'))
+
 @php
-    // Define variant early for use throughout the view
+    // Define variant early for use throughout the view (including meta tags)
     $variant = $defaultVariant ?? $product->variants->first();
 @endphp
+
+@section('og_type', 'product')
+@section('og_title', !empty($product->meta_title) ? $product->meta_title : $product->name)
+@section('og_description', !empty($product->meta_description) ? $product->meta_description : $product->short_description)
+@section('og_image', $product->images->where('is_primary', true)->first() ? asset('storage/' . $product->images->where('is_primary', true)->first()->image_path) : asset('images/placeholder.png'))
+@section('canonical', route('products.show', $product->slug))
+
+@push('meta_tags')
+    <!-- Product Specific Meta -->
+    <meta property="product:price:amount" content="{{ $variant->sale_price ?? $variant->price }}">
+    <meta property="product:price:currency" content="BDT">
+    @if($variant->stock_quantity > 0)
+    <meta property="product:availability" content="in stock">
+    @else
+    <meta property="product:availability" content="out of stock">
+    @endif
+    @if($product->brand)
+    <meta property="product:brand" content="{{ $product->brand->name }}">
+    @endif
+@endpush
+
+@section('content')
 
 <!-- Breadcrumb -->
 @php

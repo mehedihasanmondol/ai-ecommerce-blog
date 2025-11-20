@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Home - Health, Wellness & Beauty Products')
+@section('title', \App\Models\SiteSetting::get('site_name', config('app.name')) . ' - ' . \App\Models\SiteSetting::get('site_tagline', 'Health, Wellness & Beauty Products'))
 
-@section('meta')
-    <meta name="description" content="Shop the best health, wellness, and beauty products. Free shipping on orders over $40. Quality guaranteed.">
-    <meta name="keywords" content="health products, supplements, beauty, wellness, organic">
-@endsection
+@section('description', \App\Models\SiteSetting::get('site_description', 'Shop the best health, wellness, and beauty products. Free shipping on orders over $40. Quality guaranteed.'))
+
+@section('keywords', \App\Models\SiteSetting::get('site_keywords', 'health products, supplements, beauty, wellness, organic'))
+
+@section('og_type', 'website')
+@section('og_image', \App\Models\SiteSetting::get('site_logo') ? asset('storage/' . \App\Models\SiteSetting::get('site_logo')) : asset('images/og-default.jpg'))
 
 @section('content')
 <!-- Hero Slider -->

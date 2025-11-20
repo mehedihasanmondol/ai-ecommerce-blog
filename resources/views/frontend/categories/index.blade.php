@@ -1,11 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'All Categories')
+@section('title', 'All Categories - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
 
-@section('meta')
-    <meta name="description" content="Browse all product categories and find what you're looking for.">
-    <meta name="keywords" content="categories, shop, products, browse">
-@endsection
+@section('description', 'Browse all product categories and find what you\'re looking for. Shop by category for health, wellness, and beauty products.')
+
+@section('keywords', 'categories, shop, products, browse, product categories')
+
+@section('og_type', 'website')
+@section('og_image', asset('images/categories-banner.jpg'))
+@section('canonical', route('categories.index'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

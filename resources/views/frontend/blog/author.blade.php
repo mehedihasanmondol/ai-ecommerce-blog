@@ -1,7 +1,16 @@
 @extends('layouts.app')
 
-@section('title', $author->name . ' - Author Profile')
-@section('meta_description', $author->authorProfile?->bio ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
+@section('title', $author->name . ' - Author Profile - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+
+@section('description', !empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
+
+@section('keywords', $author->name . ', author, blog posts, articles, writer')
+
+@section('og_type', 'profile')
+@section('og_title', $author->name . ' - Author Profile')
+@section('og_description', !empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
+@section('og_image', !empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg'))
+@section('canonical', route('blog.author', $author->id))
 
 @section('content')
 <div class="bg-gradient-to-b from-gray-50  min-h-screen">

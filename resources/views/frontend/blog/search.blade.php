@@ -2,6 +2,13 @@
 
 @section('title', 'Search Results: ' . $query . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
 
+@section('description', 'Search results for "' . $query . '" in our blog. Find health and wellness articles, tips, and advice.')
+
+@section('keywords', $query . ', blog search, health articles, wellness tips')
+
+@section('robots', 'noindex, follow')
+@section('canonical', route('blog.search', ['q' => $query]))
+
 @section('content')
 <div class="bg-gray-50 min-h-screen">
     <div class="container mx-auto px-4 py-8">

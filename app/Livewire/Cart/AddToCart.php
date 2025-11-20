@@ -64,9 +64,9 @@ class AddToCart extends Component
     /**
      * Handle variant change from variant selector
      */
-    public function handleVariantChange($variantData)
+    public function handleVariantChange($variantData = null)
     {
-        if (isset($variantData['id'])) {
+        if ($variantData && isset($variantData['id'])) {
             $this->selectedVariantId = $variantData['id'];
             $this->updateMaxQuantity();
             
@@ -85,6 +85,12 @@ class AddToCart extends Component
      */
     protected function updateMaxQuantity()
     {
+        // If stock validation is disabled, set a high limit
+        if (!ProductVariant::isStockRestrictionEnabled()) {
+            $this->maxQuantity = 9999; // High limit when stock validation is disabled
+            return;
+        }
+        
         if ($this->selectedVariantId) {
             $variant = ProductVariant::find($this->selectedVariantId);
             $this->maxQuantity = $variant ? $variant->stock_quantity : 0;

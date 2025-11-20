@@ -20,7 +20,7 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Brand::where('is_active', true);
+        $query = Brand::where('is_active', true)->withCount('products');
         
         // Filter by letter if provided
         if ($request->has('letter')) {
@@ -32,6 +32,7 @@ class BrandController extends Controller
         
         // Get brands grouped by letter for A-Z navigation
         $brandsByLetter = Brand::where('is_active', true)
+            ->withCount('products')
             ->orderBy('name')
             ->get()
             ->groupBy(function($brand) {

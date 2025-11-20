@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Checkout')
+@section('title', 'Checkout - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('description', 'Complete your order with secure checkout. Multiple payment options available.')
+
+@section('robots', 'noindex, nofollow')
 
 @section('content')
 <div class="bg-gray-50 min-h-screen py-8" x-data="checkoutPage()" @shipping-updated.window="shippingCost = $event.detail.shippingCost || 0">

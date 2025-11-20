@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Available Coupons & Offers')
+@section('title', 'Coupons & Special Offers - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('description', 'Discover exclusive discount codes and special offers. Save more on your favorite health and wellness products with our active coupons.')
+
+@section('keywords', 'coupons, discount codes, promo codes, special offers, deals, savings')
+
+@section('og_type', 'website')
+@section('og_image', asset('images/coupons-banner.jpg'))
 
 @section('content')
 <div class="bg-gradient-to-r from-blue-50 to-purple-50 py-8">

@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Shop - All Products')
+@section('title', 'Shop All Products - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('description', 'Browse our complete collection of health, wellness, and beauty products. Find the best supplements, vitamins, and natural health solutions.')
+
+@section('keywords', 'shop, all products, health products, supplements, vitamins, wellness, beauty products, buy online')
+
+@section('og_type', 'website')
+@section('og_image', asset('images/shop-banner.jpg'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen" x-data="shopPage()">

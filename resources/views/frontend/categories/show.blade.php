@@ -1,31 +1,17 @@
 @extends('layouts.app')
 
-@section('title', $category->meta_title ?? $category->name)
+@section('title', !empty($category->meta_title) ? $category->meta_title : $category->name . ' - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
 
-@section('meta')
-    <meta name="description" content="{{ $category->meta_description ?? $category->description }}">
-    @if($category->meta_keywords)
-        <meta name="keywords" content="{{ $category->meta_keywords }}">
-    @endif
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="{{ $category->og_title ?? $category->name }}">
-    <meta property="og:description" content="{{ $category->og_description ?? $category->description }}">
-    @if($category->og_image)
-        <meta property="og:image" content="{{ asset('storage/' . $category->og_image) }}">
-    @elseif($category->image)
-        <meta property="og:image" content="{{ asset('storage/' . $category->image) }}">
-    @endif
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:type" content="website">
-    
-    <!-- Canonical URL -->
-    @if($category->canonical_url)
-        <link rel="canonical" href="{{ $category->canonical_url }}">
-    @else
-        <link rel="canonical" href="{{ url()->current() }}">
-    @endif
-@endsection
+@section('description', !empty($category->meta_description) ? $category->meta_description : $category->description)
+
+@section('keywords', !empty($category->meta_keywords) ? $category->meta_keywords : '')
+
+@section('og_type', 'website')
+@section('og_title', !empty($category->og_title) ? $category->og_title : $category->name)
+@section('og_description', !empty($category->og_description) ? $category->og_description : $category->description)
+@section('og_image', !empty($category->og_image) ? asset('storage/' . $category->og_image) : (!empty($category->image) ? asset('storage/' . $category->image) : asset('images/category-default.jpg')))
+
+@section('canonical', $category->canonical_url ?? route('categories.show', $category->slug))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen" x-data="categoryPage()">

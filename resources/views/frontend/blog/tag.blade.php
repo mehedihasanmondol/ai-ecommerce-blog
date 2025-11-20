@@ -1,7 +1,16 @@
 @extends('layouts.app')
 
-@section('title', $tag->meta_title ?? $tag->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
-@section('meta_description', $tag->meta_description ?? $tag->description ?? 'Posts tagged with ' . $tag->name)
+@section('title', !empty($tag->meta_title) ? $tag->meta_title : $tag->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+
+@section('description', !empty($tag->meta_description) ? $tag->meta_description : (!empty($tag->description) ? $tag->description : 'Posts tagged with ' . $tag->name))
+
+@section('keywords', !empty($tag->meta_keywords) ? $tag->meta_keywords : $tag->name . ', blog tag, health, wellness')
+
+@section('og_type', 'website')
+@section('og_title', !empty($tag->meta_title) ? $tag->meta_title : 'Tag: ' . $tag->name)
+@section('og_description', !empty($tag->meta_description) ? $tag->meta_description : (!empty($tag->description) ? $tag->description : 'Browse posts tagged with ' . $tag->name))
+@section('og_image', asset('images/blog-tag-default.jpg'))
+@section('canonical', route('blog.tag', $tag->slug))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

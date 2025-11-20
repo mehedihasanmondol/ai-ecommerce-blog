@@ -1,8 +1,31 @@
 @extends('layouts.app')
 
-@section('title', $post->seo_title)
-@section('meta_description', $post->seo_description)
-@section('meta_keywords', $post->seo_keywords)
+@section('title', !empty($post->seo_title) ? $post->seo_title : $post->title . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+
+@section('description', !empty($post->seo_description) ? $post->seo_description : (!empty($post->excerpt) ? $post->excerpt : \Illuminate\Support\Str::limit(strip_tags($post->content), 160)))
+
+@section('keywords', !empty($post->seo_keywords) ? $post->seo_keywords : (($post->category ? $post->category->name . ', ' : '') . 'health blog, wellness, tips'))
+
+@section('og_type', 'article')
+@section('og_title', !empty($post->seo_title) ? $post->seo_title : $post->title)
+@section('og_description', !empty($post->seo_description) ? $post->seo_description : $post->excerpt)
+@section('og_image', $post->featured_image ? asset('storage/' . $post->featured_image) : asset('images/blog-default.jpg'))
+@section('canonical', url($post->slug))
+
+@push('meta_tags')
+    <!-- Article Specific Meta -->
+    <meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">
+    <meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">
+    @if($post->author)
+    <meta property="article:author" content="{{ $post->author->name }}">
+    @endif
+    @if($post->category)
+    <meta property="article:section" content="{{ $post->category->name }}">
+    @endif
+    @foreach($post->tags as $tag)
+    <meta property="article:tag" content="{{ $tag->name }}">
+    @endforeach
+@endpush
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

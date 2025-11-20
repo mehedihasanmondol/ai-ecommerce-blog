@@ -5,10 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'Home')</title>
+    <title>@yield('title', config('app.name', 'Laravel'))</title>
 
     <!-- SEO Meta Tags -->
-    @yield('meta')
+    <meta name="description" content="@yield('description', \App\Models\SiteSetting::get('site_description', 'Shop health, wellness and beauty products'))">
+    <meta name="keywords" content="@yield('keywords', \App\Models\SiteSetting::get('site_keywords', 'health, wellness, beauty, supplements'))">
+    <meta name="author" content="@yield('author', \App\Models\SiteSetting::get('site_name', config('app.name')))">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+    
+    <!-- Robots Meta -->
+    <meta name="robots" content="@yield('robots', 'index, follow')">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:url" content="@yield('og_url', url()->current())">
+    <meta property="og:title" content="@yield('og_title', config('app.name'))">
+    <meta property="og:description" content="@yield('og_description', \App\Models\SiteSetting::get('site_description', 'Shop health, wellness and beauty products'))">
+    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta property="og:site_name" content="{{ \App\Models\SiteSetting::get('site_name', config('app.name')) }}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="@yield('twitter_card', 'summary_large_image')">
+    <meta name="twitter:url" content="@yield('twitter_url', url()->current())">
+    <meta name="twitter:title" content="@yield('twitter_title', config('app.name'))">
+    <meta name="twitter:description" content="@yield('twitter_description', \App\Models\SiteSetting::get('site_description'))">
+    <meta name="twitter:image" content="@yield('twitter_image', asset('images/og-default.jpg'))">
+    
+    <!-- Additional Meta Tags -->
+    @stack('meta_tags')
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

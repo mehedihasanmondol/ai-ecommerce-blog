@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'My Wishlist')
+@section('title', 'My Wishlist - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+
+@section('description', 'View and manage your saved products. Add items to cart or remove from wishlist.')
+
+@section('keywords', 'wishlist, saved items, favorites, saved products')
+
+@section('robots', 'noindex, follow')
 
 @section('content')
 <div class="bg-gray-50 min-h-screen py-8" x-data="wishlistPage()">

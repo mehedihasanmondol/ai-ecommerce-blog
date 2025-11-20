@@ -2,10 +2,13 @@
 
 @section('title', \App\Models\SiteSetting::get('blog_title', 'Blog') . ' - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
 
-@section('meta')
-    <meta name="description" content="{{ \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips') }}">
-    <meta name="keywords" content="{{ \App\Models\SiteSetting::get('blog_keywords', 'health blog, wellness tips') }}">
-@endsection
+@section('description', \App\Models\SiteSetting::get('blog_description', 'Discover the latest health and wellness tips, product reviews, and lifestyle advice.'))
+
+@section('keywords', \App\Models\SiteSetting::get('blog_keywords', 'health blog, wellness tips, nutrition advice, fitness, supplements'))
+
+@section('og_type', 'website')
+@section('og_image', asset('images/blog-banner.jpg'))
+@section('canonical', route('blog.index'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

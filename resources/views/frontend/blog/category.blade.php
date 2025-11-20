@@ -1,7 +1,16 @@
 @extends('layouts.app')
 
-@section('title', $category->meta_title ?? $category->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
-@section('meta_description', $category->meta_description ?? $category->description)
+@section('title', !empty($category->meta_title) ? $category->meta_title : $category->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+
+@section('description', !empty($category->meta_description) ? $category->meta_description : (!empty($category->description) ? $category->description : 'Browse ' . $category->name . ' blog posts and articles.'))
+
+@section('keywords', !empty($category->meta_keywords) ? $category->meta_keywords : $category->name . ', blog, health, wellness, tips')
+
+@section('og_type', 'website')
+@section('og_title', !empty($category->meta_title) ? $category->meta_title : $category->name)
+@section('og_description', !empty($category->meta_description) ? $category->meta_description : $category->description)
+@section('og_image', !empty($category->image) ? asset('storage/' . $category->image) : asset('images/blog-category-default.jpg'))
+@section('canonical', route('blog.category', $category->slug))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">
