@@ -1,3 +1,20 @@
+@section('title', $seoData['title'] ?? 'Shop')
+
+@section('description', $seoData['description'] ?? 'Shop our products')
+
+@section('keywords', $seoData['keywords'] ?? 'shop, products')
+
+@section('og_type', $seoData['og_type'] ?? 'website')
+@section('og_title', $seoData['title'] ?? 'Shop')
+@section('og_description', $seoData['description'] ?? 'Shop our products')
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? url()->current())
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? 'Shop')
+@section('twitter_description', $seoData['description'] ?? 'Shop our products')
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+
 <div class="bg-gray-50 min-h-screen">
     <!-- Breadcrumb -->
     @if($breadcrumb)

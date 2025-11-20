@@ -563,6 +563,86 @@ class ProductList extends Component
     }
 
     /**
+     * Get SEO data for category or brand page
+     */
+    public function getSeoDataProperty()
+    {
+        $siteName = \App\Models\SiteSetting::get('site_name', config('app.name'));
+        
+        // SEO for Category page
+        if ($this->category) {
+            return [
+                'title' => !empty($this->category->meta_title) 
+                    ? $this->category->meta_title 
+                    : $this->category->name . ' | ' . $siteName,
+                
+                'description' => !empty($this->category->meta_description) 
+                    ? $this->category->meta_description 
+                    : (!empty($this->category->description) 
+                        ? \Illuminate\Support\Str::limit(strip_tags($this->category->description), 160)
+                        : 'Shop ' . $this->category->name . ' products. Browse our collection of quality ' . $this->category->name),
+                
+                'keywords' => !empty($this->category->meta_keywords) 
+                    ? $this->category->meta_keywords 
+                    : $this->category->name . ', ' . $this->category->name . ' products, shop ' . $this->category->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
+                
+                'og_image' => !empty($this->category->og_image)
+                    ? asset('storage/' . $this->category->og_image)
+                    : ($this->category->image 
+                        ? asset('storage/' . $this->category->image) 
+                        : (\App\Models\SiteSetting::get('site_logo')
+                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                            : asset('images/og-default.jpg'))),
+                
+                'og_type' => 'website',
+                'canonical' => route('categories.show', $this->category->slug),
+            ];
+        }
+        
+        // SEO for Brand page (when accessed via Livewire)
+        if ($this->brand) {
+            return [
+                'title' => !empty($this->brand->meta_title) 
+                    ? $this->brand->meta_title 
+                    : $this->brand->name . ' Products | ' . $siteName,
+                
+                'description' => !empty($this->brand->meta_description) 
+                    ? $this->brand->meta_description 
+                    : (!empty($this->brand->description) 
+                        ? \Illuminate\Support\Str::limit(strip_tags($this->brand->description), 160)
+                        : 'Shop ' . $this->brand->name . ' products. Discover quality products from ' . $this->brand->name),
+                
+                'keywords' => !empty($this->brand->meta_keywords) 
+                    ? $this->brand->meta_keywords 
+                    : $this->brand->name . ', ' . $this->brand->name . ' products, shop ' . $this->brand->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
+                
+                'og_image' => !empty($this->brand->og_image)
+                    ? asset('storage/' . $this->brand->og_image)
+                    : ($this->brand->logo 
+                        ? asset('storage/' . $this->brand->logo) 
+                        : (\App\Models\SiteSetting::get('site_logo')
+                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                            : asset('images/og-default.jpg'))),
+                
+                'og_type' => 'website',
+                'canonical' => route('brands.show', $this->brand->slug),
+            ];
+        }
+        
+        // SEO for general Shop page
+        return [
+            'title' => 'Shop All Products | ' . $siteName,
+            'description' => \App\Models\SiteSetting::get('meta_description', 'Shop our wide selection of quality products'),
+            'keywords' => \App\Models\SiteSetting::get('meta_keywords', 'shop, products, ecommerce'),
+            'og_image' => \App\Models\SiteSetting::get('site_logo') 
+                ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => route('shop'),
+        ];
+    }
+
+    /**
      * Render component
      */
     public function render()
@@ -576,6 +656,7 @@ class ProductList extends Component
             'category' => $this->category,
             'brand' => $this->brand,
             'pageType' => $this->pageType,
+            'seoData' => $this->seoData,
         ])->extends('layouts.app')
           ->section('content');
     }

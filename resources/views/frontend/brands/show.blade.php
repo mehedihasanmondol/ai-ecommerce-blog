@@ -1,16 +1,21 @@
 @extends('layouts.app')
 
-@section('title', !empty($brand->meta_title) ? $brand->meta_title : $brand->name . ' Products - ' . \App\Models\SiteSetting::get('site_name', config('app.name')))
+@section('title', $seoData['title'] ?? $brand->name)
 
-@section('description', !empty($brand->meta_description) ? $brand->meta_description : 'Shop ' . $brand->name . ' products. Browse our collection of quality health, wellness, and beauty products from ' . $brand->name . '.')
+@section('description', $seoData['description'] ?? 'Shop ' . $brand->name . ' products')
 
-@section('keywords', !empty($brand->meta_keywords) ? $brand->meta_keywords : $brand->name . ', ' . $brand->name . ' products, buy ' . $brand->name . ', shop ' . $brand->name)
+@section('keywords', $seoData['keywords'] ?? $brand->name . ' products')
 
-@section('og_type', 'website')
-@section('og_title', !empty($brand->meta_title) ? $brand->meta_title : $brand->name . ' Products')
-@section('og_description', !empty($brand->meta_description) ? $brand->meta_description : 'Shop ' . $brand->name . ' products')
-@section('og_image', !empty($brand->logo) ? asset('storage/' . $brand->logo) : asset('images/brand-default.jpg'))
-@section('canonical', route('brands.show', $brand->slug))
+@section('og_type', $seoData['og_type'] ?? 'website')
+@section('og_title', $seoData['title'] ?? $brand->name)
+@section('og_description', $seoData['description'] ?? 'Shop ' . $brand->name . ' products')
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? route('brands.show', $brand->slug))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? $brand->name)
+@section('twitter_description', $seoData['description'] ?? 'Shop ' . $brand->name . ' products')
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

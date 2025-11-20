@@ -64,7 +64,35 @@ class BrandController extends Controller
             ->orderBy('name')
             ->limit(8)
             ->get();
+        
+        // Prepare SEO data for brand page - use brand's SEO settings if exist, otherwise use defaults
+        $seoData = [
+            'title' => !empty($brand->meta_title) 
+                ? $brand->meta_title 
+                : $brand->name . ' Products | ' . \App\Models\SiteSetting::get('site_name', config('app.name')),
+            
+            'description' => !empty($brand->meta_description) 
+                ? $brand->meta_description 
+                : (!empty($brand->description) 
+                    ? \Illuminate\Support\Str::limit(strip_tags($brand->description), 160)
+                    : 'Shop ' . $brand->name . ' products. Discover quality products from ' . $brand->name),
+            
+            'keywords' => !empty($brand->meta_keywords) 
+                ? $brand->meta_keywords 
+                : $brand->name . ', ' . $brand->name . ' products, shop ' . $brand->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
+            
+            'og_image' => !empty($brand->og_image)
+                ? asset('storage/' . $brand->og_image)
+                : ($brand->logo 
+                    ? asset('storage/' . $brand->logo) 
+                    : (\App\Models\SiteSetting::get('site_logo')
+                        ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                        : asset('images/og-default.jpg'))),
+            
+            'og_type' => 'website',
+            'canonical' => route('brands.show', $brand->slug),
+        ];
 
-        return view('frontend.brands.show', compact('brand', 'products', 'relatedBrands'));
+        return view('frontend.brands.show', compact('brand', 'products', 'relatedBrands', 'seoData'));
     }
 }
