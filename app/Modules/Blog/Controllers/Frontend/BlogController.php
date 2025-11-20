@@ -145,12 +145,44 @@ class BlogController extends Controller
         $relatedPosts = $post->relatedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
+        
+        // Prepare SEO data - use post's SEO settings if exist, otherwise use defaults
+        $blogTitle = \App\Models\SiteSetting::get('blog_title', 'Blog');
+        
+        $seoData = [
+            'title' => !empty($post->meta_title) 
+                ? $post->meta_title 
+                : $post->title . ' | ' . $blogTitle,
+            
+            'description' => !empty($post->meta_description) 
+                ? $post->meta_description 
+                : (!empty($post->excerpt) 
+                    ? \Illuminate\Support\Str::limit(strip_tags($post->excerpt), 160)
+                    : \Illuminate\Support\Str::limit(strip_tags($post->content), 160)),
+            
+            'keywords' => !empty($post->meta_keywords) 
+                ? $post->meta_keywords 
+                : ($post->category ? $post->category->name . ', ' : '') . 'blog, article, ' . \App\Models\SiteSetting::get('blog_keywords', 'health, wellness'),
+            
+            'og_image' => $post->featured_image 
+                ? asset('storage/' . $post->featured_image) 
+                : (\App\Models\SiteSetting::get('blog_image') 
+                    ? asset('storage/' . \App\Models\SiteSetting::get('blog_image'))
+                    : asset('images/og-default.jpg')),
+            
+            'og_type' => 'article',
+            'canonical' => url($post->slug),
+            'author_name' => $post->author ? $post->author->name : null,
+            'published_at' => $post->published_at,
+            'updated_at' => $post->updated_at,
+        ];
 
         return view('frontend.blog.show', compact(
             'post',
             'relatedPosts',
             'popularPosts',
-            'categories'
+            'categories',
+            'seoData'
         ));
     }
 

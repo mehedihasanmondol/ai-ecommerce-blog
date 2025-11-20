@@ -10,7 +10,7 @@
 @section('og_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))
 @section('og_description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
 @section('og_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg')))
-@section('canonical', $seoData['canonical'] ?? route('blog.author', $author->id))
+@section('canonical', $seoData['canonical'] ?? route('blog.author', $author->authorProfile->slug))
 
 @section('twitter_card', 'summary_large_image')
 @section('twitter_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))

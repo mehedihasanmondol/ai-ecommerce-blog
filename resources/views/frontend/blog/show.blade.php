@@ -1,21 +1,30 @@
 @extends('layouts.app')
 
-@section('title', !empty($post->seo_title) ? $post->seo_title : $post->title . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+@section('title', $seoData['title'] ?? $post->title)
 
-@section('description', !empty($post->seo_description) ? $post->seo_description : (!empty($post->excerpt) ? $post->excerpt : \Illuminate\Support\Str::limit(strip_tags($post->content), 160)))
+@section('description', $seoData['description'] ?? \Illuminate\Support\Str::limit(strip_tags($post->content), 160))
 
-@section('keywords', !empty($post->seo_keywords) ? $post->seo_keywords : (($post->category ? $post->category->name . ', ' : '') . 'health blog, wellness, tips'))
+@section('keywords', $seoData['keywords'] ?? 'blog, article')
 
-@section('og_type', 'article')
-@section('og_title', !empty($post->seo_title) ? $post->seo_title : $post->title)
-@section('og_description', !empty($post->seo_description) ? $post->seo_description : $post->excerpt)
-@section('og_image', $post->featured_image ? asset('storage/' . $post->featured_image) : asset('images/blog-default.jpg'))
-@section('canonical', url($post->slug))
+@section('og_type', $seoData['og_type'] ?? 'article')
+@section('og_title', $seoData['title'] ?? $post->title)
+@section('og_description', $seoData['description'] ?? $post->excerpt)
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? url($post->slug))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? $post->title)
+@section('twitter_description', $seoData['description'] ?? $post->excerpt)
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+
+@if(isset($seoData['author_name']))
+@section('author', $seoData['author_name'])
+@endif
 
 @push('meta_tags')
     <!-- Article Specific Meta -->
-    <meta property="article:published_time" content="{{ $post->published_at->toIso8601String() }}">
-    <meta property="article:modified_time" content="{{ $post->updated_at->toIso8601String() }}">
+    <meta property="article:published_time" content="{{ $seoData['published_at']->toIso8601String() }}">
+    <meta property="article:modified_time" content="{{ $seoData['updated_at']->toIso8601String() }}">
     @if($post->author)
     <meta property="article:author" content="{{ $post->author->name }}">
     @endif
