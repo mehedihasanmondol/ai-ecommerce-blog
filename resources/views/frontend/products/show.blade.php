@@ -17,6 +17,10 @@
 @section('og_image', $product->images->where('is_primary', true)->first() ? asset('storage/' . $product->images->where('is_primary', true)->first()->image_path) : asset('images/placeholder.png'))
 @section('canonical', route('products.show', $product->slug))
 
+@section('twitter_title', !empty($product->meta_title) ? $product->meta_title : $product->name)
+@section('twitter_description', !empty($product->meta_description) ? $product->meta_description : $product->short_description)
+@section('twitter_image', $product->images->where('is_primary', true)->first() ? asset('storage/' . $product->images->where('is_primary', true)->first()->image_path) : asset('images/placeholder.png'))
+
 @push('meta_tags')
     <!-- Product Specific Meta -->
     <meta property="product:price:amount" content="{{ $variant->sale_price ?? $variant->price }}">
