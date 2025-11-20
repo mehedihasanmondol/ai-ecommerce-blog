@@ -1,16 +1,21 @@
 @extends('layouts.app')
 
-@section('title', !empty($category->meta_title) ? $category->meta_title : $category->name . ' - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+@section('title', $seoData['title'] ?? $category->name)
 
-@section('description', !empty($category->meta_description) ? $category->meta_description : (!empty($category->description) ? $category->description : 'Browse ' . $category->name . ' blog posts and articles.'))
+@section('description', $seoData['description'] ?? 'Browse ' . $category->name . ' articles')
 
-@section('keywords', !empty($category->meta_keywords) ? $category->meta_keywords : $category->name . ', blog, health, wellness, tips')
+@section('keywords', $seoData['keywords'] ?? $category->name . ', blog')
 
-@section('og_type', 'website')
-@section('og_title', !empty($category->meta_title) ? $category->meta_title : $category->name)
-@section('og_description', !empty($category->meta_description) ? $category->meta_description : $category->description)
-@section('og_image', !empty($category->image) ? asset('storage/' . $category->image) : asset('images/blog-category-default.jpg'))
-@section('canonical', route('blog.category', $category->slug))
+@section('og_type', $seoData['og_type'] ?? 'website')
+@section('og_title', $seoData['title'] ?? $category->name)
+@section('og_description', $seoData['description'] ?? $category->description)
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? route('blog.category', $category->slug))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? $category->name)
+@section('twitter_description', $seoData['description'] ?? 'Browse ' . $category->name . ' articles')
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
 
 @section('content')
 <div class="bg-gray-50 min-h-screen">

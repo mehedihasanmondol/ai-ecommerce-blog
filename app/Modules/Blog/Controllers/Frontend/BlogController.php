@@ -3,6 +3,7 @@
 namespace App\Modules\Blog\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\SiteSetting;
 use App\Modules\Blog\Repositories\BlogCategoryRepository;
 use App\Modules\Blog\Repositories\TagRepository;
 use App\Modules\Blog\Services\PostService;
@@ -244,8 +245,38 @@ class BlogController extends Controller
         
         // Paginate
         $posts = $query->with(['author', 'tags', 'tickMarks'])->paginate($perPage)->appends($request->query());
+        
+        // Prepare SEO data for blog category page - use category's SEO settings if exist, otherwise use defaults
+        $blogTitle = SiteSetting::get('blog_title', 'Blog');
+        
+        $seoData = [
+            'title' => !empty($category->meta_title) 
+                ? $category->meta_title 
+                : $category->name . ' | ' . $blogTitle,
+            
+            'description' => !empty($category->meta_description) 
+                ? $category->meta_description 
+                : (!empty($category->description) 
+                    ? \Illuminate\Support\Str::limit(strip_tags($category->description), 160)
+                    : 'Browse ' . $category->name . ' articles and posts. Discover the latest content in ' . $category->name),
+            
+            'keywords' => !empty($category->meta_keywords) 
+                ? $category->meta_keywords 
+                : $category->name . ', ' . $category->name . ' blog, ' . $category->name . ' articles, ' . SiteSetting::get('blog_keywords', 'blog, articles'),
+            
+            'og_image' => $category->image_path
+                ? asset('storage/' . $category->image_path)
+                : (SiteSetting::get('blog_image')
+                    ? asset('storage/' . SiteSetting::get('blog_image'))
+                    : (\App\Models\SiteSetting::get('site_logo')
+                        ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                        : asset('images/og-default.jpg'))),
+            
+            'og_type' => 'website',
+            'canonical' => route('blog.category', $category->slug),
+        ];
 
-        return view('frontend.blog.category', compact('category', 'posts', 'categories'));
+        return view('frontend.blog.category', compact('category', 'posts', 'categories', 'seoData'));
     }
 
     /**
