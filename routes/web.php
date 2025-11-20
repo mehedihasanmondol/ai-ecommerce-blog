@@ -14,11 +14,17 @@ use App\Http\Controllers\CouponController;
 use App\Modules\Ecommerce\Order\Controllers\Customer\OrderController as CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RobotsTxtController;
+use App\Http\Controllers\SitemapController;
 
 // CSRF Token Refresh Route (for Livewire session maintenance)
 Route::get('/refresh-csrf', function() {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh-csrf');
+
+// SEO Routes
+Route::get('/robots.txt', [RobotsTxtController::class, 'index'])->name('robots.txt');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');

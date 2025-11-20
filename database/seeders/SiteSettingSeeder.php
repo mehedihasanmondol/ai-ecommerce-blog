@@ -632,5 +632,71 @@ class SiteSettingSeeder extends Seeder
                 $setting
             );
         }
+
+        // Search Engine Verification Settings
+        $verificationSettings = [
+            [
+                'key' => 'google_verification',
+                'value' => '',
+                'type' => 'text',
+                'group' => 'seo',
+                'label' => 'Google Search Console Verification',
+                'description' => 'Google verification meta tag content (e.g., google-site-verification code)',
+                'order' => 100,
+            ],
+            [
+                'key' => 'bing_verification',
+                'value' => '',
+                'type' => 'text',
+                'group' => 'seo',
+                'label' => 'Bing Webmaster Verification',
+                'description' => 'Bing verification meta tag content',
+                'order' => 101,
+            ],
+            [
+                'key' => 'yandex_verification',
+                'value' => '',
+                'type' => 'text',
+                'group' => 'seo',
+                'label' => 'Yandex Webmaster Verification',
+                'description' => 'Yandex verification meta tag content',
+                'order' => 102,
+            ],
+            [
+                'key' => 'pinterest_verification',
+                'value' => '',
+                'type' => 'text',
+                'group' => 'seo',
+                'label' => 'Pinterest Site Verification',
+                'description' => 'Pinterest verification meta tag content',
+                'order' => 103,
+            ],
+            [
+                'key' => 'robots_txt_custom',
+                'value' => '',
+                'type' => 'textarea',
+                'group' => 'seo',
+                'label' => 'Custom Robots.txt Rules',
+                'description' => 'Additional custom rules for robots.txt (optional)',
+                'order' => 104,
+            ],
+            [
+                'key' => 'sitemap_enabled',
+                'value' => '1',
+                'type' => 'select',
+                'group' => 'seo',
+                'label' => 'Enable Sitemap',
+                'description' => 'Enable automatic sitemap generation',
+                'options' => '1:Enabled,0:Disabled',
+                'order' => 105,
+            ],
+        ];
+
+        foreach ($verificationSettings as $setting) {
+            SiteSetting::updateOrCreate(
+                ['key' => $setting['key']],
+                $setting
+            );
+        }
     }
 }

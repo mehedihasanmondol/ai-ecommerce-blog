@@ -12,6 +12,8 @@ php artisan migrate --path=database/migrations/2025_11_20_000001_migrate_categor
 
 php artisan migrate --path=database/migrations/2025_11_20_000002_drop_category_id_from_products.php
 
+
+
 ## Theme System Setup (NEW - Nov 20, 2025)
 
 # Step 1: Load helper functions
@@ -25,6 +27,10 @@ php artisan migrate --path=database/migrations/2025_11_20_100001_add_frontend_th
 
 # Step 4: Seed predefined themes (6 themes with frontend colors)
 php artisan db:seed --class=ThemeSettingSeeder
+
+php artisan migrate --path=database/migrations/2025_11_20_120000_add_options_column_to_site_settings.php
+
+php artisan db:seed --class=SiteSettingSeeder
 
 # Step 5: Clear caches
 php artisan cache:clear

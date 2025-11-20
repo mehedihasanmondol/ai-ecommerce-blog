@@ -49,6 +49,7 @@ class BrandController extends Controller
     {
         $brand = Brand::where('slug', $slug)
             ->where('is_active', true)
+            ->withCount('products')
             ->firstOrFail();
 
         $products = Product::where('brand_id', $brand->id)
@@ -56,6 +57,14 @@ class BrandController extends Controller
             ->with(['images', 'categories'])
             ->paginate(24);
 
-        return view('frontend.brands.show', compact('brand', 'products'));
+        // Get related brands (other active brands)
+        $relatedBrands = Brand::where('is_active', true)
+            ->where('id', '!=', $brand->id)
+            ->withCount('products')
+            ->orderBy('name')
+            ->limit(8)
+            ->get();
+
+        return view('frontend.brands.show', compact('brand', 'products', 'relatedBrands'));
     }
 }

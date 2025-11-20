@@ -36,6 +36,20 @@
     <!-- Additional Meta Tags -->
     @stack('meta_tags')
 
+    <!-- Search Engine Verification -->
+    @if(\App\Models\SiteSetting::get('google_verification'))
+    <meta name="google-site-verification" content="{{ \App\Models\SiteSetting::get('google_verification') }}">
+    @endif
+    @if(\App\Models\SiteSetting::get('bing_verification'))
+    <meta name="msvalidate.01" content="{{ \App\Models\SiteSetting::get('bing_verification') }}">
+    @endif
+    @if(\App\Models\SiteSetting::get('yandex_verification'))
+    <meta name="yandex-verification" content="{{ \App\Models\SiteSetting::get('yandex_verification') }}">
+    @endif
+    @if(\App\Models\SiteSetting::get('pinterest_verification'))
+    <meta name="p:domain_verify" content="{{ \App\Models\SiteSetting::get('pinterest_verification') }}">
+    @endif
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />
