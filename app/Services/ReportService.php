@@ -167,7 +167,11 @@ class ReportService
             )
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('category_product', function($join) {
+                $join->on('category_product.product_id', '=', 'products.id')
+                     ->whereRaw('category_product.id = (SELECT MIN(id) FROM category_product WHERE product_id = products.id)');
+            })
+            ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->whereIn('orders.status', ['completed', 'processing', 'shipped', 'delivered'])
@@ -196,7 +200,8 @@ class ReportService
             )
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->join('category_product', 'category_product.product_id', '=', 'products.id')
+            ->join('categories', 'category_product.category_id', '=', 'categories.id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->whereIn('orders.status', ['completed', 'processing', 'shipped', 'delivered'])
             ->groupBy('categories.id', 'categories.name')
@@ -222,7 +227,11 @@ class ReportService
                 DB::raw('MAX(product_variants.stock_quantity) as max_stock'),
                 DB::raw('AVG(product_variants.price) as avg_price')
             )
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('category_product', function($join) {
+                $join->on('category_product.product_id', '=', 'products.id')
+                     ->whereRaw('category_product.id = (SELECT MIN(id) FROM category_product WHERE product_id = products.id)');
+            })
+            ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
             ->leftJoin('brands', 'products.brand_id', '=', 'brands.id')
             ->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
             ->where('products.status', 'published')
@@ -248,7 +257,11 @@ class ReportService
                 'categories.name as category_name'
             )
             ->join('products', 'product_variants.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('category_product', function($join) {
+                $join->on('category_product.product_id', '=', 'products.id')
+                     ->whereRaw('category_product.id = (SELECT MIN(id) FROM category_product WHERE product_id = products.id)');
+            })
+            ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
             ->where('product_variants.stock_quantity', '<=', $threshold)
             ->where('product_variants.stock_quantity', '>', 0)
             ->where('products.status', 'published')
@@ -272,7 +285,11 @@ class ReportService
                 'categories.name as category_name'
             )
             ->join('products', 'product_variants.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('category_product', function($join) {
+                $join->on('category_product.product_id', '=', 'products.id')
+                     ->whereRaw('category_product.id = (SELECT MIN(id) FROM category_product WHERE product_id = products.id)');
+            })
+            ->leftJoin('categories', 'category_product.category_id', '=', 'categories.id')
             ->where('product_variants.stock_quantity', 0)
             ->where('products.status', 'published')
             ->get();
@@ -369,7 +386,8 @@ class ReportService
             )
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('category_product', 'category_product.product_id', '=', 'products.id')
+            ->join('categories', 'category_product.category_id', '=', 'categories.id')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->whereIn('orders.status', ['completed', 'processing', 'shipped', 'delivered'])
             ->groupBy('categories.id', 'categories.name', 'categories.slug')

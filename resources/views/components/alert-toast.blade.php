@@ -11,6 +11,7 @@
         }
      }" 
      @alert-toast.window="showToast($event.detail)"
+     @show-toast.window="showToast($event.detail)"
      x-show="show"
      x-cloak
      class="fixed top-20 right-4 z-50 max-w-md"

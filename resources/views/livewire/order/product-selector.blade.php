@@ -122,10 +122,12 @@
                                             <span class="text-sm font-bold text-gray-900">৳{{ number_format($price, 2) }}</span>
                                         @endif
                                     </div>
-                                    @if($stock > 0)
-                                        <span class="text-xs text-green-600">Stock: {{ $stock }}</span>
-                                    @else
-                                        <span class="text-xs text-red-600">Out of Stock</span>
+                                    @if(\App\Modules\Ecommerce\Product\Models\ProductVariant::isStockRestrictionEnabled())
+                                        @if($stock > 0)
+                                            <span class="text-xs text-green-600">Stock: {{ $stock }}</span>
+                                        @else
+                                            <span class="text-xs text-red-600">Out of Stock</span>
+                                        @endif
                                     @endif
                                 </div>
                             </div>

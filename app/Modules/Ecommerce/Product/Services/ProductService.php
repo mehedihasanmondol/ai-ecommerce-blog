@@ -22,8 +22,17 @@ class ProductService
                 $data['slug'] = Str::slug($data['name']);
             }
 
+            // Extract categories before creating product
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+
             // Create product
             $product = $this->repository->create($data);
+
+            // Sync categories (many-to-many relationship)
+            if (!empty($categoryIds)) {
+                $product->categories()->sync($categoryIds);
+            }
 
             // Create default variant for simple and grouped products
             if (($product->product_type === 'simple' || $product->product_type === 'grouped') && !empty($data['variant'])) {
@@ -45,15 +54,28 @@ class ProductService
                 $this->createTempVariations($product, $data['temp_variations']);
             }
 
-            return $product->load(['variants', 'images']);
+            return $product->load(['variants', 'images', 'categories']);
         });
     }
 
     public function update(Product $product, array $data): Product
     {
         return DB::transaction(function () use ($product, $data) {
+            // Extract categories before updating product
+            $categoryIds = $data['category_ids'] ?? [];
+            unset($data['category_ids']);
+
             // Update product
             $this->repository->update($product, $data);
+
+            // Sync categories (many-to-many relationship)
+            if (isset($categoryIds)) {
+                if (!empty($categoryIds)) {
+                    $product->categories()->sync($categoryIds);
+                } else {
+                    $product->categories()->detach();
+                }
+            }
 
             // Update variant for simple and grouped products
             if (($product->product_type === 'simple' || $product->product_type === 'grouped') && !empty($data['variant'])) {
@@ -70,7 +92,7 @@ class ProductService
                 $this->syncGroupedProducts($product, $data['child_products']);
             }
 
-            return $product->fresh(['variants', 'images']);
+            return $product->fresh(['variants', 'images', 'categories']);
         });
     }
 

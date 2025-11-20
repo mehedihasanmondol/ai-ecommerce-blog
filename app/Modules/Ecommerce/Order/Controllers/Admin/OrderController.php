@@ -60,7 +60,10 @@ class OrderController extends Controller
         try {
             $validated = $request->validated();
             
-            // Prepare items data
+            // Check stock restriction setting
+            $stockRestrictionEnabled = ProductVariant::isStockRestrictionEnabled();
+            
+            // Prepare items data and validate stock if restriction is enabled
             $items = [];
             foreach ($validated['items'] as $itemData) {
                 $product = Product::find($itemData['product_id']);
@@ -69,6 +72,27 @@ class OrderController extends Controller
                 $variant = null;
                 if (!empty($itemData['variant_id'])) {
                     $variant = ProductVariant::find($itemData['variant_id']);
+                    
+                    // Validate stock availability if restriction is enabled
+                    if ($stockRestrictionEnabled) {
+                        if (!$variant) {
+                            return back()
+                                ->withInput()
+                                ->with('error', "Product variant not found for {$product->name}");
+                        }
+                        
+                        if (!$variant->canAddToCart()) {
+                            return back()
+                                ->withInput()
+                                ->with('error', "Product '{$product->name}' is currently out of stock and cannot be ordered.");
+                        }
+                        
+                        if ($variant->stock_quantity < $itemData['quantity']) {
+                            return back()
+                                ->withInput()
+                                ->with('error', "Insufficient stock for '{$product->name}'. Only {$variant->stock_quantity} available.");
+                        }
+                    }
                 }
                 
                 $items[] = [

@@ -34,8 +34,7 @@ class ProductController extends Controller
         $product = Product::with([
             'variants.attributeValues.attribute', 
             'images', 
-            'category.parent',
-            'categories',
+            'categories.parent',
             'brand'
         ])
         ->where('slug', $slug)
@@ -46,9 +45,14 @@ class ProductController extends Controller
         $defaultVariant = $product->variants->where('is_default', true)->first() 
                        ?? $product->variants->first();
 
-        // Get related products (same category, limit 8)
+        // Get related products (same categories, limit 8)
+        $categoryIds = $product->categories->pluck('id')->toArray();
         $relatedProducts = Product::with(['variants', 'images', 'brand'])
-            ->where('category_id', $product->category_id)
+            ->when(!empty($categoryIds), function ($query) use ($categoryIds) {
+                $query->whereHas('categories', function ($q) use ($categoryIds) {
+                    $q->whereIn('categories.id', $categoryIds);
+                });
+            })
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
             ->limit(8)
@@ -153,10 +157,15 @@ class ProductController extends Controller
     {
         $recentlyViewedIds = session()->get('recently_viewed', []);
         
-        // If no browsing history, return products from same category
+        // If no browsing history, return products from same categories
         if (empty($recentlyViewedIds)) {
+            $categoryIds = $currentProduct->categories->pluck('id')->toArray();
             return Product::with(['variants', 'images', 'brand'])
-                ->where('category_id', $currentProduct->category_id)
+                ->when(!empty($categoryIds), function ($query) use ($categoryIds) {
+                    $query->whereHas('categories', function ($q) use ($categoryIds) {
+                        $q->whereIn('categories.id', $categoryIds);
+                    });
+                })
                 ->where('id', '!=', $currentProduct->id)
                 ->where('is_active', true)
                 ->inRandomOrder()
@@ -165,12 +174,13 @@ class ProductController extends Controller
         }
 
         // Get recently viewed products to analyze browsing patterns
-        $recentlyViewedProducts = Product::whereIn('id', $recentlyViewedIds)
+        $recentlyViewedProducts = Product::with('categories')
+            ->whereIn('id', $recentlyViewedIds)
             ->where('is_active', true)
             ->get();
 
         // Collect category IDs and brand IDs from browsing history
-        $categoryIds = $recentlyViewedProducts->pluck('category_id')->unique()->toArray();
+        $categoryIds = $recentlyViewedProducts->pluck('categories')->flatten()->pluck('id')->unique()->toArray();
         $brandIds = $recentlyViewedProducts->pluck('brand_id')->filter()->unique()->toArray();
 
         // Get products from browsed categories and brands
@@ -181,7 +191,9 @@ class ProductController extends Controller
         // Filter by categories or brands from browsing history
         $query->where(function ($q) use ($categoryIds, $brandIds) {
             if (!empty($categoryIds)) {
-                $q->whereIn('category_id', $categoryIds);
+                $q->whereHas('categories', function ($subQuery) use ($categoryIds) {
+                    $subQuery->whereIn('categories.id', $categoryIds);
+                });
             }
             if (!empty($brandIds)) {
                 $q->orWhereIn('brand_id', $brandIds);

@@ -31,14 +31,14 @@ class ProductSelector extends Component
     {
         if (empty($this->search)) {
             // Show recent/popular products when no search
-            $this->products = Product::with(['variants', 'brand', 'category'])
+            $this->products = Product::with(['variants', 'brand', 'categories'])
                 ->where('is_active', true)
                 ->where('status', 'published')
                 ->orderBy('name')
                 ->limit(10)
                 ->get();
         } else {
-            $this->products = Product::with(['variants', 'brand', 'category'])
+            $this->products = Product::with(['variants', 'brand', 'categories'])
                 ->where('is_active', true)
                 ->where('status', 'published')
                 ->where(function($query) {
@@ -59,7 +59,7 @@ class ProductSelector extends Component
 
     public function selectProduct($productId, $variantId = null)
     {
-        $product = Product::with(['variants', 'brand', 'category'])->find($productId);
+        $product = Product::with(['variants', 'brand', 'categories'])->find($productId);
         
         if (!$product) {
             return;

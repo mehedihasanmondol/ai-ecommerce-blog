@@ -23,7 +23,6 @@ class Product extends Model
         'slug',
         'description',
         'short_description',
-        'category_id',
         'brand_id',
         'product_type',
         'status',
@@ -53,11 +52,6 @@ class Product extends Model
     // protected $with = ['defaultVariant'];
 
     // Relationships
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-    
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class, 'category_product')

@@ -53,7 +53,7 @@ class ProductSelector extends Component
     {
         if (empty($this->search)) {
             // Show recent products when no search
-            return Product::with(['variants', 'brand', 'category', 'images'])
+            return Product::with(['variants', 'brand', 'categories', 'images'])
                 ->where('is_active', true)
                 ->orderBy('name')
                 ->limit(10)
@@ -61,7 +61,7 @@ class ProductSelector extends Component
         }
         
         $searchTerm = $this->search;
-        return Product::with(['variants', 'brand', 'category', 'images'])
+        return Product::with(['variants', 'brand', 'categories', 'images'])
             ->where('is_active', true)
             ->where(function($query) use ($searchTerm) {
                 $query->where('name', 'like', '%' . $searchTerm . '%')

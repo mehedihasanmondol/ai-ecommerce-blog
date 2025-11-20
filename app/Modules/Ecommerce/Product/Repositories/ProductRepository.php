@@ -10,12 +10,12 @@ class ProductRepository
 {
     public function all(): Collection
     {
-        return Product::with(['category', 'brand', 'defaultVariant', 'images'])->get();
+        return Product::with(['categories', 'brand', 'defaultVariant', 'images'])->get();
     }
 
     public function paginate(int $perPage = 15, array $filters = []): LengthAwarePaginator
     {
-        $query = Product::with(['category', 'categories', 'brand', 'variants', 'images']);
+        $query = Product::with(['categories', 'brand', 'variants', 'images']);
 
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
@@ -25,11 +25,8 @@ class ProductRepository
         }
 
         if (!empty($filters['category_id'])) {
-            $query->where(function ($q) use ($filters) {
-                $q->whereHas('categories', function ($query) use ($filters) {
-                    $query->where('categories.id', $filters['category_id']);
-                })
-                ->orWhere('category_id', $filters['category_id']);
+            $query->whereHas('categories', function ($subQuery) use ($filters) {
+                $subQuery->where('categories.id', $filters['category_id']);
             });
         }
 
@@ -66,12 +63,12 @@ class ProductRepository
 
     public function find(int $id): ?Product
     {
-        return Product::with(['category', 'brand', 'variants', 'images'])->find($id);
+        return Product::with(['categories', 'brand', 'variants', 'images'])->find($id);
     }
 
     public function findBySlug(string $slug): ?Product
     {
-        return Product::with(['category', 'brand', 'variants', 'images'])
+        return Product::with(['categories', 'brand', 'variants', 'images'])
             ->where('slug', $slug)
             ->first();
     }
@@ -102,11 +99,10 @@ class ProductRepository
 
     public function getByCategory(int $categoryId, int $perPage = 12): LengthAwarePaginator
     {
-        return Product::with(['defaultVariant', 'primaryImage'])
+        return Product::with(['defaultVariant', 'primaryImage', 'categories'])
             ->whereHas('categories', function ($query) use ($categoryId) {
                 $query->where('categories.id', $categoryId);
             })
-            ->orWhere('category_id', $categoryId)
             ->active()
             ->paginate($perPage);
     }

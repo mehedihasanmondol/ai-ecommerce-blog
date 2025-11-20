@@ -21,7 +21,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         // Eager load relationships needed for editing
-        $product->load(['category', 'brand', 'variants', 'images']);
+        $product->load(['categories', 'brand', 'variants', 'images']);
         
         return view('admin.product.edit-livewire', compact('product'));
     }

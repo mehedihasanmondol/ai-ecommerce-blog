@@ -52,17 +52,13 @@ class MegaMenuService
             // Get all descendant category IDs (including current category)
             $categoryIds = $this->getCategoryWithDescendants($categoryId);
             
-            // First, get brand IDs with sales totals using subquery
-            // Check both single category_id and many-to-many categories relationship
+            // Get brand IDs with sales totals from many-to-many categories relationship
             $brandSales = DB::table('order_items')
                 ->select('products.brand_id', DB::raw('SUM(order_items.quantity) as total_sales'))
                 ->join('orders', 'orders.id', '=', 'order_items.order_id')
                 ->join('products', 'products.id', '=', 'order_items.product_id')
-                ->leftJoin('category_product', 'category_product.product_id', '=', 'products.id')
-                ->where(function($query) use ($categoryIds) {
-                    $query->whereIn('products.category_id', $categoryIds)
-                          ->orWhereIn('category_product.category_id', $categoryIds);
-                })
+                ->join('category_product', 'category_product.product_id', '=', 'products.id')
+                ->whereIn('category_product.category_id', $categoryIds)
                 ->whereNotNull('products.brand_id')
                 ->where('orders.status', '!=', 'cancelled')
                 ->where('orders.status', '!=', 'failed')

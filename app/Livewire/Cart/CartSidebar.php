@@ -152,9 +152,9 @@ class CartSidebar extends Component
         // Get product IDs from cart
         $cartProductIds = collect($this->cartItems)->pluck('product_id')->unique()->toArray();
 
-        // Get category IDs from cart products
-        $cartProducts = Product::whereIn('id', $cartProductIds)->get();
-        $categoryIds = $cartProducts->pluck('category_id')->unique()->filter()->toArray();
+        // Get category IDs from cart products (many-to-many relationship)
+        $cartProducts = Product::with('categories')->whereIn('id', $cartProductIds)->get();
+        $categoryIds = $cartProducts->pluck('categories')->flatten()->pluck('id')->unique()->filter()->toArray();
 
         if (empty($categoryIds)) {
             $this->frequentlyPurchased = [];
@@ -164,7 +164,9 @@ class CartSidebar extends Component
         // Get related products from same categories (same logic as product view)
         // This matches the frequently-purchased-together component logic
         $relatedProducts = Product::with(['variants', 'images', 'brand'])
-            ->whereIn('category_id', $categoryIds)
+            ->whereHas('categories', function ($query) use ($categoryIds) {
+                $query->whereIn('categories.id', $categoryIds);
+            })
             ->whereNotIn('id', $cartProductIds)
             ->where('is_active', true)
             ->limit(3)

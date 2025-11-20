@@ -185,7 +185,7 @@ class ProductList extends Component
      */
     public function getProductsProperty()
     {
-        $query = Product::with(['variants', 'category', 'brand', 'images', 'defaultVariant'])
+        $query = Product::with(['variants', 'categories', 'brand', 'images', 'defaultVariant'])
             ->where('is_active', true);
 
         // If viewing a specific category, filter by that category and its children

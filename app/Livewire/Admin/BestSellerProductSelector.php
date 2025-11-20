@@ -42,7 +42,7 @@ class BestSellerProductSelector extends Component
 
     public function getProductsProperty()
     {
-        $query = Product::with(['variants', 'category', 'brand', 'images'])
+        $query = Product::with(['variants', 'categories', 'brand', 'images'])
             ->where('is_active', true)
             ->whereDoesntHave('bestSellerProduct');
 

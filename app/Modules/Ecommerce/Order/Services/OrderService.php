@@ -183,9 +183,15 @@ class OrderService
 
     /**
      * Update product stock after order.
+     * Only reduces stock if stock restriction is enabled.
      */
     protected function updateProductStock(array $items): void
     {
+        // Only update stock if restriction is enabled
+        if (!ProductVariant::isStockRestrictionEnabled()) {
+            return;
+        }
+        
         foreach ($items as $item) {
             if (isset($item['variant'])) {
                 $variant = ProductVariant::find($item['variant']->id);
@@ -230,12 +236,14 @@ class OrderService
                 $reason ?? 'Order cancelled'
             );
 
-            // Restore product stock
-            foreach ($order->items as $item) {
-                if ($item->product_variant_id) {
-                    $variant = ProductVariant::find($item->product_variant_id);
-                    if ($variant) {
-                        $variant->increment('stock_quantity', $item->quantity);
+            // Restore product stock (only if stock restriction is enabled)
+            if (ProductVariant::isStockRestrictionEnabled()) {
+                foreach ($order->items as $item) {
+                    if ($item->product_variant_id) {
+                        $variant = ProductVariant::find($item->product_variant_id);
+                        if ($variant) {
+                            $variant->increment('stock_quantity', $item->quantity);
+                        }
                     }
                 }
             }

@@ -69,21 +69,21 @@ class HomeController extends Controller
     public function showDefaultHomepage()
     {
         // Get featured products (limit 12 for slider)
-        $featuredProducts = Product::with(['variants', 'category', 'brand', 'images'])
+        $featuredProducts = Product::with(['variants', 'categories', 'brand', 'images'])
             ->where('is_active', true)
             ->where('is_featured', true)
             ->limit(12)
             ->get();
 
         // Get new arrivals (latest 8 products)
-        $newArrivals = Product::with(['variants', 'category', 'brand', 'images'])
+        $newArrivals = Product::with(['variants', 'categories', 'brand', 'images'])
             ->where('is_active', true)
             ->latest()
             ->limit(8)
             ->get();
 
         // Get best sellers (products with most orders - placeholder for now)
-        $bestSellers = Product::with(['variants', 'category', 'brand', 'images'])
+        $bestSellers = Product::with(['variants', 'categories', 'brand', 'images'])
             ->where('is_active', true)
             ->inRandomOrder()
             ->limit(8)
@@ -102,7 +102,7 @@ class HomeController extends Controller
             ->get();
 
         // Get sale offers products
-        $saleOffers = SaleOffer::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+        $saleOffers = SaleOffer::with(['product.variants', 'product.categories', 'product.brand', 'product.images'])
             ->active()
             ->ordered()
             ->get()
@@ -110,7 +110,7 @@ class HomeController extends Controller
             ->filter(fn($product) => $product && $product->is_active);
 
         // Get trending products
-        $trendingProducts = TrendingProduct::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+        $trendingProducts = TrendingProduct::with(['product.variants', 'product.categories', 'product.brand', 'product.images'])
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get()
@@ -118,7 +118,7 @@ class HomeController extends Controller
             ->filter(fn($product) => $product && $product->is_active);
 
         // Get best seller products
-        $bestSellerProducts = BestSellerProduct::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+        $bestSellerProducts = BestSellerProduct::with(['product.variants', 'product.categories', 'product.brand', 'product.images'])
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get()
@@ -126,7 +126,7 @@ class HomeController extends Controller
             ->filter(fn($product) => $product && $product->is_active);
 
         // Get new arrival products
-        $newArrivalProducts = NewArrivalProduct::with(['product.variants', 'product.category', 'product.brand', 'product.images'])
+        $newArrivalProducts = NewArrivalProduct::with(['product.variants', 'product.categories', 'product.brand', 'product.images'])
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get()
@@ -185,7 +185,7 @@ class HomeController extends Controller
      */
     public function shop(Request $request)
     {
-        $query = Product::with(['variants', 'category', 'brand', 'images'])
+        $query = Product::with(['variants', 'categories', 'brand', 'images'])
             ->where('is_active', true);
 
         // Search
@@ -201,7 +201,9 @@ class HomeController extends Controller
         // Category Filter
         if ($request->filled('category')) {
             $categoryIds = is_array($request->category) ? $request->category : [$request->category];
-            $query->whereIn('category_id', $categoryIds);
+            $query->whereHas('categories', function ($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            });
         }
 
         // Brand Filter

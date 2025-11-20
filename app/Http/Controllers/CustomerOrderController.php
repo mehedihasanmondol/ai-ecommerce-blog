@@ -38,7 +38,7 @@ class CustomerOrderController extends Controller
 
         $order->load([
             'items.product.images',
-            'items.product.category',
+            'items.product.categories',
             'items.product.brand',
             'items.variant',
             'shippingAddress',

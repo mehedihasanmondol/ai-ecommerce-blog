@@ -105,7 +105,7 @@
                                     <p class="text-xs text-gray-600" x-text="'Variant: ' + tempProduct.variant_name"></p>
                                 </template>
                                 <p class="text-xs text-gray-500" x-text="'SKU: ' + tempProduct.sku"></p>
-                                <template x-if="tempProduct.stock_quantity !== undefined">
+                                <template x-if="stockRestrictionEnabled && tempProduct.stock_quantity !== undefined">
                                     <p class="text-xs mt-1" :class="tempProduct.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'">
                                         Stock: <span x-text="tempProduct.stock_quantity"></span>
                                     </p>
@@ -121,9 +121,9 @@
                             <input type="number" 
                                    x-model.number="tempProduct.quantity" 
                                    min="1" 
-                                   :max="tempProduct.stock_quantity || 999"
+                                   :max="stockRestrictionEnabled ? (tempProduct.stock_quantity || 999) : 9999"
                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-xs text-gray-500 mt-1" x-show="stockRestrictionEnabled" style="display: none;">
                                 Available: <span x-text="tempProduct.stock_quantity || 'Unlimited'"></span>
                             </p>
                         </div>
@@ -238,7 +238,7 @@
                                                         <p class="text-xs text-gray-600 mt-0.5">Variant: <span x-text="item.variant_name"></span></p>
                                                     </template>
                                                     <p class="text-xs text-gray-500 mt-0.5">SKU: <span x-text="item.sku"></span></p>
-                                                    <template x-if="item.stock_quantity !== undefined">
+                                                    <template x-if="stockRestrictionEnabled && item.stock_quantity !== undefined">
                                                         <p class="text-xs mt-1" :class="item.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'">
                                                             Stock: <span x-text="item.stock_quantity"></span>
                                                         </p>
@@ -262,7 +262,7 @@
                                                     <input type="number" 
                                                            x-model.number="item.quantity" 
                                                            min="1" 
-                                                           :max="item.stock_quantity || 999"
+                                                           :max="stockRestrictionEnabled ? (item.stock_quantity || 999) : 9999"
                                                            class="w-full text-sm px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-center">
                                                 </div>
                                                 <div>
@@ -595,6 +595,8 @@
 <script>
 function orderForm() {
     return {
+        // Check if stock restriction is enabled
+        stockRestrictionEnabled: {{ \App\Modules\Ecommerce\Product\Models\ProductVariant::isStockRestrictionEnabled() ? 'true' : 'false' }},
         items: @json(old('items', [])),
         shipping: {{ old('shipping_cost', 60) }},
         discount: {{ old('discount', 0) }},

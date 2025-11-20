@@ -22,7 +22,6 @@ class ProductForm extends Component
     public $slug = '';
     public $description = '';
     public $short_description = '';
-    public $category_id = '';
     public $category_ids = []; // Multiple categories
     public $brand_id = '';
     public $product_type = 'simple';
@@ -89,7 +88,8 @@ class ProductForm extends Component
             'slug' => 'required|string|max:255|unique:products,slug,' . ($this->product->id ?? 'NULL'),
             'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:500',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'product_type' => 'required|in:simple,grouped,affiliate,variable',
             'is_featured' => 'boolean',
@@ -144,7 +144,6 @@ class ProductForm extends Component
                 'slug' => $product->slug,
                 'description' => $product->description,
                 'short_description' => $product->short_description,
-                'category_id' => $product->category_id,
                 'brand_id' => $product->brand_id,
                 'product_type' => $product->product_type,
                 'is_featured' => $product->is_featured,
@@ -266,7 +265,7 @@ class ProductForm extends Component
                 'slug' => $this->slug,
                 'description' => $this->description,
                 'short_description' => $this->short_description,
-                'category_id' => $this->category_id ?: null,
+                'category_ids' => $this->category_ids,
                 'brand_id' => $this->brand_id ?: null,
                 'product_type' => $this->product_type,
                 'is_featured' => $this->is_featured,
@@ -308,13 +307,6 @@ class ProductForm extends Component
 
             // Always update since we create draft on mount
             $product = $service->update($this->product, $data);
-            
-            // Sync categories
-            if (!empty($this->category_ids)) {
-                $product->categories()->sync($this->category_ids);
-            } else {
-                $product->categories()->detach();
-            }
             
             if ($this->status === 'published') {
                 session()->flash('success', 'Product published successfully!');
