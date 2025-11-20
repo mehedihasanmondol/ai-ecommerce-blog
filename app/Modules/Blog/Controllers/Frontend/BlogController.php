@@ -332,6 +332,19 @@ class BlogController extends Controller
         
         $categories = $this->categoryRepository->getRoots();
         
+        // Prepare SEO data for author profile page
+        $jobTitle = $authorProfile->job_title ?? 'Author Profile';
+        
+        $seoData = [
+            'title' => $author->name . ' | ' . $jobTitle,
+            'description' => $authorProfile->bio ? \Illuminate\Support\Str::limit(strip_tags($authorProfile->bio), 160) : 'View profile and articles by ' . $author->name,
+            'keywords' => $author->name . ', author, blog, articles, writer' . ($authorProfile->job_title ? ', ' . $authorProfile->job_title : ''),
+            'og_image' => $authorProfile->avatar ? asset('storage/' . $authorProfile->avatar) : asset('images/default-avatar.jpg'),
+            'og_type' => 'profile',
+            'canonical' => route('blog.author', $authorProfile->slug),
+            'author_name' => $author->name,
+        ];
+        
         return view('frontend.blog.author', compact(
             'author',
             'posts',
@@ -339,7 +352,8 @@ class BlogController extends Controller
             'totalViews',
             'totalComments',
             'categories',
-            'sort'
+            'sort',
+            'seoData'
         ));
     }
 }

@@ -1,13 +1,25 @@
 @extends('layouts.app')
 
-@section('title', \App\Models\SiteSetting::get('site_name', config('app.name')) . ' - ' . \App\Models\SiteSetting::get('site_tagline', 'Health, Wellness & Beauty Products'))
+@section('title', $seoData['title'] ?? \App\Models\SiteSetting::get('site_name', config('app.name')))
 
-@section('description', \App\Models\SiteSetting::get('site_description', 'Shop the best health, wellness, and beauty products. Free shipping on orders over $40. Quality guaranteed.'))
+@section('description', $seoData['description'] ?? \App\Models\SiteSetting::get('meta_description', 'Shop health, wellness and beauty products'))
 
-@section('keywords', \App\Models\SiteSetting::get('site_keywords', 'health products, supplements, beauty, wellness, organic'))
+@section('keywords', $seoData['keywords'] ?? \App\Models\SiteSetting::get('meta_keywords', 'health, wellness, beauty, supplements'))
 
-@section('og_type', 'website')
-@section('og_image', \App\Models\SiteSetting::get('site_logo') ? asset('storage/' . \App\Models\SiteSetting::get('site_logo')) : asset('images/og-default.jpg'))
+@section('og_type', $seoData['og_type'] ?? 'website')
+@section('og_title', $seoData['title'] ?? \App\Models\SiteSetting::get('site_name', config('app.name')))
+@section('og_description', $seoData['description'] ?? \App\Models\SiteSetting::get('meta_description', 'Shop health, wellness and beauty products'))
+@section('og_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+@section('canonical', $seoData['canonical'] ?? url('/'))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? \App\Models\SiteSetting::get('site_name', config('app.name')))
+@section('twitter_description', $seoData['description'] ?? \App\Models\SiteSetting::get('meta_description', 'Shop health, wellness and beauty products'))
+@section('twitter_image', $seoData['og_image'] ?? asset('images/og-default.jpg'))
+
+@if(isset($seoData['author_name']))
+@section('author', $seoData['author_name'])
+@endif
 
 @section('content')
 <!-- Hero Slider -->

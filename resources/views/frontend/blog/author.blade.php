@@ -1,16 +1,25 @@
 @extends('layouts.app')
 
-@section('title', $author->name . ' - Author Profile - ' . \App\Models\SiteSetting::get('blog_title', 'Blog'))
+@section('title', $seoData['title'] ?? ($author->name . ' - Author Profile - ' . \App\Models\SiteSetting::get('blog_title', 'Blog')))
 
-@section('description', !empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
+@section('description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
 
-@section('keywords', $author->name . ', author, blog posts, articles, writer')
+@section('keywords', $seoData['keywords'] ?? ($author->name . ', author, blog posts, articles, writer'))
 
-@section('og_type', 'profile')
-@section('og_title', $author->name . ' - Author Profile')
-@section('og_description', !empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name)
-@section('og_image', !empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg'))
-@section('canonical', route('blog.author', $author->id))
+@section('og_type', $seoData['og_type'] ?? 'profile')
+@section('og_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))
+@section('og_description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
+@section('og_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg')))
+@section('canonical', $seoData['canonical'] ?? route('blog.author', $author->id))
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))
+@section('twitter_description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
+@section('twitter_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg')))
+
+@if(isset($seoData['author_name']))
+@section('author', $seoData['author_name'])
+@endif
 
 @section('content')
 <div class="bg-gradient-to-b from-gray-50  min-h-screen">

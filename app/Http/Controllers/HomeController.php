@@ -133,6 +133,20 @@ class HomeController extends Controller
             ->pluck('product')
             ->filter(fn($product) => $product && $product->is_active);
 
+        // Prepare SEO data for default homepage
+        $siteName = SiteSetting::get('site_name', config('app.name'));
+        $siteTagline = SiteSetting::get('site_tagline', '');
+        $siteLogo = SiteSetting::get('site_logo');
+        
+        $seoData = [
+            'title' => $siteTagline ? $siteName . ' | ' . $siteTagline : $siteName,
+            'description' => SiteSetting::get('meta_description', 'Shop health, wellness and beauty products'),
+            'keywords' => SiteSetting::get('meta_keywords', 'health, wellness, beauty, supplements'),
+            'og_image' => $siteLogo ? asset('storage/' . $siteLogo) : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => url('/'),
+        ];
+
         return view('frontend.home.index', compact(
             'featuredProducts',
             'newArrivals',
@@ -142,7 +156,8 @@ class HomeController extends Controller
             'saleOffers',
             'trendingProducts',
             'bestSellerProducts',
-            'newArrivalProducts'
+            'newArrivalProducts',
+            'seoData'
         ));
     }
     
@@ -174,8 +189,22 @@ class HomeController extends Controller
             ->orderBy('name')
             ->get();
         
+        // Prepare SEO data for author profile homepage
+        $authorProfile = $author->authorProfile;
+        $jobTitle = $authorProfile->job_title ?? 'Author Profile';
+        
+        $seoData = [
+            'title' => $author->name . ' | ' . $jobTitle,
+            'description' => $authorProfile->bio ? \Illuminate\Support\Str::limit(strip_tags($authorProfile->bio), 160) : 'View profile and articles by ' . $author->name,
+            'keywords' => $author->name . ', author, blog, articles, writer' . ($authorProfile->job_title ? ', ' . $authorProfile->job_title : ''),
+            'og_image' => $authorProfile->avatar ? asset('storage/' . $authorProfile->avatar) : asset('images/default-avatar.jpg'),
+            'og_type' => 'profile',
+            'canonical' => url('/'),
+            'author_name' => $author->name,
+        ];
+        
         // Render author profile page as homepage
-        return view('frontend.blog.author', compact('author', 'categories'));
+        return view('frontend.blog.author', compact('author', 'categories', 'seoData'));
     }
 
     /**
