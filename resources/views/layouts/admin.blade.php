@@ -515,6 +515,15 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+
+                <a href="{{ route('admin.theme-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.theme-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-palette w-5 mr-3"></i>
+                    <span>Theme Settings</span>
+                    @if(request()->routeIs('admin.theme-settings.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
                 @endif
             </nav>
         </aside>

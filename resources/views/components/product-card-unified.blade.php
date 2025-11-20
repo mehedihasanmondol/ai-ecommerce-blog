@@ -139,7 +139,7 @@
                 $cartQuantity = $isInCart ? $cart[$cartKey]['quantity'] : 0;
             @endphp
             <button onclick="addToCartAndUpdate(this, {{ $product->id }}, {{ $variant->id ?? 'null' }}, 1, {{ $cartQuantity }})"
-                    class="w-full {{ $classes['button'] }} {{ $isInCart ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-medium rounded-lg transition flex items-center justify-center"
+                    class="w-full {{ $classes['button'] }} {{ $isInCart ? '{{ theme('button_primary_bg') }} {{ theme('button_primary_bg_hover') }}' : '{{ theme('success_bg') }} hover:bg-green-700' }} text-white font-medium rounded-lg transition flex items-center justify-center"
                     data-product-id="{{ $product->id }}" 
                     data-variant-id="{{ $variant->id ?? 'null' }}"
                     data-is-in-cart="{{ $isInCart ? 'true' : 'false' }}"
@@ -255,7 +255,7 @@
                             $cartQuantity = $isInCart ? $cart[$cartKey]['quantity'] : 0;
                         @endphp
                         <button onclick="addToCartAndUpdate(this, {{ $product->id }}, {{ $variant->id ?? 'null' }}, 1, {{ $cartQuantity }})"
-                                class="px-6 py-3 {{ $isInCart ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700' }} text-white font-medium rounded-lg transition flex items-center justify-center"
+                                class="px-6 py-3 {{ $isInCart ? '{{ theme('button_primary_bg') }} {{ theme('button_primary_bg_hover') }}' : '{{ theme('success_bg') }} hover:bg-green-700' }} text-white font-medium rounded-lg transition flex items-center justify-center"
                                 data-product-id="{{ $product->id }}" 
                                 data-variant-id="{{ $variant->id ?? 'null' }}"
                                 data-is-in-cart="{{ $isInCart ? 'true' : 'false' }}"
@@ -307,3 +307,4 @@
         overflow: hidden;
     }
 </style>
+
