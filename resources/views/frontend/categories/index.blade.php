@@ -51,9 +51,9 @@
                        class="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
                         <!-- Category Image -->
                         <div class="relative overflow-hidden bg-gradient-to-br from-green-50 to-blue-50 aspect-square">
-                            @if($category->image)
+                            @if($category->media)
                                 <img 
-                                    src="{{ asset('storage/' . $category->image) }}" 
+                                    src="{{ $category->getThumbnailUrl() }}" 
                                     alt="{{ $category->name }}"
                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                 >

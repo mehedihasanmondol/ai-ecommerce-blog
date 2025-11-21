@@ -4,6 +4,7 @@ namespace App\Modules\Ecommerce\Category\Models;
 
 use App\Traits\HasSeo;
 use App\Traits\HasUniqueSlug;
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,7 @@ class Category extends Model
         'slug',
         'description',
         'image',
+        'media_id',
         'sort_order',
         'is_active',
         'meta_title',
@@ -61,6 +63,14 @@ class Category extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get the category image from media library
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'media_id');
     }
 
     /**
@@ -215,11 +225,46 @@ class Category extends Model
     }
 
     /**
-     * Get image URL
+     * Get image URL (prioritizes media library, fallback to old image field)
      */
     public function getImageUrl(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        // Priority 1: Media library large image
+        if ($this->media) {
+            return $this->media->large_url;
+        }
+        
+        // Priority 2: Old image field (legacy support)
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+        
+        // Priority 3: Default image
+        return asset('images/default-category.jpg');
+    }
+
+    /**
+     * Get thumbnail URL (600px small size)
+     */
+    public function getThumbnailUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->small_url;
+        }
+        
+        return $this->getImageUrl();
+    }
+
+    /**
+     * Get medium image URL (1200px)
+     */
+    public function getMediumImageUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->medium_url;
+        }
+        
+        return $this->getImageUrl();
     }
 
     /**

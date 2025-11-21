@@ -93,10 +93,10 @@
             <div class="container mx-auto px-4 py-4">
                 <div class="flex items-center gap-4">
                     <!-- Category Image -->
-                    @if($category->image)
+                    @if($category->media)
                         <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 shadow-md">
                             <img 
-                                src="{{ asset('storage/' . $category->image) }}" 
+                                src="{{ $category->getThumbnailUrl() }}" 
                                 alt="{{ $category->name }}"
                                 class="w-full h-full object-cover"
                             >
@@ -144,10 +144,10 @@
                                     @click.away="subcategoriesOpen = false"
                                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors cursor-pointer">
                                     <!-- Main Category Image -->
-                                    @if($category->image)
+                                    @if($category->media)
                                         <div class="w-6 h-6 rounded-full overflow-hidden bg-white ring-2 ring-blue-200 flex-shrink-0">
                                             <img 
-                                                src="{{ asset('storage/' . $category->image) }}" 
+                                                src="{{ $category->getThumbnailUrl() }}" 
                                                 alt="{{ $category->name }}"
                                                 class="w-full h-full object-cover"
                                             >

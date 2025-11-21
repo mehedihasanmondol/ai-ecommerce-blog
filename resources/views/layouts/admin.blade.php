@@ -21,6 +21,9 @@
     <!-- TODO: Install Font Awesome locally via npm -->
     <!-- Temporary CDN - Replace with: npm install @fortawesome/fontawesome-free -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- CropperJS CSS for Image Uploader -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/2.1.0/cropper.min.css" />
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])

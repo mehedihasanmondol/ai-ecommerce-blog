@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Modules\Ecommerce\Category\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -48,7 +49,7 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|max:255|unique:categories',
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'media_id' => 'nullable|exists:media_library,id',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
@@ -59,11 +60,6 @@ class CategoryController extends Controller
             'og_description' => 'nullable|string|max:500',
             'og_image' => 'nullable|url|max:255',
         ]);
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
 
         // Set default sort_order if not provided
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
@@ -108,7 +104,7 @@ class CategoryController extends Controller
             'slug' => 'nullable|string|max:255|unique:categories,slug,' . $category->id,
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'media_id' => 'nullable|exists:media_library,id',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
             'meta_title' => 'nullable|string|max:255',
@@ -119,21 +115,6 @@ class CategoryController extends Controller
             'og_description' => 'nullable|string|max:500',
             'og_image' => 'nullable|url|max:255',
         ]);
-
-        // Handle image removal
-        if ($request->has('remove_image') && $category->image) {
-            \Storage::disk('public')->delete($category->image);
-            $validated['image'] = null;
-        }
-
-        // Handle new image upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($category->image) {
-                \Storage::disk('public')->delete($category->image);
-            }
-            $validated['image'] = $request->file('image')->store('categories', 'public');
-        }
 
         // Handle is_active checkbox
         $validated['is_active'] = $request->has('is_active');

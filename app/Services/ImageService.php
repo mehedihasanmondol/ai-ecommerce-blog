@@ -4,8 +4,12 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\Media;
+use App\Models\ImageUploadSetting;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 use Exception;
 
 class ImageService
@@ -258,5 +262,230 @@ class ImageService
         }
 
         return $paths;
+    }
+
+    /**
+     * Process uploaded image with WebP conversion, multiple sizes, and save to Media library
+     * 
+     * @param UploadedFile|string $file File or base64 blob
+     * @param array $options Configuration options
+     * @return Media
+     */
+    public static function processUniversalUpload($file, array $options = []): Media
+    {
+        $settings = self::getUploadSettings($options);
+        
+        // Handle base64 blob from cropper
+        if (is_string($file) && str_starts_with($file, 'data:image')) {
+            $file = self::base64ToUploadedFile($file);
+        }
+        
+        // Validate
+        self::validateUpload($file, $settings);
+        
+        // Generate paths
+        $year = date('Y');
+        $month = date('m');
+        $folder = "images/{$year}/{$month}";
+        $filename = self::generateFilename($file, 'webp');
+        
+        // Process original/large
+        $largePath = self::processImageSize($file, $folder, $filename, 'l', $settings);
+        
+        // Process medium
+        $mediumPath = self::processImageSize($file, $folder, $filename, 'm', $settings);
+        
+        // Process small
+        $smallPath = self::processImageSize($file, $folder, $filename, 's', $settings);
+        
+        // Get original image info
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($file instanceof UploadedFile ? $file->getRealPath() : $file);
+        $width = $image->width();
+        $height = $image->height();
+        
+        // Store in database
+        $media = Media::create([
+            'user_id' => auth()->id(),
+            'original_filename' => $file instanceof UploadedFile ? $file->getClientOriginalName() : 'cropped_image.webp',
+            'filename' => $filename,
+            'mime_type' => 'image/webp',
+            'extension' => 'webp',
+            'size' => $file instanceof UploadedFile ? $file->getSize() : strlen($file),
+            'width' => $width,
+            'height' => $height,
+            'aspect_ratio' => $width / $height,
+            'disk' => $settings['disk'],
+            'path' => $largePath,
+            'large_path' => $largePath,
+            'medium_path' => $mediumPath,
+            'small_path' => $smallPath,
+            'scope' => $settings['scope'] ?? 'global',
+            'metadata' => [
+                'compression' => $settings['compression'],
+                'created_by' => auth()->user()->name ?? 'Unknown',
+            ],
+        ]);
+        
+        // Run optimizer if enabled
+        if ($settings['enable_optimizer']) {
+            self::optimizeImage($largePath, $settings['disk']);
+            self::optimizeImage($mediumPath, $settings['disk']);
+            self::optimizeImage($smallPath, $settings['disk']);
+        }
+        
+        return $media;
+    }
+    
+    /**
+     * Process image to specific size variant
+     */
+    private static function processImageSize($file, string $folder, string $filename, string $prefix, array $settings): string
+    {
+        $sizeConfig = match($prefix) {
+            'l' => ['width' => $settings['size_large_width'], 'height' => $settings['size_large_height']],
+            'm' => ['width' => $settings['size_medium_width'], 'height' => $settings['size_medium_height']],
+            's' => ['width' => $settings['size_small_width'], 'height' => $settings['size_small_height']],
+        };
+        
+        $prefixedFilename = "{$prefix}__{$filename}";
+        $path = $folder . '/' . $prefixedFilename;
+        $fullPath = Storage::disk($settings['disk'])->path($path);
+        
+        // Create directory
+        $directory = dirname($fullPath);
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+        
+        // Load and resize
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($file instanceof UploadedFile ? $file->getRealPath() : $file);
+        
+        // Scale down maintaining aspect ratio
+        $image->scale(
+            width: $sizeConfig['width'],
+            height: $sizeConfig['height']
+        );
+        
+        // Encode to WebP
+        $encoded = $image->toWebp($settings['compression']);
+        $encoded->save($fullPath);
+        
+        return $path;
+    }
+    
+    /**
+     * Convert base64 blob to temporary file
+     */
+    private static function base64ToUploadedFile(string $base64): UploadedFile
+    {
+        // Extract base64 data
+        preg_match('/^data:image\/(\w+);base64,/', $base64, $matches);
+        $extension = $matches[1] ?? 'png';
+        $data = substr($base64, strpos($base64, ',') + 1);
+        $data = base64_decode($data);
+        
+        // Create temporary file
+        $tmpFile = tempnam(sys_get_temp_dir(), 'upload_');
+        file_put_contents($tmpFile, $data);
+        
+        return new UploadedFile(
+            $tmpFile,
+            'cropped_' . time() . '.' . $extension,
+            'image/' . $extension,
+            null,
+            true
+        );
+    }
+    
+    /**
+     * Get merged upload settings
+     */
+    private static function getUploadSettings(array $options): array
+    {
+        return array_merge([
+            'disk' => ImageUploadSetting::get('storage_disk', 'public'),
+            'compression' => ImageUploadSetting::get('default_compression', 70),
+            'size_large_width' => ImageUploadSetting::get('size_large_width', 1920),
+            'size_large_height' => ImageUploadSetting::get('size_large_height', 1920),
+            'size_medium_width' => ImageUploadSetting::get('size_medium_width', 1200),
+            'size_medium_height' => ImageUploadSetting::get('size_medium_height', 1200),
+            'size_small_width' => ImageUploadSetting::get('size_small_width', 600),
+            'size_small_height' => ImageUploadSetting::get('size_small_height', 600),
+            'max_file_size' => ImageUploadSetting::get('max_file_size', 5) * 1024 * 1024, // Convert MB to bytes
+            'max_width' => ImageUploadSetting::get('max_width', 4000),
+            'max_height' => ImageUploadSetting::get('max_height', 4000),
+            'enable_optimizer' => ImageUploadSetting::get('enable_optimizer', true),
+            'scope' => ImageUploadSetting::get('default_library_scope', 'global'),
+        ], $options);
+    }
+    
+    /**
+     * Validate upload against settings
+     */
+    private static function validateUpload($file, array $settings): void
+    {
+        if ($file instanceof UploadedFile) {
+            // Check file size
+            if ($file->getSize() > $settings['max_file_size']) {
+                throw new Exception('File size exceeds maximum allowed: ' . self::formatBytes($settings['max_file_size']));
+            }
+            
+            // Check MIME type
+            $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+            if (!in_array($file->getMimeType(), $allowedMimes)) {
+                throw new Exception('Invalid file type. Allowed: JPEG, PNG, GIF, WebP, BMP');
+            }
+        }
+        
+        // Check dimensions
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($file instanceof UploadedFile ? $file->getRealPath() : $file);
+        
+        if ($image->width() > $settings['max_width'] || $image->height() > $settings['max_height']) {
+            throw new Exception("Image dimensions exceed maximum: {$settings['max_width']}x{$settings['max_height']}px");
+        }
+    }
+    
+    /**
+     * Generate unique filename
+     */
+    private static function generateFilename($file, string $extension): string
+    {
+        $originalName = $file instanceof UploadedFile 
+            ? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+            : 'image';
+        
+        $slug = Str::slug($originalName);
+        $unique = uniqid() . '_' . time();
+        
+        return "{$slug}_{$unique}.{$extension}";
+    }
+    
+    /**
+     * Run Spatie optimizer on image
+     */
+    private static function optimizeImage(string $path, string $disk): void
+    {
+        try {
+            $fullPath = Storage::disk($disk)->path($path);
+            
+            if (file_exists($fullPath)) {
+                $optimizerChain = OptimizerChainFactory::create();
+                $optimizerChain->optimize($fullPath);
+            }
+        } catch (Exception $e) {
+            // Silently fail optimizer - image is already processed
+            logger()->warning("Image optimization failed: {$e->getMessage()}");
+        }
+    }
+    
+    /**
+     * Delete media and all size variants
+     */
+    public static function deleteMedia(Media $media): bool
+    {
+        return $media->deleteWithFiles();
     }
 }

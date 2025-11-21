@@ -9,7 +9,7 @@
 @section('og_type', 'website')
 @section('og_title', !empty($category->og_title) ? $category->og_title : $category->name)
 @section('og_description', !empty($category->og_description) ? $category->og_description : $category->description)
-@section('og_image', !empty($category->og_image) ? asset('storage/' . $category->og_image) : (!empty($category->image) ? asset('storage/' . $category->image) : asset('images/category-default.jpg')))
+@section('og_image', !empty($category->og_image) ? $category->og_image : ($category->media ? $category->getMediumImageUrl() : asset('images/category-default.jpg')))
 
 @section('canonical', $category->canonical_url ?? route('categories.show', $category->slug))
 
@@ -27,10 +27,10 @@
         <div class="container mx-auto px-4 py-8">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <!-- Category Image -->
-                @if($category->image)
+                @if($category->media)
                     <div class="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                         <img 
-                            src="{{ asset('storage/' . $category->image) }}" 
+                            src="{{ $category->getThumbnailUrl() }}" 
                             alt="{{ $category->name }}"
                             class="w-full h-full object-cover"
                         >

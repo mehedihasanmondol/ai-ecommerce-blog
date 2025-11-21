@@ -76,8 +76,8 @@
                            class="flex-shrink-0 flex flex-col items-center p-2 sm:p-4 rounded-lg hover:bg-gray-50 transition group category-item">
                             <!-- Icon Circle -->
                             <div class="w-16 h-16 sm:w-20 sm:h-20 bg-green-50 rounded-full flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-green-100 transition overflow-hidden">
-                                @if($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
+                                @if($category->media)
+                                    <img src="{{ $category->getThumbnailUrl() }}" alt="{{ $category->name }}" class="w-full h-full object-cover">
                                 @else
                                     <!-- Default SVG Icon -->
                                     <svg class="w-8 h-8 sm:w-12 sm:h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

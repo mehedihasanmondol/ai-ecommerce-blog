@@ -189,8 +189,8 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            @if($category->image)
-                                <img src="{{ asset('storage/' . $category->image) }}" 
+                            @if($category->media)
+                                <img src="{{ $category->getThumbnailUrl() }}" 
                                      alt="{{ $category->name }}"
                                      class="h-10 w-10 rounded object-cover mr-3">
                             @else

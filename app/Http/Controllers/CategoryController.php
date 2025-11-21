@@ -20,7 +20,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::with(['activeChildren'])
+        $categories = Category::with(['activeChildren', 'media'])
             ->parents()
             ->active()
             ->ordered()
@@ -34,7 +34,7 @@ class CategoryController extends Controller
      */
     public function show(Request $request, string $slug)
     {
-        $category = Category::with(['activeChildren', 'parent', 'products'])
+        $category = Category::with(['activeChildren', 'parent', 'products', 'media'])
             ->where('slug', $slug)
             ->active()
             ->firstOrFail();

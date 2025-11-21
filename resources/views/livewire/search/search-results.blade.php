@@ -192,8 +192,8 @@
                                             <a href="{{ route('categories.show', $category->slug) }}" 
                                                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
                                                 <div class="flex items-center">
-                                                    @if($category->image)
-                                                        <img src="{{ asset('storage/' . $category->image) }}" 
+                                                    @if($category->media)
+                                                        <img src="{{ $category->getThumbnailUrl() }}" 
                                                              alt="{{ $category->name }}"
                                                              class="w-10 h-10 rounded-lg object-cover mr-3">
                                                     @endif

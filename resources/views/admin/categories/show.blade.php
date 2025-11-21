@@ -33,11 +33,11 @@
             <div class="px-6 py-4">
                 <dl class="grid grid-cols-1 gap-4">
                     <!-- Image -->
-                    @if($category->image)
+                    @if($category->media)
                     <div>
                         <dt class="text-sm font-medium text-gray-500 mb-2">Image</dt>
                         <dd>
-                            <img src="{{ asset('storage/' . $category->image) }}" 
+                            <img src="{{ $category->getMediumImageUrl() }}" 
                                  alt="{{ $category->name }}"
                                  class="h-48 w-48 object-cover rounded-lg border border-gray-300">
                         </dd>
