@@ -3,27 +3,29 @@
 @section('title', 'Edit Post')
 
 @push('styles')
+@vite('resources/js/ckeditor-init.js')
 <style>
-/* TinyMCE Custom Styling */
-.tox-tinymce {
-    border-radius: 0.5rem !important;
-    border: 1px solid #e2e8f0 !important;
+/* CKEditor Custom Styling */
+.ck-editor__editable {
+    min-height: 500px;
+    max-height: 800px;
 }
-.tox .tox-toolbar {
+.ck.ck-editor {
+    border-radius: 0.5rem;
+}
+.ck.ck-toolbar {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
     background: #f8f9fa !important;
 }
+.ck.ck-editor__main > .ck-editor__editable {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
 .char-counter {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
+    margin-top: 1rem;
     font-size: 0.75rem;
     color: #64748b;
-    background: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
 }
 </style>
 @endpush
@@ -120,18 +122,15 @@
 
 
 
-                    <!-- Content Editor - TinyMCE -->
+                    <!-- Content Editor - CKEditor 5 -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <label class="block text-sm font-medium text-gray-700 mb-3">Content *</label>
                         <textarea name="content" 
-                                  id="tinymce-editor" 
-                                  class="tinymce-content">{{ old('content', $post->content) }}</textarea>
+                                  id="ckeditor" 
+                                  class="ckeditor-content">{{ old('content', $post->content) }}</textarea>
                         
                         <!-- Word Counter -->
-                        <div class="char-counter" id="editor-stats">
-                            <span id="word-count">0</span> words | 
-                            <span id="char-count">0</span> characters
-                        </div>
+                        <div class="char-counter" id="word-count"></div>
                         
                         @error('content')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -720,130 +719,8 @@
 </div>
 
 @push('scripts')
-<!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/{{ \App\Models\SiteSetting::get('tinymce_api_key', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
+@vite('resources/js/blog-post-editor.js')
 <script>
-// Initialize TinyMCE
-tinymce.init({
-    selector: '#tinymce-editor',
-    height: 500,
-    menubar: false, // Hide menubar for cleaner interface
-    plugins: [
-        'lists', 'link', 'image', 'fullscreen', 'code'
-    ],
-    toolbar: 'undo redo | bold italic underline | ' +
-        'alignleft aligncenter alignright | ' +
-        'bullist numlist | link image | ' +
-        'fullscreen | code | removeformat',
-    toolbar_mode: 'wrap',
-    promotion: false, // Remove "Upgrade" button
-    content_style: `
-        body { 
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            font-size: 18px;
-            line-height: 1.75;
-            color: #374151;
-            max-width: none;
-        }
-        h1 { font-size: 2.25em; font-weight: 800; margin-top: 0; margin-bottom: 0.8888889em; line-height: 1.1111111; }
-        h2 { font-size: 1.5em; font-weight: 700; margin-top: 2em; margin-bottom: 1em; line-height: 1.3333333; }
-        h3 { font-size: 1.25em; font-weight: 600; margin-top: 1.6em; margin-bottom: 0.6em; line-height: 1.6; }
-        p { margin-top: 1.25em; margin-bottom: 1.25em; }
-        ul, ol { margin-top: 1.25em; margin-bottom: 1.25em; padding-left: 1.625em; }
-        li { margin-top: 0.5em; margin-bottom: 0.5em; }
-        strong { font-weight: 600; color: #111827; }
-        a { color: #2563eb; text-decoration: underline; }
-        blockquote { font-style: italic; border-left: 4px solid #e5e7eb; padding-left: 1em; margin: 1.6em 0; color: #6b7280; }
-        code { background-color: #f3f4f6; padding: 0.2em 0.4em; border-radius: 0.25rem; font-size: 0.875em; }
-        img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1.5em 0; }
-    `,
-    
-    // Image upload settings
-    images_upload_handler: function (blobInfo, progress) {
-        return new Promise(function (resolve, reject) {
-            const xhr = new XMLHttpRequest();
-            xhr.withCredentials = false;
-            xhr.open('POST', '{{ route('admin.blog.upload-image') }}');
-            
-            // Add CSRF token
-            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
-            
-            xhr.upload.onprogress = function (e) {
-                progress(e.loaded / e.total * 100);
-            };
-            
-            xhr.onload = function() {
-                if (xhr.status === 403) {
-                    reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
-                    return;
-                }
-                
-                if (xhr.status < 200 || xhr.status >= 300) {
-                    reject('HTTP Error: ' + xhr.status);
-                    return;
-                }
-                
-                try {
-                    const json = JSON.parse(xhr.responseText);
-                    
-                    if (!json || typeof json.location !== 'string') {
-                        reject('Invalid JSON: ' + xhr.responseText);
-                        return;
-                    }
-                    
-                    resolve(json.location);
-                } catch (e) {
-                    reject('Invalid response: ' + xhr.responseText);
-                }
-            };
-            
-            xhr.onerror = function () {
-                reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
-            };
-            
-            const formData = new FormData();
-            formData.append('file', blobInfo.blob(), blobInfo.filename());
-            
-            xhr.send(formData);
-        });
-    },
-    automatic_uploads: true,
-    images_reuse_filename: true,
-    
-    // Advanced features
-    paste_data_images: true,
-    relative_urls: false,
-    remove_script_host: false,
-    convert_urls: true,
-    
-    // Content filtering
-    valid_elements: '*[*]',
-    extended_valid_elements: '*[*]',
-    
-    // Setup callback
-    setup: function(editor) {
-        editor.on('init', function() {
-            updateWordCount();
-        });
-        
-        editor.on('keyup change', function() {
-            updateWordCount();
-        });
-    }
-});
-
-// Word counter for TinyMCE
-function updateWordCount() {
-    const editor = tinymce.get('tinymce-editor');
-    if (editor) {
-        const content = editor.getContent({format: 'text'});
-        const words = content.trim().split(/\s+/).filter(w => w.length > 0).length;
-        const chars = editor.getContent().length;
-        document.getElementById('word-count').textContent = words;
-        document.getElementById('char-count').textContent = chars;
-    }
-}
 
 // Status change handler
 document.getElementById('status-select').addEventListener('change', function() {
@@ -882,36 +759,7 @@ function publishNow() {
     }
 }
 
-// Form validation before submit
-const postForm = document.querySelector('form');
-if (postForm) {
-    postForm.addEventListener('submit', function(e) {
-        const editor = tinymce.get('tinymce-editor');
-        const titleInput = document.querySelector('input[name="title"]');
-        
-        // Check if title is empty
-        if (titleInput && !titleInput.value.trim()) {
-            e.preventDefault();
-            alert('Please enter a post title.');
-            titleInput.focus();
-            return false;
-        }
-        
-        // Check if content is empty
-        if (editor) {
-            const content = editor.getContent({format: 'text'}).trim();
-            if (!content || content.length === 0) {
-                e.preventDefault();
-                alert('Please add some content to your post.');
-                editor.focus();
-                return false;
-            }
-        }
-        
-        // Form is valid, allow submission
-        return true;
-    });
-}
+// Form validation is handled by blog-post-editor.js
 
 // Delete post
 function deletePost() {

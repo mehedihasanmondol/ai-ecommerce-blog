@@ -19,6 +19,13 @@ php artisan migrate --path=database/migrations/2025_11_21_121700_make_product_im
 # Step 3: Seed image upload settings
 php artisan db:seed --class=ImageUploadSettingSeeder
 
+# Step 1: Install the package
+composer require mati365/ckeditor5-livewire
+
+# Step 2: Publish assets
+php artisan vendor:publish --provider="Mati365\CKEditor5Livewire\CKEditor5LivewireServiceProvider" --tag=public
+
+
 # Step 4: Build JavaScript assets (includes CropperJS)
 npm run build
 
