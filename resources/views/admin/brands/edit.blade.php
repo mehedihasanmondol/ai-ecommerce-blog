@@ -84,26 +84,8 @@
                         @enderror
                     </div>
 
-                    <!-- Brand Logo -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Brand Logo
-                        </label>
-                        
-                        <x-image-uploader 
-                            target-field="brand_logo"
-                            library-scope="global"
-                            :max-file-size="5"
-                            :preview-url="$brand->media ? $brand->getLogoUrl() : null"
-                            preview-alt="{{ $brand->name }}"
-                            input-name="media_id"
-                            :value="$brand->media_id"
-                        />
-                        
-                        @error('media_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <!-- Brand Logo (Universal Media Library) -->
+                    @livewire('admin.brand.brand-form', ['brand' => $brand])
                 </div>
             </div>
 

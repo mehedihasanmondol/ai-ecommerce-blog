@@ -103,23 +103,8 @@
                         @enderror
                     </div>
 
-                    <!-- Category Image -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Category Image
-                        </label>
-                        
-                        <x-image-uploader 
-                            target-field="category_image"
-                            library-scope="global"
-                            :max-file-size="5"
-                            input-name="media_id"
-                        />
-                        
-                        @error('media_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <!-- Category Image (Universal Media Library) -->
+                    @livewire('admin.category.category-form')
 
                     <!-- Sort Order & Status -->
                     <div class="grid grid-cols-2 gap-4">
