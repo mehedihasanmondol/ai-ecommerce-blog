@@ -72,9 +72,9 @@
                                     </div>
 
                                     <!-- Product Image -->
-                                    @if($offer->product->image_url)
+                                    @if($offer->product->getPrimaryThumbnailUrl())
                                         <img 
-                                            src="{{ asset('storage/' . $offer->product->image_url) }}" 
+                                            src="{{ $offer->product->getPrimaryThumbnailUrl() }}" 
                                             alt="{{ $offer->product->name }}"
                                             class="w-16 h-16 object-cover rounded-md"
                                         >

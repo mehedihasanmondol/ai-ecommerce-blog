@@ -3,16 +3,16 @@
     @foreach($products as $product)
     @php
         $variant = $product->variants->first();
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+        $imageUrl = $product->getPrimaryThumbnailUrl();
         $price = $variant->sale_price ?? $variant->price ?? 0;
         $originalPrice = $variant->price ?? 0;
         $hasDiscount = $originalPrice > $price;
     @endphp
 
     @if($viewMode === 'grid')
-        @include('livewire.shop.partials.product-card-grid', compact('product', 'variant', 'primaryImage', 'price', 'originalPrice', 'hasDiscount'))
+        @include('livewire.shop.partials.product-card-grid', compact('product', 'variant', 'imageUrl', 'price', 'originalPrice', 'hasDiscount'))
     @else
-        @include('livewire.shop.partials.product-card-list', compact('product', 'variant', 'primaryImage', 'price', 'originalPrice', 'hasDiscount'))
+        @include('livewire.shop.partials.product-card-list', compact('product', 'variant', 'imageUrl', 'price', 'originalPrice', 'hasDiscount'))
     @endif
     @endforeach
 </div>

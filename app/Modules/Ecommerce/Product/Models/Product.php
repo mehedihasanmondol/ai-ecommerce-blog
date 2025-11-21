@@ -251,4 +251,40 @@ class Product extends Model
     {
         return false;
     }
+
+    /**
+     * Get primary product image
+     */
+    public function getPrimaryImage()
+    {
+        return $this->images()->where('is_primary', true)->first() 
+            ?? $this->images()->first();
+    }
+
+    /**
+     * Get primary image URL (large) - NEW MEDIA SYSTEM
+     */
+    public function getPrimaryImageUrl(): ?string
+    {
+        $primaryImage = $this->getPrimaryImage();
+        return $primaryImage ? $primaryImage->getImageUrl() : null;
+    }
+
+    /**
+     * Get primary thumbnail URL (small) - NEW MEDIA SYSTEM
+     */
+    public function getPrimaryThumbnailUrl(): ?string
+    {
+        $primaryImage = $this->getPrimaryImage();
+        return $primaryImage ? $primaryImage->getThumbnailUrl() : null;
+    }
+
+    /**
+     * Get primary medium image URL - NEW MEDIA SYSTEM
+     */
+    public function getPrimaryMediumUrl(): ?string
+    {
+        $primaryImage = $this->getPrimaryImage();
+        return $primaryImage ? $primaryImage->getMediumUrl() : null;
+    }
 }

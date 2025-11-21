@@ -121,21 +121,17 @@
                                         @php
                                             $imageUrl = null;
                                             
-                                            // Priority 1: Use stored product_image from order item
+                                            // Priority 1: Use stored product_image from order item (historical data)
                                             if ($item->product_image) {
                                                 $imageUrl = asset('storage/' . $item->product_image);
                                             }
-                                            // Priority 2: Use variant image if available
+                                            // Priority 2: Use variant image if available (for old data)
                                             elseif ($item->variant && $item->variant->image) {
                                                 $imageUrl = asset('storage/' . $item->variant->image);
                                             }
-                                            // Priority 3: Use product's primary image
-                                            elseif ($item->product && $item->product->images->where('is_primary', true)->first()) {
-                                                $imageUrl = asset('storage/' . $item->product->images->where('is_primary', true)->first()->image_path);
-                                            }
-                                            // Priority 4: Use product's first image
-                                            elseif ($item->product && $item->product->images->first()) {
-                                                $imageUrl = asset('storage/' . $item->product->images->first()->image_path);
+                                            // Priority 3: Use product's primary thumbnail (NEW MEDIA SYSTEM)
+                                            elseif ($item->product) {
+                                                $imageUrl = $item->product->getPrimaryThumbnailUrl();
                                             }
                                         @endphp
                                         

@@ -83,8 +83,12 @@ class ProductService
                 $this->updateDefaultVariant($product, $data['variant']);
             }
 
-            // Handle images
-            if (isset($data['images'])) {
+            // Handle images - NEW media library system
+            if (isset($data['selected_images'])) {
+                $this->syncMediaLibraryImages($product, $data['selected_images'], $data['primary_image_media_id'] ?? null);
+            }
+            // OLD system (keeping for backward compatibility)
+            elseif (isset($data['images'])) {
                 $this->syncImages($product, $data['images'], $data['primary_image_index'] ?? null);
             }
 
@@ -230,6 +234,33 @@ class ProductService
                     'is_primary' => $primaryIndex !== null ? ($index === $primaryIndex) : ($index === 0),
                     'sort_order' => $index,
                 ]);
+            }
+        }
+    }
+    
+    protected function syncMediaLibraryImages(Product $product, array $selectedImages, ?int $primaryMediaId = null): void
+    {
+        if (empty($selectedImages)) {
+            return;
+        }
+
+        // Delete existing images if we're replacing them
+        $product->images()->delete();
+
+        // Add new images from media library
+        foreach ($selectedImages as $imageData) {
+            $product->images()->create([
+                'media_id' => $imageData['media_id'],
+                'is_primary' => isset($imageData['is_primary']) ? $imageData['is_primary'] : false,
+                'sort_order' => $imageData['sort_order'] ?? 0,
+            ]);
+        }
+
+        // Ensure at least one image is marked as primary
+        if ($product->images()->where('is_primary', true)->count() === 0) {
+            $firstImage = $product->images()->orderBy('sort_order')->first();
+            if ($firstImage) {
+                $firstImage->update(['is_primary' => true]);
             }
         }
     }

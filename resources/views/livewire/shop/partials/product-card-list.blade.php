@@ -2,7 +2,7 @@
     <div class="flex flex-col md:flex-row">
         <div class="relative md:w-48 aspect-square bg-gray-100 flex-shrink-0">
             <a href="{{ route('products.show', $product->slug) }}">
-                <img src="{{ $primaryImage ? asset('storage/' . $primaryImage->image_path) : asset('images/placeholder.svg') }}" 
+                <img src="{{ $imageUrl ?? asset('images/placeholder.svg') }}" 
                      alt="{{ $product->name }}"
                      class="w-full h-full object-cover"
                      loading="lazy">

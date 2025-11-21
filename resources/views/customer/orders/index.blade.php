@@ -129,22 +129,17 @@
                                     <div class="flex items-center space-x-3 bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
                                         @php
                                             $imageUrl = null;
-                                            // Try stored product_image first
+                                            // Priority 1: Use stored product_image from order item (historical data)
                                             if ($item->product_image) {
                                                 $imageUrl = asset('storage/' . $item->product_image);
                                             }
-                                            // Fallback to variant image
+                                            // Priority 2: Use variant image if available (for old data)
                                             elseif ($item->variant && $item->variant->image) {
                                                 $imageUrl = asset('storage/' . $item->variant->image);
                                             }
-                                            // Fallback to product images
+                                            // Priority 3: Use product's primary thumbnail (NEW MEDIA SYSTEM)
                                             elseif ($item->product) {
-                                                $primaryImage = $item->product->images->where('is_primary', true)->first();
-                                                if ($primaryImage) {
-                                                    $imageUrl = asset('storage/' . $primaryImage->image_path);
-                                                } elseif ($item->product->images->first()) {
-                                                    $imageUrl = asset('storage/' . $item->product->images->first()->image_path);
-                                                }
+                                                $imageUrl = $item->product->getPrimaryThumbnailUrl();
                                             }
                                         @endphp
                                         

@@ -57,7 +57,11 @@ class UniversalImageUploader extends Component
     
     protected $queryString = ['search', 'mimeFilter', 'startDate', 'endDate'];
     
-    protected $listeners = ['open-uploader-modal' => 'openModal'];
+    protected $listeners = [
+        'open-uploader-modal' => 'openModal',
+        'openMediaLibrary' => 'openLibraryModal',
+        'openUploader' => 'openUploadModal',
+    ];
     
     public function mount(
         $multiple = false,
@@ -102,6 +106,58 @@ class UniversalImageUploader extends Component
     {
         $this->showModal = true;
         $this->activeTab = 'library';
+        $this->resetPage();
+    }
+    
+    public function openLibraryModal(...$params)
+    {
+        // Handle Livewire dispatch which can pass object as first param
+        if (count($params) > 0 && is_array($params[0])) {
+            // Extract field and multiple from array
+            $field = $params[0]['field'] ?? null;
+            $multiple = $params[0]['multiple'] ?? null;
+        } else {
+            // Individual parameters
+            $field = $params[0] ?? null;
+            $multiple = $params[1] ?? null;
+        }
+        
+        // Set configuration
+        if ($field) {
+            $this->targetField = $field;
+        }
+        if (!is_null($multiple)) {
+            $this->multiple = $multiple;
+        }
+        
+        $this->showModal = true;
+        $this->activeTab = 'library';
+        $this->resetPage();
+    }
+    
+    public function openUploadModal(...$params)
+    {
+        // Handle Livewire dispatch which can pass object as first param
+        if (count($params) > 0 && is_array($params[0])) {
+            // Extract field and multiple from array
+            $field = $params[0]['field'] ?? null;
+            $multiple = $params[0]['multiple'] ?? null;
+        } else {
+            // Individual parameters
+            $field = $params[0] ?? null;
+            $multiple = $params[1] ?? null;
+        }
+        
+        // Set configuration
+        if ($field) {
+            $this->targetField = $field;
+        }
+        if (!is_null($multiple)) {
+            $this->multiple = $multiple;
+        }
+        
+        $this->showModal = true;
+        $this->activeTab = 'upload';
         $this->resetPage();
     }
     
@@ -174,11 +230,11 @@ class UniversalImageUploader extends Component
                 ];
             })->toArray();
             
-            // Emit event to parent component and browser
+            // Emit event to parent component and browser (wrap in array for reliable cross-component dispatch)
             $this->dispatch('imageUploaded', [
-                'media' => $uploadedMedia,
+                'media' => $mediaArray,
                 'field' => $this->targetField,
-            ])->self();
+            ]);
             
             // Also dispatch browser event for Alpine.js with properly formatted data
             $this->js("window.dispatchEvent(new CustomEvent('imageUploaded', { detail: " . json_encode([
@@ -221,11 +277,11 @@ class UniversalImageUploader extends Component
             ];
         })->toArray();
         
-        // Emit event to parent component
+        // Emit event to parent component (wrap in array for reliable cross-component dispatch)
         $this->dispatch('imageSelected', [
-            'media' => $media,
+            'media' => $mediaArray,
             'field' => $this->targetField,
-        ])->self();
+        ]);
         
         // Also dispatch browser event for Alpine.js with properly formatted data
         $this->js("window.dispatchEvent(new CustomEvent('imageSelected', { detail: " . json_encode([

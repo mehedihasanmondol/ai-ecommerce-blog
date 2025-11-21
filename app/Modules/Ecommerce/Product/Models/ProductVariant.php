@@ -2,6 +2,7 @@
 
 namespace App\Modules\Ecommerce\Product\Models;
 
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,7 @@ class ProductVariant extends Model
         'width',
         'height',
         'image',
+        'media_id',
         'shipping_class',
         'is_active',
     ];
@@ -204,5 +206,36 @@ class ProductVariant extends Model
         } else {
             $this->update(['stock_status' => 'in_stock']);
         }
+    }
+
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'media_id');
+    }
+
+    /**
+     * Get variant image URL (large size)
+     */
+    public function getImageUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->large_url;
+        }
+        
+        // Fallback to old image field
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
+    /**
+     * Get variant thumbnail URL (small size)
+     */
+    public function getThumbnailUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->small_url;
+        }
+        
+        // Fallback to old image field
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 }

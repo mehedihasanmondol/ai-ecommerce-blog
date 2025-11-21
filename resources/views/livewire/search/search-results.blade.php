@@ -124,13 +124,10 @@
                                 @foreach($results as $product)
                                     <div class="group">
                                         <a href="{{ route('products.show', $product->slug) }}" class="block">
-                                            @php
-                                                $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-                                            @endphp
                                             <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3">
-                                                @if($primaryImage)
+                                                @if($product->getPrimaryThumbnailUrl())
                                                     <img 
-                                                        src="{{ asset('storage/' . $primaryImage->image_path) }}" 
+                                                        src="{{ $product->getPrimaryThumbnailUrl() }}" 
                                                         alt="{{ $product->name }}"
                                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                     >

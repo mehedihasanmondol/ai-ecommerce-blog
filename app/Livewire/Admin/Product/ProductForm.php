@@ -54,10 +54,14 @@ class ProductForm extends Component
         'shipping_class' => '',
     ];
 
-    // Images
+    // Images - OLD system (keeping for backward compatibility)
     public $images = [];
     public $existingImages = [];
     public $primaryImageIndex = null;
+    
+    // Images - NEW media library system
+    public $selectedImages = []; // Array of media IDs with metadata
+    public $primaryImageMediaId = null;
 
     // Grouped Products
     public $selectedChildProducts = [];
@@ -84,6 +88,9 @@ class ProductForm extends Component
         'variationAdded' => 'addTempVariation',
         'variationUpdated' => 'updateTempVariation',
         'variationDeleted' => 'deleteTempVariation',
+        'imageSelected' => 'handleImageSelected',
+        'imageUploaded' => 'handleImageUploaded',
+        'reorderImages' => 'handleReorderImages',
     ];
 
     protected function rules()
@@ -195,9 +202,10 @@ class ProductForm extends Component
                 $this->selectedChildProducts = $product->childProducts->pluck('id')->toArray();
             }
 
-            // Load existing images
-            $images = $product->images;
+            // Load existing images (both old and new system)
+            $images = $product->images()->orderBy('sort_order')->get();
             foreach ($images as $index => $image) {
+                // OLD system (keep for backward compatibility)
                 $this->existingImages[] = [
                     'id' => $image->id,
                     'path' => $image->image_path,
@@ -205,6 +213,22 @@ class ProductForm extends Component
                 ];
                 if ($image->is_primary) {
                     $this->primaryImageIndex = $index;
+                }
+                
+                // NEW system - load from media library
+                if ($image->media_id) {
+                    $this->selectedImages[] = [
+                        'id' => $image->id, // ProductImage ID
+                        'media_id' => $image->media_id,
+                        'url' => $image->getMediumUrl(),
+                        'thumbnail_url' => $image->getThumbnailUrl(),
+                        'is_primary' => $image->is_primary,
+                        'sort_order' => $image->sort_order ?? $index,
+                    ];
+                    
+                    if ($image->is_primary) {
+                        $this->primaryImageMediaId = $image->media_id;
+                    }
                 }
             }
             
@@ -312,8 +336,13 @@ class ProductForm extends Component
                 $data['temp_variations'] = $this->tempVariations;
             }
 
-            // Handle images
-            if (!empty($this->images)) {
+            // Handle images - NEW media library system
+            if (!empty($this->selectedImages)) {
+                $data['selected_images'] = $this->selectedImages;
+                $data['primary_image_media_id'] = $this->primaryImageMediaId;
+            }
+            // OLD system (keeping for backward compatibility)
+            elseif (!empty($this->images)) {
                 $data['images'] = $this->images;
                 $data['primary_image_index'] = $this->primaryImageIndex;
             }
@@ -426,6 +455,144 @@ class ProductForm extends Component
     public function setPrimaryImage($index)
     {
         $this->primaryImageIndex = $index;
+    }
+    
+    // NEW Media Library Image Management Methods
+    public function handleImageSelected($data = [])
+    {
+        $this->js("console.log('handleImageSelected called with data:', " . json_encode($data) . ")");
+        
+        // Extract media and field from data array
+        $media = $data['media'] ?? null;
+        $field = $data['field'] ?? null;
+        
+        if (!$media || !$field) {
+            $this->js("console.log('handleImageSelected: Missing media or field in data')");
+            return;
+        }
+        
+        $this->js("console.log('handleImageSelected: field=' + '{$field}' + ', media count=' + " . count($media) . ")");
+        
+        if ($field === 'product_images') {
+            
+            foreach ($media as $mediaItem) {
+                // Check if already selected
+                $exists = collect($this->selectedImages)->contains('media_id', $mediaItem['id']);
+                
+                if (!$exists) {
+                    $this->selectedImages[] = [
+                        'media_id' => $mediaItem['id'],
+                        'url' => $mediaItem['medium_url'] ?? $mediaItem['large_url'],
+                        'thumbnail_url' => $mediaItem['small_url'] ?? $mediaItem['medium_url'],
+                        'is_primary' => empty($this->selectedImages), // First image is primary
+                        'sort_order' => count($this->selectedImages),
+                    ];
+                }
+            }
+            
+            // Set first image as primary if none set
+            if (!empty($this->selectedImages) && is_null($this->primaryImageMediaId)) {
+                $this->primaryImageMediaId = $this->selectedImages[0]['media_id'];
+                $this->selectedImages[0]['is_primary'] = true;
+            }
+        }
+    }
+    
+    public function handleImageUploaded($data = [])
+    {
+        $this->js("console.log('handleImageUploaded called with data:', " . json_encode($data) . ")");
+        
+        // Extract media and field from data array
+        $media = $data['media'] ?? null;
+        $field = $data['field'] ?? null;
+        
+        if (!$media || !$field) {
+            $this->js("console.log('handleImageUploaded: Missing media or field in data')");
+            return;
+        }
+        
+        $this->js("console.log('handleImageUploaded: field=' + '{$field}' + ', media count=' + " . count($media) . ")");
+        
+        if ($field === 'product_images') {
+            
+            foreach ($media as $mediaItem) {
+                $this->selectedImages[] = [
+                    'media_id' => $mediaItem['id'],
+                    'url' => $mediaItem['medium_url'] ?? $mediaItem['large_url'],
+                    'thumbnail_url' => $mediaItem['small_url'] ?? $mediaItem['medium_url'],
+                    'is_primary' => empty($this->selectedImages), // First image is primary
+                    'sort_order' => count($this->selectedImages),
+                ];
+            }
+            
+            // Set first image as primary if none set
+            if (!empty($this->selectedImages) && is_null($this->primaryImageMediaId)) {
+                $this->primaryImageMediaId = $this->selectedImages[0]['media_id'];
+                $this->selectedImages[0]['is_primary'] = true;
+            }
+        }
+    }
+    
+    public function removeSelectedImage($index)
+    {
+        if (isset($this->selectedImages[$index])) {
+            $removedMediaId = $this->selectedImages[$index]['media_id'];
+            unset($this->selectedImages[$index]);
+            $this->selectedImages = array_values($this->selectedImages);
+            
+            // Update sort order
+            foreach ($this->selectedImages as $i => $image) {
+                $this->selectedImages[$i]['sort_order'] = $i;
+            }
+            
+            // Reset primary if removed image was primary
+            if ($removedMediaId === $this->primaryImageMediaId) {
+                if (!empty($this->selectedImages)) {
+                    $this->primaryImageMediaId = $this->selectedImages[0]['media_id'];
+                    $this->selectedImages[0]['is_primary'] = true;
+                } else {
+                    $this->primaryImageMediaId = null;
+                }
+            }
+        }
+    }
+    
+    public function setSelectedImageAsPrimary($index)
+    {
+        // Remove primary from all
+        foreach ($this->selectedImages as $i => $image) {
+            $this->selectedImages[$i]['is_primary'] = false;
+        }
+        
+        // Set new primary
+        if (isset($this->selectedImages[$index])) {
+            $this->selectedImages[$index]['is_primary'] = true;
+            $this->primaryImageMediaId = $this->selectedImages[$index]['media_id'];
+        }
+    }
+    
+    public function handleReorderImages($data = [])
+    {
+        $this->js("console.log('handleReorderImages called')");
+        
+        // Extract indices from data array
+        $oldIndex = $data['oldIndex'] ?? null;
+        $newIndex = $data['newIndex'] ?? null;
+        
+        if (is_null($oldIndex) || is_null($newIndex)) {
+            $this->js("console.log('handleReorderImages: Missing indices')");
+            return;
+        }
+        
+        if (isset($this->selectedImages[$oldIndex])) {
+            $image = array_splice($this->selectedImages, $oldIndex, 1)[0];
+            array_splice($this->selectedImages, $newIndex, 0, [$image]);
+            
+            // Update sort_order for all images
+            foreach ($this->selectedImages as $index => $img) {
+                $this->selectedImages[$index]['sort_order'] = $index;
+            }
+        }
     }
     
     // Quick Add Category

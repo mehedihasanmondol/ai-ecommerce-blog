@@ -9,8 +9,8 @@
     currentIndex: 0,
     images: {{ json_encode($images->map(function($img) {
         return [
-            'full' => asset('storage/' . $img->image_path),
-            'thumb' => asset('storage/' . ($img->thumbnail_path ?? $img->image_path))
+            'full' => $img->getMediumUrl() ?? asset('images/placeholder.png'),
+            'thumb' => $img->getThumbnailUrl() ?? asset('images/placeholder.png')
         ];
     })->values()) }},
     showLightbox: false,

@@ -45,16 +45,17 @@
         $inStock = ($variant->stock_quantity ?? 0) > 0;
     }
     
-    $image = isset($product->images) && is_object($product->images) && method_exists($product->images, 'isNotEmpty') && $product->images->isNotEmpty() ? $product->images->first() : null;
+    // Use new media library system for images
+    $imageUrl = $product->getPrimaryThumbnailUrl();
 @endphp
 
 <div class="bg-white rounded-lg shadow-sm hover:shadow-lg transition group">
     <a href="{{ route('products.show', $product->slug) }}" class="block">
         <!-- Product Image -->
         <div class="relative overflow-hidden rounded-t-lg bg-gray-100">
-            @if($image)
+            @if($imageUrl)
                 <img 
-                    src="{{ asset('storage/' . $image->image_path) }}" 
+                    src="{{ $imageUrl }}" 
                     alt="{{ $product->name }}" 
                     class="w-full h-64 object-cover group-hover:scale-105 transition duration-300"
                 >

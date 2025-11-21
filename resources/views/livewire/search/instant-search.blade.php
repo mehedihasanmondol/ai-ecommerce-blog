@@ -87,13 +87,10 @@
                                         class="w-full px-4 py-3 hover:bg-gray-50 transition-colors text-left flex items-center space-x-3">
                                         
                                         <!-- Product Image -->
-                                        @php
-                                            $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-                                        @endphp
                                         <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                                            @if($primaryImage)
+                                            @if($product->getPrimaryThumbnailUrl())
                                                 <img 
-                                                    src="{{ asset('storage/' . $primaryImage->image_path) }}" 
+                                                    src="{{ $product->getPrimaryThumbnailUrl() }}" 
                                                     alt="{{ $product->name }}"
                                                     class="w-full h-full object-cover"
                                                 >

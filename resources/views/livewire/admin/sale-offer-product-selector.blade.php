@@ -57,9 +57,9 @@
                         class="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition text-left"
                     >
                         <!-- Product Image -->
-                        @if($product->image_url)
+                        @if($product->getPrimaryThumbnailUrl())
                             <img 
-                                src="{{ asset('storage/' . $product->image_url) }}" 
+                                src="{{ $product->getPrimaryThumbnailUrl() }}" 
                                 alt="{{ $product->name }}"
                                 class="w-16 h-16 object-cover rounded-md flex-shrink-0"
                             >

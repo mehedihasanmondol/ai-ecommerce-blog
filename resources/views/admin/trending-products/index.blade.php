@@ -72,9 +72,9 @@
                                     </div>
 
                                     <!-- Product Image -->
-                                    @if($trending->product->image_url)
+                                    @if($trending->product->getPrimaryThumbnailUrl())
                                         <img 
-                                            src="{{ asset('storage/' . $trending->product->image_url) }}" 
+                                            src="{{ $trending->product->getPrimaryThumbnailUrl() }}" 
                                             alt="{{ $trending->product->name }}"
                                             class="w-16 h-16 object-cover rounded-md"
                                         >

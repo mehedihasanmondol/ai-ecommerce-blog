@@ -634,115 +634,134 @@
                             </div>
                         </div>
 
-                        {{-- Images Tab --}}
+                        {{-- Images Tab - NEW Media Library System --}}
                         <div x-show="activeTab === 'images'" class="space-y-6">
-                            {{-- Upload Area --}}
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Upload Images</label>
-                                <input type="file" 
-                                       wire:model.live="images" 
-                                       multiple 
-                                       accept="image/*"
-                                       id="product-images-upload"
-                                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                                @error('images.*') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
-                                <p class="text-xs text-gray-500 mt-1">
-                                    <strong>Hold Ctrl (Windows) or Cmd (Mac)</strong> to select multiple images at once. Max 2MB per image.
-                                </p>
-                            </div>
-
-                            {{-- Loading Indicator --}}
-                            <div wire:loading wire:target="images" class="text-sm text-blue-600">
-                                <div class="flex items-center gap-2">
-                                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>Uploading images...</span>
+                            {{-- Action Buttons --}}
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Product Images</h3>
+                                    <p class="text-sm text-gray-600 mt-1">Add images from media library or upload new ones</p>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button type="button"
+                                            onclick="Livewire.dispatch('openMediaLibrary', { field: 'product_images', multiple: true })"
+                                            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        Select from Library
+                                    </button>
+                                    <button type="button"
+                                            onclick="Livewire.dispatch('openUploader', { field: 'product_images', multiple: true })"
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                        Upload New
+                                    </button>
                                 </div>
                             </div>
 
-                            {{-- Existing Images --}}
-                            @if(count($existingImages) > 0)
+                            {{-- Selected Images Grid (Sortable) --}}
+                            @if(count($selectedImages) > 0)
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">Current Images</label>
-                                <div class="grid grid-cols-4 gap-4">
-                                    @foreach($existingImages as $index => $image)
-                                    <div class="relative group">
-                                        <img src="{{ asset('storage/' . $image['path']) }}" 
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="block text-sm font-semibold text-gray-700">
+                                        Selected Images ({{ count($selectedImages) }})
+                                    </label>
+                                    <span class="text-xs text-gray-500">
+                                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                        </svg>
+                                        Drag to reorder
+                                    </span>
+                                </div>
+                                <div id="product-images-sortable" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    @foreach($selectedImages as $index => $image)
+                                    <div wire:key="image-{{ $image['media_id'] }}-{{ $index }}" 
+                                         class="relative group cursor-move" 
+                                         data-index="{{ $index }}">
+                                        {{-- Drag Handle --}}
+                                        <div class="absolute top-2 right-2 z-10 bg-white rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity drag-handle cursor-grab active:cursor-grabbing">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+                                            </svg>
+                                        </div>
+                                        
+                                        {{-- Image --}}
+                                        <img src="{{ $image['thumbnail_url'] }}" 
                                              alt="Product Image" 
-                                             class="w-full h-40 object-cover rounded-lg border-2 {{ $image['is_primary'] ? 'border-blue-500' : 'border-gray-200' }}">
+                                             class="w-full h-40 object-cover rounded-lg border-2 {{ $image['is_primary'] ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200' }}">
                                         
                                         {{-- Primary Badge --}}
                                         @if($image['is_primary'])
-                                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Primary</span>
+                                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded shadow-sm">
+                                            <svg class="w-3 h-3 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            Primary
+                                        </span>
                                         @endif
 
-                                        {{-- Actions --}}
+                                        {{-- Actions Overlay --}}
                                         <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                                             @if(!$image['is_primary'])
-                                            <button wire:click="setPrimaryImage({{ $index }})" 
+                                            <button wire:click="setSelectedImageAsPrimary({{ $index }})" 
                                                     type="button"
-                                                    class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                                    title="Set as primary image"
+                                                    class="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors">
+                                                <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
                                                 Set Primary
                                             </button>
                                             @endif
-                                            <button wire:click="removeExistingImage({{ $index }})" 
+                                            <button wire:click="removeSelectedImage({{ $index }})" 
                                                     type="button"
-                                                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                                    title="Remove image"
+                                                    class="px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 transition-colors">
+                                                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
                                                 Remove
                                             </button>
                                         </div>
                                     </div>
                                     @endforeach
                                 </div>
+                                <p class="text-xs text-gray-500 mt-3">
+                                    <svg class="w-4 h-4 inline-block text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    The first image (or marked primary) will be the main product image displayed in shop listings.
+                                </p>
                             </div>
-                            @endif
-
-                            {{-- New Images Preview --}}
-                            @if(count($images) > 0)
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">New Images ({{ count($images) }})</label>
-                                <div class="grid grid-cols-4 gap-4">
-                                    @foreach($images as $index => $image)
-                                    <div class="relative group">
-                                        <img src="{{ $image->temporaryUrl() }}" 
-                                             alt="New Image" 
-                                             class="w-full h-40 object-cover rounded-lg border-2 {{ $primaryImageIndex === $index ? 'border-blue-500' : 'border-gray-200' }}">
-                                        
-                                        {{-- Primary Badge --}}
-                                        @if($primaryImageIndex === $index)
-                                        <span class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">Primary</span>
-                                        @endif
-
-                                        {{-- Actions --}}
-                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                                            @if($primaryImageIndex !== $index)
-                                            <button wire:click="setPrimaryImage({{ $index }})" 
-                                                    type="button"
-                                                    class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
-                                                Set Primary
-                                            </button>
-                                            @endif
-                                            <button wire:click="removeImage({{ $index }})" 
-                                                    type="button"
-                                                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
-                                                Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            @if(count($existingImages) === 0 && count($images) === 0)
-                            <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                                <svg class="w-16 h-16 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            @else
+                            {{-- Empty State --}}
+                            <div class="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                                <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <p class="text-lg font-medium text-gray-900 mb-2">No images uploaded yet</p>
-                                <p class="text-sm text-gray-600">Upload product images to create a gallery</p>
+                                <p class="text-lg font-semibold text-gray-900 mb-2">No product images yet</p>
+                                <p class="text-sm text-gray-600 mb-4">Select images from your media library or upload new ones</p>
+                                <div class="flex items-center justify-center gap-3">
+                                    <button type="button"
+                                            onclick="Livewire.dispatch('openMediaLibrary', { field: 'product_images', multiple: true })"
+                                            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        Browse Library
+                                    </button>
+                                    <button type="button"
+                                            onclick="Livewire.dispatch('openUploader', { field: 'product_images', multiple: true })"
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        </svg>
+                                        Upload Images
+                                    </button>
+                                </div>
                             </div>
                             @endif
                         </div>
@@ -983,4 +1002,7 @@
         </div>
     </div>
     @endif
+    
+    {{-- Universal Image Uploader Component --}}
+    <livewire:universal-image-uploader />
 </div>

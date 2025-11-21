@@ -1,7 +1,7 @@
 <div class="bg-white rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition" wire:key="grid-{{ $product->id }}">
     <div class="relative aspect-square bg-gray-100">
         <a href="{{ route('products.show', $product->slug) }}">
-            <img src="{{ $primaryImage ? asset('storage/' . $primaryImage->image_path) : asset('images/placeholder.svg') }}" 
+            <img src="{{ $imageUrl ?? asset('images/placeholder.svg') }}" 
                  alt="{{ $product->name }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                  loading="lazy">

@@ -20,7 +20,8 @@
         }
     }
     
-    $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+    // Use new media library system
+    $imageUrl = $product->getPrimaryThumbnailUrl();
     $price = $variant ? ($variant->sale_price ?? $variant->price ?? 0) : 0;
     $originalPrice = $variant ? ($variant->price ?? 0) : 0;
     $hasDiscount = $originalPrice > $price;
@@ -66,7 +67,7 @@
      class="bg-white rounded-lg shadow-sm overflow-hidden group hover:shadow-md transition {{ $classes['container'] }}">
     <div class="relative {{ $classes['image'] }} bg-gray-100">
         <a href="{{ route('products.show', $product->slug) }}">
-            <img src="{{ $primaryImage ? asset('storage/' . $primaryImage->image_path) : asset('images/placeholder.png') }}" 
+            <img src="{{ $imageUrl ?? asset('images/placeholder.png') }}" 
                  alt="{{ $product->name }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                  loading="lazy">
@@ -180,7 +181,7 @@
     <div class="flex flex-col md:flex-row">
         <div class="relative md:w-48 aspect-square bg-gray-100 flex-shrink-0">
             <a href="{{ route('products.show', $product->slug) }}">
-                <img src="{{ $primaryImage ? asset('storage/' . $primaryImage->image_path) : asset('images/placeholder.png') }}" 
+                <img src="{{ $imageUrl ?? asset('images/placeholder.png') }}" 
                      alt="{{ $product->name }}"
                      class="w-full h-full object-cover"
                      loading="lazy">

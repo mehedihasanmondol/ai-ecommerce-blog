@@ -18,7 +18,7 @@
     "dependencies": {
         "alpinejs": "^3.14.1",
         "cropperjs": "^1.6.2",
-        "sortablejs": "^1.15.3",
+        "sortablejs": "^1.15.6",
         "tinymce": "^8.2.1"
     }
 }

@@ -3,13 +3,13 @@
     @foreach($products as $product)
     @php
         $variant = $product->variants->first();
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+        $imageUrl = $product->getPrimaryThumbnailUrl();
         $price = $variant->sale_price ?? $variant->price ?? 0;
         $originalPrice = $variant->price ?? 0;
         $hasDiscount = $originalPrice > $price;
     @endphp
 
-    @include('frontend.shop.partials.product-card', ['product' => $product, 'variant' => $variant, 'primaryImage' => $primaryImage, 'price' => $price, 'originalPrice' => $originalPrice, 'hasDiscount' => $hasDiscount])
+    @include('frontend.shop.partials.product-card', ['product' => $product, 'variant' => $variant, 'imageUrl' => $imageUrl, 'price' => $price, 'originalPrice' => $originalPrice, 'hasDiscount' => $hasDiscount])
     @endforeach
 </div>
 

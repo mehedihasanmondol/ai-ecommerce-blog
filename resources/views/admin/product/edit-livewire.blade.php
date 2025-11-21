@@ -22,9 +22,16 @@
 
 <script>
 let tinyMCERetryCount = 0;
+let tinyMCEInitializing = false;
 const maxRetries = 50; // Try for 5 seconds max
 
 function initTinyMCE() {
+    // Prevent concurrent initializations
+    if (tinyMCEInitializing) {
+        console.log('TinyMCE initialization already in progress, skipping...');
+        return;
+    }
+    
     // Check if element exists
     const element = document.getElementById('product-description-editor');
     
@@ -41,11 +48,14 @@ function initTinyMCE() {
     // Reset retry count
     tinyMCERetryCount = 0;
     
-    // Remove existing instance if any
+    // Check if already initialized
     if (tinymce.get('product-description-editor')) {
-        tinymce.get('product-description-editor').remove();
+        console.log('TinyMCE already initialized, skipping...');
+        return;
     }
     
+    // Set flag
+    tinyMCEInitializing = true;
     console.log('Initializing TinyMCE...');
     
     // Initialize TinyMCE for Product Description
@@ -127,6 +137,10 @@ function initTinyMCE() {
             editor.on('init', function() {
                 // Set initial content
                 editor.setContent(document.querySelector('#product-description-editor').value || '');
+                
+                // Reset initialization flag
+                tinyMCEInitializing = false;
+                console.log('TinyMCE initialization complete');
             });
             
             // Update hidden input and trigger Livewire update when content changes
@@ -174,18 +188,16 @@ document.addEventListener('livewire:update', function() {
     initTinyMCE();
 });
 
-// For Livewire v3
+// For Livewire v3 - Only reinitialize when description tab is shown
 if (typeof Livewire !== 'undefined') {
-    Livewire.hook('morph.updated', () => {
-        console.log('Livewire morph updated, reinitializing TinyMCE...');
-        tinyMCERetryCount = 0; // Reset retry count
-        initTinyMCE();
-    });
+    // Remove the aggressive morph.updated listener to prevent infinite loops
+    // Instead, only check when needed (after commit)
     
     Livewire.hook('commit', ({ component, commit, respond }) => {
-        // After any Livewire action completes
+        // Only initialize if element exists and TinyMCE not already active
         setTimeout(() => {
-            if (document.getElementById('product-description-editor') && !tinymce.get('product-description-editor')) {
+            const element = document.getElementById('product-description-editor');
+            if (element && !tinymce.get('product-description-editor') && !tinyMCEInitializing) {
                 console.log('TinyMCE element found after commit, initializing...');
                 tinyMCERetryCount = 0;
                 initTinyMCE();

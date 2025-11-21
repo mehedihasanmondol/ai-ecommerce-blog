@@ -141,8 +141,8 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 <div class="h-12 w-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                                    @if($product->image_url)
-                                    <img src="{{ asset('storage/' . $product->image_url) }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
+                                    @if($product->getPrimaryThumbnailUrl())
+                                    <img src="{{ $product->getPrimaryThumbnailUrl() }}" alt="{{ $product->name }}" class="h-full w-full object-cover">
                                     @else
                                     <div class="h-full w-full flex items-center justify-center text-gray-400">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
