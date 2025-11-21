@@ -55,8 +55,13 @@ class BlogCategoryService
     {
         DB::beginTransaction();
         try {
-            // Handle image upload
-            if (isset($data['image']) && $data['image']) {
+            // Handle media_id (NEW: Media library system)
+            if (isset($data['media_id']) && $data['media_id']) {
+                // Using media library - media_id is already set, remove image upload field
+                unset($data['image']);
+            }
+            // Handle legacy image upload
+            elseif (isset($data['image']) && $data['image']) {
                 $data['image_path'] = $this->uploadCategoryImage($data['image']);
                 unset($data['image']);
             }
@@ -83,13 +88,23 @@ class BlogCategoryService
         try {
             $category = $this->getCategory($id);
 
-            // Handle image upload
-            if (isset($data['image']) && $data['image']) {
+            // Handle media_id (NEW: Media library system)
+            if (isset($data['media_id']) && $data['media_id']) {
+                // Using media library - delete old legacy image if switching from old system
+                if ($category->image_path && !$category->media_id) {
+                    Storage::disk('public')->delete($category->image_path);
+                    $data['image_path'] = null; // Clear legacy path
+                }
+                unset($data['image']);
+            }
+            // Handle legacy image upload
+            elseif (isset($data['image']) && $data['image']) {
                 // Delete old image
                 if ($category->image_path) {
                     Storage::disk('public')->delete($category->image_path);
                 }
                 $data['image_path'] = $this->uploadCategoryImage($data['image']);
+                $data['media_id'] = null; // Clear media_id if uploading file
                 unset($data['image']);
             }
 

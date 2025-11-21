@@ -18,6 +18,7 @@ class StoreBlogCategoryRequest extends FormRequest
             'slug' => 'nullable|string|max:255|unique:blog_categories,slug',
             'description' => 'nullable|string|max:1000',
             'parent_id' => 'nullable|exists:blog_categories,id',
+            'media_id' => 'nullable|exists:media_library,id',  // NEW: Media library support
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'sort_order' => 'nullable|integer|min:0',
             'meta_title' => 'nullable|string|max:255',

@@ -160,8 +160,8 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                @if($category->image_path)
-                                    <img src="{{ asset('storage/' . $category->image_path) }}" 
+                                @if($category->getImageUrl())
+                                    <img src="{{ $category->getThumbnailUrl() ?? $category->getImageUrl() }}" 
                                          alt="{{ $category->name }}"
                                          class="h-10 w-10 rounded object-cover mr-3">
                                 @else

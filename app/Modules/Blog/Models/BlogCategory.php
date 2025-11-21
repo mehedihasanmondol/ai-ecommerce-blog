@@ -2,6 +2,7 @@
 
 namespace App\Modules\Blog\Models;
 
+use App\Models\Media;
 use App\Traits\HasSeo;
 use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,7 +45,8 @@ class BlogCategory extends Model
         'slug',
         'description',
         'parent_id',
-        'image_path',
+        'media_id',        // NEW: Media library support
+        'image_path',      // Legacy support
         'sort_order',
         'meta_title',
         'meta_description',
@@ -145,5 +147,67 @@ class BlogCategory extends Model
     public function shouldAutoUpdateSlug(): bool
     {
         return false;
+    }
+
+    /**
+     * Get the media (for media library system)
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'media_id');
+    }
+
+    /**
+     * Get category image URL - supports both media library and legacy paths
+     */
+    public function getImageUrl(): ?string
+    {
+        // Priority 1: Use media library if available
+        if ($this->media_id && $this->media) {
+            return $this->media->large_url;
+        }
+        
+        // Priority 2: Fallback to legacy image_path
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get category thumbnail URL
+     */
+    public function getThumbnailUrl(): ?string
+    {
+        // Priority 1: Use media library if available
+        if ($this->media_id && $this->media) {
+            return $this->media->small_url;
+        }
+        
+        // Priority 2: Fallback to legacy image_path
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get category medium size image URL
+     */
+    public function getMediumUrl(): ?string
+    {
+        // Priority 1: Use media library if available
+        if ($this->media_id && $this->media) {
+            return $this->media->medium_url;
+        }
+        
+        // Priority 2: Fallback to legacy image_path
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        
+        return null;
     }
 }

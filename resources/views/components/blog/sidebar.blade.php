@@ -124,10 +124,10 @@ if ($categoryType === 'blog') {
                        class="flex items-center justify-between gap-3 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors group {{ $currentCategory && $currentCategory->id === $category->id ? 'bg-green-50 text-green-700' : '' }}">
                         <div class="flex items-center gap-3 flex-1 min-w-0">
                             <!-- Category Image or Fallback Icon -->
-                            @if($category->image_path)
+                            @if($category->getImageUrl())
                                 <div class="w-8 h-8 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
                                     <img 
-                                        src="{{ asset('storage/' . $category->image_path) }}" 
+                                        src="{{ $category->getThumbnailUrl() ?? $category->getImageUrl() }}" 
                                         alt="{{ $category->name }}"
                                         class="w-full h-full object-cover"
                                     >

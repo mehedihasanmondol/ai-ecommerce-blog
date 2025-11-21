@@ -37,8 +37,8 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4">
                         <div class="flex items-center">
-                            @if($category->image_path)
-                            <img src="{{ asset('storage/' . $category->image_path) }}" 
+                            @if($category->getImageUrl())
+                            <img src="{{ $category->getThumbnailUrl() ?? $category->getImageUrl() }}" 
                                  class="w-10 h-10 rounded object-cover mr-3">
                             @endif
                             <div>
