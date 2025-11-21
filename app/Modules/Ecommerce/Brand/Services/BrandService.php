@@ -28,11 +28,6 @@ class BrandService
     {
         DB::beginTransaction();
         try {
-            // Handle logo upload
-            if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
-                $data['logo'] = $this->uploadLogo($data['logo']);
-            }
-
             // Auto-generate slug if not provided
             if (empty($data['slug']) && !empty($data['name'])) {
                 $brand = new Brand();
@@ -59,24 +54,6 @@ class BrandService
     {
         DB::beginTransaction();
         try {
-            // Handle logo upload
-            if (isset($data['logo']) && $data['logo'] instanceof UploadedFile) {
-                // Delete old logo
-                if ($brand->logo) {
-                    $this->deleteLogo($brand->logo);
-                }
-                $data['logo'] = $this->uploadLogo($data['logo']);
-            } elseif (isset($data['remove_logo']) && $data['remove_logo']) {
-                // Remove logo if requested
-                if ($brand->logo) {
-                    $this->deleteLogo($brand->logo);
-                }
-                $data['logo'] = null;
-            } else {
-                // Keep existing logo
-                unset($data['logo']);
-            }
-
             // Update slug if name changed
             if (isset($data['name']) && $data['name'] !== $brand->name && empty($data['slug'])) {
                 $data['slug'] = $brand->generateUniqueSlug($data['name']);

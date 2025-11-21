@@ -84,37 +84,23 @@
                         @enderror
                     </div>
 
-                    <!-- Current Logo -->
-                    @if($brand->logo)
+                    <!-- Brand Logo -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Logo</label>
-                        <div class="flex items-center space-x-4">
-                            <img src="{{ asset('storage/' . $brand->logo) }}" 
-                                 alt="{{ $brand->name }}"
-                                 class="h-32 w-32 object-contain rounded-lg border border-gray-300 bg-gray-50 p-2">
-                            <label class="inline-flex items-center">
-                                <input type="checkbox" 
-                                       name="remove_logo" 
-                                       value="1"
-                                       class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                                <span class="ml-2 text-sm text-red-600">Remove logo</span>
-                            </label>
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- New Logo -->
-                    <div>
-                        <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">
-                            {{ $brand->logo ? 'Replace Logo' : 'Brand Logo' }}
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Brand Logo
                         </label>
-                        <input type="file" 
-                               name="logo" 
-                               id="logo" 
-                               accept="image/*"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('logo') border-red-500 @enderror">
-                        <p class="mt-1 text-xs text-gray-500">Max size: 2MB. Formats: JPG, PNG, GIF, WebP, SVG</p>
-                        @error('logo')
+                        
+                        <x-image-uploader 
+                            target-field="brand_logo"
+                            library-scope="global"
+                            :max-file-size="5"
+                            :preview-url="$brand->media ? $brand->getLogoUrl() : null"
+                            preview-alt="{{ $brand->name }}"
+                            input-name="media_id"
+                            :value="$brand->media_id"
+                        />
+                        
+                        @error('media_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

@@ -33,11 +33,11 @@
             <div class="px-6 py-4">
                 <dl class="grid grid-cols-1 gap-4">
                     <!-- Logo -->
-                    @if($brand->logo)
+                    @if($brand->media || $brand->logo)
                     <div>
                         <dt class="text-sm font-medium text-gray-500 mb-2">Logo</dt>
                         <dd>
-                            <img src="{{ asset('storage/' . $brand->logo) }}" 
+                            <img src="{{ $brand->getMediumLogoUrl() }}" 
                                  alt="{{ $brand->name }}"
                                  class="h-32 w-32 object-contain rounded-lg border border-gray-300 bg-gray-50 p-2">
                         </dd>

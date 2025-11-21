@@ -103,9 +103,9 @@
                        class="group bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
                         <!-- Brand Logo -->
                         <div class="relative overflow-hidden bg-white aspect-video flex items-center justify-center p-6 border-b border-gray-100">
-                            @if($brand->logo)
+                            @if($brand->media || $brand->logo)
                                 <img 
-                                    src="{{ asset('storage/' . $brand->logo) }}" 
+                                    src="{{ $brand->getThumbnailUrl() }}" 
                                     alt="{{ $brand->name }}"
                                     class="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
                                 >

@@ -6,6 +6,8 @@ php artisan migrate --path=database/migrations/2025_11_20_130000_create_media_li
 # Step 2: Add media_id to categories table
 php artisan migrate --path=database/migrations/2025_11_21_020000_add_media_id_to_categories_table.php
 
+php artisan migrate --path=database/migrations/2025_11_21_094126_add_media_id_to_brands_table.php
+
 # Step 3: Seed image upload settings
 php artisan db:seed --class=ImageUploadSettingSeeder
 

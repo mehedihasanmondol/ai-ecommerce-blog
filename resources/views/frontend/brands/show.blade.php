@@ -32,9 +32,9 @@
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <!-- Brand Logo -->
                 <div class="w-32 h-32 flex-shrink-0 bg-white border-2 border-gray-100 rounded-lg p-4 flex items-center justify-center">
-                    @if($brand->logo)
+                    @if($brand->media || $brand->logo)
                         <img 
-                            src="{{ asset('storage/' . $brand->logo) }}" 
+                            src="{{ $brand->getMediumLogoUrl() }}" 
                             alt="{{ $brand->name }}"
                             class="max-w-full max-h-full object-contain"
                         >
@@ -125,10 +125,10 @@
                     @foreach($relatedBrands as $relatedBrand)
                         <a href="{{ route('brands.show', $relatedBrand->slug) }}" 
                            class="group text-center p-4 bg-gray-50 rounded-lg hover:bg-white hover:shadow-md transition">
-                            @if($relatedBrand->logo)
+                            @if($relatedBrand->media || $relatedBrand->logo)
                                 <div class="w-16 h-16 mx-auto mb-2 flex items-center justify-center">
                                     <img 
-                                        src="{{ asset('storage/' . $relatedBrand->logo) }}" 
+                                        src="{{ $relatedBrand->getThumbnailUrl() }}" 
                                         alt="{{ $relatedBrand->name }}"
                                         class="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform"
                                     >

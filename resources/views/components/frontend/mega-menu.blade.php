@@ -90,9 +90,9 @@
                                     @foreach($categoryBrands->take(6) as $brand)
                                         <a href="{{ route('brands.show', $brand->slug) }}" 
                                            class="block group">
-                                            @if($brand->logo)
+                                            @if($brand->media || $brand->logo)
                                                 <div class="w-full h-16 flex items-center justify-center border border-gray-200 group-hover:border-green-500 transition-all p-2">
-                                                    <img src="{{ asset('storage/' . $brand->logo) }}" 
+                                                    <img src="{{ $brand->getThumbnailUrl() }}" 
                                                          alt="{{ $brand->name }}" 
                                                          class="max-w-full max-h-full object-contain">
                                                 </div>
@@ -194,9 +194,9 @@
                                 @foreach($globalTrendingBrands->take(6) as $brand)
                                     <a href="{{ route('brands.show', $brand->slug) }}" 
                                        class="block group">
-                                        @if($brand->logo)
+                                        @if($brand->media || $brand->logo)
                                             <div class="w-full h-16 flex items-center justify-center border border-gray-200 group-hover:border-green-500 transition-all p-2">
-                                                <img src="{{ asset('storage/' . $brand->logo) }}" 
+                                                <img src="{{ $brand->getThumbnailUrl() }}" 
                                                      alt="{{ $brand->name }}" 
                                                      class="max-w-full max-h-full object-contain">
                                             </div>

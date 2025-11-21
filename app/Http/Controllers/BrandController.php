@@ -20,7 +20,7 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Brand::where('is_active', true)->withCount('products');
+        $query = Brand::where('is_active', true)->withCount('products')->with('media');
         
         // Filter by letter if provided
         if ($request->has('letter')) {
@@ -33,6 +33,7 @@ class BrandController extends Controller
         // Get brands grouped by letter for A-Z navigation
         $brandsByLetter = Brand::where('is_active', true)
             ->withCount('products')
+            ->with('media')
             ->orderBy('name')
             ->get()
             ->groupBy(function($brand) {
@@ -50,6 +51,7 @@ class BrandController extends Controller
         $brand = Brand::where('slug', $slug)
             ->where('is_active', true)
             ->withCount('products')
+            ->with('media')
             ->firstOrFail();
 
         $products = Product::where('brand_id', $brand->id)
@@ -61,6 +63,7 @@ class BrandController extends Controller
         $relatedBrands = Brand::where('is_active', true)
             ->where('id', '!=', $brand->id)
             ->withCount('products')
+            ->with('media')
             ->orderBy('name')
             ->limit(8)
             ->get();

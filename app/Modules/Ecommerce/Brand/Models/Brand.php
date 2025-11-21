@@ -4,8 +4,10 @@ namespace App\Modules\Ecommerce\Brand\Models;
 
 use App\Traits\HasSeo;
 use App\Traits\HasUniqueSlug;
+use App\Models\Media;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -33,6 +35,7 @@ class Brand extends Model
         'slug',
         'description',
         'logo',
+        'media_id',
         'website',
         'email',
         'phone',
@@ -53,6 +56,14 @@ class Brand extends Model
         'is_featured' => 'boolean',
         'sort_order' => 'integer',
     ];
+
+    /**
+     * Get the brand logo from media library
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'media_id');
+    }
 
     /**
      * Get products for this brand
@@ -107,10 +118,41 @@ class Brand extends Model
     }
 
     /**
-     * Get logo URL
+     * Get logo URL (large size)
      */
     public function getLogoUrl(): ?string
     {
+        if ($this->media) {
+            return $this->media->large_url;
+        }
+        
+        // Fallback to old logo field
+        return $this->logo ? asset('storage/' . $this->logo) : null;
+    }
+
+    /**
+     * Get thumbnail URL (small size)
+     */
+    public function getThumbnailUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->small_url;
+        }
+        
+        // Fallback to old logo field
+        return $this->logo ? asset('storage/' . $this->logo) : null;
+    }
+
+    /**
+     * Get medium logo URL
+     */
+    public function getMediumLogoUrl(): ?string
+    {
+        if ($this->media) {
+            return $this->media->medium_url;
+        }
+        
+        // Fallback to old logo field
         return $this->logo ? asset('storage/' . $this->logo) : null;
     }
 

@@ -225,8 +225,8 @@
                                             <a href="{{ route('brands.show', $brand->slug) }}" 
                                                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors group">
                                                 <div class="flex items-center">
-                                                    @if($brand->logo)
-                                                        <img src="{{ asset('storage/' . $brand->logo) }}" 
+                                                    @if($brand->media || $brand->logo)
+                                                        <img src="{{ $brand->getThumbnailUrl() }}" 
                                                              alt="{{ $brand->name }}"
                                                              class="w-10 h-10 rounded-lg object-contain bg-white border mr-3">
                                                     @endif

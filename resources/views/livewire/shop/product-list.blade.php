@@ -27,10 +27,10 @@
             <div class="container mx-auto px-4 py-4">
                 <div class="flex items-center gap-4">
                     <!-- Brand Logo -->
-                    @if($brand->logo)
+                    @if($brand->media || $brand->logo)
                         <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white shadow-md border border-gray-200 p-2">
                             <img 
-                                src="{{ asset('storage/' . $brand->logo) }}" 
+                                src="{{ $brand->getThumbnailUrl() }}" 
                                 alt="{{ $brand->name }}"
                                 class="w-full h-full object-contain"
                             >

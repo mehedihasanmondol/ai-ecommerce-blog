@@ -160,8 +160,8 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                @if($brand->logo)
-                                    <img src="{{ asset('storage/' . $brand->logo) }}" 
+                                @if($brand->media || $brand->logo)
+                                    <img src="{{ $brand->getThumbnailUrl() }}" 
                                          alt="{{ $brand->name }}"
                                          class="h-10 w-10 rounded object-contain mr-3 bg-gray-50">
                                 @else
