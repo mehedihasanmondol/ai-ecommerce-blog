@@ -4,6 +4,7 @@ namespace App\Modules\Ecommerce\Product\Services;
 
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Product\Models\ProductVariant;
+use App\Services\ImageService;
 use App\Modules\Ecommerce\Product\Repositories\ProductRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -185,12 +186,35 @@ class ProductService
         $imagePaths = [];
         foreach ($imagesData as $index => $image) {
             if (is_object($image) && method_exists($image, 'store')) {
-                // It's an uploaded file
-                $path = $image->store('products', 'public');
-                $imagePaths[] = $path;
+                // It's an uploaded file - process and convert to WebP
+                try {
+                    // Validate file size
+                    if (!ImageService::validateFileSize($image)) {
+                        \Log::warning("Image upload failed: File size exceeds limit", [
+                            'max_size' => ImageService::getMaxUploadSizeFormatted()
+                        ]);
+                        continue;
+                    }
+                    
+                    // Process and convert to WebP with compression (quality: 85)
+                    $path = ImageService::processAndStore($image, 'products', 85);
+                    
+                    $imagePaths[] = [
+                        'image_path' => $path,
+                        'thumbnail_path' => $path, // Same path, no separate thumbnail
+                    ];
+                } catch (\Exception $e) {
+                    \Log::error("Image processing failed", [
+                        'error' => $e->getMessage()
+                    ]);
+                    continue;
+                }
             } elseif (is_string($image)) {
                 // It's already a path
-                $imagePaths[] = $image;
+                $imagePaths[] = [
+                    'image_path' => $image,
+                    'thumbnail_path' => $image,
+                ];
             }
         }
 
@@ -199,9 +223,10 @@ class ProductService
             $product->images()->delete();
 
             // Add new images
-            foreach ($imagePaths as $index => $imagePath) {
+            foreach ($imagePaths as $index => $imageData) {
                 $product->images()->create([
-                    'image_path' => $imagePath,
+                    'image_path' => $imageData['image_path'],
+                    'thumbnail_path' => $imageData['thumbnail_path'] ?? $imageData['image_path'],
                     'is_primary' => $primaryIndex !== null ? ($index === $primaryIndex) : ($index === 0),
                     'sort_order' => $index,
                 ]);

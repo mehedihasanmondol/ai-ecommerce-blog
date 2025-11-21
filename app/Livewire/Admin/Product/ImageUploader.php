@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Product;
 
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Product\Models\ProductImage;
+use App\Services\ImageService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
@@ -16,13 +17,31 @@ class ImageUploader extends Component
     public $images = [];
     public $existingImages = [];
     public $primaryImageId = null;
+    public $maxUploadSize;
+    public $maxUploadSizeFormatted;
 
-    protected $rules = [
-        'images.*' => 'image|max:2048', // 2MB Max
-    ];
+    protected function rules()
+    {
+        $maxSize = ImageService::getMaxUploadSize() / 1024; // Convert to KB for Laravel validation
+        
+        return [
+            'images.*' => "image|max:{$maxSize}",
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'images.*.image' => 'Each file must be an image (JPEG, PNG, GIF, BMP, or WebP).',
+            'images.*.max' => 'Each image must not exceed ' . $this->maxUploadSizeFormatted . '. Your server PHP settings limit uploads to this size.',
+        ];
+    }
 
     public function mount($productId = null)
     {
+        $this->maxUploadSize = ImageService::getMaxUploadSize();
+        $this->maxUploadSizeFormatted = ImageService::getMaxUploadSizeFormatted();
+        
         if ($productId) {
             $this->product = Product::findOrFail($productId);
             $this->loadExistingImages();
@@ -55,22 +74,44 @@ class ImageUploader extends Component
         }
 
         $sortOrder = $this->product->images()->max('sort_order') ?? 0;
+        $uploadedCount = 0;
+        $errors = [];
 
-        foreach ($this->images as $image) {
-            $path = $image->store('products', 'public');
-            
-            $this->product->images()->create([
-                'image_path' => $path,
-                'thumbnail_path' => $path, // In production, generate actual thumbnail
-                'is_primary' => $this->product->images()->count() === 0,
-                'sort_order' => ++$sortOrder,
-            ]);
+        foreach ($this->images as $index => $image) {
+            try {
+                // Validate file size against PHP ini limits
+                if (!ImageService::validateFileSize($image)) {
+                    $errors[] = "Image " . ($index + 1) . " exceeds maximum size of {$this->maxUploadSizeFormatted}";
+                    continue;
+                }
+
+                // Process and convert to WebP with compression (quality: 85)
+                $path = ImageService::processAndStore($image, 'products', 85);
+                
+                $this->product->images()->create([
+                    'image_path' => $path,
+                    'thumbnail_path' => $path, // Same path, no separate thumbnail
+                    'is_primary' => $this->product->images()->count() === 0,
+                    'sort_order' => ++$sortOrder,
+                ]);
+                
+                $uploadedCount++;
+            } catch (\Exception $e) {
+                $errors[] = "Image " . ($index + 1) . ": " . $e->getMessage();
+            }
         }
 
         $this->images = [];
         $this->loadExistingImages();
         $this->dispatch('images-uploaded');
-        session()->flash('success', 'Images uploaded successfully!');
+        
+        if ($uploadedCount > 0) {
+            session()->flash('success', "{$uploadedCount} image(s) uploaded and converted to WebP successfully!");
+        }
+        
+        if (!empty($errors)) {
+            session()->flash('error', implode('. ', $errors));
+        }
     }
 
     public function setPrimary($imageId)

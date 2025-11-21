@@ -6,6 +6,7 @@ use App\Modules\Ecommerce\Brand\Models\Brand;
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Product\Services\ProductService;
+use App\Services\ImageService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -74,6 +75,10 @@ class ProductForm extends Component
     public $showBrandModal = false;
     public $newCategoryName = '';
     public $newBrandName = '';
+    
+    // Upload size limits
+    public $maxUploadSize;
+    public $maxUploadSizeFormatted;
 
     protected $listeners = [
         'variationAdded' => 'addTempVariation',
@@ -83,6 +88,8 @@ class ProductForm extends Component
 
     protected function rules()
     {
+        $maxSize = ImageService::getMaxUploadSize() / 1024; // Convert to KB for Laravel validation
+        
         $rules = [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:products,slug,' . ($this->product->id ?? 'NULL'),
@@ -94,7 +101,7 @@ class ProductForm extends Component
             'product_type' => 'required|in:simple,grouped,affiliate,variable',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
-            'images.*' => 'nullable|image|max:2048', // Max 2MB per image
+            'images.*' => "nullable|image|max:{$maxSize}", // Dynamic max size from PHP ini
         ];
 
         if ($this->product_type === 'simple' || $this->product_type === 'grouped') {
@@ -130,11 +137,17 @@ class ProductForm extends Component
             'variant.price.required' => 'Regular price is required.',
             'variant.sale_price.lt' => 'Sale price must be less than regular price.',
             'variant.stock_quantity.required' => 'Stock quantity is required.',
+            'images.*.image' => 'Each file must be an image (JPEG, PNG, GIF, BMP, or WebP).',
+            'images.*.max' => 'Each image must not exceed ' . ImageService::getMaxUploadSizeFormatted() . '. Your server PHP settings limit uploads to this size.',
         ];
     }
 
     public function mount(?Product $product = null)
     {
+        // Initialize upload size limits
+        $this->maxUploadSize = ImageService::getMaxUploadSize();
+        $this->maxUploadSizeFormatted = ImageService::getMaxUploadSizeFormatted();
+        
         if ($product && $product->exists) {
             $this->isEdit = true;
             $this->isNewProduct = false;
