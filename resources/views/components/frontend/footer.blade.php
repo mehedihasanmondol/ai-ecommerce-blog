@@ -21,6 +21,7 @@
             @php
                 $featuredPosts = \App\Modules\Blog\Models\Post::where('is_featured', true)
                     ->where('status', 'published')
+                    ->with('media')
                     ->latest('published_at')
                     ->take(6)
                     ->get();
@@ -29,10 +30,16 @@
             @foreach($featuredPosts->take(3) as $post)
             <a href="{{ route('products.show', $post->slug) }}" class="group">
                 <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    @if($post->featured_image)
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                             alt="{{ $post->title }}" 
-                             class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                    @if($post->media || $post->featured_image)
+                        @if($post->media)
+                            <img src="{{ $post->media->small_url }}" 
+                                 alt="{{ $post->title }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @elseif($post->featured_image)
+                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                                 alt="{{ $post->title }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @endif
                     @else
                         <div class="w-full h-32 bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
                             <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,10 +73,16 @@
             @foreach($featuredPosts->slice(3, 3) as $post)
             <a href="{{ route('products.show', $post->slug) }}" class="group">
                 <div class="bg-gray-100 rounded-lg overflow-hidden mb-2">
-                    @if($post->featured_image)
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                             alt="{{ $post->title }}" 
-                             class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                    @if($post->media || $post->featured_image)
+                        @if($post->media)
+                            <img src="{{ $post->media->small_url }}" 
+                                 alt="{{ $post->title }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @elseif($post->featured_image)
+                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                                 alt="{{ $post->title }}" 
+                                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                        @endif
                     @else
                         <div class="w-full h-32 bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
                             <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

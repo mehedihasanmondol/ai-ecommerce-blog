@@ -190,10 +190,11 @@ php artisan config:clear
 11. ✅ `resources/views/frontend/blog/tag.blade.php` - Check media first, then featured_image
 12. ✅ `resources/views/frontend/blog/search.blade.php` - Check media first, then featured_image
 13. ✅ `resources/views/components/blog/post-card.blade.php` - Check media first, then featured_image
+14. ✅ `resources/views/components/frontend/footer.blade.php` - Check media first, then featured_image (6 featured posts)
 
 ### Documentation:
-14. ✅ `development-docs/blog-post-universal-image-uploader-integration.md` - Updated table references
-15. ✅ `development-docs/blog-post-image-upload-fixes.md` - Detailed fix documentation
+15. ✅ `development-docs/blog-post-universal-image-uploader-integration.md` - Updated table references
+16. ✅ `development-docs/blog-post-image-upload-fixes.md` - Detailed fix documentation
 
 ## Key Learnings
 
