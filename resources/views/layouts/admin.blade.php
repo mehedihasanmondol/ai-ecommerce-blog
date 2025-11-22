@@ -26,12 +26,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/2.1.0/cropper.min.css" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js', 'resources/js/ckeditor-init.js'])
     
     <!-- Alpine.js Collapse Plugin -->
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     
     @livewireStyles
+    
+    <!-- Page-specific styles -->
+    @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-100" x-data="{ sidebarOpen: true, mobileMenuOpen: false }">
     <!-- Toast Notification -->

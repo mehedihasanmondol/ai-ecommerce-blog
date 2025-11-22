@@ -9,9 +9,12 @@ import {
     Heading,
     Link,
     List,
+    ListProperties,
     BlockQuote,
     Table,
     TableToolbar,
+    TableProperties,
+    TableCellProperties,
     Image,
     ImageToolbar,
     ImageCaption,
@@ -33,7 +36,8 @@ import {
     FindAndReplace,
     SpecialCharacters,
     SpecialCharactersEssentials,
-    WordCount
+    WordCount,
+    Fullscreen
 } from 'ckeditor5';
 
 import 'ckeditor5/ckeditor5.css';
@@ -58,9 +62,12 @@ export function initCKEditor(selector, options = {}) {
             Heading,
             Link,
             List,
+            ListProperties,
             BlockQuote,
             Table,
             TableToolbar,
+            TableProperties,
+            TableCellProperties,
             Image,
             ImageToolbar,
             ImageCaption,
@@ -82,7 +89,8 @@ export function initCKEditor(selector, options = {}) {
             FindAndReplace,
             SpecialCharacters,
             SpecialCharactersEssentials,
-            WordCount
+            WordCount,
+            Fullscreen
         ],
         toolbar: {
             items: [
@@ -90,60 +98,86 @@ export function initCKEditor(selector, options = {}) {
                 '|',
                 'heading',
                 '|',
-                'bold', 'italic', 'underline', 'strikethrough',
+                'bold', 'italic', 'underline',
                 '|',
-                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
-                '|',
-                'alignment',
-                '|',
-                'link', 'uploadImage', 'mediaEmbed', 'blockQuote', 'insertTable', 'codeBlock',
+                 'uploadImage', 'blockQuote',
                 '|',
                 'bulletedList', 'numberedList',
                 '|',
+                'fullscreen',
+                '|',
+                'alignment',
+                '|',
+                'link',
+                '|', // Additional features dropdown
+                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',
+                '|',
+                'insertTable', 'mediaEmbed', 'codeBlock',
+                '|',
                 'outdent', 'indent',
                 '|',
-                'subscript', 'superscript', 'code',
+                'strikethrough', 'subscript', 'superscript', 'code',
                 '|',
                 'specialCharacters', 'horizontalLine',
                 '|',
-                'findAndReplace',
-                '|',
-                'removeFormat',
+                'findAndReplace', 'removeFormat',
                 '|',
                 'sourceEditing'
             ],
-            shouldNotGroupWhenFull: true
+            shouldNotGroupWhenFull: false // Enable toolbar wrapping/grouping
         },
         heading: {
             options: [
-                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-                { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' }
+                { 
+                    model: 'paragraph', 
+                    title: 'Paragraph', 
+                    class: 'ck-heading_paragraph'
+                },
+                { 
+                    model: 'heading1', 
+                    view: { name: 'h1', classes: 'text-4xl font-extrabold text-gray-900 leading-tight mt-0 mb-4' }, 
+                    title: 'Heading 1', 
+                    class: 'text-4xl font-extrabold ck-heading_heading1' 
+                },
+                { 
+                    model: 'heading2', 
+                    view: { name: 'h2', classes: 'text-3xl font-bold text-gray-800 leading-snug mt-6 mb-3' }, 
+                    title: 'Heading 2', 
+                    class: 'text-3xl font-bold ck-heading_heading2' 
+                },
+                { 
+                    model: 'heading3', 
+                    view: { name: 'h3', classes: 'text-2xl font-semibold text-gray-700 leading-normal mt-5 mb-2' }, 
+                    title: 'Heading 3', 
+                    class: 'text-2xl font-semibold ck-heading_heading3' 
+                },
+                { 
+                    model: 'heading4', 
+                    view: { name: 'h4', classes: 'text-xl font-semibold text-gray-600 leading-relaxed mt-4 mb-2' }, 
+                    title: 'Heading 4', 
+                    class: 'text-xl font-semibold ck-heading_heading4' 
+                }
             ]
         },
         fontSize: {
             options: [
-                'tiny',
-                'small',
-                'default',
-                'big',
-                'huge'
-            ]
+                { title: 'Tiny', model: '0.75rem', view: { name: 'span', classes: 'text-xs', styles: { 'font-size': '0.75rem' } } },
+                { title: 'Small', model: '0.875rem', view: { name: 'span', classes: 'text-sm', styles: { 'font-size': '0.875rem' } } },
+                // { title: 'Default', model: 'default', view: { name: 'span', classes: 'text-base', styles: { 'font-size': '0.875rem' }  } },
+                { title: 'Large', model: '1.125rem', view: { name: 'span', classes: 'text-lg', styles: { 'font-size': '1.125rem' } } },
+                { title: 'Extra Large', model: '1.25rem', view: { name: 'span', classes: 'text-xl', styles: { 'font-size': '1.25rem' } } },
+                { title: 'Huge', model: '1.5rem', view: { name: 'span', classes: 'text-2xl', styles: { 'font-size': '1.5rem' } } }
+            ],
+            supportAllValues: true
         },
         fontFamily: {
             options: [
-                'default',
-                'Arial, Helvetica, sans-serif',
-                'Courier New, Courier, monospace',
-                'Georgia, serif',
-                'Lucida Sans Unicode, Lucida Grande, sans-serif',
-                'Tahoma, Geneva, sans-serif',
-                'Times New Roman, Times, serif',
-                'Trebuchet MS, Helvetica, sans-serif',
-                'Verdana, Geneva, sans-serif'
-            ]
+                { title: 'Default', model: undefined, view: { name: 'span', classes: 'font-sans' } },
+                { title: 'Sans Serif', model: 'ui-sans-serif, system-ui, sans-serif', view: { name: 'span', classes: 'font-sans' } },
+                { title: 'Serif', model: 'ui-serif, Georgia, serif', view: { name: 'span', classes: 'font-serif' } },
+                { title: 'Monospace', model: 'ui-monospace, monospace', view: { name: 'span', classes: 'font-mono' } }
+            ],
+            supportAllValues: true
         },
         image: {
             toolbar: [
@@ -155,14 +189,88 @@ export function initCKEditor(selector, options = {}) {
                 'imageTextAlternative',
                 '|',
                 'linkImage'
-            ]
+            ],
+            styles: {
+                options: [
+                    {
+                        name: 'inline',
+                        title: 'Inline',
+                        icon: 'left',
+                        modelElements: ['imageInline'],
+                        className: 'inline-block max-w-full h-auto'
+                    },
+                    {
+                        name: 'block',
+                        title: 'Block',
+                        icon: 'center',
+                        modelElements: ['imageBlock'],
+                        className: 'block max-w-full h-auto rounded-lg shadow-md my-6 mx-auto'
+                    },
+                    {
+                        name: 'side',
+                        title: 'Side',
+                        icon: 'right',
+                        modelElements: ['imageBlock'],
+                        className: 'float-right ml-4 mb-4 max-w-sm rounded-lg shadow-md'
+                    }
+                ]
+            }
         },
         table: {
             contentToolbar: [
                 'tableColumn',
                 'tableRow',
-                'mergeTableCells'
-            ]
+                'mergeTableCells',
+                'tableProperties',
+                'tableCellProperties'
+            ],
+            tableProperties: {
+                borderColors: [
+                    { color: '#e5e7eb', label: 'Gray' },
+                    { color: '#3b82f6', label: 'Blue' },
+                    { color: '#10b981', label: 'Green' },
+                    { color: '#ef4444', label: 'Red' },
+                    { color: '#000000', label: 'Black' }
+                ],
+                backgroundColors: [
+                    { color: '#ffffff', label: 'White' },
+                    { color: '#f9fafb', label: 'Gray 50' },
+                    { color: '#f3f4f6', label: 'Gray 100' },
+                    { color: '#e5e7eb', label: 'Gray 200' },
+                    { color: '#dbeafe', label: 'Blue 100' },
+                    { color: '#dcfce7', label: 'Green 100' },
+                    { color: '#fef3c7', label: 'Yellow 100' }
+                ],
+                defaultProperties: {
+                    borderStyle: 'solid',
+                    borderWidth: '1px',
+                    borderColor: '#e5e7eb',
+                    alignment: 'left',
+                    width: '100%',
+                    height: 'auto'
+                }
+            },
+            tableCellProperties: {
+                borderColors: [
+                    { color: '#e5e7eb', label: 'Gray' },
+                    { color: '#3b82f6', label: 'Blue' },
+                    { color: '#10b981', label: 'Green' }
+                ],
+                backgroundColors: [
+                    { color: '#ffffff', label: 'White' },
+                    { color: '#f9fafb', label: 'Gray 50' },
+                    { color: '#f3f4f6', label: 'Gray 100' },
+                    { color: '#dbeafe', label: 'Blue 100' },
+                    { color: '#dcfce7', label: 'Green 100' },
+                    { color: '#fef3c7', label: 'Yellow 100' }
+                ],
+                defaultProperties: {
+                    padding: '0.75rem',
+                    borderStyle: 'solid',
+                    borderWidth: '1px',
+                    borderColor: '#e5e7eb'
+                }
+            }
         },
         link: {
             decorators: {
@@ -173,7 +281,96 @@ export function initCKEditor(selector, options = {}) {
                         target: '_blank',
                         rel: 'noopener noreferrer'
                     }
+                },
+                defaultLink: {
+                    mode: 'automatic',
+                    callback: url => url,
+                    attributes: {
+                        class: 'text-blue-600 hover:text-blue-800 underline transition-colors'
+                    }
                 }
+            },
+            addTargetToExternalLinks: true,
+            defaultProtocol: 'https://'
+        },
+        alignment: {
+            options: [
+                { name: 'left', className: 'text-left' },
+                { name: 'center', className: 'text-center' },
+                { name: 'right', className: 'text-right' },
+                { name: 'justify', className: 'text-justify' }
+            ]
+        },
+        codeBlock: {
+            languages: [
+                { language: 'plaintext', label: 'Plain text', class: 'language-plaintext' },
+                { language: 'javascript', label: 'JavaScript', class: 'language-javascript' },
+                { language: 'php', label: 'PHP', class: 'language-php' },
+                { language: 'html', label: 'HTML', class: 'language-html' },
+                { language: 'css', label: 'CSS', class: 'language-css' },
+                { language: 'python', label: 'Python', class: 'language-python' },
+                { language: 'java', label: 'Java', class: 'language-java' },
+                { language: 'sql', label: 'SQL', class: 'language-sql' },
+                { language: 'json', label: 'JSON', class: 'language-json' }
+            ]
+        },
+        list: {
+            properties: {
+                styles: {
+                    useAttribute: false, // Use CSS list-style-type for better Tailwind integration
+                    listStyleTypes: {
+                        numbered: ['decimal', 'lower-alpha', 'upper-alpha', 'lower-roman', 'upper-roman'],
+                        bulleted: ['disc', 'circle', 'square']
+                    }
+                },
+                startIndex: true,
+                reversed: true
+            }
+        },
+        mediaEmbed: {
+            previewsInData: true,
+            providers: [
+                {
+                    name: 'youtube',
+                    url: [
+                        /^(?:m\.)?youtube\.com\/watch\?v=([\w-]+)/,
+                        /^(?:m\.)?youtube\.com\/v\/([\w-]+)/,
+                        /^youtube\.com\/embed\/([\w-]+)/,
+                        /^youtu\.be\/([\w-]+)/
+                    ],
+                    html: match => {
+                        const id = match[1];
+                        return (
+                            '<div class="aspect-w-16 aspect-h-9 my-6">' +
+                                `<iframe src="https://www.youtube.com/embed/${id}" ` +
+                                'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen ' +
+                                'class="w-full h-full rounded-lg shadow-lg">' +
+                                '</iframe>' +
+                            '</div>'
+                        );
+                    }
+                },
+                {
+                    name: 'vimeo',
+                    url: /^vimeo\.com\/(\d+)/,
+                    html: match => {
+                        const id = match[1];
+                        return (
+                            '<div class="aspect-w-16 aspect-h-9 my-6">' +
+                                `<iframe src="https://player.vimeo.com/video/${id}" ` +
+                                'frameborder="0" allow="autoplay; fullscreen" allowfullscreen ' +
+                                'class="w-full h-full rounded-lg shadow-lg">' +
+                                '</iframe>' +
+                            '</div>'
+                        );
+                    }
+                }
+            ]
+        },
+        htmlEmbed: {
+            showPreviews: true,
+            sanitizeHtml: (inputHtml) => {
+                return { html: inputHtml, hasChanged: false };
             }
         },
         placeholder: 'Write your content here...',

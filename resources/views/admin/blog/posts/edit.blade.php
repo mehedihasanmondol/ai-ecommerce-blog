@@ -3,30 +3,15 @@
 @section('title', 'Edit Post')
 
 @push('styles')
-@vite('resources/js/ckeditor-init.js')
 <style>
 /* CKEditor Custom Styling */
-.ck-editor__editable {
-    min-height: 500px;
-    max-height: 800px;
+
+/* Force list markers to display (override Tailwind reset) */
+.ck-content ul,
+.ck-content ol {
+    margin-left: 20px;
 }
-.ck.ck-editor {
-    border-radius: 0.5rem;
-}
-.ck.ck-toolbar {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-    background: #f8f9fa !important;
-}
-.ck.ck-editor__main > .ck-editor__editable {
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-}
-.char-counter {
-    margin-top: 1rem;
-    font-size: 0.75rem;
-    color: #64748b;
-}
+
 </style>
 @endpush
 
@@ -123,7 +108,7 @@
 
 
                     <!-- Content Editor - CKEditor 5 -->
-                    <div class="bg-white rounded-lg shadow p-6">
+                    <div class="bg-white rounded-lg shadow p-6 prose prose-lg max-w-none">
                         <label class="block text-sm font-medium text-gray-700 mb-3">Content *</label>
                         <textarea name="content" 
                                   id="ckeditor" 
