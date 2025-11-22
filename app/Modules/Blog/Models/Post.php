@@ -3,6 +3,7 @@
 namespace App\Modules\Blog\Models;
 
 use App\Models\User;
+use App\Models\Media;
 use App\Modules\Blog\Models\TickMark;
 use App\Traits\HasSeo;
 use App\Traits\HasUniqueSlug;
@@ -56,6 +57,7 @@ class Post extends Model
         'content',
         'author_id',
         'blog_category_id',
+        'media_id',
         'featured_image',
         'featured_image_alt',
         'youtube_url',
@@ -114,6 +116,14 @@ class Post extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    /**
+     * Get the featured image media
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'media_id');
     }
 
     /**

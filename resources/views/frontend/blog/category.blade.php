@@ -176,7 +176,7 @@
                         @forelse($posts as $post)
                         <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
                             <div class="md:flex">
-                                @if($post->youtube_url || $post->featured_image)
+                                @if($post->youtube_url || $post->media || $post->featured_image)
                                 <div class="md:w-1/3 relative">
                                     @if($post->youtube_url)
                                         <!-- YouTube Video Thumbnail -->
@@ -202,6 +202,10 @@
                                             </svg>
                                             VIDEO
                                         </div>
+                                    @elseif($post->media)
+                                        <img src="{{ $post->media->medium_url }}" 
+                                             alt="{{ $post->featured_image_alt ?? $post->title }}" 
+                                             class="w-full h-48 md:h-full object-cover">
                                     @elseif($post->featured_image)
                                         <img src="{{ asset('storage/' . $post->featured_image) }}" 
                                              alt="{{ $post->featured_image_alt }}" 
@@ -209,7 +213,7 @@
                                     @endif
                                 </div>
                                 @endif
-                                <div class="p-6 {{ $post->youtube_url || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
+                                <div class="p-6 {{ $post->youtube_url || $post->media || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
                                     <div class="flex items-center gap-2 mb-3">
                                         <span class="inline-block bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full">
                                             {{ $category->name }}

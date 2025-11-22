@@ -160,32 +160,36 @@
                         @forelse($posts as $post)
                         <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition duration-300">
                             <div class="md:flex">
-                                @if($post->youtube_url || $post->featured_image)
+                                @if($post->youtube_url || $post->media || $post->featured_image)
                                 <div class="md:w-1/3 relative">
                                     @if($post->youtube_url)
                                         <!-- YouTube Video Thumbnail -->
-                                        <img src="https://img.youtube.com/vi/{{ $post->youtube_video_id }}/maxresdefault.jpg" 
-                                             alt="{{ $post->title }}"
-                                             class="w-full h-48 md:h-full object-cover"
-                                             onerror="this.src='https://img.youtube.com/vi/{{ $post->youtube_video_id }}/hqdefault.jpg'">
-                                        
-                                        <!-- Video Play Badge -->
-                                        <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                                            <div class="bg-red-600 rounded-full p-3 shadow-lg">
-                                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                                        <div class="aspect-video overflow-hidden relative">
+                                            <img src="https://img.youtube.com/vi/{{ $post->youtube_video_id }}/maxresdefault.jpg" 
+                                                 alt="{{ $post->title }}"
+                                                 class="w-full h-full object-cover"
+                                                 onerror="this.src='https://img.youtube.com/vi/{{ $post->youtube_video_id }}/hqdefault.jpg'">
+                                            
+                                            <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                                <div class="bg-red-600 rounded-full p-3">
+                                                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="absolute top-3 right-3 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                                                 </svg>
+                                                VIDEO
                                             </div>
                                         </div>
-                                        
-                                        <!-- YouTube Badge -->
-                                        <div class="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                            VIDEO
-                                        </div>
+                                    @elseif($post->media)
+                                        <img src="{{ $post->media->medium_url }}" 
+                                             alt="{{ $post->featured_image_alt ?? $post->title }}" 
+                                             class="w-full h-48 md:h-full object-cover">
                                     @elseif($post->featured_image)
                                         <img src="{{ asset('storage/' . $post->featured_image) }}" 
                                              alt="{{ $post->featured_image_alt }}" 
@@ -193,7 +197,7 @@
                                     @endif
                                 </div>
                                 @endif
-                                <div class="p-6 {{ $post->youtube_url || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
+                                <div class="p-6 {{ $post->youtube_url || $post->media || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
                                     @if($post->category)
                                     <a href="{{ route('blog.category', $post->category->slug) }}" 
                                        class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full mb-3 hover:bg-gray-200">

@@ -103,7 +103,7 @@ class BlogController extends Controller
         }
         
         // Paginate
-        $posts = $query->with(['author', 'category', 'tags', 'tickMarks'])->paginate($perPage)->appends($request->query());
+        $posts = $query->with(['author', 'category', 'tags', 'tickMarks', 'media'])->paginate($perPage)->appends($request->query());
         
         $featuredPosts = $this->postService->getFeaturedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
@@ -143,6 +143,7 @@ class BlogController extends Controller
         $post = $this->postService->getPostBySlug($slug);
         $post->load('author.authorProfile'); // Eager load author profile
         $post->load('products.variants', 'products.images', 'products.brand'); // Eager load products for Shop This Article
+        $post->load('media'); // Eager load featured image media
         $relatedPosts = $post->relatedPosts(3);
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
@@ -165,11 +166,13 @@ class BlogController extends Controller
                 ? $post->meta_keywords 
                 : ($post->category ? $post->category->name . ', ' : '') . 'blog, article, ' . \App\Models\SiteSetting::get('blog_keywords', 'health, wellness'),
             
-            'og_image' => $post->featured_image 
-                ? asset('storage/' . $post->featured_image) 
-                : (\App\Models\SiteSetting::get('blog_image') 
-                    ? asset('storage/' . \App\Models\SiteSetting::get('blog_image'))
-                    : asset('images/og-default.jpg')),
+            'og_image' => ($post->media && $post->media->large_url)
+                ? $post->media->large_url
+                : ($post->featured_image 
+                    ? asset('storage/' . $post->featured_image) 
+                    : (\App\Models\SiteSetting::get('blog_image') 
+                        ? asset('storage/' . \App\Models\SiteSetting::get('blog_image'))
+                        : asset('images/og-default.jpg'))),
             
             'og_type' => 'article',
             'canonical' => url($post->slug),
@@ -244,7 +247,7 @@ class BlogController extends Controller
         }
         
         // Paginate
-        $posts = $query->with(['author', 'tags', 'tickMarks'])->paginate($perPage)->appends($request->query());
+        $posts = $query->with(['author', 'tags', 'tickMarks', 'media'])->paginate($perPage)->appends($request->query());
         
         // Prepare SEO data for blog category page - use category's SEO settings if exist, otherwise use defaults
         $blogTitle = SiteSetting::get('blog_title', 'Blog');
@@ -331,7 +334,7 @@ class BlogController extends Controller
         }
         
         // Paginate
-        $posts = $postsQuery->with(['author', 'category', 'tags', 'tickMarks'])
+        $posts = $postsQuery->with(['author', 'category', 'tags', 'tickMarks', 'media'])
             ->paginate($perPage)
             ->appends($request->query());
         
@@ -378,7 +381,7 @@ class BlogController extends Controller
         
         // Get published posts by this author with sorting
         $postsQuery = $author->publishedPosts()
-            ->with(['category', 'tags']);
+            ->with(['category', 'tags', 'media']);
         
         // Apply sorting
         switch ($sort) {

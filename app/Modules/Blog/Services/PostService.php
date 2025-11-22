@@ -76,8 +76,8 @@ class PostService
     {
         DB::beginTransaction();
         try {
-            // Handle featured image upload
-            if (isset($data['featured_image']) && $data['featured_image']) {
+            // Handle featured image upload (legacy support - prefer media_id)
+            if (isset($data['featured_image']) && $data['featured_image'] && !isset($data['media_id'])) {
                 $data['featured_image'] = $this->uploadFeaturedImage($data['featured_image']);
             }
 
@@ -119,7 +119,7 @@ class PostService
             //     ->log('Created blog post');
 
             DB::commit();
-            return $post->load(['categories', 'tags']);
+            return $post->load(['categories', 'tags', 'media']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
@@ -135,8 +135,8 @@ class PostService
         try {
             $post = $this->getPost($id);
 
-            // Handle featured image upload
-            if (isset($data['featured_image']) && $data['featured_image']) {
+            // Handle featured image upload (legacy support - prefer media_id)
+            if (isset($data['featured_image']) && $data['featured_image'] && !isset($data['media_id'])) {
                 // Delete old image
                 if ($post->featured_image) {
                     Storage::disk('public')->delete($post->featured_image);
@@ -171,7 +171,7 @@ class PostService
             //     ->log('Updated blog post');
 
             DB::commit();
-            return $post->load(['categories', 'tags']);
+            return $post->load(['categories', 'tags', 'media']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

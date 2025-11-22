@@ -222,11 +222,17 @@
                     </div>
 
                     <!-- Featured Image -->
-                    @if($post->featured_image)
+                    @if($post->media || $post->featured_image)
                     <div class="px-8 pb-8">
-                        <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                             alt="{{ $post->featured_image_alt }}" 
-                             class="w-full rounded-xl">
+                        @if($post->media)
+                            <img src="{{ $post->media->large_url }}" 
+                                 alt="{{ $post->featured_image_alt ?? $post->title }}" 
+                                 class="w-full rounded-xl">
+                        @elseif($post->featured_image)
+                            <img src="{{ asset('storage/' . $post->featured_image) }}" 
+                                 alt="{{ $post->featured_image_alt }}" 
+                                 class="w-full rounded-xl">
+                        @endif
                     </div>
                     @endif
 
@@ -359,10 +365,16 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     @foreach($relatedPosts as $related)
                     <article class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition duration-300">
-                        @if($related->featured_image)
-                        <img src="{{ asset('storage/' . $related->featured_image) }}" 
-                             alt="{{ $related->title }}" 
-                             class="w-full h-40 object-cover">
+                        @if($related->media || $related->featured_image)
+                            @if($related->media)
+                                <img src="{{ $related->media->medium_url }}" 
+                                     alt="{{ $related->title }}" 
+                                     class="w-full h-40 object-cover">
+                            @elseif($related->featured_image)
+                                <img src="{{ asset('storage/' . $related->featured_image) }}" 
+                                     alt="{{ $related->title }}" 
+                                     class="w-full h-40 object-cover">
+                            @endif
                         @endif
                         <div class="p-4">
                             <h3 class="font-bold text-gray-900 mb-2 hover:text-blue-600">

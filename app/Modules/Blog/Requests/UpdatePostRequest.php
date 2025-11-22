@@ -23,6 +23,7 @@ class UpdatePostRequest extends FormRequest
             'blog_category_id' => 'nullable|exists:blog_categories,id',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:blog_categories,id',
+            'media_id' => 'nullable|exists:media_library,id',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'featured_image_alt' => 'nullable|string|max:255',
             'youtube_url' => 'nullable|url|max:500',

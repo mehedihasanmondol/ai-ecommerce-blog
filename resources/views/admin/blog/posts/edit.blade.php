@@ -287,50 +287,7 @@
                     <div class="bg-white rounded-lg shadow p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Featured Image</h3>
                         
-                        <!-- Current Image -->
-                        @if($post->featured_image)
-                        <div id="current-image-container" class="mb-4">
-                            <div class="relative inline-block">
-                                <img src="{{ asset('storage/' . $post->featured_image) }}" 
-                                     alt="{{ $post->featured_image_alt }}" 
-                                     class="w-full max-w-md h-auto rounded-lg border-2 border-gray-200 shadow-sm">
-                                <div class="mt-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" 
-                                               name="remove_featured_image" 
-                                               value="1"
-                                               onchange="toggleCurrentImage(this)"
-                                               class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                                        <span class="ml-2 text-sm text-red-600">Remove current image</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                        
-                        <!-- New Image Preview -->
-                        <div id="new-image-preview-container" class="hidden mb-4">
-                            <div class="relative inline-block">
-                                <img id="new-image-preview" src="" alt="New Preview" 
-                                     class="w-full max-w-md h-auto rounded-lg border-2 border-green-200 shadow-sm">
-                                <button type="button" 
-                                        onclick="removeNewImagePreview()"
-                                        class="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 shadow-lg transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                </button>
-                                <p class="text-xs text-green-600 mt-2 font-medium">New image (will replace current)</p>
-                            </div>
-                        </div>
-
-                        <input type="file" 
-                               name="featured_image" 
-                               id="featured-image-input"
-                               accept="image/*"
-                               onchange="previewFeaturedImage(event)"
-                               class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                        <p class="mt-2 text-xs text-gray-500">Max size: 2MB (JPG, PNG, WebP)</p>
+                        @livewire('admin.blog.post-image-handler', ['post' => $post])
                         
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Alt Text</label>
@@ -575,14 +532,8 @@
     </div>
 </div>
 
-<!-- Universal Image Uploader for CKEditor -->
-@livewire('universal-image-uploader', [
-    'multiple' => false,
-    'disk' => 'public',
-    'maxFileSize' => 5,
-    'libraryScope' => 'global',
-    'targetField' => 'ckeditor_upload'
-])
+<!-- Universal Image Uploader (used for both CKEditor and Featured Image) -->
+<livewire:universal-image-uploader />
 
 <!-- Add New Category Modal - Modern Style -->
 <div id="categoryModal" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999;" x-data="{ show: false }">
