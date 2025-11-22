@@ -70,9 +70,7 @@ class SitemapController extends Controller
                 'lastmod' => $product->updated_at->toIso8601String(),
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
-                'image' => $product->images->where('is_primary', true)->first()?->image_path 
-                    ? asset('storage/' . $product->images->where('is_primary', true)->first()->image_path)
-                    : null,
+                'image' => $product->getPrimaryThumbnailUrl(), // Use media library
             ];
         }
         

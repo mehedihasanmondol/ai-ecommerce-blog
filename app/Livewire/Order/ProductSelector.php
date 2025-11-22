@@ -89,15 +89,8 @@ class ProductSelector extends Component
             return;
         }
 
-        // Get image URL
-        $imageUrl = null;
-        if ($product->images && $product->images->count() > 0) {
-            $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-            $imageUrl = $primaryImage ? asset('storage/' . $primaryImage->image_path) : null;
-        }
-        if (!$imageUrl && $variant && $variant->image) {
-            $imageUrl = asset('storage/' . $variant->image);
-        }
+        // Get image URL from media library
+        $imageUrl = $product->getPrimaryThumbnailUrl();
         
         $productData = [
             'product_id' => $product->id,
