@@ -25,14 +25,17 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Profile Photo</label>
                     <div class="flex items-center space-x-6">
-                        <div class="flex-shrink-0">
-                            @if(auth()->user()->avatar)
-                                <img id="avatar-preview" 
-                                     src="{{ Storage::url(auth()->user()->avatar) }}" 
+                        <div class="flex-shrink-0" id="avatar-preview">
+                            @if(auth()->user()->media)
+                                <img src="{{ auth()->user()->media->medium_url }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">
+                            @elseif(auth()->user()->avatar)
+                                <img src="{{ Storage::url(auth()->user()->avatar) }}" 
                                      alt="{{ auth()->user()->name }}"
                                      class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">
                             @else
-                                <div id="avatar-preview" class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-4 border-gray-200">
+                                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center border-4 border-gray-200">
                                     <span class="text-white font-semibold text-3xl">
                                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                     </span>
@@ -254,14 +257,14 @@
 
 @push('scripts')
 <script>
-    // Preview avatar before upload
+    // Preview avatar before upload - Simple and reliable
     document.getElementById('avatar-input').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const preview = document.getElementById('avatar-preview');
-                preview.innerHTML = `<img src="${e.target.result}" alt="Avatar Preview" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">`;
+                preview.innerHTML = '<img src="' + e.target.result + '" alt="Avatar Preview" class="w-24 h-24 rounded-full object-cover border-4 border-gray-200">';
             };
             reader.readAsDataURL(file);
         }

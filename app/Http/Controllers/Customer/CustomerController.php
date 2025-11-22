@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Media;
 use App\Modules\Ecommerce\Order\Models\Order;
 use App\Modules\User\Services\UserService;
+use App\Services\ImageService;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -78,18 +82,58 @@ class CustomerController extends Controller
         ]);
 
         try {
-            // Handle avatar upload
+            // Handle avatar upload via media library
             if ($request->hasFile('avatar')) {
-                // Delete old avatar if exists
-                if ($user->avatar) {
+                $file = $request->file('avatar');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                
+                // Store original file
+                $path = $file->storeAs('media/user-avatars', $filename, 'public');
+                
+                // Generate thumbnails using Intervention Image v3
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getRealPath());
+                
+                // Generate thumbnail paths
+                $smallPath = 'media/user-avatars/small_' . $filename;
+                $mediumPath = 'media/user-avatars/medium_' . $filename;
+                $largePath = 'media/user-avatars/large_' . $filename;
+                
+                // Create thumbnails with cover fit
+                $image->cover(150, 150)->save(storage_path('app/public/' . $smallPath));
+                $image->cover(400, 400)->save(storage_path('app/public/' . $mediumPath));
+                $image->cover(800, 800)->save(storage_path('app/public/' . $largePath));
+                
+                // Create media record
+                $media = Media::create([
+                    'user_id' => $user->id,
+                    'original_filename' => $file->getClientOriginalName(),
+                    'filename' => $filename,
+                    'mime_type' => $file->getMimeType(),
+                    'extension' => $file->getClientOriginalExtension(),
+                    'size' => $file->getSize(),
+                    'disk' => 'public',
+                    'path' => $path,
+                    'large_path' => $largePath,
+                    'medium_path' => $mediumPath,
+                    'small_path' => $smallPath,
+                    'alt_text' => $user->name . ' avatar',
+                    'scope' => 'user',
+                ]);
+                
+                // Save media_id instead of direct file path
+                $validated['media_id'] = $media->id;
+                
+                // Remove avatar from validated data (we use media_id now)
+                unset($validated['avatar']);
+                
+                // Delete old legacy avatar if exists (backward compatibility cleanup)
+                if ($user->avatar && !$user->media_id) {
                     Storage::disk('public')->delete($user->avatar);
                 }
-
-                $avatarPath = $request->file('avatar')->store('avatars', 'public');
-                $validated['avatar'] = $avatarPath;
             }
 
-            $this->userService->update($user->id, $validated);
+            $this->userService->updateUser($user->id, $validated);
 
             return redirect()
                 ->route('customer.profile')
@@ -97,7 +141,7 @@ class CustomerController extends Controller
         } catch (\Exception $e) {
             return redirect()
                 ->back()
-                ->with('error', 'Failed to update profile. Please try again.');
+                ->with('error', 'Failed to update profile. Please try again.'.$e->getMessage());
         }
     }
 

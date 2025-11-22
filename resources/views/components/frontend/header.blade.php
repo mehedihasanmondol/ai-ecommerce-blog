@@ -271,7 +271,11 @@ function topbarSlider() {
                             @click="userMenuOpen = !userMenuOpen"
                             @click.away="userMenuOpen = false"
                             class="flex items-center text-gray-700 hover:text-green-600 transition">
-                            @if(auth()->user()->avatar)
+                            @if(auth()->user()->media)
+                                <img src="{{ auth()->user()->media->small_url }}" 
+                                     alt="{{ auth()->user()->name }}"
+                                     class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">
+                            @elseif(auth()->user()->avatar)
                                 <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
                                      alt="{{ auth()->user()->name }}"
                                      class="w-8 h-8 rounded-full object-cover border-2 border-gray-200">

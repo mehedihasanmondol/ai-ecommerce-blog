@@ -35,7 +35,11 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
                                         <div class="flex-shrink-0">
-                                            @if(auth()->user()->avatar)
+                                            @if(auth()->user()->media)
+                                                <img src="{{ auth()->user()->media->small_url }}" 
+                                                     alt="{{ auth()->user()->name }}"
+                                                     class="w-12 h-12 rounded-full object-cover">
+                                            @elseif(auth()->user()->avatar)
                                                 <img src="{{ Storage::url(auth()->user()->avatar) }}" 
                                                      alt="{{ auth()->user()->name }}"
                                                      class="w-12 h-12 rounded-full object-cover">
@@ -150,7 +154,11 @@
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
-                                        @if(auth()->user()->avatar)
+                                        @if(auth()->user()->media)
+                                            <img src="{{ auth()->user()->media->small_url }}" 
+                                                 alt="{{ auth()->user()->name }}"
+                                                 class="w-12 h-12 rounded-full object-cover">
+                                        @elseif(auth()->user()->avatar)
                                             <img src="{{ Storage::url(auth()->user()->avatar) }}" 
                                                  alt="{{ auth()->user()->name }}"
                                                  class="w-12 h-12 rounded-full object-cover">
