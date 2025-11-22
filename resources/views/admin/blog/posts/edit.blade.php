@@ -12,7 +12,6 @@
     margin-left: 20px;
 }
 
-
 </style>
 @endpush
 

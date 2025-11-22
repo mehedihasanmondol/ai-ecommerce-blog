@@ -242,11 +242,11 @@ export function initCKEditor(selector, options = {}) {
                     { color: '#fef3c7', label: 'Yellow 100' }
                 ],
                 defaultProperties: {
-                    borderStyle: 'solid',
-                    borderWidth: '1px',
+                    borderStyle: 'none',
+                    borderWidth: '0px',
                     borderColor: '#e5e7eb',
-                    alignment: 'left',
-                    width: '100%',
+                    alignment: 'center',
+                    width: 'auto',
                     height: 'auto'
                 }
             },
