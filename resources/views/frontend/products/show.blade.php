@@ -461,7 +461,15 @@
 @livewire('product.frequently-bought-together', ['product' => $product, 'relatedProducts' => $relatedProducts])
 
 <!-- Inspired by Browsing -->
-<x-inspired-by-browsing :products="$inspiredByBrowsing" />
+
+<!-- Recently Viewed Products -->
+@if($recentlyViewed->count() > 0)
+<div class=" py-8">
+    <div class="container mx-auto px-4">
+        <x-inspired-by-browsing :products="$recentlyViewed" />
+    </div>
+</div>
+@endif
 
 <!-- Product Overview Section -->
 @if($product->description)
@@ -536,13 +544,6 @@
     </div>
 </div>
 
-<!-- Recently Viewed Products -->
-@if($recentlyViewed->count() > 0)
-<div class="bg-gray-50 py-8">
-    <div class="container mx-auto px-4">
-        <x-related-products :products="$recentlyViewed" title="Recently Viewed" />
-    </div>
-</div>
-@endif
+
 
 @endsection

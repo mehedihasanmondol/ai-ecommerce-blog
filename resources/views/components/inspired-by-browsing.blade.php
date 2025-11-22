@@ -1,7 +1,7 @@
 @props(['products'])
 
 @if($products->count() > 0)
-<div class="bg-white py-8">
+<div class=" py-8">
     <div class="container mx-auto px-4">
         <!-- Section Header -->
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Inspired by your browsing</h2>
