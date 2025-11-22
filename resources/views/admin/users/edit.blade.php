@@ -163,35 +163,10 @@
                                     Avatar
                                 </span>
                             </label>
-                            <div class="flex items-center gap-4">
-                                @if($user->avatar)
-                                    <div class="h-24 w-24">
-                                        <img src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover border-4 border-blue-100 shadow-md hover:border-blue-300 transition-all">
-                                    </div>
-                                @else
-                                    <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center border-4 border-blue-100 shadow-md">
-                                        <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                                <div class="flex-1">
-                                    <input type="file" 
-                                           name="avatar" 
-                                           accept="image/*"
-                                           id="avatar-upload"
-                                           class="hidden"
-                                           onchange="previewAvatar(event)">
-                                    <label for="avatar-upload" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-blue-500 cursor-pointer transition-all duration-200">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                                        </svg>
-                                        Choose Image
-                                    </label>
-                                    <p class="mt-2 text-xs text-gray-500">JPG, PNG or GIF (MAX. 2MB)</p>
-                                </div>
-                            </div>
-                            @error('avatar')
+                            
+                            @livewire('admin.user.user-avatar-handler', ['user' => $user])
+                            
+                            @error('media_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -462,37 +437,12 @@
                                     <span class="text-xs text-gray-500 font-normal">(Optional - separate from user avatar)</span>
                                 </span>
                             </label>
-                            <div class="flex items-center gap-4">
-                                @if($user->authorProfile && $user->authorProfile->avatar)
-                                    <div class="h-24 w-24">
-                                        <img src="{{ Storage::url($user->authorProfile->avatar) }}" 
-                                             alt="{{ $user->name }}" 
-                                             id="author-avatar-preview"
-                                             class="h-24 w-24 rounded-full object-cover border-4 border-orange-100 shadow-md hover:border-orange-300 transition-all">
-                                    </div>
-                                @else
-                                    <div class="h-24 w-24 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center border-4 border-orange-100 shadow-md" id="author-avatar-placeholder">
-                                        <svg class="w-12 h-12 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                                <div class="flex-1">
-                                    <input type="file" 
-                                           name="author_avatar" 
-                                           accept="image/*"
-                                           id="author-avatar-upload"
-                                           class="hidden"
-                                           onchange="previewAuthorAvatar(event)">
-                                    <label for="author-avatar-upload" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-orange-500 cursor-pointer transition-all duration-200">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                                        </svg>
-                                        Choose Author Image
-                                    </label>
-                                    <p class="mt-2 text-xs text-gray-500">JPG, PNG or GIF (MAX. 2MB). This image will appear on blog posts.</p>
-                                </div>
-                            </div>
+                            
+                            @livewire('admin.user.author-avatar-handler', ['authorProfile' => $user->authorProfile])
+                            
+                            @error('author_media_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Featured Author -->
@@ -575,67 +525,14 @@
         </form>
     </div>
 </div>
+
+<!-- Universal Image Uploader -->
+<livewire:universal-image-uploader />
+
 @endsection
 
 @push('scripts')
 <script>
-function previewAvatar(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Find the avatar display area
-            const avatarGroup = event.target.closest('.group');
-            const avatarDisplay = avatarGroup.querySelector('.flex.items-center.gap-4');
-            
-            if (avatarDisplay) {
-                // Find existing image or placeholder
-                const existingImg = avatarDisplay.querySelector('img');
-                
-                if (existingImg) {
-                    // Update existing image
-                    existingImg.src = e.target.result;
-                } else {
-                    // Replace placeholder with new image
-                    const placeholder = avatarDisplay.querySelector('.h-24.w-24');
-                    if (placeholder) {
-                        placeholder.outerHTML = `
-                            <div class="h-24 w-24">
-                                <img src="${e.target.result}" alt="Preview" class="h-24 w-24 rounded-full object-cover border-4 border-blue-100 shadow-md hover:border-blue-300 transition-all">
-                            </div>
-                        `;
-                    }
-                }
-            }
-        }
-        reader.readAsDataURL(file);
-    }
-}
-
-function previewAuthorAvatar(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Find the author avatar preview
-            const existingImg = document.getElementById('author-avatar-preview');
-            const placeholder = document.getElementById('author-avatar-placeholder');
-            
-            if (existingImg) {
-                // Update existing image
-                existingImg.src = e.target.result;
-            } else if (placeholder) {
-                // Replace placeholder with new image
-                placeholder.outerHTML = `
-                    <div class="h-24 w-24">
-                        <img src="${e.target.result}" alt="Author Preview" id="author-avatar-preview" class="h-24 w-24 rounded-full object-cover border-4 border-orange-100 shadow-md hover:border-orange-300 transition-all">
-                    </div>
-                `;
-            }
-        }
-        reader.readAsDataURL(file);
-    }
-}
 
 function toggleAuthorSection() {
     const roleSelect = document.getElementById('user-role-select');

@@ -27,7 +27,11 @@
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="text-center">
-                    @if($user->avatar)
+                    @if($user->media)
+                        <img src="{{ $user->media->medium_url }}" 
+                             alt="{{ $user->name }}" 
+                             class="h-32 w-32 rounded-full object-cover mx-auto mb-4">
+                    @elseif($user->avatar)
                         <img src="{{ Storage::url($user->avatar) }}" 
                              alt="{{ $user->name }}" 
                              class="h-32 w-32 rounded-full object-cover mx-auto mb-4">

@@ -57,6 +57,7 @@ class User extends Authenticatable
         'is_active',
         'last_login_at',
         'avatar',
+        'media_id',
         'address',
         'city',
         'state',
@@ -250,5 +251,13 @@ class User extends Authenticatable
     public function authorProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(\App\Models\AuthorProfile::class);
+    }
+
+    /**
+     * Get the media (avatar) for this user
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Media::class, 'media_id');
     }
 }

@@ -220,7 +220,22 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex justify-center">
-                                @if($post->author->avatar)
+                                @if($post->author->authorProfile?->media)
+                                    <img src="{{ $post->author->authorProfile->media->small_url }}" 
+                                         alt="{{ $post->author->name }}"
+                                         title="{{ $post->author->name }}"
+                                         class="h-8 w-8 rounded-full object-cover">
+                                @elseif($post->author->authorProfile?->avatar)
+                                    <img src="{{ asset('storage/' . $post->author->authorProfile->avatar) }}" 
+                                         alt="{{ $post->author->name }}"
+                                         title="{{ $post->author->name }}"
+                                         class="h-8 w-8 rounded-full object-cover">
+                                @elseif($post->author->media)
+                                    <img src="{{ $post->author->media->small_url }}" 
+                                         alt="{{ $post->author->name }}"
+                                         title="{{ $post->author->name }}"
+                                         class="h-8 w-8 rounded-full object-cover">
+                                @elseif($post->author->avatar)
                                     <img src="{{ asset('storage/' . $post->author->avatar) }}" 
                                          alt="{{ $post->author->name }}"
                                          title="{{ $post->author->name }}"

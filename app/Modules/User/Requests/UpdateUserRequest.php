@@ -36,7 +36,8 @@ class UpdateUserRequest extends FormRequest
             'password' => ['nullable', 'string', 'min:4'],
             'role' => ['required', 'in:admin,customer,author'],
             'is_active' => ['boolean'],
-            'avatar' => ['nullable', 'image', 'max:2048'], // 2MB max
+            'avatar' => ['nullable', 'image', 'max:2048'], // 2MB max (legacy)
+            'media_id' => ['nullable', 'exists:media_library,id'], // Media library avatar
             'address' => ['nullable', 'string', 'max:500'],
             'city' => ['nullable', 'string', 'max:100'],
             'state' => ['nullable', 'string', 'max:100'],
@@ -55,7 +56,8 @@ class UpdateUserRequest extends FormRequest
             'author_instagram' => ['nullable', 'string', 'max:50'],
             'author_github' => ['nullable', 'string', 'max:50'],
             'author_youtube' => ['nullable', 'string', 'max:50'],
-            'author_avatar' => ['nullable', 'image', 'max:2048'],
+            'author_avatar' => ['nullable', 'image', 'max:2048'], // Legacy
+            'author_media_id' => ['nullable', 'exists:media_library,id'], // Media library author avatar
             'author_is_featured' => ['nullable', 'boolean'],
             'author_display_order' => ['nullable', 'integer', 'min:0'],
         ];

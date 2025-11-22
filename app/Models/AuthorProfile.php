@@ -42,6 +42,7 @@ class AuthorProfile extends Model
         'github',
         'youtube',
         'avatar',
+        'media_id',
         'is_featured',
         'display_order',
     ];
@@ -215,5 +216,13 @@ class AuthorProfile extends Model
     public function scopeBySlug($query, string $slug)
     {
         return $query->where('slug', $slug);
+    }
+
+    /**
+     * Get the media (avatar) for this author profile
+     */
+    public function media(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Media::class, 'media_id');
     }
 }

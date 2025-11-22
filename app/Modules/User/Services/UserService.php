@@ -134,13 +134,20 @@ class UserService
                 unset($data['password']);
             }
 
-            // Handle avatar upload
+            // Handle avatar upload (legacy file upload)
             if (isset($data['avatar']) && $data['avatar']) {
                 // Delete old avatar
                 if ($user->avatar) {
                     Storage::disk('public')->delete($user->avatar);
                 }
                 $data['avatar'] = $this->uploadAvatar($data['avatar']);
+            }
+
+            // Handle media_id (media library avatar)
+            // If media_id is provided, it takes precedence
+            if (isset($data['media_id'])) {
+                // Keep the media_id value (can be null to remove)
+                $data['media_id'] = $data['media_id'];
             }
 
             $this->userRepository->update($id, $data);

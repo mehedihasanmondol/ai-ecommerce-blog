@@ -25,7 +25,9 @@
             <a href="{{ route('admin.users.show', $user->id) }}" 
                class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition">
                 <div class="h-10 w-10 flex-shrink-0">
-                    @if($user->avatar)
+                    @if($user->media)
+                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->media->small_url }}" alt="{{ $user->name }}">
+                    @elseif($user->avatar)
                         <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}">
                     @else
                         <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">

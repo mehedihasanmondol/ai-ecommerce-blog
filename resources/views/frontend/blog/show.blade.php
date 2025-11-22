@@ -86,8 +86,20 @@
                         <!-- Author Info -->
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                @if($post->author->authorProfile?->avatar_or_fallback)
-                                    <img src="{{ asset('storage/' . $post->author->authorProfile->avatar_or_fallback) }}" 
+                                @if($post->author->authorProfile?->media)
+                                    <img src="{{ $post->author->authorProfile->media->small_url }}" 
+                                         alt="{{ $post->author->name }}"
+                                         class="w-12 h-12 rounded-full object-cover">
+                                @elseif($post->author->authorProfile?->avatar)
+                                    <img src="{{ asset('storage/' . $post->author->authorProfile->avatar) }}" 
+                                         alt="{{ $post->author->name }}"
+                                         class="w-12 h-12 rounded-full object-cover">
+                                @elseif($post->author->media)
+                                    <img src="{{ $post->author->media->small_url }}" 
+                                         alt="{{ $post->author->name }}"
+                                         class="w-12 h-12 rounded-full object-cover">
+                                @elseif($post->author->avatar)
+                                    <img src="{{ asset('storage/' . $post->author->avatar) }}" 
                                          alt="{{ $post->author->name }}"
                                          class="w-12 h-12 rounded-full object-cover">
                                 @else
@@ -323,8 +335,20 @@
                 <div class="bg-white rounded-lg shadow-sm mt-8 p-8">
                     <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
-                            @if($post->author->authorProfile?->avatar_or_fallback)
-                                <img src="{{ asset('storage/' . $post->author->authorProfile->avatar_or_fallback) }}" 
+                            @if($post->author->authorProfile?->media)
+                                <img src="{{ $post->author->authorProfile->media->medium_url }}" 
+                                     alt="{{ $post->author->name }}"
+                                     class="w-16 h-16 rounded-full object-cover">
+                            @elseif($post->author->authorProfile?->avatar)
+                                <img src="{{ asset('storage/' . $post->author->authorProfile->avatar) }}" 
+                                     alt="{{ $post->author->name }}"
+                                     class="w-16 h-16 rounded-full object-cover">
+                            @elseif($post->author->media)
+                                <img src="{{ $post->author->media->medium_url }}" 
+                                     alt="{{ $post->author->name }}"
+                                     class="w-16 h-16 rounded-full object-cover">
+                            @elseif($post->author->avatar)
+                                <img src="{{ asset('storage/' . $post->author->avatar) }}" 
                                      alt="{{ $post->author->name }}"
                                      class="w-16 h-16 rounded-full object-cover">
                             @else

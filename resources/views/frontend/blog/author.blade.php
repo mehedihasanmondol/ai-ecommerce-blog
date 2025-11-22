@@ -9,13 +9,13 @@
 @section('og_type', $seoData['og_type'] ?? 'profile')
 @section('og_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))
 @section('og_description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
-@section('og_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg')))
+@section('og_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->media) ? $author->authorProfile->media->large_url : (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : (!empty($author->media) ? $author->media->large_url : (!empty($author->avatar) ? asset('storage/' . $author->avatar) : asset('images/default-avatar.jpg'))))))
 @section('canonical', $seoData['canonical'] ?? route('blog.author', $author->authorProfile->slug))
 
 @section('twitter_card', 'summary_large_image')
 @section('twitter_title', $seoData['title'] ?? ($author->name . ' - Author Profile'))
 @section('twitter_description', $seoData['description'] ?? (!empty($author->authorProfile?->bio) ? \Illuminate\Support\Str::limit($author->authorProfile->bio, 155) : 'View all posts by ' . $author->name))
-@section('twitter_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : asset('images/default-avatar.jpg')))
+@section('twitter_image', $seoData['og_image'] ?? (!empty($author->authorProfile?->media) ? $author->authorProfile->media->large_url : (!empty($author->authorProfile?->avatar) ? asset('storage/' . $author->authorProfile->avatar) : (!empty($author->media) ? $author->media->large_url : (!empty($author->avatar) ? asset('storage/' . $author->avatar) : asset('images/default-avatar.jpg'))))))
 
 @if(isset($seoData['author_name']))
 @section('author', $seoData['author_name'])
@@ -47,8 +47,20 @@
                         <div class="flex flex-col md:flex-row items-start gap-6 -mt-16">
                             <!-- Avatar (Top Aligned) -->
                             <div class="flex-shrink-0 self-start">
-                                @if($author->authorProfile?->avatar_or_fallback)
-                                    <img src="{{ asset('storage/' . $author->authorProfile->avatar_or_fallback) }}" 
+                                @if($author->authorProfile?->media)
+                                    <img src="{{ $author->authorProfile->media->medium_url }}" 
+                                         alt="{{ $author->name }}"
+                                         class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
+                                @elseif($author->authorProfile?->avatar)
+                                    <img src="{{ asset('storage/' . $author->authorProfile->avatar) }}" 
+                                         alt="{{ $author->name }}"
+                                         class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
+                                @elseif($author->media)
+                                    <img src="{{ $author->media->medium_url }}" 
+                                         alt="{{ $author->name }}"
+                                         class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
+                                @elseif($author->avatar)
+                                    <img src="{{ asset('storage/' . $author->avatar) }}" 
                                          alt="{{ $author->name }}"
                                          class="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover">
                                 @else

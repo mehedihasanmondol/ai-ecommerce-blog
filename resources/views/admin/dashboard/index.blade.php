@@ -153,7 +153,9 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="h-10 w-10 flex-shrink-0">
-                                @if($user->avatar)
+                                @if($user->media)
+                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->media->small_url }}" alt="{{ $user->name }}">
+                                @elseif($user->avatar)
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}">
                                 @else
                                     <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
@@ -269,7 +271,9 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 <div class="h-10 w-10 flex-shrink-0">
-                                    @if($user->avatar)
+                                    @if($user->media)
+                                        <img class="h-10 w-10 rounded-full object-cover" src="{{ $user->media->small_url }}" alt="{{ $user->name }}">
+                                    @elseif($user->avatar)
                                         <img class="h-10 w-10 rounded-full object-cover" src="{{ Storage::url($user->avatar) }}" alt="{{ $user->name }}">
                                     @else
                                         <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
