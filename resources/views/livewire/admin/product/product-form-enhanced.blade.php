@@ -230,25 +230,30 @@
                                 </div>
                             </div>
 
-                            {{-- Description --}}
+                            {{-- Description - CKEditor Full --}}
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
                                 <div wire:ignore>
                                     <textarea id="product-description-editor" 
-                                              class="w-full">{{ $description }}</textarea>
+                                              class="ckeditor-content">{{ $description }}</textarea>
                                 </div>
                                 <input type="hidden" wire:model="description" id="product-description-hidden">
+                                
+                                <!-- Word Counter -->
+                                <div class="char-counter" id="description-word-count"></div>
+                                
                                 @error('description') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
 
-                            {{-- Short Description --}}
+                            {{-- Short Description - CKEditor Minimal --}}
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Short Description</label>
-                                <textarea wire:model="short_description" 
-                                          rows="3"
-                                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                          placeholder="Brief product summary (max 500 characters)"></textarea>
-                                <p class="text-xs text-gray-500 mt-1">This will appear on product cards and search results</p>
+                                <div wire:ignore>
+                                    <textarea id="product-short-description-editor" 
+                                              class="ckeditor-content-minimal">{{ $short_description }}</textarea>
+                                </div>
+                                <input type="hidden" wire:model="short_description" id="product-short-description-hidden">
+                                <p class="text-xs text-gray-500 mt-1">Brief summary with basic formatting (max 500 characters). Appears on product cards.</p>
                                 @error('short_description') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
