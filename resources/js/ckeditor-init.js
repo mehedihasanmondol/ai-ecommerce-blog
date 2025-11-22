@@ -20,7 +20,7 @@ import {
     ImageCaption,
     ImageStyle,
     ImageResize,
-    ImageUpload,
+    // ImageUpload - Not used, using custom plugin instead
     MediaEmbed,
     Indent,
     IndentBlock,
@@ -37,10 +37,16 @@ import {
     SpecialCharacters,
     SpecialCharactersEssentials,
     WordCount,
-    Fullscreen
+    Fullscreen,
+    FileRepository,
+    ButtonView
 } from 'ckeditor5';
 
 import 'ckeditor5/ckeditor5.css';
+import { UniversalImageUploadPlugin } from './ckeditor-universal-uploader.js';
+
+// Export ButtonView for use in other modules
+export { ButtonView };
 
 // Initialize CKEditor on a textarea
 export function initCKEditor(selector, options = {}) {
@@ -73,7 +79,8 @@ export function initCKEditor(selector, options = {}) {
             ImageCaption,
             ImageStyle,
             ImageResize,
-            ImageUpload,
+            // ImageUpload removed - using custom plugin instead
+            FileRepository,
             MediaEmbed,
             Indent,
             IndentBlock,
@@ -90,7 +97,8 @@ export function initCKEditor(selector, options = {}) {
             SpecialCharacters,
             SpecialCharactersEssentials,
             WordCount,
-            Fullscreen
+            Fullscreen,
+            UniversalImageUploadPlugin
         ],
         toolbar: {
             items: [
@@ -100,7 +108,7 @@ export function initCKEditor(selector, options = {}) {
                 '|',
                 'bold', 'italic', 'underline',
                 '|',
-                 'uploadImage', 'blockQuote',
+                 'mediaLibrary', 'blockQuote',
                 '|',
                 'bulletedList', 'numberedList',
                 '|',

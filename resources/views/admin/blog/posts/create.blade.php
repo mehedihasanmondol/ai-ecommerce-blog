@@ -744,6 +744,15 @@
     </div>
 </div>
 
+<!-- Universal Image Uploader for CKEditor -->
+@livewire('universal-image-uploader', [
+    'multiple' => false,
+    'disk' => 'public',
+    'maxFileSize' => 5,
+    'libraryScope' => 'global',
+    'targetField' => 'ckeditor_upload'
+])
+
 <!-- Add New Category Modal - Modern Style -->
 <div id="categoryModal" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999;" x-data="{ show: false }">
     {{-- Background overlay with blur --}}

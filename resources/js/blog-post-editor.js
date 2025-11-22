@@ -18,6 +18,17 @@ document.addEventListener('DOMContentLoaded', function() {
             autoSave();
         });
     });
+
+    // Listen for CKEditor uploader event and trigger Livewire modal
+    window.addEventListener('open-ckeditor-uploader', (event) => {
+        const { field, multiple } = event.detail;
+        
+        // Dispatch Livewire event to open the media library (Library tab by default)
+        Livewire.dispatch('openMediaLibrary', { 
+            field: field, 
+            multiple: multiple 
+        });
+    });
     
     // WordPress-style Editor Functions
     const titleInput = document.getElementById('post-title');

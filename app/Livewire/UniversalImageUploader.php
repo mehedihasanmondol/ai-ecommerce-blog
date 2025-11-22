@@ -163,6 +163,11 @@ class UniversalImageUploader extends Component
     
     public function closeModal()
     {
+        // If target field is ckeditor_upload, dispatch cancel event
+        if ($this->targetField === 'ckeditor_upload') {
+            $this->js("window.dispatchEvent(new CustomEvent('ckeditor-upload-cancelled'))");
+        }
+        
         $this->showModal = false;
         $this->uploadedFiles = [];
         $this->croppedImages = [];
