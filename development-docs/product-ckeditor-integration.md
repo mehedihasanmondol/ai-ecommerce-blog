@@ -244,9 +244,28 @@ When creating/editing a product:
 
 ---
 
+---
+
+## Footer Settings Integration (November 22, 2024)
+
+### Additional Update:
+**File**: `resources/views/admin/footer-management/index.blade.php`
+
+Replaced TinyMCE with minimal CKEditor for:
+- Newsletter Description
+- Copyright Text
+
+**New JS File**: `resources/js/footer-settings-editor.js`
+- Minimal CKEditor configuration
+- Syncs with form fields automatically
+- Basic formatting: bold, italic, underline, lists, links, alignment
+
+---
+
 ## Related Documentation
 
 - `blog-post-universal-image-uploader-integration.md`
 - `blog-post-image-upload-fixes.md`
 - `ckeditor-init.js` - Main CKEditor configuration
 - `ckeditor-universal-uploader.js` - Custom upload plugin
+- `footer-settings-editor.js` - Footer settings minimal CKEditor

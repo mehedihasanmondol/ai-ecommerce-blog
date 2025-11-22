@@ -4,19 +4,21 @@
 
 @push('styles')
 <style>
-/* TinyMCE Custom Styling */
-.tox-tinymce {
-    border-radius: 0.5rem !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-.tox-toolbar {
-    background: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-}
-
-.tinymce-content {
+/* CKEditor Custom Styling */
+.ck-editor__editable {
     min-height: 150px;
+    max-height: 300px;
+}
+
+.ck.ck-editor__main>.ck-editor__editable {
+    background: #ffffff;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Force list markers to display (override Tailwind reset) */
+.ck-content ul,
+.ck-content ol {
+    margin-left: 20px;
 }
 </style>
 @endpush
@@ -85,7 +87,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Newsletter Description</label>
-                            <textarea name="newsletter_description" id="newsletter-description-editor" class="tinymce-content">{{ $settings['general']->firstWhere('key', 'newsletter_description')->value ?? '' }}</textarea>
+                            <textarea name="newsletter_description" id="newsletter-description-editor" class="ckeditor-content-minimal">{{ $settings['general']->firstWhere('key', 'newsletter_description')->value ?? '' }}</textarea>
                         </div>
 
                         <div>
@@ -100,7 +102,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Copyright Text</label>
-                            <textarea name="copyright_text" id="copyright-text-editor" class="tinymce-content">{{ $settings['legal']->firstWhere('key', 'copyright_text')->value ?? '' }}</textarea>
+                            <textarea name="copyright_text" id="copyright-text-editor" class="ckeditor-content-minimal">{{ $settings['legal']->firstWhere('key', 'copyright_text')->value ?? '' }}</textarea>
                         </div>
 
                         <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
@@ -441,51 +443,9 @@
 </div>
 
 @push('scripts')
-<!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/{{ \App\Models\SiteSetting::get('tinymce_api_key', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
+@vite('resources/js/footer-settings-editor.js')
 <script>
-// Initialize TinyMCE for Newsletter Description
-tinymce.init({
-    selector: '#newsletter-description-editor',
-    height: 200,
-    menubar: false,
-    plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'help', 'wordcount'
-    ],
-    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; line-height: 1.4; }',
-    branding: false,
-    promotion: false,
-    setup: function (editor) {
-        editor.on('change', function () {
-            editor.save();
-        });
-    }
-});
-
-// Initialize TinyMCE for Copyright Text
-tinymce.init({
-    selector: '#copyright-text-editor',
-    height: 250,
-    menubar: false,
-    plugins: [
-        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-        'insertdatetime', 'media', 'table', 'help', 'wordcount'
-    ],
-    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
-    content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; line-height: 1.4; }',
-    branding: false,
-    promotion: false,
-    setup: function (editor) {
-        editor.on('change', function () {
-            editor.save();
-        });
-    }
-});
+// CKEditor initialization is handled by footer-settings-editor.js
 
 function showTab(tabName) {
     // Hide all tab contents
@@ -508,16 +468,7 @@ function showTab(tabName) {
     activeTab.classList.remove('border-transparent', 'text-gray-500');
 }
 
-// Form submission handler to sync TinyMCE content
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            // Sync all TinyMCE editors before form submission
-            tinymce.triggerSave();
-        });
-    });
-});
+// CKEditor content is automatically synced on form submit
 
 // QR Code Preview Functions
 function previewQRCode(input) {
