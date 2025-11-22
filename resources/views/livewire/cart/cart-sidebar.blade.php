@@ -49,7 +49,7 @@
                             <!-- Product Image -->
                             <div class="flex-shrink-0">
                                 @if(isset($item['image']) && $item['image'])
-                                    <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['product_name'] }}" class="w-24 h-24 object-cover rounded-lg border border-gray-200">
+                                    <img src="{{ $item['image'] }}" alt="{{ $item['product_name'] }}" class="w-24 h-24 object-cover rounded-lg border border-gray-200">
                                 @else
                                     <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
                                         <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@
                             <!-- Product Image -->
                             <a href="{{ route('products.show', $product['slug']) }}" class="flex-shrink-0">
                                 @if($product['image'])
-                                    <img src="{{ asset('storage/' . $product['image']) }}" alt="{{ $product['name'] }}" class="w-16 h-16 object-cover rounded border border-gray-200">
+                                    <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="w-16 h-16 object-cover rounded border border-gray-200">
                                 @else
                                     <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
                                         <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

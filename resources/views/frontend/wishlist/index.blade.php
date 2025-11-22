@@ -26,7 +26,7 @@
                 <!-- Product Image -->
                 <div class="relative aspect-square bg-gray-100">
                     <a href="{{ route('products.show', $item['slug']) }}">
-                        <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/placeholder.png') }}" 
+                        <img src="{{ $item['image'] ?? asset('images/placeholder.png') }}" 
                              alt="{{ $item['product_name'] }}"
                              class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </a>

@@ -401,8 +401,6 @@ class ProductList extends Component
         $cart = session()->get('cart', []);
         $cartKey = 'variant_' . $variant->id;
         
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-        
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] += $quantity;
         } else {
@@ -415,7 +413,7 @@ class ProductList extends Component
                 'price' => $variant->sale_price ?? $variant->price,
                 'original_price' => $variant->price,
                 'quantity' => $quantity,
-                'image' => $primaryImage ? $primaryImage->image_path : null,
+                'image' => $product->getPrimaryThumbnailUrl(), // Use media library
                 'sku' => $variant->sku,
                 'stock_quantity' => $variant->stock_quantity,
             ];
@@ -474,8 +472,6 @@ class ProductList extends Component
             $variant = $product->variants->first();
         }
         
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-        
         $wishlist[$key] = [
             'product_id' => $product->id,
             'variant_id' => $variant->id ?? null,
@@ -484,7 +480,7 @@ class ProductList extends Component
             'brand' => $product->brand ? $product->brand->name : null,
             'price' => $variant->sale_price ?? $variant->price ?? 0,
             'original_price' => $variant->price ?? 0,
-            'image' => $primaryImage ? $primaryImage->image_path : null,
+            'image' => $product->getPrimaryThumbnailUrl(), // Use media library
             'sku' => $variant->sku ?? null,
             'added_at' => now()->toDateTimeString(),
         ];

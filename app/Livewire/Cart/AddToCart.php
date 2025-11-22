@@ -210,8 +210,6 @@ class AddToCart extends Component
         // Check if variant already in cart
         $cartKey = 'variant_' . $variant->id;
         
-        $primaryImage = $this->product->images->where('is_primary', true)->first() ?? $this->product->images->first();
-        
         // Always update/set the quantity (don't add to existing)
         $cart[$cartKey] = [
             'product_id' => $this->product->id,
@@ -222,7 +220,7 @@ class AddToCart extends Component
             'price' => $variant->sale_price ?? $variant->price,
             'original_price' => $variant->price,
             'quantity' => $this->quantity, // Set to selected quantity, not add
-            'image' => $primaryImage ? $primaryImage->image_path : null,
+            'image' => $this->product->getPrimaryThumbnailUrl(), // Use media library
             'brand' => $this->product->brand ? $this->product->brand->name : null,
             'stock_quantity' => $variant->stock_quantity,
         ];

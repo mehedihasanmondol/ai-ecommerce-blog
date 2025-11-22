@@ -76,7 +76,7 @@ class FrequentlyBoughtTogether extends Component
             'name' => $this->product->name,
             'slug' => $this->product->slug,
             'price' => $currentPrice,
-            'image' => $this->product->images->first()?->image_path ?? 'placeholder.png',
+            'image' => $this->product->getPrimaryThumbnailUrl(), // Use media library
             'rating' => $this->product->average_rating ?? 4.5,
             'reviews' => $this->product->review_count ?? rand(1000, 50000),
             'isCurrent' => true,
@@ -94,7 +94,7 @@ class FrequentlyBoughtTogether extends Component
                 'name' => $related->name,
                 'slug' => $related->slug,
                 'price' => $price,
-                'image' => $related->images->first()?->image_path ?? 'placeholder.png',
+                'image' => $related->getPrimaryThumbnailUrl(), // Use media library
                 'rating' => $related->average_rating ?? 4.5,
                 'reviews' => $related->review_count ?? rand(1000, 50000),
                 'isCurrent' => false,
@@ -223,7 +223,7 @@ class FrequentlyBoughtTogether extends Component
                     'price' => $variant->sale_price ?? $variant->price,
                     'original_price' => $variant->price,
                     'quantity' => 1,
-                    'image' => $primaryImage ? $primaryImage->image_path : null,
+                    'image' => $product->getPrimaryThumbnailUrl(), // Use media library
                     'brand' => $product->brand ? $product->brand->name : null,
                     'stock_quantity' => $variant->stock_quantity,
                 ];

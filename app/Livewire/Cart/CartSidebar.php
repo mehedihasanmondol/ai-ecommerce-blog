@@ -87,8 +87,6 @@ class CartSidebar extends Component
         $cart = session()->get('cart', []);
         $cartKey = 'variant_' . $variant->id;
         
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-        
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] += $quantity;
         } else {
@@ -101,7 +99,7 @@ class CartSidebar extends Component
                 'price' => $variant->sale_price ?? $variant->price,
                 'original_price' => $variant->price,
                 'quantity' => $quantity,
-                'image' => $primaryImage ? $primaryImage->image_path : null,
+                'image' => $product->getPrimaryThumbnailUrl(), // Use media library
                 'sku' => $variant->sku,
                 'stock_quantity' => $variant->stock_quantity,
             ];
@@ -174,7 +172,6 @@ class CartSidebar extends Component
 
         $this->frequentlyPurchased = $relatedProducts->map(function($product) {
             $variant = $product->variants->first();
-            $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
             
             return [
                 'id' => $product->id,
@@ -185,7 +182,7 @@ class CartSidebar extends Component
                 'brand' => $product->brand ? $product->brand->name : null,
                 'price' => $variant->sale_price ?? $variant->price ?? 0,
                 'original_price' => $variant->price ?? 0,
-                'image' => $primaryImage ? $primaryImage->image_path : null,
+                'image' => $product->getPrimaryThumbnailUrl(), // Use media library
                 'rating' => $product->average_rating ?? 0,
                 'reviews' => $product->review_count ?? 0,
                 'sku' => $variant->sku ?? null,

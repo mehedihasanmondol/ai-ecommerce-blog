@@ -67,7 +67,7 @@
 
                         <!-- Product Image -->
                         <div class="flex-shrink-0">
-                            <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/placeholder.png') }}" 
+                            <img src="{{ $item['image'] ?? asset('images/placeholder.png') }}" 
                                  alt="{{ $item['product_name'] }}"
                                  class="w-24 h-24 object-cover rounded-lg">
                             @if(isset($item['original_price']) && $item['original_price'] > $item['price'])

@@ -451,17 +451,14 @@
                         <!-- Product Selection -->
                         <div x-show="showProducts" x-collapse class="space-y-2 max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3" id="product-list-container">
                             @forelse($products as $product)
-                                @php
-                                    $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-                                @endphp
                                 <label class="flex items-center hover:bg-gray-50 p-2 rounded cursor-pointer">
                                     <input type="checkbox" 
                                            name="products[]" 
                                            value="{{ $product->id }}"
                                            {{ in_array($product->id, old('products', [])) ? 'checked' : '' }}
                                            class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-                                    @if($primaryImage)
-                                        <img src="{{ asset('storage/' . $primaryImage->image_path) }}" 
+                                    @if($product->getPrimaryThumbnailUrl())
+                                        <img src="{{ $product->getPrimaryThumbnailUrl() }}" 
                                              alt="{{ $product->name }}"
                                              class="w-10 h-10 object-cover rounded ml-2">
                                     @else

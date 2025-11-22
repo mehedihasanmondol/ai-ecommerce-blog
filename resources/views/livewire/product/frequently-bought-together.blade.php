@@ -18,7 +18,7 @@
                                     <!-- Image Container with Hover Effect -->
                                     <a href="{{ route('products.show', $item['slug']) }}" 
                                        class="block w-32 h-32 lg:w-40 lg:h-40 bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-orange-400 hover:shadow-lg transition-all duration-300 p-3">
-                                        <img src="{{ asset('storage/' . $item['image']) }}" 
+                                        <img src="{{ $item['image'] }}" 
                                              alt="{{ $item['name'] }}"
                                              class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
                                     </a>

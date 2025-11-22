@@ -68,13 +68,10 @@
                         <!-- Product Image -->
                         <div class="flex-shrink-0">
                             @php
-                                $imageUrl = null;
-                                // Try to get image from product images
-                                if ($product->images && $product->images->count() > 0) {
-                                    $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-                                    $imageUrl = $primaryImage ? asset('storage/' . $primaryImage->image_path) : null;
-                                }
-                                // Fallback to variant image
+                                // Use media library system
+                                $imageUrl = $product->getPrimaryThumbnailUrl();
+                                
+                                // Fallback to variant image (for old data)
                                 if (!$imageUrl && $defaultVariant && $defaultVariant->image) {
                                     $imageUrl = asset('storage/' . $defaultVariant->image);
                                 }
@@ -203,11 +200,8 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                     @php
-                        $selectedImageUrl = null;
-                        if ($selectedProduct->images && $selectedProduct->images->count() > 0) {
-                            $primaryImage = $selectedProduct->images->where('is_primary', true)->first() ?? $selectedProduct->images->first();
-                            $selectedImageUrl = $primaryImage ? asset('storage/' . $primaryImage->image_path) : null;
-                        }
+                        // Use media library system
+                        $selectedImageUrl = $selectedProduct->getPrimaryThumbnailUrl();
                     @endphp
                     
                     @if($selectedImageUrl)

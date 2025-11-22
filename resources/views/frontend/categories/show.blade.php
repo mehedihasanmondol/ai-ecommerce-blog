@@ -278,7 +278,7 @@
                                     $showStockInfo = $variant->shouldShowStock();
                                 }
                                 
-                                $image = $product->images->first();
+                                $image = $product->getPrimaryThumbnailUrl();
                             @endphp
                             
                             <div class="bg-white rounded-lg shadow-sm hover:shadow-lg transition p-4">
@@ -287,7 +287,7 @@
                                     <a href="{{ route('products.show', $product->slug) }}" class="flex-shrink-0">
                                         @if($image)
                                             <img 
-                                                src="{{ asset('storage/' . $image->image_path) }}" 
+                                                src="{{ $image }}" 
                                                 alt="{{ $product->name }}"
                                                 class="w-32 h-32 object-cover rounded-lg"
                                             >

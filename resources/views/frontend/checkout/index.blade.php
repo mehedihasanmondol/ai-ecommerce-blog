@@ -244,7 +244,7 @@
                         <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                             @foreach($cart as $item)
                             <div class="flex items-center space-x-3">
-                                <img src="{{ $item['image'] ? asset('storage/' . $item['image']) : asset('images/placeholder.png') }}" 
+                                <img src="{{ $item['image'] ?? asset('images/placeholder.png') }}" 
                                      alt="{{ $item['product_name'] }}"
                                      class="w-16 h-16 object-cover rounded">
                                 <div class="flex-1 min-w-0">

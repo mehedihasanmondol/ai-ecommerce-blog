@@ -58,8 +58,6 @@ class WishlistController extends Controller
             $variant = $product->variants->first();
         }
         
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-        
         // Add to wishlist
         $wishlist[$key] = [
             'product_id' => $product->id,
@@ -69,7 +67,7 @@ class WishlistController extends Controller
             'brand' => $product->brand ? $product->brand->name : null,
             'price' => $variant->sale_price ?? $variant->price ?? 0,
             'original_price' => $variant->price ?? 0,
-            'image' => $primaryImage ? $primaryImage->image_path : null,
+            'image' => $product->getPrimaryThumbnailUrl(), // Use media library
             'sku' => $variant->sku ?? null,
             'added_at' => now()->toDateTimeString(),
         ];
