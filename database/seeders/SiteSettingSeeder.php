@@ -17,6 +17,7 @@ class SiteSettingSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Only creates new settings or updates existing ones if values differ.
      */
     public function run(): void
     {
@@ -663,10 +664,7 @@ class SiteSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            SiteSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            $this->upsertSetting($setting);
         }
 
         // Search Engine Verification Settings
@@ -729,10 +727,7 @@ class SiteSettingSeeder extends Seeder
         ];
 
         foreach ($verificationSettings as $setting) {
-            SiteSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            $this->upsertSetting($setting);
         }
 
         // Product Features Settings
@@ -767,10 +762,43 @@ class SiteSettingSeeder extends Seeder
         ];
 
         foreach ($featureSettings as $setting) {
-            SiteSetting::updateOrCreate(
-                ['key' => $setting['key']],
-                $setting
-            );
+            $this->upsertSetting($setting);
+        }
+    }
+
+    /**
+     * Smart upsert: Only create or update if metadata differs (excludes value, timestamps)
+     */
+    private function upsertSetting(array $settingData): void
+    {
+        $existing = SiteSetting::where('key', $settingData['key'])->first();
+
+        if (!$existing) {
+            // Setting doesn't exist, create it
+            SiteSetting::create($settingData);
+            $this->command->info("Created setting: {$settingData['key']}");
+        } else {
+            // Setting exists, check if metadata differs (exclude value and timestamps)
+            $excludeFields = ['key', 'value', 'created_at', 'updated_at'];
+            $needsUpdate = false;
+            $updates = [];
+
+            foreach ($settingData as $field => $newValue) {
+                if (in_array($field, $excludeFields)) continue;
+                
+                $oldValue = $existing->{$field};
+                
+                // Compare metadata fields only
+                if ($oldValue != $newValue) {
+                    $needsUpdate = true;
+                    $updates[$field] = $newValue;
+                }
+            }
+
+            if ($needsUpdate) {
+                $existing->update($updates);
+                $this->command->info("Updated setting metadata: {$settingData['key']}");
+            }
         }
     }
 }

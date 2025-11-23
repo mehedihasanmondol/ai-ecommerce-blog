@@ -168,3 +168,11 @@ By default, Laravel’s artisan server only listens on 127.0.0.1 (localhost).
 You need to tell it to listen on all network interfaces (0.0.0.0).
 
 php artisan serve --host=0.0.0.0 --port=8000
+
+
+
+# Run all seeders in dependency order
+php artisan db:seed
+
+# Or fresh migration with seeding
+php artisan migrate:fresh --seed
