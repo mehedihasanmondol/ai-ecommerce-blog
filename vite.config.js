@@ -7,7 +7,7 @@ export default defineConfig({
         host: '0.0.0.0',        // allow network access
         port: 5173,             // or any port you like
         hmr: {
-            host: '192.168.0.118', // your computer's local IP
+            host: 'localhost', // Change this to your computer's local IP when needed (e.g., 192.168.0.118)
         },
     },
     plugins: [
@@ -17,7 +17,10 @@ export default defineConfig({
                 'resources/js/app.js', 
                 'resources/js/admin.js',
                 'resources/js/ckeditor-init.js',  // CKEditor initialization
-                'resources/js/blog-post-editor.js'  // Blog post editor
+                'resources/js/blog-post-editor.js',  // Blog post editor
+                'resources/js/product-editor.js',  // Product editor
+                'resources/js/footer-settings-editor.js',  // Footer settings editor
+                'resources/js/site-settings-editor.js'  // Site settings editor
             ],
             refresh: true,
         }),
