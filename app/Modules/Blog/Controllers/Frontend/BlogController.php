@@ -4,6 +4,8 @@ namespace App\Modules\Blog\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
+use App\Models\User;
+use App\Modules\Blog\Models\Post;
 use App\Modules\Blog\Repositories\BlogCategoryRepository;
 use App\Modules\Blog\Repositories\TagRepository;
 use App\Modules\Blog\Services\PostService;
@@ -196,6 +198,7 @@ class BlogController extends Controller
     public function category(Request $request, $slug)
     {
         $category = $this->categoryRepository->findBySlug($slug);
+        $category->load('media'); // Eager load media library image
         
         // Get sidebar categories: if current category has children, show them; otherwise show root categories
         if ($category->children()->where('is_active', true)->count() > 0) {
@@ -267,13 +270,15 @@ class BlogController extends Controller
                 ? $category->meta_keywords 
                 : $category->name . ', ' . $category->name . ' blog, ' . $category->name . ' articles, ' . SiteSetting::get('blog_keywords', 'blog, articles'),
             
-            'og_image' => $category->image_path
-                ? asset('storage/' . $category->image_path)
-                : (SiteSetting::get('blog_image')
-                    ? asset('storage/' . SiteSetting::get('blog_image'))
-                    : (\App\Models\SiteSetting::get('site_logo')
-                        ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
-                        : asset('images/og-default.jpg'))),
+            'og_image' => ($category->media && $category->media->large_url)
+                ? $category->media->large_url
+                : ($category->image_path
+                    ? asset('storage/' . $category->image_path)
+                    : (SiteSetting::get('blog_image')
+                        ? asset('storage/' . SiteSetting::get('blog_image'))
+                        : (\App\Models\SiteSetting::get('site_logo')
+                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                            : asset('images/og-default.jpg')))),
             
             'og_type' => 'website',
             'canonical' => route('blog.category', $category->slug),
@@ -367,14 +372,10 @@ class BlogController extends Controller
      */
     public function author(Request $request, $slug)
     {
-        // Find author profile by slug
         $authorProfile = \App\Models\AuthorProfile::where('slug', $slug)->firstOrFail();
-        $author = $authorProfile->user;
-        
-        // Ensure author exists
-        if (!$author) {
-            abort(404, 'Author not found');
-        }
+        $author = User::where('id', $authorProfile->user_id)->firstOrFail();
+        $author->load('authorProfile');
+        $authorProfile->load('media'); // Eager load media library image
         
         // Get sorting parameter
         $sort = $request->get('sort', 'newest');
@@ -420,7 +421,11 @@ class BlogController extends Controller
             'title' => $author->name . ' | ' . $jobTitle,
             'description' => $authorProfile->bio ? \Illuminate\Support\Str::limit(strip_tags($authorProfile->bio), 160) : 'View profile and articles by ' . $author->name,
             'keywords' => $author->name . ', author, blog, articles, writer' . ($authorProfile->job_title ? ', ' . $authorProfile->job_title : ''),
-            'og_image' => $authorProfile->avatar ? asset('storage/' . $authorProfile->avatar) : asset('images/default-avatar.jpg'),
+            'og_image' => ($authorProfile->media && $authorProfile->media->large_url)
+                ? $authorProfile->media->large_url
+                : ($authorProfile->avatar 
+                    ? asset('storage/' . $authorProfile->avatar) 
+                    : asset('images/default-avatar.jpg')),
             'og_type' => 'profile',
             'canonical' => route('blog.author', $authorProfile->slug),
             'author_name' => $author->name,

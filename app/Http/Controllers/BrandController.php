@@ -53,10 +53,13 @@ class BrandController extends Controller
             ->withCount('products')
             ->with('media')
             ->firstOrFail();
+        
+        // Eager load media library image
+        $brand->load('media');
 
-        $products = Product::where('brand_id', $brand->id)
-            ->active()
-            ->with(['images', 'categories'])
+        $products = Product::with(['variants', 'images', 'brand'])
+            ->where('brand_id', $brand->id)
+            ->where('is_active', true)
             ->paginate(24);
 
         // Get related brands (other active brands)
@@ -84,13 +87,15 @@ class BrandController extends Controller
                 ? $brand->meta_keywords 
                 : $brand->name . ', ' . $brand->name . ' products, shop ' . $brand->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
             
-            'og_image' => !empty($brand->og_image)
-                ? asset('storage/' . $brand->og_image)
-                : ($brand->logo 
-                    ? asset('storage/' . $brand->logo) 
-                    : (\App\Models\SiteSetting::get('site_logo')
-                        ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
-                        : asset('images/og-default.jpg'))),
+            'og_image' => ($brand->media && $brand->media->large_url)
+                ? $brand->media->large_url
+                : (!empty($brand->og_image)
+                    ? asset('storage/' . $brand->og_image)
+                    : ($brand->logo 
+                        ? asset('storage/' . $brand->logo) 
+                        : (\App\Models\SiteSetting::get('site_logo')
+                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                            : asset('images/og-default.jpg')))),
             
             'og_type' => 'website',
             'canonical' => route('brands.show', $brand->slug),

@@ -73,7 +73,7 @@ class ProductList extends Component
         if ($slug) {
             // Check if it's a category route
             if (request()->route()->getName() === 'categories.show') {
-                $this->category = Category::with(['activeChildren', 'parent', 'products'])
+                $this->category = Category::with(['activeChildren', 'parent', 'products', 'media'])
                     ->where('slug', $slug)
                     ->where('is_active', true)
                     ->firstOrFail();
@@ -82,7 +82,7 @@ class ProductList extends Component
             }
             // Check if it's a brand route
             elseif (request()->route()->getName() === 'brands.show') {
-                $this->brand = Brand::with(['products'])
+                $this->brand = Brand::with(['products', 'media'])
                     ->where('slug', $slug)
                     ->where('is_active', true)
                     ->firstOrFail();
@@ -582,13 +582,15 @@ class ProductList extends Component
                     ? $this->category->meta_keywords 
                     : $this->category->name . ', ' . $this->category->name . ' products, shop ' . $this->category->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
                 
-                'og_image' => !empty($this->category->og_image)
-                    ? asset('storage/' . $this->category->og_image)
-                    : ($this->category->image 
-                        ? asset('storage/' . $this->category->image) 
-                        : (\App\Models\SiteSetting::get('site_logo')
-                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
-                            : asset('images/og-default.jpg'))),
+                'og_image' => ($this->category->media && $this->category->media->large_url)
+                    ? $this->category->media->large_url
+                    : (!empty($this->category->og_image)
+                        ? asset('storage/' . $this->category->og_image)
+                        : ($this->category->image 
+                            ? asset('storage/' . $this->category->image) 
+                            : (\App\Models\SiteSetting::get('site_logo')
+                                ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                                : asset('images/og-default.jpg')))),
                 
                 'og_type' => 'website',
                 'canonical' => route('categories.show', $this->category->slug),
@@ -612,13 +614,15 @@ class ProductList extends Component
                     ? $this->brand->meta_keywords 
                     : $this->brand->name . ', ' . $this->brand->name . ' products, shop ' . $this->brand->name . ', ' . \App\Models\SiteSetting::get('meta_keywords', 'ecommerce, products'),
                 
-                'og_image' => !empty($this->brand->og_image)
-                    ? asset('storage/' . $this->brand->og_image)
-                    : ($this->brand->logo 
-                        ? asset('storage/' . $this->brand->logo) 
-                        : (\App\Models\SiteSetting::get('site_logo')
-                            ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
-                            : asset('images/og-default.jpg'))),
+                'og_image' => ($this->brand->media && $this->brand->media->large_url)
+                    ? $this->brand->media->large_url
+                    : (!empty($this->brand->og_image)
+                        ? asset('storage/' . $this->brand->og_image)
+                        : ($this->brand->logo 
+                            ? asset('storage/' . $this->brand->logo) 
+                            : (\App\Models\SiteSetting::get('site_logo')
+                                ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                                : asset('images/og-default.jpg')))),
                 
                 'og_type' => 'website',
                 'canonical' => route('brands.show', $this->brand->slug),

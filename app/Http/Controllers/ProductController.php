@@ -33,7 +33,7 @@ class ProductController extends Controller
         // Find product by slug with all relationships
         $product = Product::with([
             'variants.attributeValues.attribute', 
-            'images', 
+            'images.media', 
             'categories.parent',
             'brand'
         ])
@@ -83,6 +83,40 @@ class ProductController extends Controller
         $totalAnswers = $product->approvedQuestions()->whereHas('answers', function($query) {
             $query->where('status', 'approved');
         })->count();
+        
+        // Prepare SEO data
+        $siteName = \App\Models\SiteSetting::get('site_name', config('app.name'));
+        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
+        
+        $seoData = [
+            'title' => !empty($product->meta_title) 
+                ? $product->meta_title 
+                : $product->name . ' | ' . $siteName,
+            
+            'description' => !empty($product->meta_description) 
+                ? $product->meta_description 
+                : (!empty($product->short_description) 
+                    ? \Illuminate\Support\Str::limit(strip_tags($product->short_description), 160)
+                    : \Illuminate\Support\Str::limit(strip_tags($product->description), 160)),
+            
+            'keywords' => !empty($product->meta_keywords) 
+                ? $product->meta_keywords 
+                : $product->name . ', ' . ($product->brand ? $product->brand->name . ', ' : '') . ($product->categories->first() ? $product->categories->first()->name . ', ' : '') . \App\Models\SiteSetting::get('meta_keywords', 'products, shop'),
+            
+            'og_image' => ($primaryImage && $primaryImage->media && $primaryImage->media->large_url)
+                ? $primaryImage->media->large_url
+                : ($primaryImage && $primaryImage->image_path
+                    ? asset('storage/' . $primaryImage->image_path)
+                    : (\App\Models\SiteSetting::get('site_logo')
+                        ? asset('storage/' . \App\Models\SiteSetting::get('site_logo'))
+                        : asset('images/og-default.jpg'))),
+            
+            'og_type' => 'product',
+            'canonical' => route('products.show', $product->slug),
+            'price' => $defaultVariant ? $defaultVariant->price : null,
+            'currency' => 'BDT',
+            'availability' => ($defaultVariant && $defaultVariant->stock_quantity > 0) ? 'in stock' : 'out of stock',
+        ];
 
         return view('frontend.products.show', compact(
             'product', 
@@ -93,7 +127,8 @@ class ProductController extends Controller
             'averageRating',
             'totalReviews',
             'totalQuestions',
-            'totalAnswers'
+            'totalAnswers',
+            'seoData'
         ));
     }
 
