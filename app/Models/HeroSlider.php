@@ -14,6 +14,7 @@ class HeroSlider extends Model
         'title',
         'subtitle',
         'image',
+        'media_id',
         'link',
         'button_text',
         'order',
@@ -26,11 +27,20 @@ class HeroSlider extends Model
     ];
 
     /**
+     * Get the media associated with the hero slider
+     */
+    public function media()
+    {
+        return $this->belongsTo(Media::class, 'media_id');
+    }
+
+    /**
      * Get active sliders ordered
      */
     public static function getActive()
     {
         return self::where('is_active', true)
+            ->with('media')
             ->orderBy('order')
             ->get();
     }
@@ -40,11 +50,21 @@ class HeroSlider extends Model
      */
     public function getImageUrlAttribute(): string
     {
-        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
+        // First, check if using media library
+        if ($this->media_id && $this->media) {
+            return $this->media->large_url ?? $this->media->url;
         }
 
-        return Storage::url($this->image);
+        // Fallback to legacy image field
+        if ($this->image) {
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
+            return Storage::url($this->image);
+        }
+
+        // Return placeholder if no image
+        return asset('images/placeholder-slider.jpg');
     }
 
     /**

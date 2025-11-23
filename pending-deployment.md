@@ -28,6 +28,8 @@ php artisan migrate --path=database/migrations/2025_11_22_000003_add_media_id_to
 
 php artisan migrate --path=database/migrations/2025_11_23_000033_update_login_settings_to_ckeditor.php
 
+php artisan migrate --path=database/migrations/2025_11_23_001611_add_media_id_to_hero_sliders_table.php
+
 # Step 4: Build JavaScript assets (includes CropperJS)
 npm run build
 

@@ -3,9 +3,9 @@
 namespace App\Livewire\Admin;
 
 use App\Models\HeroSlider;
+use App\Models\Media;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 /**
  * HeroSliderManager Livewire Component
@@ -13,8 +13,6 @@ use Livewire\WithFileUploads;
  */
 class HeroSliderManager extends Component
 {
-    use WithFileUploads;
-
     public $sliders;
     public $editingId = null;
     public $showModal = false;
@@ -22,8 +20,8 @@ class HeroSliderManager extends Component
     // Form fields
     public $title;
     public $subtitle;
-    public $image;
-    public $existingImage;
+    public $media_id;
+    public $existingMediaId;
     public $link;
     public $button_text;
     public $is_active = true;
@@ -32,7 +30,7 @@ class HeroSliderManager extends Component
     protected $rules = [
         'title' => 'required|string|max:255',
         'subtitle' => 'nullable|string|max:255',
-        'image' => 'nullable|image|max:2048',
+        'media_id' => 'nullable|exists:media_library,id',
         'link' => 'nullable|url|max:255',
         'button_text' => 'nullable|string|max:50',
         'is_active' => 'boolean',
@@ -46,7 +44,7 @@ class HeroSliderManager extends Component
 
     public function loadSliders()
     {
-        $this->sliders = HeroSlider::orderBy('order')->get();
+        $this->sliders = HeroSlider::with('media')->orderBy('order')->get();
     }
 
     public function openCreateModal()
@@ -58,12 +56,13 @@ class HeroSliderManager extends Component
 
     public function openEditModal($id)
     {
-        $slider = HeroSlider::findOrFail($id);
+        $slider = HeroSlider::with('media')->findOrFail($id);
         
         $this->editingId = $slider->id;
         $this->title = $slider->title;
         $this->subtitle = $slider->subtitle;
-        $this->existingImage = $slider->image;
+        $this->media_id = $slider->media_id;
+        $this->existingMediaId = $slider->media_id;
         $this->link = $slider->link;
         $this->button_text = $slider->button_text;
         $this->is_active = $slider->is_active;
@@ -80,20 +79,11 @@ class HeroSliderManager extends Component
             $data = [
                 'title' => $this->title,
                 'subtitle' => $this->subtitle,
+                'media_id' => $this->media_id,
                 'link' => $this->link,
                 'button_text' => $this->button_text,
                 'is_active' => $this->is_active,
             ];
-
-            // Handle image upload
-            if ($this->image) {
-                // Delete old image if editing
-                if ($this->editingId && $this->existingImage) {
-                    Storage::disk('public')->delete($this->existingImage);
-                }
-                
-                $data['image'] = $this->image->store('sliders', 'public');
-            }
 
             // Set order
             if (!$this->order) {
@@ -197,9 +187,17 @@ class HeroSliderManager extends Component
 
     private function resetForm()
     {
-        $this->reset(['title', 'subtitle', 'image', 'existingImage', 'link', 'button_text', 'order']);
+        $this->reset(['title', 'subtitle', 'media_id', 'existingMediaId', 'link', 'button_text', 'order']);
         $this->is_active = true;
         $this->resetValidation();
+    }
+
+    /**
+     * Handle media uploaded event from image uploader component
+     */
+    public function mediaUploaded($mediaId)
+    {
+        $this->media_id = $mediaId;
     }
 
     public function render()

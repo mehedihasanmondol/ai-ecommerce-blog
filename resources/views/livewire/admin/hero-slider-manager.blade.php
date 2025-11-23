@@ -65,7 +65,7 @@
                             <!-- Slider Image -->
                             <div class="flex-shrink-0 w-32 h-20 rounded-lg overflow-hidden bg-gray-100">
                                 <img 
-                                    src="{{ asset('storage/' . $slider->image) }}" 
+                                    src="{{ $slider->image_url }}" 
                                     alt="{{ $slider->title }}"
                                     class="w-full h-full object-cover"
                                 >
@@ -212,6 +212,11 @@
             Livewire.hook('morph.updated', () => {
                 initializeSortable();
             });
+
+            // Listen for media uploaded event from image uploader component
+            window.addEventListener('media-uploaded-hero_slider_image', (event) => {
+                @this.call('mediaUploaded', event.detail.mediaId);
+            });
         });
 
         function initializeSortable() {
@@ -305,56 +310,40 @@
                             @error('subtitle') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
 
-                        <!-- Image Upload -->
+                        <!-- Image Upload with Media Library -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-800 mb-2">
                                 Slider Image @if(!$editingId)<span class="text-red-500">*</span>@endif
                             </label>
                             
-                            @if($existingImage && !$image)
+                            @if($editingId && $existingMediaId)
+                                @php
+                                    $existingMedia = \App\Models\Media::find($existingMediaId);
+                                @endphp
                                 <div class="mb-3">
-                                    <img 
-                                        src="{{ asset('storage/' . $existingImage) }}" 
-                                        alt="Current image"
-                                        class="h-32 rounded-lg border-2 border-gray-200"
-                                    >
-                                    <p class="text-xs text-gray-500 mt-1">Current image</p>
+                                    @if($existingMedia)
+                                        <img 
+                                            src="{{ $existingMedia->large_url ?? $existingMedia->url }}" 
+                                            alt="Current slider image"
+                                            class="h-32 rounded-lg border-2 border-gray-200"
+                                        >
+                                        <p class="text-xs text-gray-500 mt-1">Current image</p>
+                                    @endif
                                 </div>
                             @endif
 
-                            @if($image)
-                                <div class="mb-3">
-                                    <img 
-                                        src="{{ $image->temporaryUrl() }}" 
-                                        alt="Preview"
-                                        class="h-32 rounded-lg border-2 border-purple-300"
-                                    >
-                                    <p class="text-xs text-purple-600 mt-1">New image preview</p>
-                                </div>
-                            @endif
-
-                            <label class="flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all shadow-sm hover:shadow w-fit">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-sm font-medium">Choose Image</span>
-                                <input 
-                                    type="file" 
-                                    wire:model="image"
-                                    accept="image/*"
-                                    class="hidden"
-                                >
-                            </label>
-                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, WEBP (Max 2MB, Recommended: 1920x600px)</p>
-                            
-                            <div wire:loading wire:target="image" class="text-purple-600 text-sm flex items-center mt-2">
-                                <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Uploading...
+                            <div wire:ignore>
+                                <x-image-uploader 
+                                    target-field="hero_slider_image"
+                                    :media-id="null"
+                                    :aspect-ratio="[16, 6]"
+                                    :width="1920"
+                                    :height="720"
+                                    label="Upload New Slider Image"
+                                    help-text="Recommended size: 1920x720px for optimal display across all devices"
+                                />
                             </div>
-                            @error('image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                            @error('media_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                         </div>
 
                         <!-- Link -->

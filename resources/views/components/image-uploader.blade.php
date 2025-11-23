@@ -14,7 +14,74 @@
     'value' => null,
 ])
 
-<div x-data="imageUploaderTrigger()" class="relative">
+<div x-data="{
+        previewImage: @js($previewUrl),
+        previewAlt: @js($previewAlt),
+        mediaId: @js($value),
+        targetField: @js($targetField),
+        hasInput: @js($inputName ? true : false),
+        
+        init() {
+            // Set initial value to hidden input if exists
+            if (this.hasInput && this.$refs.mediaInput) {
+                this.$refs.mediaInput.value = this.mediaId || '';
+            }
+            
+            // Listen for image upload event
+            window.addEventListener('imageUploaded', (event) => {
+                if (event.detail && event.detail.field === this.targetField && event.detail.media && event.detail.media.length > 0) {
+                    this.previewImage = event.detail.media[0].large_url;
+                    this.mediaId = event.detail.media[0].id;
+                    
+                    // Update hidden input if exists
+                    if (this.hasInput && this.$refs.mediaInput) {
+                        this.$refs.mediaInput.value = this.mediaId;
+                    }
+                    
+                    // Dispatch custom event for media upload with specific field
+                    window.dispatchEvent(new CustomEvent('media-uploaded-' + this.targetField, {
+                        detail: { mediaId: this.mediaId }
+                    }));
+                    
+                    // Emit to parent component
+                    this.$dispatch('image-updated', event.detail);
+                }
+            });
+            
+            // Listen for image selection from library
+            window.addEventListener('imageSelected', (event) => {
+                if (event.detail && event.detail.field === this.targetField && event.detail.media && event.detail.media.length > 0) {
+                    this.previewImage = event.detail.media[0].large_url;
+                    this.mediaId = event.detail.media[0].id;
+                    
+                    // Update hidden input if exists
+                    if (this.hasInput && this.$refs.mediaInput) {
+                        this.$refs.mediaInput.value = this.mediaId;
+                    }
+                    
+                    // Dispatch custom event for media selection with specific field
+                    window.dispatchEvent(new CustomEvent('media-uploaded-' + this.targetField, {
+                        detail: { mediaId: this.mediaId }
+                    }));
+                    
+                    // Emit to parent component
+                    this.$dispatch('image-updated', event.detail);
+                }
+            });
+        },
+        
+        removeImage() {
+            this.previewImage = null;
+            this.mediaId = null;
+            
+            // Clear hidden input if exists
+            if (this.hasInput && this.$refs.mediaInput) {
+                this.$refs.mediaInput.value = '';
+            }
+            
+            this.$dispatch('image-removed');
+        }
+    }" class="relative">
     {{-- Trigger/Preview Area --}}
     <div 
         @click="$dispatch('open-uploader-modal', { field: @js($targetField) })"
@@ -80,76 +147,3 @@
         :target-field="$targetField"
     />
 </div>
-
-<script>
-function imageUploaderTrigger() {
-    return {
-        previewImage: @js($previewUrl),
-        previewAlt: @js($previewAlt),
-        mediaId: @js($value),
-        
-        init() {
-            const targetField = @js($targetField);
-            const hasInput = @js($inputName ? true : false);
-            
-            // Set initial value to hidden input if exists
-            if (hasInput && this.$refs.mediaInput) {
-                this.$refs.mediaInput.value = this.mediaId || '';
-            }
-            
-            // Listen for image upload event using Livewire's global event system
-            window.addEventListener('imageUploaded', (event) => {
-                if (event.detail && event.detail.field === targetField && event.detail.media && event.detail.media.length > 0) {
-                    this.previewImage = event.detail.media[0].large_url;
-                    this.mediaId = event.detail.media[0].id;
-                    
-                    // Update hidden input if exists
-                    if (hasInput && this.$refs.mediaInput) {
-                        this.$refs.mediaInput.value = this.mediaId;
-                    }
-                    
-                    // Emit to parent component
-                    this.$dispatch('image-updated', event.detail);
-                }
-            });
-            
-            // Listen for image selection from library
-            window.addEventListener('imageSelected', (event) => {
-                if (event.detail && event.detail.field === targetField && event.detail.media && event.detail.media.length > 0) {
-                    this.previewImage = event.detail.media[0].large_url;
-                    this.mediaId = event.detail.media[0].id;
-                    
-                    // Update hidden input if exists
-                    if (hasInput && this.$refs.mediaInput) {
-                        this.$refs.mediaInput.value = this.mediaId;
-                    }
-                    
-                    // Emit to parent component
-                    this.$dispatch('image-updated', event.detail);
-                }
-            });
-        },
-        
-        removeImage() {
-            const hasInput = @js($inputName ? true : false);
-            
-            this.previewImage = null;
-            this.mediaId = null;
-            
-            // Clear hidden input if exists
-            if (hasInput && this.$refs.mediaInput) {
-                this.$refs.mediaInput.value = '';
-            }
-            
-            this.$dispatch('image-removed');
-        },
-        
-        openModal() {
-            // Dispatch event to open modal
-            window.dispatchEvent(new CustomEvent('open-image-uploader', {
-                detail: { targetField: @js($targetField) }
-            }));
-        }
-    }
-}
-</script>
