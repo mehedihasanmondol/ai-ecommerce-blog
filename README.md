@@ -60,6 +60,7 @@ DB_PORT=3306
 DB_DATABASE=mydb
 DB_USERNAME=root
 DB_PASSWORD=
+APP_URL=xxxx.com
 
 📌 9. Run Migration (If needed)
 

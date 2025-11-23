@@ -20,8 +20,19 @@
         }
     }
     
-    // Use new media library system
-    $imageUrl = $product->getPrimaryThumbnailUrl();
+    // Use new media library system - handle both Product models and stdClass objects
+    if (method_exists($product, 'getPrimaryThumbnailUrl')) {
+        $imageUrl = $product->getPrimaryThumbnailUrl();
+    } elseif ($product->images && $product->images->count() > 0) {
+        $firstImage = $product->images->first();
+        if (is_object($firstImage) && isset($firstImage->image_path)) {
+            $imageUrl = asset('storage/' . $firstImage->image_path);
+        } else {
+            $imageUrl = asset('images/placeholder.png');
+        }
+    } else {
+        $imageUrl = asset('images/placeholder.png');
+    }
     $price = $variant ? ($variant->sale_price ?? $variant->price ?? 0) : 0;
     $originalPrice = $variant ? ($variant->price ?? 0) : 0;
     $hasDiscount = $originalPrice > $price;
