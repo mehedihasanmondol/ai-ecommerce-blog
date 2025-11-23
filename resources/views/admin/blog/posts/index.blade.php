@@ -283,8 +283,6 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="{{ route('admin.blog.posts.edit', $post->id) }}" 
                            class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                        <a href="{{ route('admin.blog.posts.show', $post->id) }}" 
-                           class="text-green-600 hover:text-green-900 mr-3">View</a>
                         <button onclick="deletePost({{ $post->id }})" 
                                 class="text-red-600 hover:text-red-900">Delete</button>
                     </td>
