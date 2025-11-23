@@ -246,6 +246,33 @@ class SiteSettingSeeder extends Seeder
                 'description' => 'Allow comments on blog posts',
                 'order' => 9,
             ],
+            [
+                'key' => 'blog_show_tags',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'blog',
+                'label' => 'Show Tags',
+                'description' => 'Display tags on blog posts',
+                'order' => 10,
+            ],
+            [
+                'key' => 'blog_show_views',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'blog',
+                'label' => 'Show Views Count',
+                'description' => 'Display total views count on blog posts',
+                'order' => 11,
+            ],
+            [
+                'key' => 'blog_show_reading_time',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'blog',
+                'label' => 'Show Reading Time',
+                'description' => 'Display estimated reading time on blog posts',
+                'order' => 12,
+            ],
 
             // Homepage Settings
             [

@@ -72,6 +72,7 @@
 
                         <!-- Meta Info -->
                         <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+                            @if(\App\Models\SiteSetting::get('blog_show_views', '1') === '1')
                             <div class="flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -79,11 +80,13 @@
                                 </svg>
                                 <span>{{ number_format($post->views_count) }} views</span>
                             </div>
+                            @endif
                             <!-- Tick Marks -->
                             <x-blog.tick-marks :post="$post" />
                         </div>
 
                         <!-- Author Info -->
+                        @if(\App\Models\SiteSetting::get('blog_show_author', '1') === '1')
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
                                 @if($post->author->authorProfile?->media)
@@ -109,7 +112,9 @@
                                 @endif
                                 <div>
                                     <a href="{{ route('blog.author', $post->author->authorProfile->slug) }}" class="text-blue-600 hover:text-blue-800 font-semibold">{{ $post->author->name }}</a>
+                                    @if(\App\Models\SiteSetting::get('blog_show_date', '1') === '1')
                                     <p class="text-sm text-gray-500">Posted on {{ $post->published_at->format('F j, Y') }}</p>
+                                    @endif
                                 </div>
                             </div>
 
@@ -232,6 +237,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- Featured Image -->
                     @if($post->media || $post->featured_image)
@@ -271,7 +277,7 @@
                     </div>
 
                     <!-- Tags -->
-                    @if($post->tags->count() > 0)
+                    @if(\App\Models\SiteSetting::get('blog_show_tags', '1') === '1' && $post->tags->count() > 0)
                     <div class="px-8 py-6 border-t border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900 mb-3">Tags:</h3>
                         <div class="flex flex-wrap gap-2">
@@ -332,6 +338,7 @@
                 </div>
 
                 <!-- Author Bio -->
+                @if(\App\Models\SiteSetting::get('blog_show_author', '1') === '1')
                 <div class="bg-white rounded-lg shadow-sm mt-8 p-8">
                     <div class="flex items-start space-x-4">
                         <div class="flex-shrink-0">
@@ -381,6 +388,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- Related Posts -->
                 @if($relatedPosts->count() > 0)
@@ -415,7 +423,7 @@
             @endif
 
                 <!-- Comments Section -->
-                @if($post->allow_comments)
+                @if(\App\Models\SiteSetting::get('blog_show_comments', '1') === '1' && $post->allow_comments)
                 @livewire('blog.comment-section', ['post' => $post])
                 @endif
 
@@ -498,7 +506,7 @@
                                     <p class="mt-1 text-xs text-gray-500">Your comment will be reviewed before being published.</p>
                                 </div>
 
-                                <div class="flex items-center justify-between">
+                                <div class="flex gap-2 items-center justify-between">
                                     <button type="submit" 
                                             class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

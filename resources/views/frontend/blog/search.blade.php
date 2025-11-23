@@ -207,28 +207,34 @@
                                 
                                 <!-- Mobile-Optimized Metadata & Actions -->
                                 <div class="space-y-3">
-                                    <!-- Author & Date Info -->
-                                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-6 h-6 bg-gradient-to-br from-indigo-400 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                                                {{ substr($post->author->name, 0, 1) }}
+                                        <!-- Author & Date Info -->
+                                        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
+                                            @if(\App\Models\SiteSetting::get('blog_show_author', '1') === '1')
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                    {{ substr($post->author->name, 0, 1) }}
+                                                </div>
+                                                <span class="font-medium">{{ $post->author->name }}</span>
                                             </div>
-                                            <span class="font-medium">{{ $post->author->name }}</span>
-                                        </div>
+                                            @endif
                                         <div class="flex items-center gap-4 text-xs sm:text-sm">
+                                            @if(\App\Models\SiteSetting::get('blog_show_date', '1') === '1')
                                             <span class="flex items-center gap-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                                 </svg>
                                                 {{ $post->published_at->format('M d, Y') }}
                                             </span>
+                                            @endif
+                                            @if(\App\Models\SiteSetting::get('blog_show_reading_time', '1') === '1')
                                             <span class="flex items-center gap-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                                 {{ $post->reading_time_text }}
                                             </span>
-                                            @if($post->views_count > 0)
+                                            @endif
+                                            @if(\App\Models\SiteSetting::get('blog_show_views', '1') === '1' && $post->views_count > 0)
                                             <span class="flex items-center gap-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>

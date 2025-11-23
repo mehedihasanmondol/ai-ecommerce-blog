@@ -82,12 +82,15 @@
 
         <!-- Meta Info -->
         <div class="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-100 mb-3">
+            @if(\App\Models\SiteSetting::get('blog_show_date', '1') === '1')
             <span class="flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 {{ $post->published_at->format('M d, Y') }}
             </span>
+            @endif
+            @if(\App\Models\SiteSetting::get('blog_show_views', '1') === '1')
             <span class="flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -95,6 +98,7 @@
                 </svg>
                 {{ number_format($post->views_count) }}
             </span>
+            @endif
             <!-- Read More Button -->
             <a href="{{ route('products.show', $post->slug) }}" 
             class="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors">
