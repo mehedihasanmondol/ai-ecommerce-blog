@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\ProductReview;
 use App\Modules\Ecommerce\Product\Services\ProductReviewService;
 use Livewire\Component;
@@ -42,6 +43,7 @@ class ProductReviewTable extends Component
     public $showViewModal = false;
     public $reviewToDelete = null;
     public $selectedReview = null;
+    public $enableReviews = true;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -49,6 +51,19 @@ class ProductReviewTable extends Component
         'ratingFilter' => ['except' => ''],
         'verifiedFilter' => ['except' => ''],
     ];
+
+    public function mount()
+    {
+        $this->enableReviews = SiteSetting::get('enable_product_reviews', '1') === '1';
+    }
+
+    public function toggleEnableReviews()
+    {
+        $this->enableReviews = !$this->enableReviews;
+        SiteSetting::set('enable_product_reviews', $this->enableReviews ? '1' : '0');
+        
+        session()->flash('success', 'Product reviews ' . ($this->enableReviews ? 'enabled' : 'disabled') . ' successfully!');
+    }
 
     public function updatingSearch()
     {

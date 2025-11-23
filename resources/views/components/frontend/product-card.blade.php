@@ -114,6 +114,7 @@
                 {{ $product->name }}
             </h3>
 
+            @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
             <!-- Rating (Placeholder) -->
             <div class="flex items-center mb-2">
                 <div class="flex text-yellow-400">
@@ -125,6 +126,7 @@
                 </div>
                 <span class="text-xs text-gray-500 ml-2">(0)</span>
             </div>
+            @endif
 
             <!-- Price -->
             <div class="flex items-center justify-between">

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\SiteSetting;
 use App\Modules\Ecommerce\Product\Models\ProductQuestion;
 use App\Modules\Ecommerce\Product\Services\ProductQuestionService;
 use Livewire\Component;
@@ -38,11 +39,25 @@ class ProductQuestionTable extends Component
     public $showFilters = false;
     public $showDeleteModal = false;
     public $questionToDelete = null;
+    public $enableQna = true;
 
     protected $queryString = [
         'search' => ['except' => ''],
         'statusFilter' => ['except' => ''],
     ];
+
+    public function mount()
+    {
+        $this->enableQna = SiteSetting::get('enable_product_qna', '1') === '1';
+    }
+
+    public function toggleEnableQna()
+    {
+        $this->enableQna = !$this->enableQna;
+        SiteSetting::set('enable_product_qna', $this->enableQna ? '1' : '0');
+        
+        session()->flash('success', 'Product Q&A ' . ($this->enableQna ? 'enabled' : 'disabled') . ' successfully!');
+    }
 
     public function updatingSearch()
     {

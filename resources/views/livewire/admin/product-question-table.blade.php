@@ -1,5 +1,24 @@
 <div class="p-6">
 
+    {{-- Page Header with Toggle --}}
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Product Questions & Answers</h1>
+        
+        <div class="flex items-center space-x-3">
+            <span class="text-sm font-medium text-gray-700">Enable Q&A</span>
+            <button 
+                wire:click="toggleEnableQna" 
+                type="button"
+                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 {{ $enableQna ? 'bg-green-600' : 'bg-gray-200' }}"
+                role="switch"
+                aria-checked="{{ $enableQna ? 'true' : 'false' }}">
+                <span class="sr-only">Enable Q&A</span>
+                <span class="pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $enableQna ? 'translate-x-5' : 'translate-x-0' }}">
+                </span>
+            </button>
+        </div>
+    </div>
+
     {{-- Flash Messages --}}
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-4 flex items-center">

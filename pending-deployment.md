@@ -30,6 +30,11 @@ php artisan migrate --path=database/migrations/2025_11_23_000033_update_login_se
 
 php artisan migrate --path=database/migrations/2025_11_23_001611_add_media_id_to_hero_sliders_table.php
 
+php artisan db:seed --class=SiteSettingSeeder
+php artisan cache:clear
+php artisan view:clear
+
+
 # Step 4: Build JavaScript assets (includes CropperJS)
 npm run build
 

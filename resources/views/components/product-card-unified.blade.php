@@ -101,7 +101,7 @@
         </h3>
 
         <!-- Rating -->
-        @if($product->average_rating > 0)
+        @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1' && $product->average_rating > 0)
         <div class="flex items-center mb-2">
             <div class="flex items-center">
                 @for($i = 1; $i <= 5; $i++)
@@ -211,7 +211,7 @@
                         </a>
                     </h3>
 
-                    @if($product->average_rating > 0)
+                    @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1' && $product->average_rating > 0)
                     <div class="flex items-center mb-3">
                         <div class="flex items-center">
                             @for($i = 1; $i <= 5; $i++)

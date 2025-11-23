@@ -23,6 +23,7 @@
                                              class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
                                     </a>
                                     
+                                    @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
                                     <!-- Star Rating & Reviews -->
                                     <div class="flex items-center mt-3">
                                         @for($i = 1; $i <= 5; $i++)
@@ -38,6 +39,7 @@
                                         @endfor
                                         <span class="text-sm text-gray-700 ml-1.5 font-medium">{{ number_format($item['reviews']) }}</span>
                                     </div>
+                                    @endif
                                     
                                     <!-- Product Name (Truncated) -->
                                     <p class="text-xs text-gray-600 text-center mt-2 max-w-[140px] line-clamp-2 leading-tight">

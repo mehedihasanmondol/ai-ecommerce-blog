@@ -179,6 +179,7 @@
                                     <p class="text-xs text-gray-500 mb-1">{{ $product['brand'] }}</p>
                                 @endif
                                 
+                                @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
                                 <!-- Rating -->
                                 @if($product['rating'] > 0)
                                 <div class="flex items-center mb-1">
@@ -195,6 +196,7 @@
                                     @endfor
                                     <span class="text-xs text-gray-600 ml-1">({{ number_format($product['reviews']) }})</span>
                                 </div>
+                                @endif
                                 @endif
                                 
                                 <!-- Price -->

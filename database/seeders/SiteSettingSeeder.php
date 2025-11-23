@@ -707,5 +707,43 @@ class SiteSettingSeeder extends Seeder
                 $setting
             );
         }
+
+        // Product Features Settings
+        $featureSettings = [
+            [
+                'key' => 'enable_product_reviews',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'product_features',
+                'label' => 'Enable Product Reviews',
+                'description' => 'Allow customers to submit and view product reviews on the site',
+                'order' => 1,
+            ],
+            [
+                'key' => 'enable_product_qna',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'product_features',
+                'label' => 'Enable Product Q&A',
+                'description' => 'Allow customers to ask questions and view answers on product pages',
+                'order' => 2,
+            ],
+            [
+                'key' => 'enable_product_specifications',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'product_features',
+                'label' => 'Enable Product Specifications',
+                'description' => 'Display product specifications (category, product code, shipping weight, dimensions) on product detail pages',
+                'order' => 3,
+            ],
+        ];
+
+        foreach ($featureSettings as $setting) {
+            SiteSetting::updateOrCreate(
+                ['key' => $setting['key']],
+                $setting
+            );
+        }
     }
 }
