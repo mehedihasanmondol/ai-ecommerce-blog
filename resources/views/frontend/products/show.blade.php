@@ -127,9 +127,10 @@
                 </div>
                 @endif
 
-                @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
                 <!-- Rating & Reviews Summary -->
+                @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1' || \App\Models\SiteSetting::get('enable_product_qna', '1') === '1' || $product->views_count > 0)
                 <div class="mb-4 pb-4 border-b border-gray-200">
+                @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
                     <!-- Rating Stars and Score with Hover Tooltip -->
                     <div class="flex items-center space-x-2 mb-2 relative group">
                         <div class="flex items-center cursor-pointer">
@@ -225,9 +226,8 @@
                     </div>
                     @endif
                     
-                    @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1' || \App\Models\SiteSetting::get('enable_product_qna', '1') === '1' || $product->views_count > 0)
                     <!-- Review and Q&A Links -->
-                    <div class="flex flex-wrap items-center gap-4 text-sm mb-4 pb-4 border-b border-gray-200">
+                    <div class="flex flex-wrap items-center gap-4 text-sm">
                         @if(\App\Models\SiteSetting::get('enable_product_reviews', '1') === '1')
                         <a href="#reviews-section" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center transition">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,8 +269,8 @@
                         </div>
                         @endif
                     </div>
-                    @endif
                 </div>
+                @endif
 
                 <!-- Stock Status (only shown when restriction is enabled) -->
                 @php
