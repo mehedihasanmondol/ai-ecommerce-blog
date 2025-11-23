@@ -123,7 +123,9 @@
                 <!-- Short Description -->
                 @if($product->short_description)
                 <div class="mb-4 pb-4 border-b border-gray-200">
-                    <p class="text-sm text-gray-700 leading-relaxed">{{ $product->short_description }}</p>
+                    <div class="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none">
+                        {!! $product->short_description !!}
+                    </div>
                 </div>
                 @endif
 
@@ -565,6 +567,15 @@
                 @livewire('product.review-form', ['productId' => $product->id])
             </div>
         </div>
+    </div>
+</div>
+@endif
+
+<!-- Most Popular / Featured Products -->
+@if($popularProducts->count() > 0)
+<div class="bg-white py-8">
+    <div class="container mx-auto px-4">
+        <x-popular-products-slider :products="$popularProducts" />
     </div>
 </div>
 @endif

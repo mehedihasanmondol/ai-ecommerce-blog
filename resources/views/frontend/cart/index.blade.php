@@ -236,7 +236,7 @@
                                     ];
                                     $productObj->images = collect($product['image'] ? [$image] : []);
                                 @endphp
-                                <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] xl:w-[calc(20%-0.8rem)]">
+                                <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] ">
                                     <x-product-card-unified :product="$productObj" size="default" />
                                 </div>
                             @endforeach

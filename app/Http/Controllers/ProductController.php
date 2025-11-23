@@ -64,6 +64,9 @@ class ProductController extends Controller
         // Get inspired by browsing products (based on browsing history)
         $inspiredByBrowsing = $this->getInspiredByBrowsing($product);
 
+        // Get popular/featured products for bottom slider
+        $popularProducts = $this->getPopularOrFeaturedProducts($product->id);
+
         // Track this product as recently viewed
         $this->trackRecentlyViewed($product->id);
 
@@ -124,6 +127,7 @@ class ProductController extends Controller
             'relatedProducts', 
             'recentlyViewed',
             'inspiredByBrowsing',
+            'popularProducts',
             'averageRating',
             'totalReviews',
             'totalQuestions',
@@ -241,5 +245,36 @@ class ProductController extends Controller
         return $query->inRandomOrder()
             ->limit(10)
             ->get();
+    }
+
+    /**
+     * Get popular products (by sales count) or featured products as fallback
+     *
+     * @param int $currentProductId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getPopularOrFeaturedProducts(int $currentProductId)
+    {
+        // First, try to get popular products (by sales_count)
+        $popularProducts = Product::with(['variants', 'images', 'brand'])
+            ->where('id', '!=', $currentProductId)
+            ->where('is_active', true)
+            ->where('sales_count', '>', 0)
+            ->orderBy('sales_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // If no popular products found, fallback to featured products
+        if ($popularProducts->isEmpty()) {
+            $popularProducts = Product::with(['variants', 'images', 'brand'])
+                ->where('id', '!=', $currentProductId)
+                ->where('is_active', true)
+                ->where('is_featured', true)
+                ->inRandomOrder()
+                ->limit(10)
+                ->get();
+        }
+
+        return $popularProducts;
     }
 }
