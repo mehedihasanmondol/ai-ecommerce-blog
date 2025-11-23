@@ -180,7 +180,29 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+/* CKEditor Custom Styling */
+.ck-editor__editable {
+    min-height: 150px;
+    max-height: 300px;
+}
+
+.ck.ck-editor__main>.ck-editor__editable {
+    background: #ffffff;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Force list markers to display (override Tailwind reset) */
+.ck-content ul,
+.ck-content ol {
+    margin-left: 20px;
+}
+</style>
+@endpush
+
 @push('scripts')
+@vite('resources/js/site-settings-editor.js')
 <script>
     // Toast Notification System
     document.addEventListener('livewire:init', () => {
@@ -238,7 +260,7 @@
     // Tab interface - no scroll spy needed since we're showing/hiding content
 </script>
 
-<!-- TinyMCE CDN with API Key -->
+<!-- TinyMCE CDN with API Key (for backward compatibility with existing tinymce fields) -->
 <script src="https://cdn.tiny.cloud/1/{{ \App\Models\SiteSetting::get('tinymce_api_key', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 @endpush
 @endsection

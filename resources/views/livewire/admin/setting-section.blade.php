@@ -51,6 +51,8 @@
                                 <span class="text-xs font-normal px-2 py-1 bg-green-100 text-green-700 rounded">Toggle</span>
                             @elseif($setting->type === 'tinymce')
                                 <span class="text-xs font-normal px-2 py-1 bg-orange-100 text-orange-700 rounded">Rich Editor</span>
+                            @elseif($setting->type === 'ckeditor')
+                                <span class="text-xs font-normal px-2 py-1 bg-orange-100 text-orange-700 rounded">Rich Editor</span>
                             @elseif($setting->type === 'textarea')
                                 <span class="text-xs font-normal px-2 py-1 bg-blue-100 text-blue-700 rounded">Long Text</span>
                             @else
@@ -110,6 +112,15 @@
                                 }"
                                 x-init="init()"
                             ></textarea>
+                        </div>
+
+                    @elseif($setting->type === 'ckeditor')
+                        <div wire:ignore>
+                            <textarea 
+                                id="ckeditor-{{ $setting->key }}"
+                                class="ckeditor-content-minimal"
+                                data-setting-key="{{ $setting->key }}"
+                            >{{ $settings[$setting->key] ?? '' }}</textarea>
                         </div>
 
                     @elseif($setting->type === 'select')

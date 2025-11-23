@@ -481,7 +481,7 @@ class SiteSettingSeeder extends Seeder
         </div>
     </div>
 </div>',
-                'type' => 'tinymce',
+                'type' => 'ckeditor',
                 'group' => 'login',
                 'label' => 'Login Page Content',
                 'description' => 'Rich content for the right side of login page (HTML supported)',
@@ -517,7 +517,7 @@ class SiteSettingSeeder extends Seeder
             [
                 'key' => 'login_terms_conditions',
                 'value' => '<p>By continuing, you\'ve read and agree to our <a href="/terms-and-conditions" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="/privacy-policy" class="text-blue-600 hover:underline">Privacy Policy</a>.</p>',
-                'type' => 'tinymce',
+                'type' => 'ckeditor',
                 'group' => 'login',
                 'label' => 'Terms & Conditions Text',
                 'description' => 'Terms and conditions text displayed on login page (HTML supported)',

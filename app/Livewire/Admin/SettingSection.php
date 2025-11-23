@@ -77,6 +77,11 @@ class SettingSection extends Component
                     $value = $this->settings[$setting->key] ?? '';
                     $setting->update(['value' => $value]);
                 }
+                // Handle ckeditor (rich text)
+                elseif ($setting->type === 'ckeditor') {
+                    $value = $this->settings[$setting->key] ?? '';
+                    $setting->update(['value' => $value]);
+                }
                 // Handle text and textarea
                 else {
                     $value = $this->settings[$setting->key] ?? '';
