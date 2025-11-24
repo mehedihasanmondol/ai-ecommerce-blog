@@ -414,7 +414,9 @@ class ReportService
                 DB::raw('AVG(shipping_cost) as avg_shipping_cost')
             )
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereIn('status', ['completed', 'processing', 'shipped', 'delivered'])
+            ->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered'])
+            ->whereNotNull('delivery_zone_name') // Filter out NULL zones
+            ->where('delivery_zone_name', '!=', '') // Filter out empty zones
             ->groupBy('delivery_zone_name', 'delivery_method_name')
             ->orderByDesc('order_count')
             ->get();

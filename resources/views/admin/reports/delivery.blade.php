@@ -225,12 +225,14 @@
 // Group data by zone
 const zoneData = {};
 @foreach($deliveryZones as $zone)
-    const zoneName = '{{ $zone->delivery_zone_name ?? "N/A" }}';
-    if (!zoneData[zoneName]) {
-        zoneData[zoneName] = { orders: 0, shipping: 0 };
-    }
-    zoneData[zoneName].orders += {{ $zone->order_count }};
-    zoneData[zoneName].shipping += {{ $zone->shipping_revenue }};
+    (function() {
+        const zoneName = '{{ $zone->delivery_zone_name ?? "N/A" }}';
+        if (!zoneData[zoneName]) {
+            zoneData[zoneName] = { orders: 0, shipping: 0 };
+        }
+        zoneData[zoneName].orders += {{ $zone->order_count }};
+        zoneData[zoneName].shipping += {{ $zone->shipping_revenue }};
+    })();
 @endforeach
 
 const zoneNames = Object.keys(zoneData);
