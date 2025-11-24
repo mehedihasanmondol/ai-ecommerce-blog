@@ -180,6 +180,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/payment-gateways/{gateway}/edit', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'edit'])->name('payment-gateways.edit');
     Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
     Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
+    
+    // Stock Report Routes
+    Route::prefix('stock')->name('stock.')->group(function () {
+        Route::get('/reports', [\App\Modules\Stock\Controllers\StockReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/export-pdf', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportPdf'])->name('reports.pdf');
+        Route::get('/reports/export-excel', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportExcel'])->name('reports.excel');
+    });
 });
 
 // Customer Dashboard and Profile Routes (Protected)

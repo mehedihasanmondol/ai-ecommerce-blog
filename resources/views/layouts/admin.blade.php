@@ -377,6 +377,15 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+
+                <a href="{{ route('admin.stock.reports.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-chart-bar w-5 mr-3"></i>
+                    <span>Stock Reports</span>
+                    @if(request()->routeIs('admin.stock.reports.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
                 @endif
 
                 <!-- Content Section (Placeholder) -->
@@ -710,6 +719,12 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-truck w-5 mr-3"></i>
                     <span>Suppliers</span>
+                </a>
+
+                <a href="{{ route('admin.stock.reports.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-chart-bar w-5 mr-3"></i>
+                    <span>Stock Reports</span>
                 </a>
                 @endif
 
