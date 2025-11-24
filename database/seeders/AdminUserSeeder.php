@@ -37,7 +37,7 @@ class AdminUserSeeder extends Seeder
         if (!$adminExists) {
             User::create([
                 'name' => 'Admin User',
-                'email' => 'admin@iherb.com',
+                'email' => 'admin@demo.com',
                 'mobile' => '01700000000',
                 'password' => Hash::make('admin123'),
                 'role' => 'admin',
@@ -45,7 +45,7 @@ class AdminUserSeeder extends Seeder
             ]);
 
             $this->command->info('Admin user created successfully!');
-            $this->command->info('Email: admin@iherb.com');
+            $this->command->info('Email: admin@demo.com');
             $this->command->info('Password: admin123');
         } else {
             $this->command->warn('Admin user already exists!');

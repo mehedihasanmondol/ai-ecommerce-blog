@@ -18,6 +18,11 @@ class DummyContentSeeder extends Seeder
     {
         $this->command->info('🌱 Starting Dummy content database seeding...');
       
+        // Phase 2: User Management & Permissions (Depends on settings)
+        $this->command->info('👥 Phase 2: User Management & Permissions');
+        $this->call([
+            TestUsersSeeder::class,
+        ]);
 
         // Phase 3: Product & Category Setup (Depends on users)
         $this->command->info('📦 Phase 3: Product & Category Setup');
