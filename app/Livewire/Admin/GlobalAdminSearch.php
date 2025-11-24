@@ -56,6 +56,42 @@ class GlobalAdminSearch extends Component
                 'category' => 'Users',
                 'keywords' => ['access control', 'permissions', 'authorization']
             ],
+            [
+                'title' => 'Email Preferences',
+                'description' => 'Manage customer email notification preferences',
+                'route' => 'admin.email-preferences.index',
+                'icon' => 'fas fa-envelope-open-text',
+                'permission' => 'users.view',
+                'category' => 'Users',
+                'keywords' => ['email settings', 'notifications', 'newsletter', 'promotions', 'order updates', 'recommendations', 'unsubscribe']
+            ],
+            [
+                'title' => 'Email Setup Guide',
+                'description' => 'Server setup and cron job configuration guide',
+                'route' => 'admin.email-preferences.guideline',
+                'icon' => 'fas fa-book',
+                'permission' => 'users.view',
+                'category' => 'Users',
+                'keywords' => ['email setup', 'cron job', 'smtp', 'server configuration', 'automation', 'guideline', 'help']
+            ],
+            [
+                'title' => 'Email Schedule Setup',
+                'description' => 'Configure automated email campaign schedules',
+                'route' => 'admin.email-preferences.schedule-setup',
+                'icon' => 'fas fa-calendar-alt',
+                'permission' => 'users.view',
+                'category' => 'Users',
+                'keywords' => ['schedule', 'automation', 'cron', 'timing', 'frequency', 'email schedule', 'campaigns']
+            ],
+            [
+                'title' => 'Email Content Editor',
+                'description' => 'Compose and test email campaigns with rich editor',
+                'route' => 'admin.email-preferences.mail-setup',
+                'icon' => 'fas fa-edit',
+                'permission' => 'users.view',
+                'category' => 'Users',
+                'keywords' => ['email editor', 'compose', 'ckeditor', 'mail content', 'test email', 'template', 'newsletter']
+            ],
             
             // E-commerce
             [

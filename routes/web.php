@@ -187,6 +187,20 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/reports/export-pdf', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportPdf'])->name('reports.pdf');
         Route::get('/reports/export-excel', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportExcel'])->name('reports.excel');
     });
+    
+    // Email Preferences Management Routes
+    Route::prefix('email-preferences')->name('email-preferences.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'index'])->name('index');
+        Route::get('/guideline', function () { return view('admin.email-preferences.guideline'); })->name('guideline');
+        Route::get('/schedule-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'scheduleSetup'])->name('schedule-setup');
+        Route::get('/mail-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'mailSetup'])->name('mail-setup');
+        Route::post('/update-schedule', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'updateSchedule'])->name('update-schedule');
+        Route::post('/send-test-email', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'sendTestEmail'])->name('send-test-email');
+        Route::put('/{user}', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'update'])->name('update');
+        Route::post('/bulk-update', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'bulkUpdate'])->name('bulk-update');
+        Route::get('/export', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'export'])->name('export');
+        Route::get('/newsletter-subscribers', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'newsletterSubscribers'])->name('newsletter-subscribers');
+    });
 });
 
 // Customer Dashboard and Profile Routes (Protected)
