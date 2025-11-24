@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\FooterSetting;
 use App\Models\FooterLink;
 use App\Models\FooterBlogPost;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FooterManagementController extends Controller
 {
@@ -24,11 +26,22 @@ class FooterManagementController extends Controller
             FooterSetting::where('key', $key)->update(['value' => $value]);
         }
 
-        // Handle QR code image upload
+        // Handle QR code image upload with WebP compression
         if ($request->hasFile('qr_code_image')) {
-            $file = $request->file('qr_code_image');
-            $filename = time() . '_qr_code.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('footer/qr-codes', $filename, 'public');
+            $imageService = app(ImageCompressionService::class);
+            
+            // Delete old QR code if exists
+            $oldQrCode = FooterSetting::where('key', 'qr_code_image')->first();
+            if ($oldQrCode && $oldQrCode->value) {
+                Storage::disk('public')->delete($oldQrCode->value);
+            }
+            
+            // Compress and store as WebP
+            $path = $imageService->compressAndStore(
+                $request->file('qr_code_image'),
+                'footer/qr-codes',
+                'public'
+            );
             
             FooterSetting::where('key', 'qr_code_image')->update(['value' => $path]);
         }
@@ -45,8 +58,14 @@ class FooterManagementController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
+        // Compress and store image as WebP
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('footer/blog', 'public');
+            $imageService = app(ImageCompressionService::class);
+            $validated['image'] = $imageService->compressAndStore(
+                $request->file('image'),
+                'footer/blog',
+                'public'
+            );
         }
 
         $validated['sort_order'] = FooterBlogPost::max('sort_order') + 1;
@@ -58,7 +77,7 @@ class FooterManagementController extends Controller
     public function deleteBlogPost(FooterBlogPost $blogPost)
     {
         if ($blogPost->image) {
-            \Storage::disk('public')->delete($blogPost->image);
+            Storage::disk('public')->delete($blogPost->image);
         }
         $blogPost->delete();
         return redirect()->back()->with('success', 'Blog post deleted successfully!');

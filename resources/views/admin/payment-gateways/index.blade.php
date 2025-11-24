@@ -12,13 +12,6 @@
         </div>
     </div>
 
-    <!-- Success Message -->
-    @if(session('success'))
-        <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <!-- Payment Gateways List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($gateways as $gateway)

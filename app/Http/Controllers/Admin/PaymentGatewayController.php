@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PaymentGateway;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Payment Gateway Admin Controller
@@ -36,15 +38,21 @@ class PaymentGatewayController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
         ]);
 
-        // Handle logo upload
+        // Handle logo upload with WebP compression
         if ($request->hasFile('logo')) {
+            $imageService = app(ImageCompressionService::class);
+            
             // Delete old logo if exists
-            if ($gateway->logo && \Storage::disk('public')->exists($gateway->logo)) {
-                \Storage::disk('public')->delete($gateway->logo);
+            if ($gateway->logo && Storage::disk('public')->exists($gateway->logo)) {
+                Storage::disk('public')->delete($gateway->logo);
             }
             
-            // Store new logo
-            $logoPath = $request->file('logo')->store('payment-gateways', 'public');
+            // Compress and store as WebP
+            $logoPath = $imageService->compressAndStore(
+                $request->file('logo'),
+                'payment-gateways',
+                'public'
+            );
             $validated['logo'] = $logoPath;
         }
 
