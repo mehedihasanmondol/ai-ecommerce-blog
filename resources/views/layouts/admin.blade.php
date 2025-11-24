@@ -79,9 +79,9 @@
 
                     <!-- Right Side -->
                     <div class="flex items-center space-x-4">
-                        <!-- Global Search -->
-                        <div class="hidden md:block w-64">
-                            @livewire('admin.global-user-search')
+                        <!-- Global Admin Search -->
+                        <div class="hidden md:block w-80">
+                            @livewire('admin.global-admin-search')
                         </div>
 
                         <!-- Notifications -->
