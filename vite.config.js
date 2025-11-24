@@ -16,6 +16,7 @@ export default defineConfig({
                 'resources/css/app.css', 
                 'resources/js/app.js', 
                 'resources/js/admin.js',
+                'resources/js/email-editor.js',
                 'resources/js/ckeditor-init.js',  // CKEditor initialization
                 'resources/js/blog-post-editor.js',  // Blog post editor
                 'resources/js/product-editor.js',  // Product editor

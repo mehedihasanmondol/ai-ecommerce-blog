@@ -80,19 +80,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="p-6 space-y-4 mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">Email Content *</label>
+                            <textarea name="content" 
+                                      id="ckeditor" 
+                                      class="ckeditor-content"></textarea>
+                            
+                            <!-- Word Counter -->
+                            <div class="char-counter" id="word-count"></div>
+
+
+                        </div>
                     </div>
 
-                    <!-- Content Editor - CKEditor 5 -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Email Content *</label>
-                        <textarea name="content" 
-                                  id="ckeditor" 
-                                  class="ckeditor-content"></textarea>
-                        
-                        <!-- Word Counter -->
-                        <div class="char-counter" id="word-count"></div>
-                    </div>
-
+                
                     <!-- Test Email Section -->
                     <div class="bg-white rounded-lg shadow p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">

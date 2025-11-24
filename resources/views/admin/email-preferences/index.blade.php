@@ -12,11 +12,11 @@
                 <p class="mt-1 text-sm text-gray-600">Manage customer email notification preferences</p>
             </div>
             <div class="flex gap-3 flex-wrap">
-                <a href="{{ route('admin.email-preferences.schedule-setup') }}" 
+                <!-- <a href="{{ route('admin.email-preferences.schedule-setup') }}" 
                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
                     <i class="fas fa-calendar-alt"></i>
                     Schedule Setup
-                </a>
+                </a> -->
                 <a href="{{ route('admin.email-preferences.mail-setup') }}" 
                    class="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors flex items-center gap-2">
                     <i class="fas fa-edit"></i>
@@ -27,11 +27,7 @@
                     <i class="fas fa-book"></i>
                     Setup Guide
                 </a>
-                <a href="{{ route('admin.email-preferences.newsletter-subscribers') }}" 
-                   class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2">
-                    <i class="fas fa-users"></i>
-                    Newsletter Subscribers
-                </a>
+                
                 <button onclick="exportPreferences('csv')" 
                         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
                     <i class="fas fa-download"></i>
