@@ -185,14 +185,14 @@
                                 </a>
                                 
                                 @if($order->status !== 'cancelled' && $order->status !== 'delivered')
-                                    <a href="{{ route('orders.track') }}?order_number={{ $order->order_number }}" 
+                                    <!-- <a href="{{ route('orders.track') }}?order_number={{ $order->order_number }}" 
                                        class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 border-2 border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         </svg>
                                         Track Order
-                                    </a>
+                                    </a> -->
                                 @endif
                                 
                                 @if($order->status === 'delivered')
