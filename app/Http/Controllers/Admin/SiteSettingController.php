@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\ImageCompressionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,7 +46,7 @@ class SiteSettingController extends Controller
     /**
      * Update site settings
      */
-    public function update(Request $request)
+    public function update(Request $request, ImageCompressionService $imageService)
     {
         $validated = $request->validate([
             'settings' => 'required|array',
@@ -56,15 +57,19 @@ class SiteSettingController extends Controller
             $setting = SiteSetting::where('key', $key)->first();
             
             if ($setting) {
-                // Handle image uploads
+                // Handle image uploads with WebP compression
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
                     // Delete old image
                     if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                         Storage::disk('public')->delete($setting->value);
                     }
                     
-                    // Store new image
-                    $path = $request->file("settings.{$key}")->store('site-settings', 'public');
+                    // Compress and store as WebP
+                    $path = $imageService->compressAndStore(
+                        $request->file("settings.{$key}"),
+                        'site-settings',
+                        'public'
+                    );
                     $value = $path;
                 } 
                 // Handle boolean values
@@ -89,7 +94,7 @@ class SiteSettingController extends Controller
     /**
      * Update specific group settings
      */
-    public function updateGroup(Request $request, string $group)
+    public function updateGroup(Request $request, string $group, ImageCompressionService $imageService)
     {
         $validated = $request->validate([
             'settings' => 'required|array',
@@ -102,15 +107,19 @@ class SiteSettingController extends Controller
                 ->first();
             
             if ($setting) {
-                // Handle image uploads
+                // Handle image uploads with WebP compression
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
                     // Delete old image
                     if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                         Storage::disk('public')->delete($setting->value);
                     }
                     
-                    // Store new image
-                    $path = $request->file("settings.{$key}")->store('site-settings', 'public');
+                    // Compress and store as WebP
+                    $path = $imageService->compressAndStore(
+                        $request->file("settings.{$key}"),
+                        'site-settings',
+                        'public'
+                    );
                     $value = $path;
                 } 
                 // Handle boolean values

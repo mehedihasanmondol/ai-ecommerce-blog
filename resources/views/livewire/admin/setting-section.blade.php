@@ -203,7 +203,20 @@
 
                     @elseif($setting->type === 'image')
                         <div class="space-y-4">
-                            @if($setting->value)
+                            {{-- Show new image preview if selected, otherwise show existing image --}}
+                            @if(isset($images[$setting->key]))
+                                <div class="relative inline-block group">
+                                    <img 
+                                        src="{{ $images[$setting->key]->temporaryUrl() }}" 
+                                        alt="Preview"
+                                        class="max-h-40 rounded-xl border-2 border-blue-300 shadow-sm"
+                                    >
+                                    <span class="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded font-medium shadow">New Upload</span>
+                                    <div class="absolute -bottom-6 left-0 right-0 text-center">
+                                        <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">Will be saved as WebP</span>
+                                    </div>
+                                </div>
+                            @elseif($setting->value)
                                 <div class="relative inline-block group">
                                     <img 
                                         src="{{ asset('storage/' . $setting->value) }}" 
@@ -220,15 +233,6 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </button>
-                                </div>
-                            @elseif(isset($images[$setting->key]))
-                                <div class="relative inline-block">
-                                    <img 
-                                        src="{{ $images[$setting->key]->temporaryUrl() }}" 
-                                        alt="Preview"
-                                        class="max-h-40 rounded-xl border-2 border-blue-300 shadow-sm"
-                                    >
-                                    <span class="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">New</span>
                                 </div>
                             @else
                                 <div class="flex items-center justify-center w-full h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl">

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\ImageCompressionService;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -51,16 +52,22 @@ class SettingSection extends Component
         $this->loading = true;
 
         try {
+            $imageService = app(ImageCompressionService::class);
+            
             foreach ($this->groupSettings as $setting) {
-                // Handle image uploads
+                // Handle image uploads with WebP compression
                 if ($setting->type === 'image' && isset($this->images[$setting->key])) {
                     // Delete old image
                     if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                         Storage::disk('public')->delete($setting->value);
                     }
                     
-                    // Store new image
-                    $path = $this->images[$setting->key]->store('site-settings', 'public');
+                    // Compress and store as WebP
+                    $path = $imageService->compressAndStore(
+                        $this->images[$setting->key],
+                        'site-settings',
+                        'public'
+                    );
                     $setting->update(['value' => $path]);
                     
                     // Clear uploaded image from memory
