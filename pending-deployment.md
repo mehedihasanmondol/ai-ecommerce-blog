@@ -1,0 +1,1 @@
+php artisan migrate --path=database/migrations/2025_11_24_000001_add_unlisted_status_to_blog_posts.php

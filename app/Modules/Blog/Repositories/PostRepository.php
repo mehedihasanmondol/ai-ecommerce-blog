@@ -249,6 +249,7 @@ class PostRepository
             'published' => $this->model->where('status', 'published')->count(),
             'draft' => $this->model->where('status', 'draft')->count(),
             'scheduled' => $this->model->where('status', 'scheduled')->count(),
+            'unlisted' => $this->model->where('status', 'unlisted')->count(),
         ];
     }
 }

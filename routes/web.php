@@ -104,8 +104,10 @@ Route::get('/{slug}', function($slug) {
         return app(\App\Http\Controllers\ProductController::class)->show($slug);
     }
     
-    // Then try to find blog post
-    $post = \App\Modules\Blog\Models\Post::where('slug', $slug)->published()->first();
+    // Then try to find blog post (published or unlisted)
+    $post = \App\Modules\Blog\Models\Post::where('slug', $slug)
+        ->whereIn('status', ['published', 'unlisted'])
+        ->first();
     if ($post) {
         return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->show($slug);
     }

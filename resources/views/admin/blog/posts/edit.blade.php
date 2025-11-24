@@ -185,7 +185,11 @@
                                     <option value="draft" {{ old('status', $post->status) == 'draft' ? 'selected' : '' }}>Draft</option>
                                     <option value="published" {{ old('status', $post->status) == 'published' ? 'selected' : '' }}>Published</option>
                                     <option value="scheduled" {{ old('status', $post->status) == 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                    <option value="unlisted" {{ old('status', $post->status) == 'unlisted' ? 'selected' : '' }}>Unlisted</option>
                                 </select>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    <strong>Unlisted:</strong> Post is viewable via direct link but won't appear in any frontend lists
+                                </p>
                             </div>
 
                             <!-- Schedule Date -->

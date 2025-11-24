@@ -25,7 +25,7 @@ class StorePostRequest extends FormRequest
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'featured_image_alt' => 'nullable|string|max:255',
             'youtube_url' => 'nullable|url|max:500',
-            'status' => 'required|in:draft,published,scheduled',
+            'status' => 'required|in:draft,published,scheduled,unlisted',
             'published_at' => 'nullable|date',
             'scheduled_at' => 'nullable|date|after:now',
             'is_featured' => 'boolean',

@@ -61,7 +61,7 @@ class PostService
     {
         $post = $this->postRepository->findBySlug($slug);
         
-        // Increment views
+        // Increment views for published posts (not for unlisted posts)
         if ($post && $post->isPublished()) {
             $post->incrementViews();
         }

@@ -304,13 +304,21 @@ class Post extends Model
     }
 
     /**
-     * Scope to get only published posts
+     * Scope to get only published posts (excludes unlisted posts from frontend lists)
      */
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
+    }
+
+    /**
+     * Check if post is unlisted
+     */
+    public function isUnlisted(): bool
+    {
+        return $this->status === 'unlisted';
     }
 
     /**

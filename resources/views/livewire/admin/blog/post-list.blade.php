@@ -16,7 +16,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
                 <div>
@@ -72,6 +72,20 @@
                 </div>
             </div>
         </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-500 text-sm">Unlisted</p>
+                    <p class="text-2xl font-bold text-orange-600">{{ $counts['unlisted'] }}</p>
+                </div>
+                <div class="bg-orange-100 rounded-full p-3">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Filters Bar --}}
@@ -114,6 +128,7 @@
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
                         <option value="scheduled">Scheduled</option>
+                        <option value="unlisted">Unlisted</option>
                     </select>
                 </div>
 
@@ -262,9 +277,17 @@
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                                     Draft
                                 </span>
-                            @else
+                            @elseif($post->status === 'scheduled')
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
                                     Scheduled
+                                </span>
+                            @elseif($post->status === 'unlisted')
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                    Unlisted
+                                </span>
+                            @else
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    {{ ucfirst($post->status) }}
                                 </span>
                             @endif
                         </td>

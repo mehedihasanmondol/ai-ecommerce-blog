@@ -157,6 +157,7 @@ class PostList extends Component
             'published' => Post::where('status', 'published')->count(),
             'draft' => Post::where('status', 'draft')->count(),
             'scheduled' => Post::where('status', 'scheduled')->count(),
+            'unlisted' => Post::where('status', 'unlisted')->count(),
         ];
 
         return view('livewire.admin.blog.post-list', [
