@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             ThemeSettingSeeder::class,
             ImageUploadSettingSeeder::class,
             SecondaryMenuSeeder::class,
+            BlogTickMarkSeeder::class,
         ]);
 
         // Phase 2: User Management & Permissions (Depends on settings)
@@ -38,30 +39,7 @@ class DatabaseSeeder extends Seeder
             TestUsersSeeder::class,
         ]);
 
-        // Phase 3: Product & Category Setup (Depends on users)
-        $this->command->info('📦 Phase 3: Product & Category Setup');
-        $this->call([
-            HealthCategorySeeder::class,
-            TrendingBrandSeeder::class,
-        ]);
-
-        // Phase 4: Blog Content (Depends on categories and users)
-        $this->command->info('📝 Phase 4: Blog Content');
-        $this->call([
-            ComprehensiveHealthBlogSeeder::class,
-            HealthBlogPostsSeeder::class,
-            BlogTickMarkSeeder::class,
-            BlogCommentSeeder::class,
-        ]);
-
-        // Phase 5: E-commerce Features (Depends on products)
-        $this->command->info('🛒 Phase 5: E-commerce Features');
-        $this->call([
-            ProductQAAndReviewSeeder::class,
-            ProductQuestionSeeder::class,
-            ProductReviewSeeder::class,
-            CouponSeeder::class,
-        ]);
+    
 
         // Phase 6: Stock & Finance Management (Depends on products)
         $this->command->info('📊 Phase 6: Stock & Finance Management');
@@ -76,11 +54,7 @@ class DatabaseSeeder extends Seeder
             DeliverySystemSeeder::class,
         ]);
 
-        // Phase 8: Test Data (Optional - Depends on all above)
-        $this->command->info('🧪 Phase 8: Test Data (Optional)');
-        $this->call([
-            TestOrdersSeeder::class,
-        ]);
+   
 
         $this->command->info('✅ Database seeding completed successfully!');
     }
