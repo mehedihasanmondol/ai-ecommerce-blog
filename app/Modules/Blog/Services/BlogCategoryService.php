@@ -147,4 +147,71 @@ class BlogCategoryService
         $filename = 'blog_category_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
         return $image->storeAs('blog/categories', $filename, 'public');
     }
+
+    /**
+     * Get categories formatted for dropdown with hierarchy labels
+     * Returns categories ordered hierarchically with indentation
+     * 
+     * @param int|null $excludeId Category ID to exclude (useful when editing to prevent circular references)
+     * @return \Illuminate\Support\Collection
+     */
+    public function getCategoriesForDropdown(?int $excludeId = null): \Illuminate\Support\Collection
+    {
+        $categories = $this->getAllCategories();
+        
+        // Exclude specific category and its descendants if provided
+        if ($excludeId) {
+            $excludeCategory = $categories->firstWhere('id', $excludeId);
+            if ($excludeCategory) {
+                $excludeIds = [$excludeId];
+                // Get all descendant IDs
+                $this->getDescendantIds($excludeCategory, $categories, $excludeIds);
+                $categories = $categories->whereNotIn('id', $excludeIds);
+            }
+        }
+        
+        // Build hierarchical structure
+        return $this->buildHierarchicalList($categories);
+    }
+
+    /**
+     * Recursively get all descendant IDs
+     */
+    private function getDescendantIds($category, $allCategories, &$excludeIds): void
+    {
+        $children = $allCategories->where('parent_id', $category->id);
+        foreach ($children as $child) {
+            $excludeIds[] = $child->id;
+            $this->getDescendantIds($child, $allCategories, $excludeIds);
+        }
+    }
+
+    /**
+     * Build hierarchical list with proper indentation and labels
+     */
+    private function buildHierarchicalList($categories, $parentId = null, $prefix = ''): \Illuminate\Support\Collection
+    {
+        $result = collect();
+        
+        $items = $categories->where('parent_id', $parentId)->sortBy('sort_order');
+        
+        foreach ($items as $category) {
+            // Create formatted label with hierarchy
+            $category->dropdown_label = $prefix . $category->name;
+            $category->dropdown_path = $category->getHierarchyPath();
+            
+            $result->push($category);
+            
+            // Recursively add children
+            $children = $this->buildHierarchicalList(
+                $categories,
+                $category->id,
+                $prefix . '— '
+            );
+            
+            $result = $result->merge($children);
+        }
+        
+        return $result;
+    }
 }

@@ -53,12 +53,16 @@
 
     <!-- Content Section -->
     <div class="p-5">
-        <!-- Category Badge -->
-        @if($post->category)
-            <a href="{{ route('blog.category', $post->category->slug) }}" 
-               class="inline-block text-xs font-semibold text-blue-600 hover:text-blue-800 mb-2 transition-colors">
-                {{ $post->category->name }}
-            </a>
+        <!-- Categories Badges -->
+        @if($post->categories && $post->categories->count() > 0)
+            <div class="flex flex-wrap gap-2 mb-2">
+                @foreach($post->categories as $category)
+                    <a href="{{ route('blog.category', $category->slug) }}" 
+                       class="inline-block text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">
+                        {{ $category->name }}
+                    </a>
+                @endforeach
+            </div>
         @endif
 
         <!-- Title -->

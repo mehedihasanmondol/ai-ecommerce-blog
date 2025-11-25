@@ -101,13 +101,14 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('parent_id') border-red-500 @enderror">
                             <option value="">None (Root Category)</option>
                             @foreach($categories as $cat)
-                                @if($cat->id != $category->id)
-                                    <option value="{{ $cat->id }}" {{ old('parent_id', $category->parent_id) == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endif
+                                <option value="{{ $cat->id }}" 
+                                        {{ old('parent_id', $category->parent_id) == $cat->id ? 'selected' : '' }}
+                                        title="{{ $cat->dropdown_path ?? $cat->name }}">
+                                    {{ $cat->dropdown_label ?? $cat->name }}
+                                </option>
                             @endforeach
                         </select>
+                        <p class="mt-1 text-xs text-gray-500">Select parent category. Current category and its descendants are excluded to prevent circular references.</p>
                         @error('parent_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror

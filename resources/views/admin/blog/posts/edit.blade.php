@@ -352,18 +352,25 @@
                             </button>
                         </div>
 
-                        <p class="text-sm text-gray-600 mb-3">Select one or more categories</p>
+                        <p class="text-sm text-gray-600 mb-3">Select one or more categories (hierarchical structure shown)</p>
 
                         <!-- Category Checkboxes -->
-                        <div class="space-y-2 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3" id="category-list">
+                        <div class="space-y-1 max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-3" id="category-list">
                             @forelse($categories as $category)
-                                <label class="flex items-center hover:bg-gray-50 p-2 rounded cursor-pointer">
+                                <label class="flex items-start hover:bg-gray-50 p-2 rounded cursor-pointer group">
                                     <input type="checkbox" 
                                            name="categories[]" 
                                            value="{{ $category->id }}"
                                            {{ in_array($category->id, old('categories', $post->categories->pluck('id')->toArray())) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                                    <span class="ml-2 text-sm text-gray-700">{{ $category->name }}</span>
+                                           class="mt-0.5 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    <div class="ml-2 flex-1">
+                                        <span class="text-sm text-gray-700">{{ $category->dropdown_label ?? $category->name }}</span>
+                                        @if($category->dropdown_path && $category->getDepthLevel() > 0)
+                                            <div class="text-xs text-gray-400 mt-0.5">
+                                                {{ $category->dropdown_path }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </label>
                             @empty
                                 <p class="text-sm text-gray-500 text-center py-4">No categories available. Click "Add New" to create one.</p>

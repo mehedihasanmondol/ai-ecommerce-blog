@@ -198,11 +198,15 @@
                                 </div>
                                 @endif
                                 <div class="p-6 {{ $post->youtube_url || $post->media || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
-                                    @if($post->category)
-                                    <a href="{{ route('blog.category', $post->category->slug) }}" 
-                                       class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full mb-3 hover:bg-gray-200">
-                                        {{ $post->category->name }}
-                                    </a>
+                                    @if($post->categories && $post->categories->count() > 0)
+                                    <div class="flex flex-wrap gap-2 mb-3">
+                                        @foreach($post->categories as $category)
+                                        <a href="{{ route('blog.category', $category->slug) }}" 
+                                           class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-gray-200">
+                                            {{ $category->name }}
+                                        </a>
+                                        @endforeach
+                                    </div>
                                     @endif
                                     
                                     <h3 class="text-2xl font-bold text-gray-900 mb-2 hover:text-blue-600">

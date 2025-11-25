@@ -47,7 +47,7 @@ class PostRepository
      */
     public function all(int $perPage = 10, array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with(['author', 'category', 'tags'])
+        $query = $this->model->with(['author', 'categories', 'tags'])
             ->latest('created_at');
 
         // Apply filters
@@ -91,7 +91,7 @@ class PostRepository
      */
     public function find(int $id): ?Post
     {
-        return $this->model->with(['author', 'category', 'tags', 'approvedComments'])
+        return $this->model->with(['author', 'categories', 'tags', 'approvedComments'])
             ->findOrFail($id);
     }
 
@@ -100,7 +100,7 @@ class PostRepository
      */
     public function findBySlug(string $slug): ?Post
     {
-        return $this->model->with(['author', 'category', 'tags', 'approvedComments'])
+        return $this->model->with(['author', 'categories', 'tags', 'approvedComments'])
             ->where('slug', $slug)
             ->firstOrFail();
     }
@@ -117,7 +117,7 @@ class PostRepository
             $post->tags()->sync($data['tags']);
         }
 
-        return $post->load(['author', 'category', 'tags']);
+        return $post->load(['author', 'categories', 'tags']);
     }
 
     /**
@@ -133,7 +133,7 @@ class PostRepository
             $post->tags()->sync($data['tags']);
         }
 
-        return $post->fresh(['author', 'category', 'tags']);
+        return $post->fresh(['author', 'categories', 'tags']);
     }
 
     /**
@@ -151,7 +151,7 @@ class PostRepository
     public function getPublished(int $perPage = 10): LengthAwarePaginator
     {
         return $this->model->published()
-            ->with(['author', 'category', 'tags'])
+            ->with(['author', 'categories', 'tags'])
             ->latest('published_at')
             ->paginate($perPage);
     }
@@ -163,7 +163,7 @@ class PostRepository
     {
         return $this->model->published()
             ->featured()
-            ->with(['author', 'category'])
+            ->with(['author', 'categories'])
             ->latest('published_at')
             ->limit($limit)
             ->get();
@@ -176,7 +176,7 @@ class PostRepository
     {
         return $this->model->published()
             ->byCategory($categoryId)
-            ->with(['author', 'category', 'tags'])
+            ->with(['author', 'categories', 'tags'])
             ->latest('published_at')
             ->paginate($perPage);
     }
@@ -188,7 +188,7 @@ class PostRepository
     {
         return $this->model->published()
             ->byTag($tagId)
-            ->with(['author', 'category', 'tags', 'tickMarks'])
+            ->with(['author', 'categories', 'tags', 'tickMarks'])
             ->latest('published_at')
             ->paginate($perPage);
     }
@@ -200,7 +200,7 @@ class PostRepository
     {
         return $this->model->published()
             ->byAuthor($authorId)
-            ->with(['author', 'category', 'tags'])
+            ->with(['author', 'categories', 'tags'])
             ->latest('published_at')
             ->paginate($perPage);
     }
@@ -212,7 +212,7 @@ class PostRepository
     {
         return $this->model->published()
             ->search($query)
-            ->with(['author', 'category', 'tags'])
+            ->with(['author', 'categories', 'tags'])
             ->latest('published_at')
             ->paginate($perPage);
     }
@@ -224,7 +224,7 @@ class PostRepository
     {
         return $this->model->published()
             ->popular($limit)
-            ->with(['author', 'category'])
+            ->with(['author', 'categories'])
             ->get();
     }
 
@@ -235,7 +235,7 @@ class PostRepository
     {
         return $this->model->published()
             ->recent($limit)
-            ->with(['author', 'category'])
+            ->with(['author', 'categories'])
             ->get();
     }
 

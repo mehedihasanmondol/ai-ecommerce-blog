@@ -119,7 +119,7 @@ class PostList extends Component
             return $value !== '' && $value !== null;
         });
 
-        $posts = Post::with(['author', 'category', 'tags'])
+        $posts = Post::with(['author', 'categories', 'tags'])
             ->when($this->search, function($query) {
                 $query->where(function($q) {
                     $q->where('title', 'like', '%' . $this->search . '%')
@@ -131,7 +131,9 @@ class PostList extends Component
                 $query->where('status', $this->statusFilter);
             })
             ->when($this->categoryFilter, function($query) {
-                $query->where('blog_category_id', $this->categoryFilter);
+                $query->whereHas('categories', function($q) {
+                    $q->where('blog_categories.id', $this->categoryFilter);
+                });
             })
             ->when($this->authorFilter, function($query) {
                 $query->where('author_id', $this->authorFilter);

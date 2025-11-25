@@ -28,8 +28,10 @@
     @if($post->author)
     <meta property="article:author" content="{{ $post->author->name }}">
     @endif
-    @if($post->category)
-    <meta property="article:section" content="{{ $post->category->name }}">
+    @if($post->categories && $post->categories->count() > 0)
+        @foreach($post->categories as $category)
+    <meta property="article:section" content="{{ $category->name }}">
+        @endforeach
     @endif
     @foreach($post->tags as $tag)
     <meta property="article:tag" content="{{ $tag->name }}">
@@ -45,7 +47,7 @@
                 title="{{ \App\Models\SiteSetting::get('blog_title', 'Wellness Hub') }}"
                 subtitle="{{ \App\Models\SiteSetting::get('blog_tagline', 'Health & Lifestyle Blog') }}"
                 :categories="$categories"
-                :currentCategory="$post->category"
+                :currentCategory="$post->categories->first()"
                 categoryType="blog"
             />
 
@@ -57,10 +59,15 @@
                         <div class="flex items-center gap-2 text-sm text-gray-600">
                             <a href="{{ route('home') }}" class="hover:text-green-600 transition-colors">Wellness Hub Home</a>
                             <span>/</span>
-                            @if($post->category)
-                                <a href="{{ route('blog.category', $post->category->slug) }}" class="hover:text-green-600 transition-colors">
-                                    {{ $post->category->name }}
-                                </a>
+                            @if($post->categories && $post->categories->count() > 0)
+                                @foreach($post->categories as $index => $category)
+                                    <a href="{{ route('blog.category', $category->slug) }}" class="hover:text-green-600 transition-colors">
+                                        {{ $category->name }}
+                                    </a>
+                                    @if(!$loop->last)
+                                        <span>/</span>
+                                    @endif
+                                @endforeach
                             @endif
                         </div>
                     </div>

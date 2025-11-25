@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Blog\Repositories\BlogCategoryRepository;
 use App\Modules\Blog\Repositories\TagRepository;
 use App\Modules\Blog\Services\PostService;
+use App\Modules\Blog\Services\BlogCategoryService;
 use App\Modules\Blog\Services\TickMarkService;
 use App\Modules\Blog\Requests\StorePostRequest;
 use App\Modules\Blog\Requests\UpdatePostRequest;
@@ -24,17 +25,20 @@ class PostController extends Controller
 {
     protected PostService $postService;
     protected BlogCategoryRepository $categoryRepository;
+    protected BlogCategoryService $categoryService;
     protected TagRepository $tagRepository;
     protected TickMarkService $tickMarkService;
 
     public function __construct(
         PostService $postService,
         BlogCategoryRepository $categoryRepository,
+        BlogCategoryService $categoryService,
         TagRepository $tagRepository,
         TickMarkService $tickMarkService
     ) {
         $this->postService = $postService;
         $this->categoryRepository = $categoryRepository;
+        $this->categoryService = $categoryService;
         $this->tagRepository = $tagRepository;
         $this->tickMarkService = $tickMarkService;
     }
@@ -50,7 +54,7 @@ class PostController extends Controller
 
     public function create()
     {
-        $categories = $this->categoryRepository->getActive();
+        $categories = $this->categoryService->getCategoriesForDropdown();
         $tags = $this->tagRepository->all();
         $products = \App\Modules\Ecommerce\Product\Models\Product::where('status', 'published')
             ->with('images')
@@ -87,7 +91,7 @@ class PostController extends Controller
     {
         $post = $this->postService->getPost($id);
         $post->load('products'); // Load attached products
-        $categories = $this->categoryRepository->getActive();
+        $categories = $this->categoryService->getCategoriesForDropdown();
         $tags = $this->tagRepository->all();
         $products = \App\Modules\Ecommerce\Product\Models\Product::where('status', 'published')
             ->with('images')

@@ -271,8 +271,16 @@
                             @endif
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $post->category->name ?? 'Uncategorized' }}</div>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">
+                            @if($post->categories && $post->categories->count() > 0)
+                                @foreach($post->categories as $category)
+                                    <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded mr-1 mb-1">{{ $category->name }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-gray-400">Uncategorized</span>
+                            @endif
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($post->status === 'published')

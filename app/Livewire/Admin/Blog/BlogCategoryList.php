@@ -98,7 +98,7 @@ class BlogCategoryList extends Component
     public function render()
     {
         try {
-            $query = BlogCategory::with(['parent', 'posts']);
+            $query = BlogCategory::with(['parent.parent', 'posts']);
 
             // Apply search filter
             if ($this->search) {

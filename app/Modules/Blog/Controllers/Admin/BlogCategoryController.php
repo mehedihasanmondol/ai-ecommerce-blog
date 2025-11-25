@@ -32,7 +32,7 @@ class BlogCategoryController extends Controller
 
     public function create()
     {
-        $categories = $this->categoryService->getActiveCategories();
+        $categories = $this->categoryService->getCategoriesForDropdown();
         return view('admin.blog.categories.create', compact('categories'));
     }
 
@@ -60,7 +60,7 @@ class BlogCategoryController extends Controller
     public function edit($id)
     {
         $category = $this->categoryService->getCategory($id);
-        $categories = $this->categoryService->getActiveCategories();
+        $categories = $this->categoryService->getCategoriesForDropdown($id); // Exclude current category and its descendants
 
         return view('admin.blog.categories.edit', compact('category', 'categories'));
     }

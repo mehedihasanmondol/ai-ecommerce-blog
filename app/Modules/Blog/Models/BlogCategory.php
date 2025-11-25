@@ -210,4 +210,65 @@ class BlogCategory extends Model
         
         return null;
     }
+
+    /**
+     * Get the full hierarchy path (e.g., "Grandparent > Parent > Category")
+     */
+    public function getHierarchyPath(string $separator = ' > '): string
+    {
+        $path = [];
+        $current = $this;
+        
+        // Build path from current category up to root
+        while ($current) {
+            array_unshift($path, $current->name);
+            $current = $current->parent;
+        }
+        
+        return implode($separator, $path);
+    }
+
+    /**
+     * Get the parent hierarchy path only (without current category)
+     */
+    public function getParentHierarchyPath(string $separator = ' > '): ?string
+    {
+        if (!$this->parent) {
+            return null;
+        }
+        
+        return $this->parent->getHierarchyPath($separator);
+    }
+
+    /**
+     * Get all ancestor categories (parent, grandparent, etc.)
+     */
+    public function getAncestors(): array
+    {
+        $ancestors = [];
+        $current = $this->parent;
+        
+        while ($current) {
+            $ancestors[] = $current;
+            $current = $current->parent;
+        }
+        
+        return array_reverse($ancestors);
+    }
+
+    /**
+     * Get depth level in hierarchy (0 for root, 1 for first level child, etc.)
+     */
+    public function getDepthLevel(): int
+    {
+        $depth = 0;
+        $current = $this->parent;
+        
+        while ($current) {
+            $depth++;
+            $current = $current->parent;
+        }
+        
+        return $depth;
+    }
 }

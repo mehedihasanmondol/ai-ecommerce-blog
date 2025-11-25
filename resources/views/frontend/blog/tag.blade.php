@@ -202,12 +202,14 @@
                             </div>
                             @endif
                             <div class="p-6 {{ $post->youtube_url || $post->media || $post->featured_image ? 'md:w-2/3' : 'w-full' }}">
-                                <div class="flex items-center gap-2 mb-3">
-                                    @if($post->category)
-                                    <a href="{{ route('blog.category', $post->category->slug) }}" 
-                                       class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-gray-200">
-                                        {{ $post->category->name }}
-                                    </a>
+                                <div class="flex flex-wrap items-center gap-2 mb-3">
+                                    @if($post->categories && $post->categories->count() > 0)
+                                        @foreach($post->categories as $category)
+                                        <a href="{{ route('blog.category', $category->slug) }}" 
+                                           class="inline-block bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full hover:bg-gray-200">
+                                            {{ $category->name }}
+                                        </a>
+                                        @endforeach
                                     @endif
                                     @if($post->is_featured)
                                     <span class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
