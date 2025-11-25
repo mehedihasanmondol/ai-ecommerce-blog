@@ -56,22 +56,27 @@ class SettingSection extends Component
             
             foreach ($this->groupSettings as $setting) {
                 // Handle image uploads with WebP compression
-                if ($setting->type === 'image' && isset($this->images[$setting->key])) {
-                    // Delete old image
-                    if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
-                        Storage::disk('public')->delete($setting->value);
+                if ($setting->type === 'image') {
+                    // Only process if a new image was uploaded for this specific field
+                    if (isset($this->images[$setting->key])) {
+                        // Delete old image only when uploading a new one
+                        if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
+                            Storage::disk('public')->delete($setting->value);
+                        }
+                        
+                        // Compress and store as WebP
+                        $path = $imageService->compressAndStore(
+                            $this->images[$setting->key],
+                            'site-settings',
+                            'public'
+                        );
+                        $setting->update(['value' => $path]);
+                        
+                        // Clear uploaded image from memory
+                        unset($this->images[$setting->key]);
                     }
-                    
-                    // Compress and store as WebP
-                    $path = $imageService->compressAndStore(
-                        $this->images[$setting->key],
-                        'site-settings',
-                        'public'
-                    );
-                    $setting->update(['value' => $path]);
-                    
-                    // Clear uploaded image from memory
-                    unset($this->images[$setting->key]);
+                    // If no new image uploaded, keep the existing value (don't update)
+                    // This prevents clearing other image fields in the same group
                 }
                 // Handle boolean values
                 elseif ($setting->type === 'boolean') {
