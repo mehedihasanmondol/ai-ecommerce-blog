@@ -211,33 +211,8 @@
                             style="scrollbar-width: none; -ms-overflow-style: none;"
                         >
                             @foreach($recommendedProducts as $product)
-                                @php
-                                    // Convert array data to object-like structure for the unified component
-                                    $productObj = (object) $product;
-                                    $productObj->slug = $product['slug'];
-                                    $productObj->name = $product['name'];
-                                    $productObj->brand = $product['brand'] ? (object) ['name' => $product['brand']] : null;
-                                    $productObj->average_rating = $product['rating'] ?? 0;
-                                    $productObj->review_count = $product['reviews'] ?? 0;
-                                    
-                                    // Create a mock variant for the unified component
-                                    $variant = (object) [
-                                        'id' => $product['variant_id'] ?? 1,
-                                        'price' => $product['original_price'] ?? $product['price'],
-                                        'sale_price' => $product['price'],
-                                        'stock_quantity' => 10 // Assume in stock
-                                    ];
-                                    $productObj->variants = collect([$variant]);
-                                    
-                                    // Create a mock image for the unified component
-                                    $image = (object) [
-                                        'image_path' => $product['image'],
-                                        'is_primary' => true
-                                    ];
-                                    $productObj->images = collect($product['image'] ? [$image] : []);
-                                @endphp
                                 <div class="flex-none w-[calc(75%-0.75rem)] sm:w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)] ">
-                                    <x-product-card-unified :product="$productObj" size="default" />
+                                    <x-product-card-unified :product="$product" size="default" />
                                 </div>
                             @endforeach
                         </div>
@@ -482,6 +457,12 @@ function cartPage() {
             } else {
                 this.selectedItems = [];
             }
+        },
+        
+        updateSelectAllState() {
+            // Update selectAll checkbox state based on selected items
+            const totalItems = Object.keys(this.cartData).length;
+            this.selectAll = totalItems > 0 && this.selectedItems.length === totalItems;
         },
         
         // Calculate items total for selected items

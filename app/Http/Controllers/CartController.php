@@ -50,19 +50,17 @@ class CartController extends Controller
     
     /**
      * Get recommended products based on cart items
+     * Returns Product eloquent objects (not arrays) for proper component usage
      */
     protected function getRecommendedProducts($cart)
     {
         if (empty($cart)) {
             // If cart is empty, show popular products
-            return Product::with(['variants', 'images.media', 'brand'])
+            return Product::with(['variants', 'images.media', 'brand', 'categories'])
                 ->where('is_active', true)
                 ->where('is_featured', true)
                 ->limit(5)
-                ->get()
-                ->map(function($product) {
-                    return $this->formatProductData($product);
-                });
+                ->get();
         }
         
         // Get product IDs from cart
@@ -77,45 +75,12 @@ class CartController extends Controller
         }
         
         // Get related products from same categories
-        return Product::with(['variants', 'images.media', 'brand'])
+        return Product::with(['variants', 'images.media', 'brand', 'categories'])
             ->whereIn('category_id', $categoryIds)
             ->whereNotIn('id', $cartProductIds)
             ->where('is_active', true)
             ->limit(5)
-            ->get()
-            ->map(function($product) {
-                return $this->formatProductData($product);
-            });
-    }
-    
-    /**
-     * Format product data for display
-     */
-    protected function formatProductData($product)
-    {
-        $variant = $product->variants->first();
-        $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
-        
-        // Get proper image URL from media library or fallback to image_path
-        $imageUrl = null;
-        if ($primaryImage) {
-            $imageUrl = $primaryImage->getImageUrl() ?? $primaryImage->image_path;
-        }
-        
-        return [
-            'id' => $product->id,
-            'product_id' => $product->id,
-            'variant_id' => $variant->id ?? null,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'brand' => $product->brand ? $product->brand->name : null,
-            'price' => $variant->sale_price ?? $variant->price ?? 0,
-            'original_price' => $variant->price ?? 0,
-            'image' => $imageUrl,
-            'rating' => $product->average_rating ?? 0,
-            'reviews' => $product->review_count ?? 0,
-            'sku' => $variant->sku ?? null,
-        ];
+            ->get();
     }
     
     /**
