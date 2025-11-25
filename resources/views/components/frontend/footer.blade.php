@@ -144,6 +144,7 @@
         <p class="text-center text-gray-800 font-semibold">{{ $valueGuarantee }}</p>
     </div>
 </section>
+@endif
 
 {{-- 
 /**
@@ -305,7 +306,6 @@
             
         </div>
     </div>
-    @endif
 
     <!-- Newsletter Signup Section -->
     @if(\App\Models\FooterSetting::get('newsletter_section_enabled', '1') === '1')

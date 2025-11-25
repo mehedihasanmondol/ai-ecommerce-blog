@@ -9,7 +9,7 @@
     <a href="{{ route('products.show', $post->slug) }}" class="block relative">
         @if($post->youtube_url)
             <!-- YouTube Video Thumbnail (Priority) -->
-            <div class="aspect-video overflow-hidden relative">
+            <div class="relative overflow-hidden" style="aspect-ratio: 16/9;">
                 <img src="https://img.youtube.com/vi/{{ $post->youtube_video_id }}/maxresdefault.jpg" 
                      alt="{{ $post->title }}"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -35,14 +35,19 @@
             </div>
         @elseif($post->media)
             <!-- Featured Image from Media Library -->
-            <div class="aspect-video overflow-hidden">
+            @php
+                $aspectRatio = ($post->media->width && $post->media->height) 
+                    ? $post->media->width / $post->media->height 
+                    : 16/9;
+            @endphp
+            <div class="relative overflow-hidden" style="aspect-ratio: {{ $aspectRatio }};">
                 <img src="{{ $post->media->large_url }}" 
                      alt="{{ $post->featured_image_alt ?? $post->title }}"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
             </div>
         @elseif($post->featured_image)
             <!-- Featured Image (Legacy) -->
-            <div class="aspect-video overflow-hidden">
+            <div class="relative overflow-hidden" style="aspect-ratio: 16/9;">
                 <img src="{{ asset('storage/' . $post->featured_image) }}" 
                      alt="{{ $post->featured_image_alt }}"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
