@@ -67,22 +67,22 @@ class ReviewForm extends Component
         $this->errorMessage = '';
         $this->successMessage = '';
 
-        // Validate purchase for authenticated users
-        if (auth()->check()) {
-            $hasPurchased = \DB::table('order_items')
-                ->join('orders', 'order_items.order_id', '=', 'orders.id')
-                ->where('orders.user_id', auth()->id())
-                ->where('order_items.product_id', $this->productId)
-                ->where('orders.status', 'completed')
-                ->exists();
-
-            if (!$hasPurchased) {
-                $this->errorMessage = 'You can only review products you have purchased.';
-                return;
-            }
-        } else {
-            // Guest users cannot review
+        // Only authenticated users can review
+        if (!auth()->check()) {
             $this->errorMessage = 'Please login to write a review. Only verified purchases can be reviewed.';
+            return;
+        }
+        
+        // Validate purchase - check for delivered or completed orders
+        $hasPurchased = \DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.user_id', auth()->id())
+            ->where('order_items.product_id', $this->productId)
+            ->whereIn('orders.status', ['delivered', 'completed'])
+            ->exists();
+
+        if (!$hasPurchased) {
+            $this->errorMessage = 'You can only review products you have purchased and received.';
             return;
         }
 

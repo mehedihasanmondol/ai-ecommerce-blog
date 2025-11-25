@@ -216,7 +216,7 @@ class ProductReviewRepository
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.user_id', $userId)
             ->where('order_items.product_id', $productId)
-            ->where('orders.status', 'completed')
+            ->whereIn('orders.status', ['delivered', 'completed'])
             ->exists();
     }
 

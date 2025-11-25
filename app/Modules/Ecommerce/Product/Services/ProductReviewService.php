@@ -77,7 +77,7 @@ class ProductReviewService
     }
 
     /**
-     * Upload review images
+     * Upload review images with WebP compression
      */
     public function uploadReviewImages(array $images): array
     {
@@ -85,8 +85,31 @@ class ProductReviewService
 
         foreach ($images as $image) {
             if ($image && $image->isValid()) {
-                $path = $image->store('reviews', 'public');
-                $uploadedPaths[] = $path;
+                // Get original image
+                $originalImage = imagecreatefromstring(file_get_contents($image->getRealPath()));
+                
+                if ($originalImage !== false) {
+                    // Generate unique filename
+                    $filename = 'review-' . uniqid() . '.webp';
+                    $path = 'reviews/' . $filename;
+                    $fullPath = storage_path('app/public/' . $path);
+                    
+                    // Ensure directory exists
+                    $directory = dirname($fullPath);
+                    if (!file_exists($directory)) {
+                        mkdir($directory, 0755, true);
+                    }
+                    
+                    // Save as WebP with high quality (90)
+                    imagewebp($originalImage, $fullPath, 90);
+                    imagedestroy($originalImage);
+                    
+                    $uploadedPaths[] = $path;
+                } else {
+                    // Fallback to regular upload if image processing fails
+                    $path = $image->store('reviews', 'public');
+                    $uploadedPaths[] = $path;
+                }
             }
         }
 

@@ -1,3 +1,7 @@
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+
 <div>
     <!-- Rating Summary -->
     <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
@@ -101,13 +105,62 @@
 
                 <!-- Review Images -->
                 @if($review->images && count($review->images) > 0)
-                    <div class="flex items-center space-x-2 mb-3">
-                        @foreach($review->images as $image)
+                    <div class="flex items-center space-x-2 mb-3" x-data="{ openGallery: false, currentImage: 0, images: {{ json_encode(array_map(fn($img) => asset('storage/' . $img), $review->images)) }} }">
+                        @foreach($review->images as $index => $image)
                             <img src="{{ asset('storage/' . $image) }}" 
                                  alt="Review image" 
                                  class="w-20 h-20 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-75 transition-opacity"
-                                 onclick="window.open('{{ asset('storage/' . $image) }}', '_blank')">
+                                 @click="openGallery = true; currentImage = {{ $index }}">
                         @endforeach
+                        
+                        <!-- Gallery Modal -->
+                        <div x-show="openGallery" 
+                             x-cloak
+                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
+                             @click.self="openGallery = false"
+                             @keydown.escape.window="openGallery = false">
+                            
+                            <!-- Close Button -->
+                            <button @click="openGallery = false" 
+                                    class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                            
+                            <!-- Previous Button -->
+                            <button @click="currentImage = currentImage > 0 ? currentImage - 1 : images.length - 1" 
+                                    class="absolute left-4 text-white hover:text-gray-300 z-10"
+                                    x-show="images.length > 1">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            
+                            <!-- Image Display -->
+                            <div class="max-w-6xl max-h-screen p-4">
+                                <template x-for="(image, index) in images" :key="index">
+                                    <img x-show="currentImage === index"
+                                         :src="image"
+                                         alt="Review image"
+                                         class="max-w-full max-h-[90vh] object-contain mx-auto">
+                                </template>
+                                
+                                <!-- Image Counter -->
+                                <div class="text-center text-white mt-4" x-show="images.length > 1">
+                                    <span x-text="(currentImage + 1) + ' / ' + images.length"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Next Button -->
+                            <button @click="currentImage = currentImage < images.length - 1 ? currentImage + 1 : 0" 
+                                    class="absolute right-4 text-white hover:text-gray-300 z-10"
+                                    x-show="images.length > 1">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 @endif
 
