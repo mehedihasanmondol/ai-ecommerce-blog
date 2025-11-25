@@ -118,29 +118,35 @@
         </div>
 
         <!-- Subcategories / Tags -->
-        @if($categories->count() > 0)
+        @php
+            // Get all subcategories (child categories) from the main categories
+            $subcategories = \App\Modules\Ecommerce\Category\Models\Category::whereNotNull('parent_id')
+                ->whereIn('parent_id', $categories->pluck('id'))
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->limit(12)
+                ->get();
+        @endphp
+        
+        @if($subcategories->count() > 0)
             <div class="flex flex-wrap gap-3 items-center">
-                @php
-                    $subcategories = [
-                        'Antioxidants', 'Omegas & Fish Oils (EPA DHA)', 'Amino Acids', 
-                        'Minerals', 'Bee Products', 'Herbs', "Men's Health", 
-                        'Gut Health', 'Sleep'
-                    ];
-                @endphp
-                
                 @foreach($subcategories as $subcategory)
-                    <a href="{{ route('shop', ['search' => $subcategory]) }}" 
+                    <a href="{{ route('categories.show', $subcategory->slug) }}" 
                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition">
-                        {{ $subcategory }}
+                        {{ $subcategory->name }}
                     </a>
                 @endforeach
                 
-                <!-- Next Arrow -->
-                <button class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition">
-                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
+                @if($subcategories->count() >= 12)
+                    <!-- View All Link -->
+                    <a href="{{ route('categories.index') }}" 
+                       class="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full transition"
+                       title="View all categories">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                @endif
             </div>
         @endif
     </div>
