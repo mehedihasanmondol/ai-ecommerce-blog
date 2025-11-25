@@ -9,7 +9,7 @@
     currentIndex: 0,
     images: {{ json_encode($images->map(function($img) {
         return [
-            'full' => $img->getLargeUrl() ?? asset('images/placeholder.png'),
+            'full' => $img->getImageUrl() ?? asset('images/placeholder.png'),
             'thumb' => $img->getThumbnailUrl() ?? asset('images/placeholder.png')
         ];
     })->values()) }},
