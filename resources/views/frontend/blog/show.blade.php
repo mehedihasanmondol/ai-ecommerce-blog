@@ -57,7 +57,7 @@
                     <!-- Breadcrumb -->
                     <div class="px-8 pt-6 pb-4 border-b border-gray-100">
                         <div class="flex items-center gap-2 text-sm text-gray-600">
-                            <a href="{{ route('home') }}" class="hover:text-green-600 transition-colors">Wellness Hub Home</a>
+                            <a href="{{ route('home') }}" class="hover:text-green-600 transition-colors">{{ \App\Models\SiteSetting::get('site_name', 'Wellness Hub') }}</a>
                             <span>/</span>
                             @if($post->categories && $post->categories->count() > 0)
                                 @foreach($post->categories as $index => $category)
