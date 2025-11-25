@@ -14,6 +14,15 @@
 
     <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Favicon -->
+    @php
+        $favicon = \App\Models\SiteSetting::get('site_favicon');
+    @endphp
+    @if($favicon)
+        <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    @endif
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />

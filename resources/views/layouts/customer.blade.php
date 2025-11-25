@@ -7,6 +7,15 @@
 
     <title>{{ config('app.name', 'Laravel') }} - @yield('title', 'My Account')</title>
 
+    <!-- Favicon -->
+    @php
+        $favicon = \App\Models\SiteSetting::get('site_favicon');
+    @endphp
+    @if($favicon)
+        <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    @endif
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700" rel="stylesheet" />

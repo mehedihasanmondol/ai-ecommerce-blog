@@ -16,11 +16,11 @@ class UniversalImageUploadAdapter {
             // Store resolve/reject for later use
             this.uploadPromise = { resolve, reject };
 
-            // Open the Universal Image Uploader modal
+            // Open the Universal Image Uploader modal with multiple support
             window.dispatchEvent(new CustomEvent('open-ckeditor-uploader', {
                 detail: {
                     field: 'ckeditor_upload',
-                    multiple: false
+                    multiple: true // Enable multiple image selection
                 }
             }));
 
@@ -29,6 +29,7 @@ class UniversalImageUploadAdapter {
                 const { media, field } = event.detail;
                 
                 if (field === 'ckeditor_upload' && media && media.length > 0) {
+                    // For paste/drop operations, only use the first image
                     const uploadedImage = media[0];
                     
                     // Resolve with the uploaded image URL
@@ -47,6 +48,7 @@ class UniversalImageUploadAdapter {
                 const { media, field } = event.detail;
                 
                 if (field === 'ckeditor_upload' && media && media.length > 0) {
+                    // For paste/drop operations, only use the first image
                     const selectedImage = media[0];
                     
                     // Resolve with the selected image URL
@@ -103,29 +105,44 @@ export function UniversalImageUploadPlugin(editor) {
             withText: false
         });
         
-        // Handle button click - open media library
+        // Handle button click - open media library with multiple image support
         button.on('execute', () => {
-            // Open media library modal directly
+            // Open media library modal directly with multiple selection enabled
             window.dispatchEvent(new CustomEvent('open-ckeditor-uploader', {
                 detail: {
                     field: 'ckeditor_upload',
-                    multiple: false
+                    multiple: true // Enable multiple image selection
                 }
             }));
             
-            // Listen for selected/uploaded image
+            // Listen for selected/uploaded images
             const handleImageReady = (eventData) => {
                 const { media, field } = eventData.detail;
                 
                 if (field === 'ckeditor_upload' && media && media.length > 0) {
-                    const image = media[0];
-                    
-                    // Insert image into editor at current cursor position
+                    // Insert ALL selected/uploaded images into editor
                     editor.model.change(writer => {
-                        const imageElement = writer.createElement('imageBlock', {
-                            src: image.large_url
+                        // Track the last inserted element to insert subsequent images after it
+                        let lastInsertedElement = null;
+                        
+                        // Insert each image sequentially
+                        media.forEach((image, index) => {
+                            const imageElement = writer.createElement('imageBlock', {
+                                src: image.large_url
+                            });
+                            
+                            // Insert image at appropriate position
+                            if (index === 0) {
+                                // First image at current selection
+                                editor.model.insertContent(imageElement, editor.model.document.selection);
+                                lastInsertedElement = imageElement;
+                            } else {
+                                // Subsequent images after the last inserted one
+                                const insertPosition = writer.createPositionAfter(lastInsertedElement);
+                                editor.model.insertContent(imageElement, insertPosition);
+                                lastInsertedElement = imageElement;
+                            }
                         });
-                        editor.model.insertContent(imageElement, editor.model.document.selection);
                     });
                     
                     // Clean up event listeners

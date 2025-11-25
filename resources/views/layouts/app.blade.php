@@ -7,6 +7,15 @@
 
     <title>@yield('title', config('app.name', 'Laravel'))</title>
 
+    <!-- Favicon -->
+    @php
+        $favicon = \App\Models\SiteSetting::get('site_favicon');
+    @endphp
+    @if($favicon)
+        <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    @endif
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('description', \App\Models\SiteSetting::get('site_description', 'Shop health, wellness and beauty products'))">
     <meta name="keywords" content="@yield('keywords', \App\Models\SiteSetting::get('site_keywords', 'health, wellness, beauty, supplements'))">
