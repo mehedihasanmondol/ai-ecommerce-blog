@@ -37,11 +37,18 @@ trait HasUniqueSlug
     }
 
     /**
-     * Generate a unique slug
+     * Generate a unique slug with Bangla/Unicode support
      */
     public function generateUniqueSlug(string $text): string
     {
-        $slug = Str::slug($text);
+        // Use custom slug helper that supports Bangla characters
+        $slug = generate_slug($text);
+        
+        // Fallback to Laravel's Str::slug if generate_slug returns empty
+        if (empty($slug)) {
+            $slug = Str::slug($text);
+        }
+        
         $originalSlug = $slug;
         $count = 1;
 

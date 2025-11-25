@@ -93,7 +93,13 @@ class Post extends Model
 
         static::creating(function ($post) {
             if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title);
+                // Use Bangla-compatible slug generation
+                $post->slug = generate_slug($post->title);
+                
+                // Fallback to Laravel's Str::slug if generate_slug returns empty
+                if (empty($post->slug)) {
+                    $post->slug = Str::slug($post->title);
+                }
             }
             
             // Calculate reading time

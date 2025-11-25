@@ -258,7 +258,13 @@ class ProductForm extends Component
     {
         // Only auto-update slug for new products
         if ($this->isNewProduct) {
-            $this->slug = \Illuminate\Support\Str::slug($value);
+            // Use Bangla-compatible slug generation
+            $this->slug = generate_slug($value);
+            
+            // Fallback to Laravel's Str::slug if generate_slug returns empty
+            if (empty($this->slug)) {
+                $this->slug = \Illuminate\Support\Str::slug($value);
+            }
         }
     }
     
@@ -269,7 +275,14 @@ class ProductForm extends Component
             return;
         }
         
-        $baseSlug = \Illuminate\Support\Str::slug($this->name);
+        // Use Bangla-compatible slug generation
+        $baseSlug = generate_slug($this->name);
+        
+        // Fallback to Laravel's Str::slug if generate_slug returns empty
+        if (empty($baseSlug)) {
+            $baseSlug = \Illuminate\Support\Str::slug($this->name);
+        }
+        
         $slug = $baseSlug;
         $counter = 1;
         
