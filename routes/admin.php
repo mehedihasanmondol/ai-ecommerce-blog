@@ -207,6 +207,11 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('site-settings/remove-logo', [SiteSettingController::class, 'removeLogo'])->name('site-settings.remove-logo');
     });
     
+    // System Settings Routes - Requires system settings permission
+    Route::middleware(['permission:system.settings.view'])->group(function () {
+        Route::get('system-settings', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'index'])->name('system-settings.index');
+    });
+    
     // Stock Management Routes - Requires stock permissions
     Route::middleware(['permission:stock.view'])->prefix('stock')->name('stock.')->group(function () {
         Route::get('/', [\App\Modules\Stock\Controllers\StockController::class, 'index'])->name('index');

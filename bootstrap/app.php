@@ -55,6 +55,12 @@ return Application::configure(basePath: dirname(__DIR__))
             });
     })
     ->withMiddleware(function (Middleware $middleware): void {
+        // Register global web middleware
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckMaintenanceMode::class,
+        ]);
+        
+        // Register middleware aliases
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \App\Http\Middleware\CheckPermission::class,

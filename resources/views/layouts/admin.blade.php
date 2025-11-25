@@ -88,6 +88,19 @@
 
                     <!-- Right Side -->
                     <div class="flex items-center space-x-4">
+                        <!-- Maintenance Mode Alert (Small) -->
+                        @php
+                            $maintenanceMode = \App\Models\SystemSetting::get('maintenance_mode', false);
+                        @endphp
+                        @if($maintenanceMode)
+                        <div class="hidden md:flex items-center bg-orange-100 text-orange-800 px-3 py-1.5 rounded-lg text-xs font-medium border border-orange-200">
+                            <svg class="w-4 h-4 mr-1.5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span>Maintenance Mode</span>
+                        </div>
+                        @endif
+                        
                         <!-- Global Admin Search -->
                         <div class="hidden md:block w-80">
                             @livewire('admin.global-admin-search')
@@ -539,11 +552,12 @@
                 @endif
 
                 <!-- Settings Section -->
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('system.settings.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
                 </div>
                 
+                @if(auth()->user()->hasPermission('users.view'))
                 <a href="{{ route('admin.site-settings.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.site-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-cog w-5 mr-3"></i>
@@ -561,6 +575,18 @@
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
+                @endif
+
+                @if(auth()->user()->hasPermission('system.settings.view'))
+                <a href="{{ route('admin.system-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.system-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-server w-5 mr-3"></i>
+                    <span>System Settings</span>
+                    @if(request()->routeIs('admin.system-settings.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+                @endif
                 @endif
             </nav>
         </aside>

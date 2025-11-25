@@ -244,8 +244,12 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'View Site Settings', 'slug' => 'settings.view', 'module' => 'system'],
             ['name' => 'Edit Site Settings', 'slug' => 'settings.edit', 'module' => 'system'],
             ['name' => 'Manage Logo', 'slug' => 'settings.logo', 'module' => 'system'],
-            ['name' => 'View System Logs', 'slug' => 'system.logs', 'module' => 'system'],
+            
+            // System Settings (Cache & Maintenance)
+            ['name' => 'View System Settings', 'slug' => 'system.settings.view', 'module' => 'system'],
             ['name' => 'Manage Cache', 'slug' => 'system.cache', 'module' => 'system'],
+            ['name' => 'Manage Maintenance Mode', 'slug' => 'system.maintenance', 'module' => 'system'],
+            ['name' => 'View System Logs', 'slug' => 'system.logs', 'module' => 'system'],
         ];
 
         foreach ($permissions as $permission) {
