@@ -148,10 +148,19 @@
                  x-transition:leave-end="opacity-0"
                  class="absolute inset-0">
                 
-                <!-- Full Width Banner Image -->
-                <img :src="slide.image" 
-                     :alt="slide.title" 
-                     class="w-full h-full object-cover">
+                <!-- Full Width Banner Image (Clickable if has link) -->
+                <template x-if="slide.link && slide.link !== '#'">
+                    <a :href="slide.link" class="block w-full h-full">
+                        <img :src="slide.image" 
+                             :alt="slide.title" 
+                             class="w-full h-full object-cover cursor-pointer hover:opacity-95 transition-opacity">
+                    </a>
+                </template>
+                <template x-if="!slide.link || slide.link === '#'">
+                    <img :src="slide.image" 
+                         :alt="slide.title" 
+                         class="w-full h-full object-cover">
+                </template>
             </div>
         </template>
         

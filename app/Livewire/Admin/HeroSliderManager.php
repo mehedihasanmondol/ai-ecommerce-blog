@@ -16,6 +16,8 @@ class HeroSliderManager extends Component
     public $sliders;
     public $editingId = null;
     public $showModal = false;
+    public $showDeleteModal = false;
+    public $deleteId = null;
     
     // Form fields
     public $title;
@@ -118,23 +120,35 @@ class HeroSliderManager extends Component
         }
     }
 
-    public function deleteSlider($id)
+    public function confirmDelete($id)
+    {
+        $this->deleteId = $id;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteSlider()
     {
         try {
-            $slider = HeroSlider::findOrFail($id);
-            $slider->delete();
-            
-            $this->loadSliders();
-            
-            $this->dispatch('slider-saved', [
-                'message' => 'Slider deleted successfully!',
-                'type' => 'success'
-            ]);
+            if ($this->deleteId) {
+                $slider = HeroSlider::findOrFail($this->deleteId);
+                $slider->delete();
+                
+                $this->loadSliders();
+                $this->showDeleteModal = false;
+                $this->deleteId = null;
+                
+                $this->dispatch('slider-saved', [
+                    'message' => 'Slider deleted successfully!',
+                    'type' => 'success'
+                ]);
+            }
         } catch (\Exception $e) {
             $this->dispatch('slider-saved', [
                 'message' => 'Error deleting slider: ' . $e->getMessage(),
                 'type' => 'error'
             ]);
+            $this->showDeleteModal = false;
+            $this->deleteId = null;
         }
     }
 
