@@ -55,7 +55,7 @@ class CartController extends Controller
     {
         if (empty($cart)) {
             // If cart is empty, show popular products
-            return Product::with(['variants', 'images', 'brand'])
+            return Product::with(['variants', 'images.media', 'brand'])
                 ->where('is_active', true)
                 ->where('is_featured', true)
                 ->limit(5)
@@ -77,7 +77,7 @@ class CartController extends Controller
         }
         
         // Get related products from same categories
-        return Product::with(['variants', 'images', 'brand'])
+        return Product::with(['variants', 'images.media', 'brand'])
             ->whereIn('category_id', $categoryIds)
             ->whereNotIn('id', $cartProductIds)
             ->where('is_active', true)
@@ -96,6 +96,12 @@ class CartController extends Controller
         $variant = $product->variants->first();
         $primaryImage = $product->images->where('is_primary', true)->first() ?? $product->images->first();
         
+        // Get proper image URL from media library or fallback to image_path
+        $imageUrl = null;
+        if ($primaryImage) {
+            $imageUrl = $primaryImage->getImageUrl() ?? $primaryImage->image_path;
+        }
+        
         return [
             'id' => $product->id,
             'product_id' => $product->id,
@@ -105,7 +111,7 @@ class CartController extends Controller
             'brand' => $product->brand ? $product->brand->name : null,
             'price' => $variant->sale_price ?? $variant->price ?? 0,
             'original_price' => $variant->price ?? 0,
-            'image' => $primaryImage ? $primaryImage->image_path : null,
+            'image' => $imageUrl,
             'rating' => $product->average_rating ?? 0,
             'reviews' => $product->review_count ?? 0,
             'sku' => $variant->sku ?? null,
