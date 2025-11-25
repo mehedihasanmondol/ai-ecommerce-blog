@@ -16,12 +16,7 @@
 
 @if($secondaryMenuItems->isNotEmpty())
 <div class="flex items-center space-x-6 py-3">
-        <!-- Blog Link -->
-        <a href="{{ route('blog.index') }}" 
-           class="text-gray-700 hover:text-green-600 text-sm font-medium transition {{ request()->routeIs('blog.*') ? 'text-green-600' : '' }}">
-            Blog
-        </a>
-        
+      
         @foreach($secondaryMenuItems as $item)
             @if($item->type === 'link')
                 <a href="{{ $item->url }}" 
