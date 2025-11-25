@@ -101,7 +101,7 @@ class ProductForm extends Component
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:products,slug,' . ($this->product->id ?? 'NULL'),
             'description' => 'nullable|string',
-            'short_description' => 'nullable|string|max:500',
+            'short_description' => 'nullable|string',
             'category_ids' => 'nullable|array',
             'category_ids.*' => 'exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',

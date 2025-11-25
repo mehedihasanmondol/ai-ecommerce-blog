@@ -253,7 +253,7 @@
                                               class="ckeditor-content-minimal">{{ $short_description }}</textarea>
                                 </div>
                                 <input type="hidden" wire:model="short_description" id="product-short-description-hidden">
-                                <p class="text-xs text-gray-500 mt-1">Brief summary with basic formatting (max 500 characters). Appears on product cards.</p>
+                                <p class="text-xs text-gray-500 mt-1">Brief summary with basic formatting . Appears on product cards.</p>
                                 @error('short_description') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
