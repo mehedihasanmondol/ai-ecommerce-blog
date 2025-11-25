@@ -6,9 +6,12 @@ use App\Modules\Ecommerce\Delivery\Services\DeliveryService;
 use App\Modules\Ecommerce\Order\Services\OrderService;
 use App\Modules\User\Models\UserAddress;
 use App\Services\CouponService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 /**
  * ModuleName: Checkout Management
@@ -243,6 +246,26 @@ class CheckoutController extends Controller
         }
 
         try {
+            // Track if this is a new customer account
+            $isNewCustomer = false;
+            
+            // Handle guest checkout - create customer account and log them in
+            if (!Auth::check()) {
+                $result = $this->createOrGetCustomer(
+                    $validated['shipping_email'] ?? null,
+                    $validated['shipping_name'],
+                    $validated['shipping_phone']
+                );
+                
+                $user = $result['user'];
+                $isNewCustomer = $result['is_new'];
+                
+                // Log the user in
+                Auth::login($user);
+                
+                \Log::info('Guest user auto-registered and logged in', ['user_id' => $user->id, 'is_new' => $isNewCustomer]);
+            }
+            
             // Calculate totals
             $subtotal = 0;
             $totalWeight = 0;
@@ -351,7 +374,7 @@ class CheckoutController extends Controller
             $shippingAddress = [
                 'first_name' => $firstName,
                 'last_name' => $lastName,
-                'email' => $validated['shipping_email'],
+                'email' => $validated['shipping_email'] ?? null,
                 'phone' => $validated['shipping_phone'],
                 'address_line_1' => $validated['shipping_address_line_1'],
                 'address_line_2' => '',
@@ -362,10 +385,13 @@ class CheckoutController extends Controller
             ];
 
             // Prepare order data for OrderService
+            // Use authenticated user's email if customer didn't provide one
+            $customerEmail = $validated['shipping_email'] ?? (Auth::check() ? Auth::user()->email : null);
+            
             $orderData = [
                 'user_id' => Auth::id(),
                 'customer_name' => $validated['shipping_name'],
-                'customer_email' => $validated['shipping_email'],
+                'customer_email' => $customerEmail,
                 'customer_phone' => $validated['shipping_phone'],
                 'customer_notes' => $validated['order_notes'] ?? null,
                 'payment_method' => $validated['payment_method'],
@@ -386,6 +412,15 @@ class CheckoutController extends Controller
 
             // Create order
             $order = $this->orderService->createOrder($orderData);
+            
+            // Save shipping address to user's address book if not already exists
+            $this->saveShippingAddress(
+                Auth::id(),
+                $validated['shipping_name'],
+                $validated['shipping_email'] ?? null,
+                $validated['shipping_phone'],
+                $validated['shipping_address_line_1']
+            );
 
             // Record coupon usage after order is created
             if ($couponCode && Auth::check()) {
@@ -428,15 +463,15 @@ class CheckoutController extends Controller
             Session::forget('applied_coupon');
             Session::forget('pending_order_id');
 
-            // Redirect based on authentication for COD orders
-            if (Auth::check()) {
-                return redirect()->route('customer.orders.show', $order->id)
-                    ->with('success', 'Order placed successfully! Order number: ' . $order->order_number);
-            } else {
-                // For guest users, redirect to a thank you page or home
-                return redirect()->route('home')
-                    ->with('success', 'Order placed successfully! Order number: ' . $order->order_number . '. Check your email for order details.');
+            // Prepare success message based on customer status
+            $successMessage = 'Order placed successfully! Order number: ' . $order->order_number;
+            if (isset($isNewCustomer) && $isNewCustomer) {
+                $successMessage .= '. We have created an account for you. Check your email for login details.';
             }
+
+            // Redirect to order detail page with success message
+            return redirect()->route('customer.orders.show', $order->id)
+                ->with('success', $successMessage);
 
         } catch (\Exception $e) {
             \Log::error('Checkout error: ' . $e->getMessage());
@@ -445,5 +480,104 @@ class CheckoutController extends Controller
                 ->withInput()
                 ->with('error', 'Failed to place order: ' . $e->getMessage());
         }
+    }
+    
+    /**
+     * Create or get existing customer for guest checkout
+     * Returns array with user and is_new flag
+     * Email is optional - if not provided, generates dummy email from phone
+     */
+    protected function createOrGetCustomer(?string $email, string $name, string $phone): array
+    {
+        // If email provided, check if user exists
+        if ($email) {
+            $user = User::where('email', $email)->first();
+            
+            if ($user) {
+                \Log::info('Existing customer found by email', ['user_id' => $user->id, 'email' => $email]);
+                return [
+                    'user' => $user,
+                    'is_new' => false
+                ];
+            }
+        }
+        
+        // Check if user exists by phone number
+        $user = User::where('mobile', $phone)->first();
+        
+        if ($user) {
+            \Log::info('Existing customer found by phone', ['user_id' => $user->id, 'phone' => $phone]);
+            return [
+                'user' => $user,
+                'is_new' => false
+            ];
+        }
+        
+        // Generate email if not provided (use phone number)
+        $customerEmail = $email ?: $phone . '@guest.local';
+        
+        // Generate random password
+        $randomPassword = Str::random(12);
+        
+        // Create new customer account
+        $user = User::create([
+            'name' => $name,
+            'email' => $customerEmail,
+            'mobile' => $phone,
+            'password' => Hash::make($randomPassword),
+            'role' => 'customer',
+            'is_active' => true,
+            'email_verified_at' => $email ? now() : null, // Only verify if real email provided
+        ]);
+        
+        \Log::info('New customer account created', [
+            'user_id' => $user->id,
+            'email' => $customerEmail,
+            'has_real_email' => !empty($email),
+            'password' => $randomPassword
+        ]);
+        
+        // TODO: Send welcome email with login credentials (only if real email)
+        // if ($email) {
+        //     Mail::to($user->email)->send(new WelcomeCustomerMail($user, $randomPassword));
+        // }
+        
+        return [
+            'user' => $user,
+            'is_new' => true
+        ];
+    }
+    
+    /**
+     * Save shipping address to user's address book if not already exists
+     */
+    protected function saveShippingAddress(int $userId, string $name, ?string $email, string $phone, string $address): void
+    {
+        // Check if this exact address already exists
+        $existingAddress = UserAddress::where('user_id', $userId)
+            ->where('address', $address)
+            ->where('phone', $phone)
+            ->first();
+        
+        if ($existingAddress) {
+            \Log::info('Shipping address already exists in address book', ['address_id' => $existingAddress->id]);
+            return;
+        }
+        
+        // Count existing addresses
+        $addressCount = UserAddress::where('user_id', $userId)->count();
+        
+        // Create new address
+        $userAddress = UserAddress::create([
+            'user_id' => $userId,
+            'label' => 'Order Address ' . date('M d, Y'),
+            'name' => $name,
+            'phone' => $phone,
+            'email' => $email,
+            'address' => $address,
+            'is_default' => $addressCount === 0, // Set as default if it's the first address
+        ]);
+        
+        \Log::info('Shipping address saved to address book', ['address_id' => $userAddress->id]);
     }
 }
