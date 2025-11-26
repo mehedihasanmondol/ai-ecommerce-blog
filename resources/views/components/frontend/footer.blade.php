@@ -203,6 +203,8 @@
                     @foreach($footerLinks['company'] as $link)
                         <li><a href="{{ $link->url }}" class="hover:text-green-600 transition">{{ $link->title }}</a></li>
                     @endforeach
+                    {{-- Customer Feedback Link --}}
+                    <li><a href="{{ route('feedback.index') }}" class="hover:text-green-600 transition">Customer Feedback</a></li>
                 </ul>
             </div>
             @endif

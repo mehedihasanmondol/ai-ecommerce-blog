@@ -15,6 +15,7 @@
                         'homepage' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>',
                         'blog' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>',
                         'stock' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>',
+                        'feedback' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>',
                     ];
                     $icon = $icons[$group] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>';
                 @endphp
@@ -49,6 +50,8 @@
                                 <span class="text-xs font-normal px-2 py-1 bg-purple-100 text-purple-700 rounded">Image Upload</span>
                             @elseif($setting->type === 'boolean')
                                 <span class="text-xs font-normal px-2 py-1 bg-green-100 text-green-700 rounded">Toggle</span>
+                            @elseif($setting->type === 'number')
+                                <span class="text-xs font-normal px-2 py-1 bg-indigo-100 text-indigo-700 rounded">Number</span>
                             @elseif($setting->type === 'tinymce')
                                 <span class="text-xs font-normal px-2 py-1 bg-orange-100 text-orange-700 rounded">Rich Editor</span>
                             @elseif($setting->type === 'ckeditor')
@@ -70,6 +73,16 @@
                             wire:model="settings.{{ $setting->key }}"
                             class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                             placeholder="Enter {{ strtolower($setting->label) }}"
+                        >
+
+                    @elseif($setting->type === 'number')
+                        <input 
+                            type="number" 
+                            wire:model="settings.{{ $setting->key }}"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                            placeholder="Enter {{ strtolower($setting->label) }}"
+                            min="1"
+                            step="1"
                         >
 
                     @elseif($setting->type === 'textarea')

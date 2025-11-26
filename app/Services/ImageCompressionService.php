@@ -136,4 +136,79 @@ class ImageCompressionService
     {
         return in_array($file->getMimeType(), self::getSupportedMimeTypes());
     }
+
+    /**
+     * Compress and save image to WebP format
+     * Alternative method signature for backward compatibility
+     * 
+     * @param UploadedFile $file The uploaded image file
+     * @param string $directory The storage directory
+     * @param string $filename The desired filename
+     * @param int $quality The quality (0-100)
+     * @param string|null $disk The storage disk (default: 'public')
+     * @return string The path to the stored WebP image
+     */
+    public function compressAndSave(UploadedFile $file, string $directory, string $filename, int $quality = 85, string $disk = 'public'): string
+    {
+        // Ensure filename has .webp extension
+        if (pathinfo($filename, PATHINFO_EXTENSION) !== 'webp') {
+            $filename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+        }
+
+        $path = $directory . '/' . $filename;
+
+        // Read and process the uploaded image
+        $image = $this->manager->read($file->getRealPath());
+
+        // Encode to WebP format with specified quality
+        $encoded = $image->toWebp($quality);
+
+        // Store the WebP image
+        Storage::disk($disk)->put($path, (string) $encoded);
+
+        return $path;
+    }
+
+    /**
+     * Create thumbnail from existing image
+     * 
+     * @param string $sourcePath The source image path
+     * @param int $width The thumbnail width
+     * @param int $height The thumbnail height
+     * @param string|null $disk The storage disk (default: 'public')
+     * @return string|null The path to the thumbnail or null on failure
+     */
+    public function createThumbnail(string $sourcePath, int $width, int $height, string $disk = 'public'): ?string
+    {
+        try {
+            // Get the full path from storage
+            $fullPath = Storage::disk($disk)->path($sourcePath);
+
+            if (!file_exists($fullPath)) {
+                return null;
+            }
+
+            // Read the existing image
+            $image = $this->manager->read($fullPath);
+
+            // Resize maintaining aspect ratio
+            $image->scale($width, $height);
+
+            // Generate thumbnail filename
+            $pathInfo = pathinfo($sourcePath);
+            $filename = $pathInfo['filename'] . '_' . $width . 'x' . $height . '.webp';
+            $thumbnailPath = $pathInfo['dirname'] . '/' . $filename;
+
+            // Encode to WebP format
+            $encoded = $image->toWebp(self::WEBP_QUALITY);
+
+            // Store the thumbnail
+            Storage::disk($disk)->put($thumbnailPath, (string) $encoded);
+
+            return $thumbnailPath;
+        } catch (\Exception $e) {
+            \Log::error('Failed to create thumbnail: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

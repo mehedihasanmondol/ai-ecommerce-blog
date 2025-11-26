@@ -173,6 +173,28 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
             ->name('tick-marks.update-sort-order');
     });
     
+    // Feedback Management Routes - Requires feedback permissions
+    Route::middleware(['permission:feedback.view'])->prefix('feedback')->name('feedback.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\FeedbackController::class, 'index'])->name('index');
+        Route::get('{feedback}', [\App\Http\Controllers\Admin\FeedbackController::class, 'show'])->name('show');
+        
+        Route::middleware(['permission:feedback.approve'])->group(function () {
+            Route::post('{feedback}/approve', [\App\Http\Controllers\Admin\FeedbackController::class, 'approve'])->name('approve');
+        });
+        
+        Route::middleware(['permission:feedback.reject'])->group(function () {
+            Route::post('{feedback}/reject', [\App\Http\Controllers\Admin\FeedbackController::class, 'reject'])->name('reject');
+        });
+        
+        Route::middleware(['permission:feedback.feature'])->group(function () {
+            Route::post('{feedback}/feature', [\App\Http\Controllers\Admin\FeedbackController::class, 'toggleFeature'])->name('feature');
+        });
+        
+        Route::middleware(['permission:feedback.delete'])->group(function () {
+            Route::delete('{feedback}', [\App\Http\Controllers\Admin\FeedbackController::class, 'destroy'])->name('destroy');
+        });
+    });
+    
     // Delivery Management Routes - Requires order permissions
     Route::middleware(['permission:orders.view'])->prefix('delivery')->name('delivery.')->group(function () {
         // Delivery Zones

@@ -157,8 +157,14 @@
                                 @endif
                             </div>
                         </div>
-</div>
+                        
+
+                        </div>
+                    <!-- Feedback Section (60/40 Layout) -->
+                    <x-feedback.author-profile-section />
                     </div>
+
+                    
 
                     <!-- Posts Section with Livewire (Border Separation) -->
                 <div class="">

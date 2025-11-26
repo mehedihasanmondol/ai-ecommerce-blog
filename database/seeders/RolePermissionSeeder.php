@@ -250,6 +250,15 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Cache', 'slug' => 'system.cache', 'module' => 'system'],
             ['name' => 'Manage Maintenance Mode', 'slug' => 'system.maintenance', 'module' => 'system'],
             ['name' => 'View System Logs', 'slug' => 'system.logs', 'module' => 'system'],
+            
+            // ===================================
+            // FEEDBACK MODULE
+            // ===================================
+            ['name' => 'View Feedback', 'slug' => 'feedback.view', 'module' => 'feedback'],
+            ['name' => 'Approve Feedback', 'slug' => 'feedback.approve', 'module' => 'feedback'],
+            ['name' => 'Reject Feedback', 'slug' => 'feedback.reject', 'module' => 'feedback'],
+            ['name' => 'Delete Feedback', 'slug' => 'feedback.delete', 'module' => 'feedback'],
+            ['name' => 'Feature Feedback', 'slug' => 'feedback.feature', 'module' => 'feedback'],
         ];
 
         foreach ($permissions as $permission) {

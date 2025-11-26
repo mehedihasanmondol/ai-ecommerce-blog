@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\CouponController;
@@ -90,6 +91,11 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name(
 
 // Search Routes
 Route::get('/search', \App\Livewire\Search\SearchResults::class)->name('search.results');
+
+// Feedback Routes (must be before catch-all route)
+Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+Route::post('/feedback/{feedback}/helpful', [FeedbackController::class, 'helpful'])->name('feedback.helpful');
+Route::post('/feedback/{feedback}/not-helpful', [FeedbackController::class, 'notHelpful'])->name('feedback.notHelpful');
 
 // Blog Routes (must be before catch-all product route)
 require __DIR__.'/blog.php';

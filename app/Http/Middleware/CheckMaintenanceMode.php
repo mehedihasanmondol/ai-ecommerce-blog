@@ -30,8 +30,38 @@ class CheckMaintenanceMode
             'verification.send',
         ];
         
-        if ($request->routeIs($excludedRoutes) || $request->is('login') || $request->is('logout')) {
+        // Excluded URL paths (for Livewire requests and direct access)
+        $excludedPaths = [
+            'login',
+            'logout',
+            'register',
+            'forgot-password',
+            'reset-password',
+            'livewire/update', // Allow all Livewire updates from auth pages
+        ];
+        
+        // Check if request is from auth pages
+        if ($request->routeIs($excludedRoutes)) {
             return $next($request);
+        }
+        
+        // Check if URL path matches excluded paths
+        foreach ($excludedPaths as $path) {
+            if ($request->is($path) || $request->is($path . '/*')) {
+                return $next($request);
+            }
+        }
+        
+        // Check if it's a Livewire request from auth pages (check referer)
+        if ($request->header('X-Livewire')) {
+            $referer = $request->header('referer');
+            if ($referer) {
+                foreach ($excludedPaths as $path) {
+                    if (str_contains($referer, '/' . $path)) {
+                        return $next($request);
+                    }
+                }
+            }
         }
         
         // Check if maintenance mode is enabled
