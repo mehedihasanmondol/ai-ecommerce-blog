@@ -1,8 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'Contact Us - ' . config('app.name'))
+@section('title', \App\Models\ContactSetting::get('seo_title', 'Contact Us - ' . config('app.name')))
 
-@section('meta_description', 'Get in touch with us. Contact us for any inquiries, support, or feedback.')
+@section('description', \App\Models\ContactSetting::get('seo_description', 'Get in touch with us. Contact us for any inquiries, support, or feedback.'))
+
+@section('keywords', \App\Models\ContactSetting::get('seo_keywords', 'contact, support, customer service'))
+
+@section('og_type', 'website')
+@section('og_title', \App\Models\ContactSetting::get('seo_og_title', \App\Models\ContactSetting::get('seo_title', 'Contact Us')))
+@section('og_description', \App\Models\ContactSetting::get('seo_og_description', \App\Models\ContactSetting::get('seo_description', 'Contact us for any inquiries.')))
+@if(\App\Models\ContactSetting::get('seo_image'))
+@section('og_image', asset('storage/' . \App\Models\ContactSetting::get('seo_image')))
+@endif
+
+@section('twitter_card', 'summary_large_image')
+@section('twitter_title', \App\Models\ContactSetting::get('seo_twitter_title', \App\Models\ContactSetting::get('seo_title', 'Contact Us')))
+@section('twitter_description', \App\Models\ContactSetting::get('seo_twitter_description', \App\Models\ContactSetting::get('seo_description', 'Contact us for any inquiries.')))
+@if(\App\Models\ContactSetting::get('seo_image'))
+@section('twitter_image', asset('storage/' . \App\Models\ContactSetting::get('seo_image')))
+@endif
 
 @section('content')
 

@@ -58,7 +58,7 @@
 
         <!-- Settings Tab -->
         <div x-show="activeTab === 'settings'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-            <form action="{{ route('admin.contact.settings.update') }}" method="POST">
+            <form action="{{ route('admin.contact.settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -70,7 +70,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         @foreach($groupSettings as $setting)
-                        <div>
+                        <div class="{{ $setting->type === 'image' ? 'md:col-span-2' : '' }}">
                             <label for="{{ $setting->key }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 {{ ucwords(str_replace('_', ' ', $setting->key)) }}
                                 @if($setting->description)
@@ -78,7 +78,32 @@
                                 @endif
                             </label>
                             
-                            @if($setting->type === 'textarea')
+                            @if($setting->type === 'image')
+                                <!-- Image Upload Field -->
+                                <div class="space-y-3">
+                                    @if($setting->value)
+                                    <div class="relative inline-block">
+                                        <img src="{{ asset('storage/' . $setting->value) }}" 
+                                             alt="SEO Image" 
+                                             class="h-32 w-auto rounded-lg border border-gray-300">
+                                        <span class="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                                            <i class="fas fa-check-circle mr-1"></i>Current
+                                        </span>
+                                    </div>
+                                    @endif
+                                    <input 
+                                        type="file"
+                                        id="{{ $setting->key }}"
+                                        name="{{ $setting->key }}"
+                                        accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                    >
+                                    <p class="text-xs text-gray-500">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Recommended: 1200x630px for optimal social media sharing. Max 5MB. Will be converted to WebP.
+                                    </p>
+                                </div>
+                            @elseif($setting->type === 'textarea')
                                 <textarea 
                                     id="{{ $setting->key }}"
                                     name="settings[{{ $setting->key }}]"

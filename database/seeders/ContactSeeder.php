@@ -223,6 +223,72 @@ class ContactSeeder extends Seeder
                 'description' => 'Chamber business hours',
                 'order' => 5,
             ],
+
+            // SEO Settings
+            [
+                'key' => 'seo_title',
+                'group' => 'seo',
+                'value' => 'Contact Us - Get in Touch',
+                'type' => 'text',
+                'description' => 'SEO page title',
+                'order' => 1,
+            ],
+            [
+                'key' => 'seo_description',
+                'group' => 'seo',
+                'value' => 'Contact us for any inquiries, support, or feedback. We are here to help you with all your questions and concerns.',
+                'type' => 'textarea',
+                'description' => 'SEO meta description (150-160 characters recommended)',
+                'order' => 2,
+            ],
+            [
+                'key' => 'seo_keywords',
+                'group' => 'seo',
+                'value' => 'contact, support, customer service, help, inquiry, get in touch',
+                'type' => 'textarea',
+                'description' => 'SEO keywords (comma separated)',
+                'order' => 3,
+            ],
+            [
+                'key' => 'seo_image',
+                'group' => 'seo',
+                'value' => '',
+                'type' => 'image',
+                'description' => 'SEO image for social media (Open Graph & Twitter Card)',
+                'order' => 4,
+            ],
+            [
+                'key' => 'seo_og_title',
+                'group' => 'seo',
+                'value' => 'Contact Us - Get in Touch',
+                'type' => 'text',
+                'description' => 'Open Graph title (for Facebook, LinkedIn)',
+                'order' => 5,
+            ],
+            [
+                'key' => 'seo_og_description',
+                'group' => 'seo',
+                'value' => 'Contact us for any inquiries, support, or feedback. We are here to help you.',
+                'type' => 'textarea',
+                'description' => 'Open Graph description',
+                'order' => 6,
+            ],
+            [
+                'key' => 'seo_twitter_title',
+                'group' => 'seo',
+                'value' => 'Contact Us - Get in Touch',
+                'type' => 'text',
+                'description' => 'Twitter card title',
+                'order' => 7,
+            ],
+            [
+                'key' => 'seo_twitter_description',
+                'group' => 'seo',
+                'value' => 'Contact us for any inquiries, support, or feedback.',
+                'type' => 'textarea',
+                'description' => 'Twitter card description',
+                'order' => 8,
+            ],
         ];
 
         foreach ($settings as $setting) {

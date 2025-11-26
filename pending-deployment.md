@@ -96,3 +96,5 @@ php artisan migrate --path=database/migrations/2025_11_26_131108_create_contact_
 php artisan migrate --path=database/migrations/2025_11_26_131108_create_contact_faqs_table.php
 
 php artisan migrate --path=database/migrations/2025_11_26_131112_create_contact_messages_table.php
+
+php artisan db:seed --class=ContactSeeder

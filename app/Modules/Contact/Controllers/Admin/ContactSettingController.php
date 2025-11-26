@@ -5,9 +5,11 @@ namespace App\Modules\Contact\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ContactSetting;
 use App\Models\ContactFaq;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class ContactSettingController extends Controller
 {
@@ -30,9 +32,30 @@ class ContactSettingController extends Controller
         $validated = $request->validate([
             'settings' => 'required|array',
             'settings.*' => 'nullable|string',
+            'seo_image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120', // 5MB max
         ]);
 
         try {
+            // Handle image upload for SEO image
+            if ($request->hasFile('seo_image')) {
+                // Delete old image if exists
+                $oldImage = ContactSetting::get('seo_image');
+                if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+                
+                // Upload new image with WebP compression
+                $path = ImageService::processAndStore(
+                    $request->file('seo_image'),
+                    'contact/seo',
+                    85 // Quality: 85 for good balance
+                );
+                
+                // Update SEO image setting
+                ContactSetting::where('key', 'seo_image')->update(['value' => $path]);
+            }
+
+            // Update other settings
             foreach ($validated['settings'] as $key => $value) {
                 ContactSetting::where('key', $key)->update(['value' => $value]);
             }
@@ -46,7 +69,7 @@ class ContactSettingController extends Controller
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'An error occurred while updating settings.');
+                ->with('error', 'An error occurred while updating settings: ' . $e->getMessage());
         }
     }
 
