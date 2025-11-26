@@ -259,6 +259,16 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Reject Feedback', 'slug' => 'feedback.reject', 'module' => 'feedback'],
             ['name' => 'Delete Feedback', 'slug' => 'feedback.delete', 'module' => 'feedback'],
             ['name' => 'Feature Feedback', 'slug' => 'feedback.feature', 'module' => 'feedback'],
+
+            // ===================================
+            // APPOINTMENT MODULE
+            // ===================================
+            ['name' => 'View Appointments', 'slug' => 'appointments.view', 'module' => 'appointments'],
+            ['name' => 'Confirm Appointments', 'slug' => 'appointments.confirm', 'module' => 'appointments'],
+            ['name' => 'Cancel Appointments', 'slug' => 'appointments.cancel', 'module' => 'appointments'],
+            ['name' => 'Complete Appointments', 'slug' => 'appointments.complete', 'module' => 'appointments'],
+            ['name' => 'Delete Appointments', 'slug' => 'appointments.delete', 'module' => 'appointments'],
+            ['name' => 'Manage Chambers', 'slug' => 'chambers.manage', 'module' => 'appointments'],
         ];
 
         foreach ($permissions as $permission) {

@@ -195,6 +195,22 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         });
     });
     
+    // Appointment Management Routes
+    Route::middleware(['permission:appointments.view'])->prefix('appointments')->name('appointments.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AppointmentController::class, 'index'])->name('index');
+    });
+
+    // Chamber Management Routes
+    Route::middleware(['permission:chambers.manage'])->prefix('chambers')->name('chambers.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ChamberController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\ChamberController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\ChamberController::class, 'store'])->name('store');
+        Route::get('/{chamber}/edit', [\App\Http\Controllers\Admin\ChamberController::class, 'edit'])->name('edit');
+        Route::put('/{chamber}', [\App\Http\Controllers\Admin\ChamberController::class, 'update'])->name('update');
+        Route::post('/{chamber}/toggle-status', [\App\Http\Controllers\Admin\ChamberController::class, 'toggleStatus'])->name('toggle-status');
+        Route::delete('/{chamber}', [\App\Http\Controllers\Admin\ChamberController::class, 'destroy'])->name('destroy');
+    });
+    
     // Delivery Management Routes - Requires order permissions
     Route::middleware(['permission:orders.view'])->prefix('delivery')->name('delivery.')->group(function () {
         // Delivery Zones

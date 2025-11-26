@@ -829,6 +829,59 @@ class SiteSettingSeeder extends Seeder
         foreach ($featureSettings as $setting) {
             $this->upsertSetting($setting);
         }
+
+        // Appointment Settings
+        $appointmentSettings = [
+            [
+                'key' => 'appointment_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'appointment',
+                'label' => 'Enable Appointments',
+                'description' => 'Enable/disable the appointment booking system',
+                'order' => 1,
+            ],
+            [
+                'key' => 'appointment_heading',
+                'value' => 'অ্যাপয়েন্টমেন্ট বুক করুন',
+                'type' => 'text',
+                'group' => 'appointment',
+                'label' => 'Appointment Form Heading',
+                'description' => 'Heading text for the appointment form',
+                'order' => 2,
+            ],
+            [
+                'key' => 'appointment_alert_message',
+                'value' => 'দয়া করে নোট করুন: আপনার অ্যাপয়েন্টমেন্ট রিকোয়েস্ট গ্রহণ করার পর আমরা শীঘ্রই ফোন করে আপনাকে কনফার্মেশন জানাব।',
+                'type' => 'textarea',
+                'group' => 'appointment',
+                'label' => 'Alert Message',
+                'description' => 'Alert message shown before the appointment form',
+                'order' => 3,
+            ],
+            [
+                'key' => 'appointment_success_message',
+                'value' => 'আপনার অ্যাপয়েন্টমেন্ট রিকোয়েস্ট সফলভাবে জমা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।',
+                'type' => 'textarea',
+                'group' => 'appointment',
+                'label' => 'Success Message',
+                'description' => 'Message shown after successful appointment submission',
+                'order' => 4,
+            ],
+            [
+                'key' => 'appointment_default_chamber',
+                'value' => '1',
+                'type' => 'number',
+                'group' => 'appointment',
+                'label' => 'Default Chamber ID',
+                'description' => 'Default chamber to pre-select in appointment form',
+                'order' => 5,
+            ],
+        ];
+
+        foreach ($appointmentSettings as $setting) {
+            $this->upsertSetting($setting);
+        }
     }
 
     /**
