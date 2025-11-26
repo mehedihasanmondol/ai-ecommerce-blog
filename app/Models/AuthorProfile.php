@@ -41,6 +41,7 @@ class AuthorProfile extends Model
         'instagram',
         'github',
         'youtube',
+        'whatsapp',
         'avatar',
         'media_id',
         'is_featured',
@@ -95,7 +96,8 @@ class AuthorProfile extends Model
             || !empty($this->linkedin) 
             || !empty($this->instagram) 
             || !empty($this->github) 
-            || !empty($this->youtube);
+            || !empty($this->youtube)
+            || !empty($this->whatsapp);
     }
 
     /**

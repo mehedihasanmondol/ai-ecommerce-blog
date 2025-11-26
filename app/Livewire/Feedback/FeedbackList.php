@@ -28,6 +28,8 @@ class FeedbackList extends Component
     public $ratingDistribution = [];
     public $ratingEnabled = true;
     public $showImages = true;
+    public $timeEnabled = true;
+    public $helpfulEnabled = true;
     
     // Gallery modal
     public $showGalleryModal = false;
@@ -45,6 +47,8 @@ class FeedbackList extends Component
     {
         $this->ratingEnabled = \App\Models\SiteSetting::get('feedback_rating_enabled', '1') === '1';
         $this->showImages = \App\Models\SiteSetting::get('feedback_show_images', '1') === '1';
+        $this->timeEnabled = \App\Models\SiteSetting::get('feedback_time_enabled', '1') === '1';
+        $this->helpfulEnabled = \App\Models\SiteSetting::get('feedback_helpful_enabled', '1') === '1';
         $this->perLoad = (int) \App\Models\SiteSetting::get('feedback_per_page_frontend', '10');
         $this->calculateStats();
     }

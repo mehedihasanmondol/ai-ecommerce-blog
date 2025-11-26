@@ -21,6 +21,11 @@
     $feedbackPerPage = (int) \App\Models\SiteSetting::get('feedback_per_author_page', '5');
     $ratingEnabled = \App\Models\SiteSetting::get('feedback_rating_enabled', '1') === '1';
     $showImages = \App\Models\SiteSetting::get('feedback_show_images', '1') === '1';
+    $feedbackTitle = \App\Models\SiteSetting::get('feedback_title', 'Customer Feedback');
+    $feedbackTimeEnabled = \App\Models\SiteSetting::get('feedback_time_enabled', '1') === '1';
+    
+    // Check if appointments are enabled
+    $appointmentEnabled = \App\Models\SiteSetting::get('appointment_enabled', '1') === '1';
     
     $featuredFeedback = \App\Models\Feedback::approved()
         ->with('user')
@@ -30,11 +35,11 @@
 @endphp
 
 <div class="bg-white border-t border-gray-200 p-6">
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {{-- 60% - Featured Feedback Section --}}
-        <div class="lg:col-span-3">
+    <div class="grid grid-cols-1 {{ $appointmentEnabled ? 'lg:grid-cols-5' : 'lg:grid-cols-1' }} gap-6">
+        {{-- Featured Feedback Section (60% with appointments, 100% without) --}}
+        <div class="{{ $appointmentEnabled ? 'lg:col-span-3' : 'lg:col-span-1' }}">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Customer Feedback</h2>
+                <h2 class="text-xl font-bold text-gray-900">{{ $feedbackTitle }}</h2>
                 
             </div>
 
@@ -61,7 +66,9 @@
                                         @endif
                                     </div>
                                 </div>
+                                @if($feedbackTimeEnabled)
                                 <span class="text-xs text-gray-500">{{ $item->created_at->diffForHumans() }}</span>
+                                @endif
                             </div>
 
                             {{-- Title --}}
@@ -109,43 +116,13 @@
             @endif
         </div>
 
-        {{-- 40% - Appointment Form Section (Sticky) --}}
+        {{-- 40% - Appointment Form Section (Sticky) - Only show if enabled --}}
+        @if($appointmentEnabled)
         <div class="lg:col-span-2">
             <div class="lg:sticky lg:top-24">
-                @php
-                    $appointmentEnabled = \App\Models\SiteSetting::get('appointment_enabled', '1') === '1';
-                @endphp
-
-                @if($appointmentEnabled)
-                    @livewire('appointment.appointment-form')
-                @else
-                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-6 h-full flex flex-col items-center justify-center text-center border-2 border-dashed border-blue-200">
-                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-lg">
-                            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Appointment</h3>
-                        <p class="text-lg font-semibold text-blue-600 mb-4">Coming Soon</p>
-                        
-                        <p class="text-sm text-gray-600 mb-6">
-                            Book your consultation appointment with our experts. This feature will be available soon!
-                        </p>
-                        
-                        <div class="w-full max-w-xs">
-                            <div class="bg-white rounded-lg p-4 shadow-sm">
-                                <div class="flex items-center justify-center space-x-2 text-gray-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <span class="text-sm font-medium">Stay Tuned</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+                @livewire('appointment.appointment-form')
             </div>
         </div>
+        @endif
     </div>
 </div>

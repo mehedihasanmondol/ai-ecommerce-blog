@@ -117,7 +117,9 @@
                                     @endfor
                                 </div>
                                 @endif
+                                @if($timeEnabled)
                                 <span class="text-sm text-gray-500">{{ $item->created_at->format('M d, Y') }}</span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -147,6 +149,7 @@
                 @endif
 
                 {{-- Helpful Actions --}}
+                @if($helpfulEnabled)
                 <div class="flex items-center space-x-4 pt-4 border-t border-gray-100">
                     @auth
                         <button wire:click="voteHelpful({{ $item->id }})" 
@@ -182,6 +185,7 @@
                         </button>
                     @endauth
                 </div>
+                @endif
             </div>
         @empty
             <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">

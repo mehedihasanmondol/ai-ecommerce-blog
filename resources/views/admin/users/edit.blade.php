@@ -423,6 +423,17 @@
                                                class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
                                     </div>
                                 </div>
+
+                                <!-- WhatsApp -->
+                                <div class="group">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp Number</label>
+                                    <input type="text" 
+                                           name="author_whatsapp" 
+                                           value="{{ old('author_whatsapp', $user->authorProfile->whatsapp ?? '') }}"
+                                           placeholder="8801XXXXXXXXX (with country code)"
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200">
+                                    <p class="text-xs text-gray-500 mt-1">Include country code (e.g., 8801712345678)</p>
+                                </div>
                             </div>
                         </div>
 

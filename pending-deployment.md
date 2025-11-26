@@ -43,4 +43,23 @@ php artisan view:clear
 
 # ✅ APPOINTMENT SYSTEM COMPLETE!
 # Admin: /admin/appointments
-# Frontend: Author profile pages (60/40 sticky layout)
+# Frontend: Author profile pages (responsive layout)
+
+# ✅ FEEDBACK ENHANCEMENTS COMPLETE!
+# - Customizable feedback title (Site Settings > Feedback)
+# - Time display toggle (Site Settings > Feedback)
+# - Helpful/Not Helpful voting toggle (Site Settings > Feedback)
+# - Full width when appointments disabled
+# - No "Coming Soon" content when appointments off
+# - Settings work on both author profile AND /feedback page
+
+# ✅ AUTHOR PROFILE WHATSAPP ADDED!
+# - WhatsApp social link added to author profiles
+# - Shows with other social links (Twitter, Facebook, etc.)
+# - Admin can add WhatsApp number in user create/edit forms
+# - Format: Include country code (e.g., 8801712345678)
+
+
+
+
+php artisan make:migration add_whatsapp_to_author_profiles_table

@@ -65,6 +65,7 @@ class AuthorProfileService
                 'instagram' => $data['author_instagram'] ?? $authorProfile->instagram ?? null,
                 'github' => $data['author_github'] ?? $authorProfile->github ?? null,
                 'youtube' => $data['author_youtube'] ?? $authorProfile->youtube ?? null,
+                'whatsapp' => $data['author_whatsapp'] ?? $authorProfile->whatsapp ?? null,
                 'avatar' => $data['avatar'] ?? $authorProfile->avatar ?? null,
                 'media_id' => $data['author_media_id'] ?? $authorProfile->media_id ?? null,
                 'is_featured' => $data['author_is_featured'] ?? $authorProfile->is_featured ?? false,

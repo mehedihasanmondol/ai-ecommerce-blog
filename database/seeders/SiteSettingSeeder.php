@@ -229,6 +229,33 @@ class SiteSettingSeeder extends Seeder
                 'description' => 'Display images in feedback submissions',
                 'order' => 7,
             ],
+            [
+                'key' => 'feedback_title',
+                'value' => 'Customer Feedback',
+                'type' => 'text',
+                'group' => 'feedback',
+                'label' => 'Feedback Section Title',
+                'description' => 'The title displayed for the feedback section',
+                'order' => 8,
+            ],
+            [
+                'key' => 'feedback_time_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'feedback',
+                'label' => 'Show Time',
+                'description' => 'Display time posted for feedback items',
+                'order' => 9,
+            ],
+            [
+                'key' => 'feedback_helpful_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'feedback',
+                'label' => 'Enable Helpful Votes',
+                'description' => 'Enable or disable helpful/not helpful voting buttons',
+                'order' => 10,
+            ],
 
             // Blog Settings
             [

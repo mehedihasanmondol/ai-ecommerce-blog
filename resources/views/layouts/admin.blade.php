@@ -116,7 +116,11 @@
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" 
                                     class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none">
-                                @if(auth()->user()->avatar)
+                                @if(auth()->user()->media_id && auth()->user()->media)
+                                    <img src="{{ auth()->user()->media->thumbnail_url ?? auth()->user()->media->file_url }}" 
+                                         alt="{{ auth()->user()->name }}"
+                                         class="h-8 w-8 rounded-full object-cover border-2 border-gray-200">
+                                @elseif(auth()->user()->avatar)
                                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}" 
                                          alt="{{ auth()->user()->name }}"
                                          class="h-8 w-8 rounded-full object-cover border-2 border-gray-200">

@@ -96,6 +96,28 @@ Creating comprehensive appointment booking system with chambers/branches, sticky
 - ✅ Auto-scroll to form on close
 - ✅ Fields remain visible when changing date
 
+**Step 14: Feedback Section Enhancements** ✅ COMPLETED
+- ✅ Remove "Coming Soon" content when appointments disabled
+- ✅ Feedback section full width (100%) when appointments disabled
+- ✅ Customizable feedback title via site settings
+- ✅ Time display enable/disable toggle
+- ✅ Helpful voting enable/disable toggle
+- ✅ Responsive layout (60/40 with appointments, 100% without)
+- ✅ Added feedback_title setting (default: 'Customer Feedback')
+- ✅ Added feedback_time_enabled setting (default: '1')
+- ✅ Added feedback_helpful_enabled setting (default: '1')
+- ✅ Settings applied to both author profile AND /feedback page
+
+**Step 15: Author Profile WhatsApp Integration** ✅ COMPLETED
+- ✅ Added whatsapp column to author_profiles table
+- ✅ WhatsApp link displayed with other social media links
+- ✅ Added WhatsApp field to admin user create form
+- ✅ Added WhatsApp field to admin user edit form
+- ✅ Updated AuthorProfileService to handle whatsapp
+- ✅ Updated StoreUserRequest validation
+- ✅ Updated UpdateUserRequest validation
+- ✅ Migration created and executed
+
 ### Files Created (18 Total)
 1. ✅ `database/migrations/2025_11_26_025300_create_chambers_table.php`
 2. ✅ `database/migrations/2025_11_26_025301_create_appointments_table.php`
@@ -116,16 +138,28 @@ Creating comprehensive appointment booking system with chambers/branches, sticky
 17. ✅ `development-docs/APPOINTMENT_SYSTEM_IMPLEMENTATION.md`
 18. ✅ `editor-task-management.md` - Updated
 
-### Files Modified (9 Total)
+### Files Created (19 Total)
+- ✅ `database/migrations/2025_11_26_055411_add_whatsapp_to_author_profiles_table.php` ⭐ NEW
+
+### Files Modified (16 Total)
 1. ✅ `database/seeders/RolePermissionSeeder.php` - Added 6 appointment permissions
-2. ✅ `database/seeders/SiteSettingSeeder.php` - Added 5 appointment settings
+2. ✅ `database/seeders/SiteSettingSeeder.php` - Added feedback helpful setting ⭐ UPDATED
 3. ✅ `routes/admin.php` - Added appointment & chamber routes
 4. ✅ `resources/views/layouts/admin.blade.php` - Added appointments & chambers menu
-5. ✅ `resources/views/components/feedback/author-profile-section.blade.php` - Added 60/40 sticky layout
-6. ✅ `resources/views/livewire/appointment/appointment-form.blade.php` - Persistent fields + close button ⭐ UPDATED
-7. ✅ `app/Livewire/Appointment/AppointmentForm.php` - formExpanded state + closeForm() ⭐ NEW
-8. ✅ `resources/views/admin/chambers/index.blade.php` - Product-style delete modal ⭐ UPDATED
-9. ✅ `resources/views/livewire/admin/appointment-table.blade.php` - Product-style delete modal ⭐ UPDATED
+5. ✅ `resources/views/components/feedback/author-profile-section.blade.php` - Responsive layout + settings ⭐ UPDATED
+6. ✅ `resources/views/livewire/appointment/appointment-form.blade.php` - Persistent fields + close button
+7. ✅ `app/Livewire/Appointment/AppointmentForm.php` - formExpanded state + closeForm()
+8. ✅ `resources/views/admin/chambers/index.blade.php` - Product-style delete modal
+9. ✅ `resources/views/livewire/admin/appointment-table.blade.php` - Product-style delete modal
+10. ✅ `resources/views/livewire/feedback/feedback-list.blade.php` - Time & helpful toggles ⭐ UPDATED
+11. ✅ `app/Livewire/Feedback/FeedbackList.php` - Settings for time & helpful ⭐ UPDATED
+12. ✅ `resources/views/frontend/blog/author.blade.php` - WhatsApp social link ⭐ UPDATED
+13. ✅ `resources/views/admin/users/create.blade.php` - WhatsApp field ⭐ UPDATED
+14. ✅ `resources/views/admin/users/edit.blade.php` - WhatsApp field ⭐ UPDATED
+15. ✅ `app/Services/AuthorProfileService.php` - WhatsApp handling ⭐ UPDATED
+16. ✅ `app/Modules/User/Requests/StoreUserRequest.php` - WhatsApp validation ⭐ UPDATED
+17. ✅ `app/Modules/User/Requests/UpdateUserRequest.php` - WhatsApp validation ⭐ UPDATED
+18. ✅ `pending-deployment.md` - Updated deployment notes ⭐ UPDATED
 
 ### Next: Complete Implementation Guide
 See `development-docs/APPOINTMENT_SYSTEM_IMPLEMENTATION.md` for:

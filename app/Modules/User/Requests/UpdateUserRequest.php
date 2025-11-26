@@ -56,6 +56,7 @@ class UpdateUserRequest extends FormRequest
             'author_instagram' => ['nullable', 'string', 'max:50'],
             'author_github' => ['nullable', 'string', 'max:50'],
             'author_youtube' => ['nullable', 'string', 'max:50'],
+            'author_whatsapp' => ['nullable', 'string', 'max:20'],
             'author_avatar' => ['nullable', 'image', 'max:2048'], // Legacy
             'author_media_id' => ['nullable', 'exists:media_library,id'], // Media library author avatar
             'author_is_featured' => ['nullable', 'boolean'],
