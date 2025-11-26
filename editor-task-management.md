@@ -117,6 +117,31 @@ Creating comprehensive appointment booking system with chambers/branches, sticky
 - ✅ Updated StoreUserRequest validation
 - ✅ Updated UpdateUserRequest validation
 - ✅ Migration created and executed
+- ✅ CRITICAL FIX: Added 'whatsapp' to AuthorProfile $fillable array
+- ✅ Added whatsapp to hasSocialLinks() method
+
+**Step 16: Admin Header Profile Image Fix** ✅ COMPLETED
+- ✅ Updated admin header to use media library avatar (media->small_url)
+- ✅ Matched frontend header implementation exactly
+- ✅ Three-tier fallback: media library → direct avatar → initials
+- ✅ Works with User model media relationship
+
+**Step 17: Customer Panel Appointments & Feedback** ✅ COMPLETED
+- ✅ Added "My Appointments" link to customer SIDEBAR (mobile & desktop)
+- ✅ Added "My Feedback" link to customer SIDEBAR (mobile & desktop)
+- ✅ REMOVED from frontend header dropdown (only in sidebar)
+- ✅ Conditional display based on site settings
+- ✅ Created Customer\AppointmentController with index, show, cancel
+- ✅ Created Customer\FeedbackController with index, show, update, destroy
+- ✅ Added routes: /my/appointments, /my/feedback
+- ✅ Permission checks ensure users can only access their own data
+- ✅ Icons: Calendar for appointments, Message for feedback
+- ✅ FIXED: Changed customer_id to user_id in AppointmentController
+- ✅ Created 4 view files: appointments/index, appointments/show, feedback/index, feedback/show
+- ✅ Product-style modals with backdrop blur for cancel/delete
+- ✅ Removed title field from all feedback forms
+- ✅ Made rating conditional based on 'feedback_rating_enabled' setting
+- ✅ Responsive design with Tailwind CSS
 
 ### Files Created (18 Total)
 1. ✅ `database/migrations/2025_11_26_025300_create_chambers_table.php`
@@ -138,10 +163,16 @@ Creating comprehensive appointment booking system with chambers/branches, sticky
 17. ✅ `development-docs/APPOINTMENT_SYSTEM_IMPLEMENTATION.md`
 18. ✅ `editor-task-management.md` - Updated
 
-### Files Created (19 Total)
-- ✅ `database/migrations/2025_11_26_055411_add_whatsapp_to_author_profiles_table.php` ⭐ NEW
+### Files Created (25 Total)
+- ✅ `database/migrations/2025_11_26_055411_add_whatsapp_to_author_profiles_table.php`
+- ✅ `app/Http/Controllers/Customer/AppointmentController.php`
+- ✅ `app/Http/Controllers/Customer/FeedbackController.php`
+- ✅ `resources/views/customer/appointments/index.blade.php` ⭐ NEW
+- ✅ `resources/views/customer/appointments/show.blade.php` ⭐ NEW
+- ✅ `resources/views/customer/feedback/index.blade.php` ⭐ NEW
+- ✅ `resources/views/customer/feedback/show.blade.php` ⭐ NEW
 
-### Files Modified (16 Total)
+### Files Modified (20 Total)
 1. ✅ `database/seeders/RolePermissionSeeder.php` - Added 6 appointment permissions
 2. ✅ `database/seeders/SiteSettingSeeder.php` - Added feedback helpful setting ⭐ UPDATED
 3. ✅ `routes/admin.php` - Added appointment & chamber routes
@@ -157,9 +188,14 @@ Creating comprehensive appointment booking system with chambers/branches, sticky
 13. ✅ `resources/views/admin/users/create.blade.php` - WhatsApp field ⭐ UPDATED
 14. ✅ `resources/views/admin/users/edit.blade.php` - WhatsApp field ⭐ UPDATED
 15. ✅ `app/Services/AuthorProfileService.php` - WhatsApp handling ⭐ UPDATED
-16. ✅ `app/Modules/User/Requests/StoreUserRequest.php` - WhatsApp validation ⭐ UPDATED
-17. ✅ `app/Modules/User/Requests/UpdateUserRequest.php` - WhatsApp validation ⭐ UPDATED
-18. ✅ `pending-deployment.md` - Updated deployment notes ⭐ UPDATED
+16. ✅ `app/Modules/User/Requests/StoreUserRequest.php` - WhatsApp validation
+17. ✅ `app/Modules/User/Requests/UpdateUserRequest.php` - WhatsApp validation
+18. ✅ `app/Models/AuthorProfile.php` - Added whatsapp to $fillable + hasSocialLinks ⭐ CRITICAL FIX
+19. ✅ `resources/views/layouts/admin.blade.php` - Media library avatar support ⭐ UPDATED
+20. ✅ `resources/views/components/frontend/header.blade.php` - Appointments & feedback links in dropdown
+21. ✅ `resources/views/layouts/customer.blade.php` - Appointments & feedback in sidebar ⭐ UPDATED
+22. ✅ `routes/web.php` - Customer appointments & feedback routes
+23. ✅ `pending-deployment.md` - Updated deployment notes ⭐ UPDATED
 
 ### Next: Complete Implementation Guide
 See `development-docs/APPOINTMENT_SYSTEM_IMPLEMENTATION.md` for:

@@ -58,6 +58,28 @@ php artisan view:clear
 # - Shows with other social links (Twitter, Facebook, etc.)
 # - Admin can add WhatsApp number in user create/edit forms
 # - Format: Include country code (e.g., 8801712345678)
+# - FIXED: Added 'whatsapp' to AuthorProfile $fillable array
+
+# ✅ ADMIN HEADER PROFILE IMAGE FIXED!
+# - Now uses media library avatar (auth()->user()->media->small_url)
+# - Matches frontend header implementation exactly
+# - Fallback to direct upload avatar if no media library image
+# - Fallback to initials if no avatar at all
+
+# ✅ CUSTOMER PANEL APPOINTMENTS & FEEDBACK ADDED!
+# - My Appointments link in customer SIDEBAR (if appointments enabled)
+# - My Feedback link in customer SIDEBAR (if feedback enabled)
+# - REMOVED from frontend header dropdown (only in sidebar)
+# - Routes added: /my/appointments, /my/feedback
+# - Controllers created: Customer\AppointmentController, Customer\FeedbackController
+# - Views created: appointments/index, appointments/show, feedback/index, feedback/show
+# - Features: View, show details, cancel appointments
+# - Features: View, edit, delete feedback
+# - FIXED: Changed customer_id to user_id (matches appointments table schema)
+# - Sidebar links added to both mobile and desktop customer sidebar
+# - Product-style modals: Cancel appointments & delete feedback (backdrop blur)
+# - Feedback title field REMOVED from all forms
+# - Rating field conditional based on 'feedback_rating_enabled' setting
 
 
 

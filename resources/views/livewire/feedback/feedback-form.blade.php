@@ -69,17 +69,6 @@
         </div>
         @endif
 
-        {{-- Title --}}
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Feedback Title (Optional)
-            </label>
-            <input type="text" wire:model="title"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                   placeholder="Summarize your feedback">
-            @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-        </div>
-
         {{-- Feedback --}}
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">

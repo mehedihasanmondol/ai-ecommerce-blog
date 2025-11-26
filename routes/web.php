@@ -232,6 +232,17 @@ Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () 
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])->name('orders.invoice');
+    
+    // Appointment Management
+    Route::get('appointments', [App\Http\Controllers\Customer\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('appointments/{appointment}', [App\Http\Controllers\Customer\AppointmentController::class, 'show'])->name('appointments.show');
+    Route::post('appointments/{appointment}/cancel', [App\Http\Controllers\Customer\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    
+    // Feedback Management
+    Route::get('feedback', [App\Http\Controllers\Customer\FeedbackController::class, 'index'])->name('feedback.index');
+    Route::get('feedback/{feedback}', [App\Http\Controllers\Customer\FeedbackController::class, 'show'])->name('feedback.show');
+    Route::put('feedback/{feedback}', [App\Http\Controllers\Customer\FeedbackController::class, 'update'])->name('feedback.update');
+    Route::delete('feedback/{feedback}', [App\Http\Controllers\Customer\FeedbackController::class, 'destroy'])->name('feedback.destroy');
 });
 
 // Public Order Tracking
