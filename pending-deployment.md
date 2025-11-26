@@ -84,4 +84,15 @@ php artisan view:clear
 
 
 
-php artisan make:migration add_whatsapp_to_author_profiles_table
+php artisan migrate --path=database/migrations/2025_11_26_055411_add_whatsapp_to_author_profiles_table.php
+
+
+
+
+---------------------
+
+php artisan migrate --path=database/migrations/2025_11_26_131108_create_contact_settings_table.php
+
+php artisan migrate --path=database/migrations/2025_11_26_131108_create_contact_faqs_table.php
+
+php artisan migrate --path=database/migrations/2025_11_26_131112_create_contact_messages_table.php

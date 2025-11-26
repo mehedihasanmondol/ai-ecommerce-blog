@@ -17,6 +17,10 @@ use App\Http\Controllers\Customer\CustomerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RobotsTxtController;
 use App\Http\Controllers\SitemapController;
+use App\Modules\Contact\Controllers\ContactController;
+use App\Modules\Contact\Controllers\Admin\ContactSettingController;
+use App\Modules\Contact\Controllers\Admin\ContactFaqController;
+use App\Modules\Contact\Controllers\Admin\ContactMessageController;
 
 // CSRF Token Refresh Route (for Livewire session maintenance)
 Route::get('/refresh-csrf', function() {
@@ -34,7 +38,10 @@ Route::get('/ecommerce', function() {
 })->name('ecommerce');
 Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+
+// Contact Routes
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -206,6 +213,26 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/bulk-update', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'bulkUpdate'])->name('bulk-update');
         Route::get('/export', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'export'])->name('export');
         Route::get('/newsletter-subscribers', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'newsletterSubscribers'])->name('newsletter-subscribers');
+    });
+    
+    // Contact Management Routes
+    Route::prefix('contact')->name('contact.')->group(function () {
+        // Contact Settings (includes FAQs management)
+        Route::get('/settings', [ContactSettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [ContactSettingController::class, 'update'])->name('settings.update');
+        
+        // FAQ Management (within settings)
+        Route::post('/settings/faqs', [ContactSettingController::class, 'storeFaq'])->name('settings.faqs.store');
+        Route::put('/settings/faqs/{faq}', [ContactSettingController::class, 'updateFaq'])->name('settings.faqs.update');
+        Route::delete('/settings/faqs/{faq}', [ContactSettingController::class, 'destroyFaq'])->name('settings.faqs.destroy');
+        Route::post('/settings/faqs/{faq}/toggle', [ContactSettingController::class, 'toggleFaq'])->name('settings.faqs.toggle');
+        
+        // Contact Messages
+        Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{message}', [ContactMessageController::class, 'show'])->name('messages.show');
+        Route::put('/messages/{message}/status', [ContactMessageController::class, 'updateStatus'])->name('messages.update-status');
+        Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
+        Route::post('/messages/bulk-action', [ContactMessageController::class, 'bulkAction'])->name('messages.bulk-action');
     });
 });
 

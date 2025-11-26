@@ -140,7 +140,7 @@ class AppointmentForm extends Component
         return [
             'chamber_id' => 'required|exists:chambers,id',
             'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
+            'customer_email' => 'nullable|email|max:255',
             'customer_mobile' => 'required|string|max:20',
             'customer_address' => 'nullable|string|max:500',
             'appointment_date' => 'required|date|after:today',
@@ -158,7 +158,6 @@ class AppointmentForm extends Component
         return [
             'chamber_id.required' => 'চেম্বার নির্বাচন করুন',
             'customer_name.required' => 'নাম লিখুন',
-            'customer_email.required' => 'ইমেইল লিখুন',
             'customer_email.email' => 'সঠিক ইমেইল লিখুন',
             'customer_mobile.required' => 'মোবাইল নম্বর লিখুন',
             'appointment_date.required' => 'তারিখ নির্বাচন করুন',

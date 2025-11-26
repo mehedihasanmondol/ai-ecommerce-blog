@@ -614,6 +614,32 @@
                 </a>
                 @endif
 
+                <!-- Communication Section -->
+                @if(auth()->user()->hasPermission('users.view'))
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Communication</p>
+                </div>
+                
+                <a href="{{ route('admin.contact.messages.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.contact.messages.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-envelope w-5 mr-3"></i>
+                    <span>Contact Messages</span>
+                    @php
+                        try {
+                            $unreadMessagesCount = \App\Models\ContactMessage::where('status', 'unread')->count();
+                        } catch (\Exception $e) {
+                            $unreadMessagesCount = 0;
+                        }
+                    @endphp
+                    @if($unreadMessagesCount > 0)
+                        <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">{{ $unreadMessagesCount }}</span>
+                    @endif
+                    @if(request()->routeIs('admin.contact.messages.*'))
+                        <i class="fas fa-chevron-right {{ $unreadMessagesCount > 0 ? '' : 'ml-auto' }} text-xs"></i>
+                    @endif
+                </a>
+                @endif
+
                 <!-- Settings Section -->
                 @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('system.settings.view'))
                 <div class="pt-4 pb-2">

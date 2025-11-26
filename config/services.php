@@ -62,4 +62,17 @@ return [
         'redirect' => env('APPLE_REDIRECT_URL', env('APP_URL') . '/login/apple/callback'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Google Maps API
+    |--------------------------------------------------------------------------
+    |
+    | API key for Google Maps integration on contact page
+    |
+    */
+
+    'google_maps' => [
+        'api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
 ];

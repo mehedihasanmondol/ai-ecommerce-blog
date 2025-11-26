@@ -87,7 +87,7 @@
         <!-- Customer Email -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-                ইমেইল <span class="text-red-500">*</span>
+                ইমেইল <span class="text-gray-400 text-xs">(ঐচ্ছিক)</span>
             </label>
             <input type="email" 
                    wire:model="customer_email"
