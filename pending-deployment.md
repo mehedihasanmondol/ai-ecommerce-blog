@@ -98,3 +98,13 @@ php artisan migrate --path=database/migrations/2025_11_26_131108_create_contact_
 php artisan migrate --path=database/migrations/2025_11_26_131112_create_contact_messages_table.php
 
 php artisan db:seed --class=ContactSeeder
+-------------------------
+
+php artisan db:seed --class=SiteSettingSeeder
+
+-------------------------
+# November 27, 2025 - Site Settings & Profile Fixes
+# Fixed: Author page & sitemap dropdown options now display correctly
+# Added: Admin profile page at /admin/profile
+# Modified: Sitemap options format, added select field parsing
+# Run seeder to update sitemap options format

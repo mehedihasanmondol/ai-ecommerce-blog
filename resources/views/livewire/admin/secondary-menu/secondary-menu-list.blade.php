@@ -207,11 +207,11 @@
                         </div>
 
                         <!-- Color -->
-                        <div>
+                        <div class="col-span-2" x-data="{ showCustomInput: @entangle('showCustomColorInput') }">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Color Class <span class="text-red-500">*</span>
                             </label>
-                            <select wire:model="color"
+                            <select wire:model.live="color"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                 <option value="text-gray-700">Gray (Default)</option>
                                 <option value="text-red-600">Red</option>
@@ -219,8 +219,37 @@
                                 <option value="text-green-600">Green</option>
                                 <option value="text-purple-600">Purple</option>
                                 <option value="text-orange-600">Orange</option>
+                                <option value="text-yellow-600">Yellow</option>
+                                <option value="text-pink-600">Pink</option>
+                                <option value="text-indigo-600">Indigo</option>
+                                <option value="text-teal-600">Teal</option>
+                                <option value="text-cyan-600">Cyan</option>
+                                <option value="text-rose-600">Rose</option>
+                                <option value="text-emerald-600">Emerald</option>
+                                <option value="text-sky-600">Sky</option>
+                                <option value="text-amber-600">Amber</option>
+                                <option value="text-lime-600">Lime</option>
+                                <option value="custom">Custom Tailwind Classes</option>
                             </select>
                             @error('color') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                            
+                            <!-- Custom Tailwind Class Input -->
+                            <div x-show="showCustomInput" x-transition class="mt-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Custom Tailwind Classes
+                                </label>
+                                <input type="text" wire:model="customColorClass"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       placeholder="e.g., text-blue-500 hover:text-blue-700 font-bold">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Reference: <a href="https://tailwindcss.com/docs/text-color" target="_blank" class="text-blue-600 hover:underline">Tailwind Colors</a> | 
+                                    <a href="https://tailwindcss.com/docs/font-weight" target="_blank" class="text-blue-600 hover:underline">Font Weight</a>
+                                </p>
+                                @error('customColorClass') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <!-- Sort Order -->
@@ -324,11 +353,11 @@
                         </div>
 
                         <!-- Color -->
-                        <div>
+                        <div class="col-span-2" x-data="{ showCustomInput: @entangle('showCustomColorInput') }">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Color Class <span class="text-red-500">*</span>
                             </label>
-                            <select wire:model="color"
+                            <select wire:model.live="color"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                                 <option value="text-gray-700">Gray (Default)</option>
                                 <option value="text-red-600">Red</option>
@@ -336,8 +365,37 @@
                                 <option value="text-green-600">Green</option>
                                 <option value="text-purple-600">Purple</option>
                                 <option value="text-orange-600">Orange</option>
+                                <option value="text-yellow-600">Yellow</option>
+                                <option value="text-pink-600">Pink</option>
+                                <option value="text-indigo-600">Indigo</option>
+                                <option value="text-teal-600">Teal</option>
+                                <option value="text-cyan-600">Cyan</option>
+                                <option value="text-rose-600">Rose</option>
+                                <option value="text-emerald-600">Emerald</option>
+                                <option value="text-sky-600">Sky</option>
+                                <option value="text-amber-600">Amber</option>
+                                <option value="text-lime-600">Lime</option>
+                                <option value="custom">Custom Tailwind Classes</option>
                             </select>
                             @error('color') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                            
+                            <!-- Custom Tailwind Class Input -->
+                            <div x-show="showCustomInput" x-transition class="mt-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Custom Tailwind Classes
+                                </label>
+                                <input type="text" wire:model="customColorClass"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                       placeholder="e.g., text-blue-500 hover:text-blue-700 font-bold">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Reference: <a href="https://tailwindcss.com/docs/text-color" target="_blank" class="text-blue-600 hover:underline">Tailwind Colors</a> | 
+                                    <a href="https://tailwindcss.com/docs/font-weight" target="_blank" class="text-blue-600 hover:underline">Font Weight</a>
+                                </p>
+                                @error('customColorClass') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                            </div>
                         </div>
 
                         <!-- Sort Order -->

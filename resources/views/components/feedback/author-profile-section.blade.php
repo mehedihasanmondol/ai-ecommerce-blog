@@ -27,6 +27,26 @@
     // Check if appointments are enabled
     $appointmentEnabled = \App\Models\SiteSetting::get('appointment_enabled', '1') === '1';
     
+    // Get width settings
+    $appointmentWidth = \App\Models\SiteSetting::get('author_page_appointment_width', 'full');
+    $feedbackWidth = \App\Models\SiteSetting::get('author_page_feedback_width', 'full');
+    
+    // Map width to Tailwind classes
+    $widthMap = [
+        'full'          => 'lg:col-span-12',
+        'half'          => 'lg:col-span-6',
+        'one-third'     => 'lg:col-span-5',
+        'two-third'     => 'lg:col-span-7',
+        'quarter'       => 'lg:col-span-3',
+        'three-quarter' => 'lg:col-span-9',
+    ];
+    
+    $appointmentClass = $widthMap[$appointmentWidth] ?? 'lg:col-span-12';
+    $feedbackClass = $widthMap[$feedbackWidth] ?? 'lg:col-span-12';
+    
+    // Check if both are full width for border divider
+    $bothFullWidth = ($appointmentWidth === 'full' && $feedbackWidth === 'full' && $appointmentEnabled);
+    
     $featuredFeedback = \App\Models\Feedback::approved()
         ->with('user')
         ->orderBy('created_at', 'desc')
@@ -35,9 +55,9 @@
 @endphp
 
 <div class="bg-white border-t border-gray-200 p-6">
-    <div class="grid grid-cols-1 {{ $appointmentEnabled ? 'lg:grid-cols-5' : 'lg:grid-cols-1' }} gap-6">
-        {{-- Featured Feedback Section (60% with appointments, 100% without) --}}
-        <div class="{{ $appointmentEnabled ? 'lg:col-span-3' : 'lg:col-span-1' }}">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {{-- Featured Feedback Section --}}
+        <div class="{{ $feedbackClass }} {{ $bothFullWidth ? 'border-b lg:border-b-0 lg:border-r border-gray-200 pb-6 lg:pb-0 lg:pr-6' : '' }}">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-gray-900">{{ $feedbackTitle }}</h2>
                 
@@ -116,9 +136,9 @@
             @endif
         </div>
 
-        {{-- 40% - Appointment Form Section (Sticky) - Only show if enabled --}}
+        {{-- Appointment Form Section (Sticky) - Only show if enabled --}}
         @if($appointmentEnabled)
-        <div class="lg:col-span-2">
+        <div class="{{ $appointmentClass }}">
             <div class="lg:sticky lg:top-24">
                 @livewire('appointment.appointment-form')
             </div>

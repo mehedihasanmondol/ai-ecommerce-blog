@@ -42,6 +42,8 @@ class SecondaryMenuList extends Component
     public $label = '';
     public $url = '';
     public $color = 'text-gray-700';
+    public $customColorClass = '';
+    public $showCustomColorInput = false;
     public $type = 'link';
     public $sort_order = 1;
     public $is_active = true;
@@ -54,6 +56,7 @@ class SecondaryMenuList extends Component
         'label' => 'required|string|max:255',
         'url' => 'required|string|max:255',
         'color' => 'required|string|max:255',
+        'customColorClass' => 'nullable|string|max:500',
         'type' => 'required|in:link,dropdown',
         'sort_order' => 'required|integer|min:0',
         'is_active' => 'boolean',
@@ -68,6 +71,19 @@ class SecondaryMenuList extends Component
     public function loadMenuItems()
     {
         $this->menuItems = SecondaryMenuItem::ordered()->get();
+    }
+
+    /**
+     * Watch for color changes to toggle custom input
+     */
+    public function updatedColor($value)
+    {
+        $this->showCustomColorInput = ($value === 'custom');
+        
+        // Clear custom class if switching away from custom
+        if ($value !== 'custom') {
+            $this->customColorClass = '';
+        }
     }
 
     public function openCreateModal()
@@ -91,11 +107,28 @@ class SecondaryMenuList extends Component
         $this->menuItemId = $item->id;
         $this->label = $item->label;
         $this->url = $item->url;
-        $this->color = $item->color;
         $this->type = $item->type;
         $this->sort_order = $item->sort_order;
         $this->is_active = $item->is_active;
         $this->open_new_tab = $item->open_new_tab;
+        
+        // Check if color is a predefined option or custom
+        $predefinedColors = [
+            'text-gray-700', 'text-red-600', 'text-blue-600', 'text-green-600',
+            'text-purple-600', 'text-orange-600', 'text-yellow-600', 'text-pink-600',
+            'text-indigo-600', 'text-teal-600', 'text-cyan-600', 'text-rose-600',
+            'text-emerald-600', 'text-sky-600', 'text-amber-600', 'text-lime-600'
+        ];
+        
+        if (in_array($item->color, $predefinedColors)) {
+            $this->color = $item->color;
+            $this->customColorClass = '';
+            $this->showCustomColorInput = false;
+        } else {
+            $this->color = 'custom';
+            $this->customColorClass = $item->color;
+            $this->showCustomColorInput = true;
+        }
         
         $this->showEditModal = true;
     }
@@ -110,11 +143,14 @@ class SecondaryMenuList extends Component
     public function store()
     {
         $this->validate();
+        
+        // Use custom class if 'custom' is selected, otherwise use predefined color
+        $finalColor = $this->color === 'custom' ? $this->customColorClass : $this->color;
 
         SecondaryMenuItem::create([
             'label' => $this->label,
             'url' => $this->url,
-            'color' => $this->color,
+            'color' => $finalColor,
             'type' => $this->type,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
@@ -131,13 +167,16 @@ class SecondaryMenuList extends Component
     public function update()
     {
         $this->validate();
+        
+        // Use custom class if 'custom' is selected, otherwise use predefined color
+        $finalColor = $this->color === 'custom' ? $this->customColorClass : $this->color;
 
         $item = SecondaryMenuItem::findOrFail($this->menuItemId);
         
         $item->update([
             'label' => $this->label,
             'url' => $this->url,
-            'color' => $this->color,
+            'color' => $finalColor,
             'type' => $this->type,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
@@ -191,6 +230,8 @@ class SecondaryMenuList extends Component
         $this->label = '';
         $this->url = '';
         $this->color = 'text-gray-700';
+        $this->customColorClass = '';
+        $this->showCustomColorInput = false;
         $this->type = 'link';
         $this->sort_order = 1;
         $this->is_active = true;

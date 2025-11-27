@@ -257,6 +257,28 @@ class SiteSettingSeeder extends Seeder
                 'order' => 10,
             ],
 
+            // Author Page Layout Settings
+            [
+                'key' => 'author_page_appointment_width',
+                'value' => 'full',
+                'type' => 'select',
+                'group' => 'author_page',
+                'label' => 'Appointment Form Width',
+                'description' => 'Width of the appointment form section on author page',
+                'options' => json_encode(['full' => 'Full Width', 'half' => 'Half Width', 'one-third' => 'One Third', 'two-third' => 'Two third', 'quarter' => 'Quarter Width', 'three-quarter' => 'Three Quarter']),
+                'order' => 1,
+            ],
+            [
+                'key' => 'author_page_feedback_width',
+                'value' => 'full',
+                'type' => 'select',
+                'group' => 'author_page',
+                'label' => 'Feedback Section Width',
+                'description' => 'Width of the feedback section on author page',
+                'options' => json_encode(['full' => 'Full Width', 'half' => 'Half Width', 'one-third' => 'One Third', 'two-third' => 'Two third', 'quarter' => 'Quarter Width', 'three-quarter' => 'Three Quarter']),
+                'order' => 2,
+            ],
+
             // Blog Settings
             [
                 'key' => 'blog_title',
@@ -813,7 +835,7 @@ class SiteSettingSeeder extends Seeder
                 'group' => 'seo',
                 'label' => 'Enable Sitemap',
                 'description' => 'Enable automatic sitemap generation',
-                'options' => '1:Enabled,0:Disabled',
+                'options' => json_encode(['1' => 'Enabled', '0' => 'Disabled']),
                 'order' => 105,
             ],
         ];

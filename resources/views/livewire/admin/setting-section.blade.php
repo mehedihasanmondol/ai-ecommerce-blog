@@ -16,6 +16,7 @@
                         'blog' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>',
                         'stock' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>',
                         'feedback' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>',
+                        'author_page' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>',
                     ];
                     $icon = $icons[$group] ?? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>';
                 @endphp
@@ -52,6 +53,8 @@
                                 <span class="text-xs font-normal px-2 py-1 bg-green-100 text-green-700 rounded">Toggle</span>
                             @elseif($setting->type === 'number')
                                 <span class="text-xs font-normal px-2 py-1 bg-indigo-100 text-indigo-700 rounded">Number</span>
+                            @elseif($setting->type === 'select')
+                                <span class="text-xs font-normal px-2 py-1 bg-teal-100 text-teal-700 rounded">Dropdown</span>
                             @elseif($setting->type === 'tinymce')
                                 <span class="text-xs font-normal px-2 py-1 bg-orange-100 text-orange-700 rounded">Rich Editor</span>
                             @elseif($setting->type === 'ckeditor')
@@ -207,10 +210,21 @@
                             @endif
                         @else
                             <!-- Generic Select -->
+                            @php
+                                $options = [];
+                                if ($setting->options) {
+                                    $options = is_string($setting->options) ? json_decode($setting->options, true) : $setting->options;
+                                }
+                            @endphp
                             <select 
                                 wire:model="settings.{{ $setting->key }}"
                                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white">
                                 <option value="">Select an option...</option>
+                                @if(is_array($options))
+                                    @foreach($options as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                @endif
                             </select>
                         @endif
 

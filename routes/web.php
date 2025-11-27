@@ -37,7 +37,7 @@ Route::get('/ecommerce', function() {
     return app(HomeController::class)->showDefaultHomepage();
 })->name('ecommerce');
 Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
+// Route::get('/about', [HomeController::class, 'about'])->name('about');
 
 // Contact Routes
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
@@ -107,28 +107,6 @@ Route::post('/feedback/{feedback}/not-helpful', [FeedbackController::class, 'not
 // Blog Routes (must be before catch-all product route)
 require __DIR__.'/blog.php';
 
-// Public Product and Blog Post Routes (must be last to avoid conflicts)
-// This route handles both products and blog posts by slug
-// Named 'products.show' as primary, but works for both products and blog posts
-Route::get('/{slug}', function($slug) {
-    // Try to find product first
-    $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
-    if ($product) {
-        return app(\App\Http\Controllers\ProductController::class)->show($slug);
-    }
-    
-    // Then try to find blog post (published or unlisted)
-    $post = \App\Modules\Blog\Models\Post::where('slug', $slug)
-        ->whereIn('status', ['published', 'unlisted'])
-        ->first();
-    if ($post) {
-        return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->show($slug);
-    }
-    
-    // Neither found
-    abort(404);
-})->where('slug', '[a-z0-9-]+')->name('products.show');
-
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
@@ -137,6 +115,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         }
         return view('admin.dashboard');
     })->name('dashboard');
+    
+    // Admin Profile
+    Route::get('/profile', function () {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized access');
+        }
+        $user = auth()->user();
+        return view('admin.users.show', compact('user'));
+    })->name('profile');
 
     // Product Management Routes
     Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
@@ -286,3 +273,28 @@ Route::post('/payment/nagad/callback', [PaymentController::class, 'nagadCallback
 Route::post('/payment/sslcommerz/success', [PaymentController::class, 'sslcommerzSuccess'])->name('payment.sslcommerz.success');
 Route::post('/payment/sslcommerz/fail', [PaymentController::class, 'sslcommerzFail'])->name('payment.sslcommerz.fail');
 Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerzCancel'])->name('payment.sslcommerz.cancel');
+
+
+
+// Public Product and Blog Post Routes (must be last to avoid conflicts)
+// This route handles both products and blog posts by slug
+// Named 'products.show' as primary, but works for both products and blog posts
+Route::get('/{slug}', function($slug) {
+    // Try to find product first
+    $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
+    if ($product) {
+        return app(\App\Http\Controllers\ProductController::class)->show($slug);
+    }
+    
+    // Then try to find blog post (published or unlisted)
+    $post = \App\Modules\Blog\Models\Post::where('slug', $slug)
+        ->whereIn('status', ['published', 'unlisted'])
+        ->first();
+    if ($post) {
+        return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->show($slug);
+    }
+    
+    // Neither found
+    abort(404);
+})->where('slug', '[a-z0-9-]+')->name('products.show');
+

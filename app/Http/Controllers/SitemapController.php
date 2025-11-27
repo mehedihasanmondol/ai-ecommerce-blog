@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
+use App\Models\User;
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
 use App\Modules\Blog\Models\Post;
 use App\Modules\Blog\Models\BlogCategory;
+use App\Modules\Blog\Models\Tag;
 use Illuminate\Http\Response;
 
 /**
@@ -130,12 +132,46 @@ class SitemapController extends Controller
             ];
         }
         
+        // Blog tags
+        $blogTags = Tag::orderBy('updated_at', 'desc')->get();
+        foreach ($blogTags as $tag) {
+            $urls[] = [
+                'loc' => route('blog.tag', $tag->slug),
+                'lastmod' => $tag->updated_at->toIso8601String(),
+                'changefreq' => 'monthly',
+                'priority' => '0.4',
+            ];
+        }
+        
+        // Author pages (only authors with published posts)
+        $authors = User::whereHas('authorProfile')
+            ->whereHas('posts', function($query) {
+                $query->where('status', 'published');
+            })
+            ->with('authorProfile')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+            
+        foreach ($authors as $author) {
+            if ($author->authorProfile && $author->authorProfile->slug) {
+                $urls[] = [
+                    'loc' => route('blog.author', $author->authorProfile->slug),
+                    'lastmod' => $author->updated_at->toIso8601String(),
+                    'changefreq' => 'weekly',
+                    'priority' => '0.6',
+                ];
+            }
+        }
+        
         // Static pages
         $staticPages = [
             ['url' => route('blog.index'), 'priority' => '0.8'],
             ['url' => route('categories.index'), 'priority' => '0.7'],
             ['url' => route('brands.index'), 'priority' => '0.6'],
             ['url' => route('coupons.index'), 'priority' => '0.5'],
+            ['url' => route('about'), 'priority' => '0.6'],
+            ['url' => route('contact.index'), 'priority' => '0.5'],
+            ['url' => route('feedback.index'), 'priority' => '0.5'],
         ];
         
         foreach ($staticPages as $page) {
