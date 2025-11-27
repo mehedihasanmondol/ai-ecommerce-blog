@@ -44,9 +44,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Type
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Color
-                    </th>
+                    
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                     </th>
@@ -81,9 +79,7 @@
                             {{ ucfirst($item->type) }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-xs {{ $item->color }} font-medium">{{ $item->color }}</span>
-                    </td>
+                   
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($item->is_active)
                             <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
