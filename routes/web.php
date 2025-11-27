@@ -43,6 +43,20 @@ Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+// TEMPORARY: Test contact email
+Route::get('/test-contact-email', function() {
+    $message = \App\Models\ContactMessage::latest()->first();
+    if ($message) {
+        try {
+            \Illuminate\Support\Facades\Mail::to('mhnoyonmondol@gmail.com')->send(new \App\Mail\ContactMessageReceived($message));
+            return 'Email sent successfully! Check logs for details.';
+        } catch (\Exception $e) {
+            return 'Error: ' . $e->getMessage();
+        }
+    }
+    return 'No contact messages found in database';
+});
+
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');

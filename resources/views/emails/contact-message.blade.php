@@ -128,25 +128,25 @@
             <div class="message-info">
                 <div class="info-row">
                     <span class="info-label">From:</span>
-                    <span class="info-value"><strong>{{ $message->name }}</strong></span>
+                    <span class="info-value"><strong>{{ $contactMessage->name }}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Email:</span>
-                    <span class="info-value"><a href="mailto:{{ $message->email }}" style="color: #2563eb; text-decoration: none;">{{ $message->email }}</a></span>
+                    <span class="info-value"><a href="mailto:{{ $contactMessage->email }}" style="color: #2563eb; text-decoration: none;">{{ $contactMessage->email }}</a></span>
                 </div>
-                @if($message->phone)
+                @if($contactMessage->phone)
                 <div class="info-row">
                     <span class="info-label">Phone:</span>
-                    <span class="info-value"><a href="tel:{{ $message->phone }}" style="color: #2563eb; text-decoration: none;">{{ $message->phone }}</a></span>
+                    <span class="info-value"><a href="tel:{{ $contactMessage->phone }}" style="color: #2563eb; text-decoration: none;">{{ $contactMessage->phone }}</a></span>
                 </div>
                 @endif
                 <div class="info-row">
                     <span class="info-label">Subject:</span>
-                    <span class="info-value"><strong>{{ $message->subject }}</strong></span>
+                    <span class="info-value"><strong>{{ $contactMessage->subject }}</strong></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Received:</span>
-                    <span class="info-value">{{ $message->created_at->format('M d, Y h:i A') }}</span>
+                    <span class="info-value">{{ $contactMessage->created_at->format('M d, Y h:i A') }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Status:</span>
@@ -157,7 +157,7 @@
             <!-- Message Content -->
             <div class="message-content">
                 <h3>Message:</h3>
-                <div class="message-text">{{ $message->message }}</div>
+                <div class="message-text">{{ $contactMessage->message }}</div>
             </div>
 
             <!-- Action Button -->
@@ -172,7 +172,7 @@
         <div class="email-footer">
             <p style="margin: 0 0 10px 0;">This is an automated notification from {{ config('app.name') }}</p>
             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                IP Address: {{ $message->ip_address ?? 'N/A' }}
+                IP Address: {{ $contactMessage->ip_address ?? 'N/A' }}
             </p>
         </div>
     </div>
