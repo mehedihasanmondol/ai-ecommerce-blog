@@ -7,7 +7,7 @@
     <div class="w-full max-w-6xl">
         <!-- Logo -->
         <div class="text-center mb-8">
-            dsdsdsd <h1 class="text-4xl font-bold text-green-600">{{\App\Models\SiteSetting::get('site_name', 'Iherb')}}</h1>
+            <h1 class="text-4xl font-bold text-green-600">{{\App\Models\SiteSetting::get('site_name', 'Iherb')}}</h1>
         </div>
 
         <!-- Main Card -->
