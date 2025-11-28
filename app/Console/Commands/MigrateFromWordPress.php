@@ -316,15 +316,15 @@ class MigrateFromWordPress extends Command
         // Create post
         $post = Post::create([
             'slug' => $postSlug,
-            'title' => $wpPost['title']['rendered'],
+            'title' => html_entity_decode($wpPost['title']['rendered'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'excerpt' => $this->stripHtml($wpPost['excerpt']['rendered'] ?? ''),
             'content' => $content,
             'author_id' => $authorId,
             'media_id' => $mediaId,
             'status' => $wpPost['status'] === 'publish' ? 'published' : 'draft',
             'published_at' => $wpPost['status'] === 'publish' ? $wpPost['date'] : null,
-            'meta_title' => $wpPost['yoast_head_json']['og_title'] ?? $wpPost['title']['rendered'],
-            'meta_description' => $wpPost['yoast_head_json']['og_description'] ?? null,
+            'meta_title' => isset($wpPost['yoast_head_json']['og_title']) ? html_entity_decode($wpPost['yoast_head_json']['og_title'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : html_entity_decode($wpPost['title']['rendered'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'meta_description' => isset($wpPost['yoast_head_json']['og_description']) ? html_entity_decode($wpPost['yoast_head_json']['og_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : null,
             'meta_keywords' => isset($wpPost['yoast_head_json']['keywords']) ? implode(', ', $wpPost['yoast_head_json']['keywords']) : null,
             'allow_comments' => $wpPost['comment_status'] === 'open',
         ]);
@@ -372,11 +372,20 @@ class MigrateFromWordPress extends Command
         $totalMigrated = 0;
 
         do {
-            $products = $this->fetchWooCommerce('/wc/v3/products', [
-                'per_page' => $batchSize,
-                'page' => $page,
-                'status' => 'publish', // Only published products
-            ]);
+            // Fetch products directly with WooCommerce authentication
+            $response = Http::withBasicAuth($this->wcKey, $this->wcSecret)
+                ->get("{$this->wordpressDomain}/wp-json/wc/v3/products", [
+                    'per_page' => $batchSize,
+                    'page' => $page,
+                    'status' => 'publish', // Only published products
+                ]);
+
+            if (!$response->successful()) {
+                $this->warn("Failed to fetch products: " . $response->body());
+                break;
+            }
+
+            $products = $response->json();
 
             if (empty($products)) {
                 break;
@@ -459,7 +468,7 @@ class MigrateFromWordPress extends Command
         // Create product
         $product = Product::create([
             'slug' => $productSlug,
-            'name' => $wcProduct['name'],
+            'name' => html_entity_decode($wcProduct['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'description' => $description,
             'short_description' => $shortDescription,
             'brand_id' => $brandId,
@@ -469,8 +478,8 @@ class MigrateFromWordPress extends Command
             'button_text' => $wcProduct['button_text'] ?? null,
             'is_active' => $wcProduct['status'] === 'publish',
             'is_featured' => $wcProduct['featured'],
-            'meta_title' => $wcProduct['name'],
-            'meta_description' => $this->stripHtml($wcProduct['short_description']),
+            'meta_title' => html_entity_decode($wcProduct['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            'meta_description' => $this->stripHtml(html_entity_decode($wcProduct['short_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8')),
         ]);
 
         // Attach categories
@@ -672,7 +681,19 @@ class MigrateFromWordPress extends Command
         if (!empty($matches[1])) {
             foreach ($matches[1] as $imageUrl) {
                 try {
-                    // Download and get new URL
+                    // Check if image is from WordPress domain
+                    $parsedImageUrl = parse_url($imageUrl);
+                    $parsedWpDomain = parse_url($this->wordpressDomain);
+                    
+                    // Skip if image is from external domain
+                    if (isset($parsedImageUrl['host']) && isset($parsedWpDomain['host'])) {
+                        if ($parsedImageUrl['host'] !== $parsedWpDomain['host']) {
+                            $this->info("  ⏭️  Keeping external image: {$imageUrl}");
+                            continue; // Keep external image as-is
+                        }
+                    }
+                    
+                    // Download and get new URL (only for WordPress domain images)
                     $mediaId = $this->downloadAndCreateMedia($imageUrl);
                     if ($mediaId) {
                         $media = Media::find($mediaId);
