@@ -46,9 +46,9 @@ class MigrateFromWordPress extends Command
 
     public function handle()
     {
-        $this->wordpressDomain = rtrim($this->option('domain'), '/');
-        $this->wcKey = $this->option('wc-key');
-        $this->wcSecret = $this->option('wc-secret');
+        $this->wordpressDomain = $this->option('domain') ?? env('WORDPRESS_DOMAIN', 'https://example.org');
+        $this->wcKey = $this->option('wc-key') ?? env('WOOCOMMERCE_KEY', 'wkey');
+        $this->wcSecret = $this->option('wc-secret') ?? env('WOOCOMMERCE_SECRET', 'wsecret');
 
         $this->info("🚀 Starting WordPress Migration from: {$this->wordpressDomain}");
         $this->newLine();
@@ -391,7 +391,8 @@ class MigrateFromWordPress extends Command
                 break;
             }
 
-            $progressBar = $this->output->createProgressBar(count($products));
+            $productsInPage = count($products);
+            $progressBar = $this->output->createProgressBar($productsInPage);
             $progressBar->start();
 
             foreach ($products as $wcProduct) {
@@ -410,7 +411,8 @@ class MigrateFromWordPress extends Command
 
             $page++;
 
-        } while (count($products) === $batchSize);
+            // Continue while we're getting products (don't stop just because we got fewer than batch size)
+        } while ($productsInPage > 0);
 
         $this->info("✅ Migrated {$totalMigrated} products");
     }
@@ -498,15 +500,15 @@ class MigrateFromWordPress extends Command
         // Create product variant (default) - Ensure all required fields have defaults
         $variantData = [
             'name' => !empty($wcProduct['name']) ? $wcProduct['name'] : 'Default Variant',
-            'sku' => !empty($wcProduct['sku']) ? $wcProduct['sku'] : 'SKU-' . $product->id . '-' . time(),
+            'sku' => !empty($wcProduct['sku']) ? $wcProduct['sku'] : 'SKU-' . $product->id ,
             'price' => !empty($wcProduct['regular_price']) ? (float)$wcProduct['regular_price'] : 0,
             'sale_price' => !empty($wcProduct['sale_price']) ? (float)$wcProduct['sale_price'] : null,
             'stock_quantity' => isset($wcProduct['stock_quantity']) ? (int)$wcProduct['stock_quantity'] : 0,
             'stock_status' => ($wcProduct['stock_status'] ?? 'instock') === 'instock' ? 'in_stock' : 'out_of_stock',
-            'weight' => $wcProduct['weight'] ?? null,
-            'length' => $wcProduct['dimensions']['length'] ?? null,
-            'width' => $wcProduct['dimensions']['width'] ?? null,
-            'height' => $wcProduct['dimensions']['height'] ?? null,
+            'weight' => $this->emptyToNull($wcProduct['weight'] ?? null),
+            'length' => $this->emptyToNull($wcProduct['dimensions']['length'] ?? null),
+            'width' => $this->emptyToNull($wcProduct['dimensions']['width'] ?? null),
+            'height' => $this->emptyToNull($wcProduct['dimensions']['height'] ?? null),
         ];
         
         $variant = ProductVariant::updateOrCreate(
@@ -587,6 +589,10 @@ class MigrateFromWordPress extends Command
                     'sale_price' => $variation['sale_price'] ? (float)$variation['sale_price'] : null,
                     'stock_quantity' => (int)$variation['stock_quantity'] ?: 0,
                     'stock_status' => $variation['stock_status'] === 'instock' ? 'in_stock' : 'out_of_stock',
+                    'weight' => $this->emptyToNull($variation['weight'] ?? null),
+                    'length' => $this->emptyToNull($variation['dimensions']['length'] ?? null),
+                    'width' => $this->emptyToNull($variation['dimensions']['width'] ?? null),
+                    'height' => $this->emptyToNull($variation['dimensions']['height'] ?? null),
                     'media_id' => $mediaId,
                     'is_default' => false,
                 ]
@@ -817,7 +823,16 @@ class MigrateFromWordPress extends Command
 
     protected function stripHtml($text)
     {
-        return strip_tags(html_entity_decode($text));
+        return strip_tags($text);
+    }
+
+    protected function emptyToNull($value)
+    {
+        // Convert empty strings or empty values to null for decimal columns
+        if ($value === '' || $value === null || $value === false) {
+            return null;
+        }
+        return $value;
     }
 
     protected function displayStatistics()
