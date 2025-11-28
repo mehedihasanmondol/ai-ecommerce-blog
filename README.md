@@ -69,6 +69,7 @@ A feature-rich, modular ecommerce and blog platform designed for scalability, pe
 - ✅ **Tick Marks** - Key points highlighter for posts
 - ✅ **Shop This Article** - Link products within blog posts
 - ✅ **SEO Optimization** - Meta tags, structured data, sitemaps
+- ✅ **WordPress Migration** - One-click migration from WordPress/WooCommerce
 
 ### 🎨 **Frontend Features**
 - ✅ **Dynamic Theme System** - 6 pre-built themes, admin-customizable
@@ -943,6 +944,57 @@ php artisan migrate:fresh --seed
 | `php artisan email:newsletter` | Send newsletter emails |
 | `php artisan email:promotional` | Send promotional campaigns |
 | `php artisan email:recommendations` | Send product recommendations |
+| `php artisan wordpress:migrate` | Migrate content from WordPress/WooCommerce |
+
+### **WordPress/WooCommerce Migration**
+
+Migrate your entire WordPress blog and WooCommerce store to Laravel with a single command:
+
+```bash
+# Interactive migration (recommended)
+php artisan db:seed --class=WordPressMigrationSeeder
+
+# Or direct command
+php artisan wordpress:migrate --domain=https://your-site.com
+```
+
+**Features:**
+- ✅ Migrates all blog posts, categories, tags, and authors
+- ✅ Migrates WooCommerce products with variants and attributes
+- ✅ Downloads and converts all images (including Bangla filenames)
+- ✅ Replaces old WordPress URLs with new Laravel URLs
+- ✅ Preserves SEO meta data, slugs, and permalinks
+- ✅ Creates author profiles automatically
+- ✅ Maintains publish dates and authorship
+- ✅ Idempotent (safe to run multiple times)
+- ✅ Handles missing data with smart defaults
+
+**Configuration (.env):**
+```env
+WORDPRESS_DOMAIN=https://your-wordpress-site.com
+WOOCOMMERCE_KEY=ck_xxxxxxxxxxxxxxxxxxxxx
+WOOCOMMERCE_SECRET=cs_xxxxxxxxxxxxxxxxxxxxx
+```
+
+**Options:**
+```bash
+--domain=URL              # WordPress site URL
+--wc-key=KEY             # WooCommerce Consumer Key
+--wc-secret=SECRET       # WooCommerce Consumer Secret
+--only-posts             # Migrate only blog posts
+--only-products          # Migrate only products
+--skip-images            # Skip image download (testing)
+--batch-size=N           # Items per batch (default: 10)
+--start-from=N           # Resume from page N
+```
+
+**Quick Start:**
+1. Get WooCommerce API keys from: `WP Admin → WooCommerce → Settings → Advanced → REST API`
+2. Add credentials to `.env`
+3. Run: `php artisan db:seed --class=WordPressMigrationSeeder`
+4. Review migrated content in admin panel
+
+**Documentation:** See `WORDPRESS_MIGRATION_QUICK_START.md` and `development-docs/WORDPRESS_MIGRATION_GUIDE.md` for complete details.
 
 ### **Common Laravel Commands**
 
