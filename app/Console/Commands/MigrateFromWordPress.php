@@ -655,6 +655,24 @@ class MigrateFromWordPress extends Command
             $fullPath = Storage::disk('public')->path($wordpressPath);
             $mimeType = mime_content_type($fullPath);
 
+            // Get image dimensions
+            $width = null;
+            $height = null;
+            $aspectRatio = null;
+            
+            if (strpos($mimeType, 'image/') === 0) {
+                $imageInfo = @getimagesize($fullPath);
+                if ($imageInfo !== false) {
+                    $width = $imageInfo[0];
+                    $height = $imageInfo[1];
+                    
+                    // Calculate aspect ratio (width / height)
+                    if ($height > 0) {
+                        $aspectRatio = round($width / $height, 4);
+                    }
+                }
+            }
+
             // Create Media record with correct field names
             $media = Media::create([
                 'user_id' => User::first()->id ?? null,
@@ -663,6 +681,9 @@ class MigrateFromWordPress extends Command
                 'mime_type' => $mimeType,
                 'extension' => $extension,
                 'size' => $fileSize,
+                'width' => $width,
+                'height' => $height,
+                'aspect_ratio' => $aspectRatio,
                 'disk' => 'public',
                 'path' => $wordpressPath,
                 'alt_text' => $altText,

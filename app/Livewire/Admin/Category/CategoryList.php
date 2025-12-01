@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin\Category;
 
 use App\Modules\Ecommerce\Category\Models\Category;
+use App\Modules\Ecommerce\Category\Services\CategoryService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,6 +20,8 @@ class CategoryList extends Component
     public $sortOrder = 'asc';
 
     public $showFilters = false;
+    public $showDeleteModal = false;
+    public $categoryToDelete = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -63,6 +67,30 @@ class CategoryList extends Component
             $category->save();
             $this->dispatch('category-updated');
         }
+    }
+
+    public function confirmDelete($categoryId)
+    {
+        $this->categoryToDelete = $categoryId;
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteCategory(CategoryService $service)
+    {
+        if ($this->categoryToDelete) {
+            $category = Category::find($this->categoryToDelete);
+            if ($category) {
+                try {
+                    $service->delete($category);
+                    session()->flash('success', 'Category deleted successfully!');
+                } catch (\Exception $e) {
+                    session()->flash('error', $e->getMessage());
+                }
+            }
+        }
+
+        $this->showDeleteModal = false;
+        $this->categoryToDelete = null;
     }
 
     public function clearFilters()
@@ -126,7 +154,7 @@ class CategoryList extends Component
                 'statistics' => $statistics,
             ]);
         } catch (\Exception $e) {
-            \Log::error('CategoryList render error: ' . $e->getMessage());
+            Log::error('CategoryList render error: ' . $e->getMessage());
             return view('livewire.admin.category.category-list', [
                 'categories' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15),
                 'parents' => collect([]),
