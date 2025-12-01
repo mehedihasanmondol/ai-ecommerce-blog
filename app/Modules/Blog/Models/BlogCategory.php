@@ -8,6 +8,7 @@ use App\Traits\HasUniqueSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -76,11 +77,12 @@ class BlogCategory extends Model
     }
 
     /**
-     * Get posts in this category
+     * Get posts in this category (many-to-many)
      */
-    public function posts(): HasMany
+    public function posts(): BelongsToMany
     {
-        return $this->hasMany(Post::class, 'blog_category_id');
+        return $this->belongsToMany(Post::class, 'blog_post_category', 'blog_category_id', 'blog_post_id')
+            ->withTimestamps();
     }
 
     /**
@@ -97,7 +99,9 @@ class BlogCategory extends Model
     public function allPosts()
     {
         $categoryIds = $this->children->pluck('id')->push($this->id);
-        return Post::whereIn('blog_category_id', $categoryIds);
+        return Post::whereHas('categories', function($query) use ($categoryIds) {
+            $query->whereIn('blog_categories.id', $categoryIds);
+        });
     }
 
     /**
