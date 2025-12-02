@@ -169,7 +169,6 @@ class SitemapController extends Controller
             ['url' => route('categories.index'), 'priority' => '0.7'],
             ['url' => route('brands.index'), 'priority' => '0.6'],
             ['url' => route('coupons.index'), 'priority' => '0.5'],
-            ['url' => route('about'), 'priority' => '0.6'],
             ['url' => route('contact.index'), 'priority' => '0.5'],
             ['url' => route('feedback.index'), 'priority' => '0.5'],
         ];
