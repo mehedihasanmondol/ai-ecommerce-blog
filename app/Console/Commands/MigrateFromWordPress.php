@@ -22,6 +22,7 @@ use App\Modules\Ecommerce\Product\Models\ProductAttributeValue;
 use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Brand\Models\Brand;
 
+// test overide for ftp update
 class MigrateFromWordPress extends Command
 {
     protected $signature = 'wordpress:migrate 
