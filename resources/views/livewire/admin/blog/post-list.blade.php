@@ -6,24 +6,13 @@
             <h1 class="text-2xl font-bold text-gray-900">Blog Posts</h1>
             <p class="text-sm text-gray-600 mt-1">Manage your blog posts</p>
         </div>
-        <div class="flex gap-3">
-            @if(count($selectedPosts) > 0)
-            <button wire:click="confirmBulkDelete" 
-                    class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-                Delete Selected ({{ count($selectedPosts) }})
-            </button>
-            @endif
-            <a href="{{ route('admin.blog.posts.create') }}" 
-               class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
-                Add New Post
-            </a>
-        </div>
+        <a href="{{ route('admin.blog.posts.create') }}" 
+           class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add New Post
+        </a>
     </div>
 
     {{-- Stats Cards --}}
@@ -228,8 +217,19 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
                         </th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider relative">
+                            <span class="{{ count($selectedPosts) > 0 ? 'invisible' : '' }}">Actions</span>
+                            @if(count($selectedPosts) > 0)
+                            <div class="absolute inset-0 flex items-center justify-end px-6">
+                                <button wire:click="confirmBulkDelete" 
+                                        class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Delete ({{ count($selectedPosts) }})
+                                </button>
+                            </div>
+                            @endif
                         </th>
                     </tr>
                 </thead>
