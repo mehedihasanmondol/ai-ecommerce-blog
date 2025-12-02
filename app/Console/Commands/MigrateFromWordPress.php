@@ -43,12 +43,17 @@ class MigrateFromWordPress extends Command
     protected $userMapping = [];
     protected $categoryMapping = [];
     protected $tagMapping = [];
+    protected $lastTimestamp = null;
+    protected $timestampIncrement = 1; // seconds
 
     public function handle()
     {
         $this->wordpressDomain = $this->option('domain') ?? env('WORDPRESS_DOMAIN', 'https://example.org');
         $this->wcKey = $this->option('wc-key') ?? env('WOOCOMMERCE_KEY', 'wkey');
         $this->wcSecret = $this->option('wc-secret') ?? env('WOOCOMMERCE_SECRET', 'wsecret');
+        
+        // Initialize timestamp tracker to start from 30 days ago
+        $this->lastTimestamp = now()->subDays(30);
 
         $this->info("🚀 Starting WordPress Migration from: {$this->wordpressDomain}");
         $this->newLine();
@@ -106,12 +111,16 @@ class MigrateFromWordPress extends Command
         foreach ($users as $wpUser) {
             $email = $wpUser['slug'] . '@migrated.local'; // WordPress doesn't expose real emails via REST API
             
+            $timestamps = $this->getNextTimestamp();
+            
             $user = User::updateOrCreate(
                 ['email' => $email],
                 [
                     'name' => $wpUser['name'] ?? $wpUser['slug'],
                     'password' => bcrypt(Str::random(32)), // Random password
-                    'email_verified_at' => now(),
+                    'email_verified_at' => $timestamps['created_at'],
+                    'created_at' => $timestamps['created_at'],
+                    'updated_at' => $timestamps['updated_at'],
                 ]
             );
 
@@ -121,6 +130,8 @@ class MigrateFromWordPress extends Command
                 $authorSlug = Str::slug($wpUser['name'] ?? $wpUser['slug']);
             }
             
+            $profileTimestamps = $this->getNextTimestamp();
+            
             AuthorProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
@@ -129,6 +140,8 @@ class MigrateFromWordPress extends Command
                     'website' => $wpUser['url'] ?? null,
                     'is_featured' => false,
                     'display_order' => 0,
+                    'created_at' => $profileTimestamps['created_at'],
+                    'updated_at' => $profileTimestamps['updated_at'],
                 ]
             );
 
@@ -154,6 +167,8 @@ class MigrateFromWordPress extends Command
                 $catSlug = 'category-' . $wpCat['id'];
             }
             
+            $catTimestamps = $this->getNextTimestamp();
+            
             $category = BlogCategory::updateOrCreate(
                 ['slug' => $catSlug],
                 [
@@ -161,6 +176,8 @@ class MigrateFromWordPress extends Command
                     'description' => $wpCat['description'] ?? null,
                     'meta_title' => $wpCat['name'],
                     'meta_description' => $wpCat['description'] ?? null,
+                    'created_at' => $catTimestamps['created_at'],
+                    'updated_at' => $catTimestamps['updated_at'],
                 ]
             );
 
@@ -178,11 +195,15 @@ class MigrateFromWordPress extends Command
                 $tagSlug = 'tag-' . $wpTag['id'];
             }
             
+            $tagTimestamps = $this->getNextTimestamp();
+            
             $tag = Tag::updateOrCreate(
                 ['slug' => $tagSlug],
                 [
                     'name' => $wpTag['name'],
                     'description' => $wpTag['description'] ?? null,
+                    'created_at' => $tagTimestamps['created_at'],
+                    'updated_at' => $tagTimestamps['updated_at'],
                 ]
             );
 
@@ -201,6 +222,8 @@ class MigrateFromWordPress extends Command
                     $prodCatSlug = 'product-category-' . $wpCat['id'];
                 }
                 
+                $prodCatTimestamps = $this->getNextTimestamp();
+                
                 $category = Category::updateOrCreate(
                     ['slug' => $prodCatSlug],
                     [
@@ -209,6 +232,8 @@ class MigrateFromWordPress extends Command
                         'parent_id' => $wpCat['parent'] > 0 ? ($this->categoryMapping['product'][$wpCat['parent']] ?? null) : null,
                         'meta_title' => $wpCat['name'],
                         'meta_description' => $wpCat['description'] ?? null,
+                        'created_at' => $prodCatTimestamps['created_at'],
+                        'updated_at' => $prodCatTimestamps['updated_at'],
                     ]
                 );
 
@@ -312,6 +337,12 @@ class MigrateFromWordPress extends Command
 
         // Get author ID
         $authorId = $this->userMapping[$wpPost['author']] ?? User::first()->id;
+        
+        // Use WordPress original timestamps if available
+        $postTimestamps = $this->getNextTimestamp(
+            isset($wpPost['date']) ? $wpPost['date'] : null,
+            isset($wpPost['modified']) ? $wpPost['modified'] : null
+        );
 
         // Create post
         $post = Post::create([
@@ -327,6 +358,8 @@ class MigrateFromWordPress extends Command
             'meta_description' => isset($wpPost['yoast_head_json']['og_description']) ? html_entity_decode($wpPost['yoast_head_json']['og_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : null,
             'meta_keywords' => isset($wpPost['yoast_head_json']['keywords']) ? implode(', ', $wpPost['yoast_head_json']['keywords']) : null,
             'allow_comments' => $wpPost['comment_status'] === 'open',
+            'created_at' => $postTimestamps['created_at'],
+            'updated_at' => $postTimestamps['updated_at'],
         ]);
 
         // Attach categories
@@ -468,6 +501,12 @@ class MigrateFromWordPress extends Command
 
         // Process short description
         $shortDescription = $this->removeFlexClasses($wcProduct['short_description']);
+        
+        // Use WordPress original timestamps if available
+        $productTimestamps = $this->getNextTimestamp(
+            isset($wcProduct['date_created']) ? $wcProduct['date_created'] : null,
+            isset($wcProduct['date_modified']) ? $wcProduct['date_modified'] : null
+        );
 
         // Create product
         $product = Product::create([
@@ -484,6 +523,8 @@ class MigrateFromWordPress extends Command
             'is_featured' => $wcProduct['featured'],
             'meta_title' => html_entity_decode($wcProduct['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'meta_description' => $this->stripHtml(html_entity_decode($wcProduct['short_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8')),
+            'created_at' => $productTimestamps['created_at'],
+            'updated_at' => $productTimestamps['updated_at'],
         ]);
 
         // Attach categories
@@ -513,6 +554,14 @@ class MigrateFromWordPress extends Command
             'height' => $this->emptyToNull($wcProduct['dimensions']['height'] ?? null),
         ];
         
+        $variantTimestamps = $this->getNextTimestamp(
+            isset($wcProduct['date_created']) ? $wcProduct['date_created'] : null,
+            isset($wcProduct['date_modified']) ? $wcProduct['date_modified'] : null
+        );
+        
+        $variantData['created_at'] = $variantTimestamps['created_at'];
+        $variantData['updated_at'] = $variantTimestamps['updated_at'];
+        
         $variant = ProductVariant::updateOrCreate(
             [
                 'product_id' => $product->id,
@@ -541,6 +590,8 @@ class MigrateFromWordPress extends Command
             $mediaId = $this->downloadAndCreateMedia($image['src'], $image['alt'] ?? $product->name);
             
             if ($mediaId) {
+                $imageTimestamps = $this->getNextTimestamp();
+                
                 ProductImage::updateOrCreate(
                     [
                         'product_id' => $product->id,
@@ -550,6 +601,8 @@ class MigrateFromWordPress extends Command
                         'is_primary' => $sortOrder === 0,
                         'sort_order' => $sortOrder++,
                         'alt_text' => $image['alt'] ?? $product->name,
+                        'created_at' => $imageTimestamps['created_at'],
+                        'updated_at' => $imageTimestamps['updated_at'],
                     ]
                 );
             }
@@ -580,6 +633,11 @@ class MigrateFromWordPress extends Command
                 $variantName .= ' - ' . implode(', ', $attributes);
             }
 
+            $variationTimestamps = $this->getNextTimestamp(
+                isset($variation['date_created']) ? $variation['date_created'] : null,
+                isset($variation['date_modified']) ? $variation['date_modified'] : null
+            );
+            
             ProductVariant::updateOrCreate(
                 [
                     'product_id' => $product->id,
@@ -597,6 +655,8 @@ class MigrateFromWordPress extends Command
                     'height' => $this->emptyToNull($variation['dimensions']['height'] ?? null),
                     'media_id' => $mediaId,
                     'is_default' => false,
+                    'created_at' => $variationTimestamps['created_at'],
+                    'updated_at' => $variationTimestamps['updated_at'],
                 ]
             );
         }
@@ -676,6 +736,8 @@ class MigrateFromWordPress extends Command
             }
 
             // Create Media record with correct field names
+            $mediaTimestamps = $this->getNextTimestamp();
+            
             $media = Media::create([
                 'user_id' => User::first()->id ?? null,
                 'original_filename' => $originalFilename,
@@ -690,6 +752,8 @@ class MigrateFromWordPress extends Command
                 'path' => $wordpressPath,
                 'alt_text' => $altText,
                 'scope' => 'global',
+                'created_at' => $mediaTimestamps['created_at'],
+                'updated_at' => $mediaTimestamps['updated_at'],
             ]);
 
             $this->imageMapping[$url] = $media->id;
@@ -873,5 +937,49 @@ class MigrateFromWordPress extends Command
                 ['Total Products', Product::count()],
             ]
         );
+    }
+    
+    /**
+     * Get next unique timestamp pair
+     * 
+     * @param string|null $originalCreated WordPress original created timestamp
+     * @param string|null $originalModified WordPress original modified timestamp
+     * @return array ['created_at' => Carbon, 'updated_at' => Carbon]
+     */
+    protected function getNextTimestamp($originalCreated = null, $originalModified = null)
+    {
+        // If WordPress original timestamps are provided, use them
+        if ($originalCreated) {
+            try {
+                $createdAt = \Carbon\Carbon::parse($originalCreated);
+                $updatedAt = $originalModified ? \Carbon\Carbon::parse($originalModified) : $createdAt;
+                
+                // Ensure this timestamp is after the last one used
+                if ($createdAt->lte($this->lastTimestamp)) {
+                    $createdAt = $this->lastTimestamp->copy()->addSeconds($this->timestampIncrement);
+                    $updatedAt = $createdAt->copy()->addSeconds($this->timestampIncrement);
+                }
+                
+                $this->lastTimestamp = $updatedAt;
+                
+                return [
+                    'created_at' => $createdAt,
+                    'updated_at' => $updatedAt,
+                ];
+            } catch (\Exception $e) {
+                // If parsing fails, fall through to generated timestamps
+            }
+        }
+        
+        // Generate timestamps with increment
+        $createdAt = $this->lastTimestamp->copy()->addSeconds($this->timestampIncrement);
+        $updatedAt = $createdAt->copy()->addSeconds($this->timestampIncrement);
+        
+        $this->lastTimestamp = $updatedAt;
+        
+        return [
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt,
+        ];
     }
 }
