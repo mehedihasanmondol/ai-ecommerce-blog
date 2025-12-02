@@ -61,6 +61,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.access'])->gr
             Route::post('posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
         });
         
+        // Toggle Featured - Requires posts.edit permission
+        Route::middleware(['permission:posts.edit'])->group(function () {
+            Route::post('posts/{post}/toggle-featured', [PostController::class, 'toggleFeatured'])->name('posts.toggle-featured');
+        });
+        
         // TinyMCE Image Upload - Requires posts.upload-image permission
         Route::middleware(['permission:posts.upload-image'])->group(function () {
             Route::post('upload-image', [PostController::class, 'uploadImage'])->name('upload-image');

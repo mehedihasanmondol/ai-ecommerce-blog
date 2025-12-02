@@ -195,6 +195,28 @@ class PostController extends Controller
     }
 
     /**
+     * Toggle featured status
+     */
+    public function toggleFeatured($id)
+    {
+        try {
+            $post = $this->postService->getPost($id);
+            $this->postService->toggleFeatured($post);
+            
+            return response()->json([
+                'success' => true,
+                'is_featured' => !$post->is_featured,
+                'message' => !$post->is_featured ? 'ফিচার্ড পোস্টে যোগ করা হয়েছে' : 'ফিচার্ড পোস্ট থেকে সরানো হয়েছে',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Toggle verification status
      */
     public function toggleVerification($id)

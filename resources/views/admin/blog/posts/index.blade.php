@@ -326,6 +326,20 @@
                                 {{ ucfirst($post->status) }}
                             </span>
                         @endif
+                        <div class="mt-2">
+                            <button onclick="toggleFeatured({{ $post->id }}, this)" 
+                                    class="inline-flex items-center transition-colors {{ $post->is_featured ? 'text-yellow-500' : 'text-gray-400' }} hover:text-yellow-600"
+                                    title="{{ $post->is_featured ? 'Remove from Featured' : 'Mark as Featured' }}"
+                                    data-post-id="{{ $post->id }}"
+                                    data-is-featured="{{ $post->is_featured ? '1' : '0' }}">
+                                <svg class="w-5 h-5" fill="{{ $post->is_featured ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                </svg>
+                                @if($post->is_featured)
+                                <span class="ml-1 text-xs font-medium">Featured</span>
+                                @endif
+                            </button>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ number_format($post->views_count) }}
@@ -482,6 +496,54 @@ document.addEventListener('click', function(e) {
         });
     }
 });
+
+// Toggle featured status
+function toggleFeatured(postId, button) {
+    // Show loading state
+    button.style.opacity = '0.5';
+    button.disabled = true;
+    
+    fetch(`/admin/blog/posts/${postId}/toggle-featured`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Toggle the visual state
+            const isFeatured = data.is_featured;
+            const svg = button.querySelector('svg');
+            
+            if (isFeatured) {
+                button.classList.remove('text-gray-300');
+                button.classList.add('text-yellow-500');
+                svg.setAttribute('fill', 'currentColor');
+                button.title = 'Remove from Featured';
+            } else {
+                button.classList.remove('text-yellow-500');
+                button.classList.add('text-gray-300');
+                svg.setAttribute('fill', 'none');
+                button.title = 'Mark as Featured';
+            }
+            
+            button.dataset.isFeatured = isFeatured ? '1' : '0';
+        }
+        
+        // Remove loading state
+        button.style.opacity = '1';
+        button.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update featured status');
+        button.style.opacity = '1';
+        button.disabled = false;
+    });
+}
 
 // Delete post function
 function deletePost(postId) {

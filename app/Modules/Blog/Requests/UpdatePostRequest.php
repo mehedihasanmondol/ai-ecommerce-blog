@@ -49,4 +49,17 @@ class UpdatePostRequest extends FormRequest
             'status.required' => 'স্ট্যাটাস আবশ্যক',
         ];
     }
+
+    /**
+     * Prepare data for validation
+     * Handle checkbox fields that may not be present when unchecked
+     */
+    protected function prepareForValidation(): void
+    {
+        // Handle checkboxes: if not present in request, set to false
+        $this->merge([
+            'is_featured' => $this->has('is_featured') ? (bool) $this->is_featured : false,
+            'allow_comments' => $this->has('allow_comments') ? (bool) $this->allow_comments : false,
+        ]);
+    }
 }

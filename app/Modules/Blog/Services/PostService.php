@@ -301,4 +301,13 @@ class PostService
     {
         return $this->postRepository->getCountByStatus();
     }
+
+    /**
+     * Toggle featured status for a post
+     */
+    public function toggleFeatured(Post $post): Post
+    {
+        $post->update(['is_featured' => !$post->is_featured]);
+        return $post->fresh();
+    }
 }

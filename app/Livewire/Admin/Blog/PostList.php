@@ -81,6 +81,15 @@ class PostList extends Component
         $this->resetPage();
     }
 
+    public function toggleFeatured($postId, PostService $service)
+    {
+        $post = Post::find($postId);
+        if ($post) {
+            $service->toggleFeatured($post);
+            $this->dispatch('post-updated');
+        }
+    }
+
     public function confirmDelete($postId)
     {
         $this->postToDelete = $postId;
