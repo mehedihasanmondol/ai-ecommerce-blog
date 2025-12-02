@@ -44,8 +44,9 @@ class MigrateFromWordPress extends Command
     protected $categoryMapping = [];
     protected $tagMapping = [];
     protected $lastTimestamp = null;
-    protected $timestampIncrement = 3; // seconds (increased for production safety)
+    protected $timestampIncrement = 4; // seconds between records (production safety)
     protected $lastUnixTimestamp = 0; // Track unix timestamp for reliable comparison
+    protected $recordCounter = 0; // Track total records migrated
 
     public function handle()
     {
@@ -58,7 +59,8 @@ class MigrateFromWordPress extends Command
         $this->lastUnixTimestamp = $this->lastTimestamp->timestamp;
 
         $this->info("🚀 Starting WordPress Migration from: {$this->wordpressDomain}");
-        $this->info("   Using {$this->timestampIncrement}-second timestamp increments to prevent duplicates");
+        $this->info("   ⏱️  Guaranteed unique timestamps: {$this->timestampIncrement}s + 2s spacing (UTC)");
+        $this->info("   📊 Starting unix timestamp: {$this->lastUnixTimestamp}");
         $this->newLine();
 
         try {
@@ -84,6 +86,8 @@ class MigrateFromWordPress extends Command
 
             $this->newLine();
             $this->info('✅ Migration completed successfully!');
+            $this->info("   📊 Total records with unique timestamps: {$this->recordCounter}");
+            $this->info("   ⏱️  Final unix timestamp: {$this->lastUnixTimestamp}");
             $this->displayStatistics();
 
         } catch (\Exception $e) {
@@ -944,52 +948,38 @@ class MigrateFromWordPress extends Command
     
     /**
      * Get next unique timestamp pair
-     * Database DATETIME columns don't support microseconds, so we use second-level precision
-     * with guaranteed increments to prevent duplicates.
      * 
-     * @param string|null $originalCreated WordPress original created timestamp
-     * @param string|null $originalModified WordPress original modified timestamp
+     * CRITICAL: ALWAYS increments to guarantee uniqueness across Windows/Linux.
+     * Never reuses timestamps, even from WordPress originals.
+     * 
+     * @param string|null $originalCreated WordPress original created timestamp (unused, kept for compatibility)
+     * @param string|null $originalModified WordPress original modified timestamp (unused, kept for compatibility)
      * @return array ['created_at' => Carbon, 'updated_at' => Carbon]
      */
     protected function getNextTimestamp($originalCreated = null, $originalModified = null)
     {
-        // If WordPress original timestamps are provided, try to use them as base
-        if ($originalCreated) {
-            try {
-                $wpCreated = \Carbon\Carbon::parse($originalCreated);
-                $wpUnixTimestamp = $wpCreated->timestamp;
-                
-                // ALWAYS force increment if WordPress timestamp would cause duplicate or collision
-                // Use integer comparison for reliability across platforms
-                if ($wpUnixTimestamp <= $this->lastUnixTimestamp) {
-                    // Force increment - add to last timestamp
-                    $this->lastUnixTimestamp += $this->timestampIncrement;
-                    $createdAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp);
-                } else {
-                    // WordPress timestamp is newer, use it as base
-                    $createdAt = $wpCreated->copy();
-                    $this->lastUnixTimestamp = $wpUnixTimestamp;
-                }
-                
-            } catch (\Exception $e) {
-                // If parsing fails, generate new timestamp
-                $this->lastUnixTimestamp += $this->timestampIncrement;
-                $createdAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp);
-            }
-        } else {
-            // Generate timestamps with guaranteed increment
-            $this->lastUnixTimestamp += $this->timestampIncrement;
-            $createdAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp);
-        }
+        $this->recordCounter++;
         
-        // Updated timestamp is always after created timestamp (add 1 more second)
-        $this->lastUnixTimestamp += 1;
-        $updatedAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp);
+        // ALWAYS increment - never trust WordPress timestamps for uniqueness
+        // This prevents ALL duplicate timestamp issues across platforms
+        $this->lastUnixTimestamp += $this->timestampIncrement;
+        
+        // Create Carbon instance in UTC to ensure consistency
+        $createdAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp, 'UTC');
+        
+        // Add 2 more seconds for updated_at (created_at + 2)
+        $this->lastUnixTimestamp += 2;
+        $updatedAt = \Carbon\Carbon::createFromTimestamp($this->lastUnixTimestamp, 'UTC');
         
         // Update the Carbon tracker
         $this->lastTimestamp = $updatedAt->copy();
         
-        // Return Carbon instances (not strings) for better compatibility with Eloquent
+        // Debug log every 10 records on production
+        if ($this->recordCounter % 10 === 0) {
+            $this->info("  [{$this->recordCounter}] Timestamp: {$createdAt->format('Y-m-d H:i:s')} (unix: {$createdAt->timestamp})");
+        }
+        
+        // Return Carbon instances for Eloquent
         return [
             'created_at' => $createdAt,
             'updated_at' => $updatedAt,
