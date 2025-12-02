@@ -56,7 +56,7 @@ class MigrateFromWordPress extends Command
         // Initialize timestamp tracker to start from 30 days ago
         $this->lastTimestamp = now()->subDays(30);
 
-        $this->info("🚀 Starting WordPress Migration from: {$this->wordpressDomain}");
+        $this->info("🚀 Starting WordPress Migration from: {$this->wordpressDomain} with 1 seconds plus");
         $this->newLine();
 
         try {
