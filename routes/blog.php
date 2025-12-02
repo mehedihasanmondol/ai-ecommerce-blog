@@ -53,6 +53,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.access'])->gr
         // Delete Posts - Requires posts.delete permission
         Route::middleware(['permission:posts.delete'])->group(function () {
             Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+            Route::post('posts/bulk-delete', [PostController::class, 'bulkDelete'])->name('posts.bulk-delete');
         });
         
         // Publish Posts - Requires posts.publish permission

@@ -7,6 +7,7 @@ use App\Modules\Ecommerce\Category\Models\Category;
 use App\Modules\Ecommerce\Product\Models\Product;
 use App\Modules\Ecommerce\Product\Repositories\ProductRepository;
 use App\Modules\Ecommerce\Product\Services\ProductService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -27,6 +28,11 @@ class ProductList extends Component
     public $showFilters = false;
     public $showDeleteModal = false;
     public $productToDelete = null;
+    
+    // Bulk delete properties
+    public $selectedProducts = [];
+    public $selectAll = false;
+    public $showBulkDeleteModal = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -126,6 +132,41 @@ class ProductList extends Component
         $this->resetPage();
     }
 
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            // Select all products on current page
+            $this->selectedProducts = Product::pluck('id')->toArray();
+        } else {
+            $this->selectedProducts = [];
+        }
+    }
+
+    public function confirmBulkDelete()
+    {
+        if (count($this->selectedProducts) > 0) {
+            $this->showBulkDeleteModal = true;
+        }
+    }
+
+    public function bulkDelete(ProductService $service)
+    {
+        if (count($this->selectedProducts) > 0) {
+            foreach ($this->selectedProducts as $productId) {
+                $product = Product::find($productId);
+                if ($product) {
+                    $service->delete($product);
+                }
+            }
+            
+            session()->flash('success', count($this->selectedProducts) . ' products deleted successfully!');
+            $this->selectedProducts = [];
+            $this->selectAll = false;
+        }
+
+        $this->showBulkDeleteModal = false;
+    }
+
     public function render(ProductRepository $repository)
     {
         try {
@@ -156,7 +197,7 @@ class ProductList extends Component
                 'brands' => $brands,
             ]);
         } catch (\Exception $e) {
-            \Log::error('ProductList render error: ' . $e->getMessage());
+            Log::error('ProductList render error: ' . $e->getMessage());
             return view('livewire.admin.product.product-list', [
                 'products' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15),
                 'categories' => collect([]),

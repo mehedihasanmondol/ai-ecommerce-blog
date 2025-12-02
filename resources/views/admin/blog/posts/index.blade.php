@@ -10,13 +10,23 @@
             <h1 class="text-3xl font-bold text-gray-900">Blog Posts</h1>
             <p class="text-gray-600 mt-1">Manage your blog posts</p>
         </div>
-        <a href="{{ route('admin.blog.posts.create') }}" 
-           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium inline-flex items-center">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Add New Post
-        </a>
+        <div class="flex gap-3">
+            <button id="bulk-delete-btn" 
+                    onclick="confirmBulkDelete()" 
+                    class="hidden bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Delete Selected (<span id="selected-count">0</span>)
+            </button>
+            <a href="{{ route('admin.blog.posts.create') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add New Post
+            </a>
+        </div>
     </div>
 
     <!-- Stats Cards -->
@@ -229,6 +239,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <input type="checkbox" 
+                                   id="select-all" 
+                                   onchange="toggleSelectAll(this)" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
@@ -241,6 +257,12 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($posts as $post)
                 <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">
+                        <input type="checkbox" 
+                               class="post-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                               value="{{ $post->id }}" 
+                               onchange="updateBulkDeleteButton()">
+                    </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center">
                             @if($post->featured_image)
@@ -320,7 +342,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -477,6 +499,79 @@ function deletePost(postId) {
                 // Reload table content instead of full page
                 submitFilterForm();
             }
+        });
+    }
+}
+
+// Toggle select all checkboxes
+function toggleSelectAll(checkbox) {
+    const postCheckboxes = document.querySelectorAll('.post-checkbox');
+    postCheckboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+    updateBulkDeleteButton();
+}
+
+// Update bulk delete button visibility and count
+function updateBulkDeleteButton() {
+    const selectedCheckboxes = document.querySelectorAll('.post-checkbox:checked');
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+    const selectedCount = document.getElementById('selected-count');
+    const selectAllCheckbox = document.getElementById('select-all');
+    
+    if (selectedCheckboxes.length > 0) {
+        bulkDeleteBtn.classList.remove('hidden');
+        selectedCount.textContent = selectedCheckboxes.length;
+    } else {
+        bulkDeleteBtn.classList.add('hidden');
+    }
+    
+    // Update select all checkbox state
+    const allCheckboxes = document.querySelectorAll('.post-checkbox');
+    selectAllCheckbox.checked = allCheckboxes.length > 0 && selectedCheckboxes.length === allCheckboxes.length;
+}
+
+// Confirm bulk delete
+function confirmBulkDelete() {
+    const selectedCheckboxes = document.querySelectorAll('.post-checkbox:checked');
+    const postIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+    
+    if (postIds.length === 0) {
+        alert('Please select at least one post to delete');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${postIds.length} post(s)? This action cannot be undone.`)) {
+        // Show loading
+        document.getElementById('table-loading').classList.remove('hidden');
+        
+        fetch('{{ route('admin.blog.posts.bulk-delete') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post_ids: postIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Uncheck select all
+                document.getElementById('select-all').checked = false;
+                // Reload table
+                submitFilterForm();
+                // Show success message
+                alert(data.message);
+            } else {
+                alert('Error: ' + data.message);
+                document.getElementById('table-loading').classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting posts');
+            document.getElementById('table-loading').classList.add('hidden');
         });
     }
 }

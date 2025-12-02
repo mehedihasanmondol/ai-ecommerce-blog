@@ -25,6 +25,11 @@ class PostList extends Component
     public $showFilters = false;
     public $showDeleteModal = false;
     public $postToDelete = null;
+    
+    // Bulk delete properties
+    public $selectedPosts = [];
+    public $selectAll = false;
+    public $showBulkDeleteModal = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -100,6 +105,41 @@ class PostList extends Component
     {
         $this->reset(['search', 'statusFilter', 'categoryFilter', 'authorFilter', 'featuredFilter', 'dateFrom', 'dateTo']);
         $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            // Select all posts on current page
+            $this->selectedPosts = Post::pluck('id')->toArray();
+        } else {
+            $this->selectedPosts = [];
+        }
+    }
+
+    public function confirmBulkDelete()
+    {
+        if (count($this->selectedPosts) > 0) {
+            $this->showBulkDeleteModal = true;
+        }
+    }
+
+    public function bulkDelete(PostService $service)
+    {
+        if (count($this->selectedPosts) > 0) {
+            foreach ($this->selectedPosts as $postId) {
+                $post = Post::find($postId);
+                if ($post) {
+                    $service->deletePost($postId);
+                }
+            }
+            
+            session()->flash('success', count($this->selectedPosts) . ' posts deleted successfully!');
+            $this->selectedPosts = [];
+            $this->selectAll = false;
+        }
+
+        $this->showBulkDeleteModal = false;
     }
 
     public function render()

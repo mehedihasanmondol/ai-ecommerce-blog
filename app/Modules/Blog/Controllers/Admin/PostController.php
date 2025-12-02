@@ -309,4 +309,34 @@ class PostController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Bulk delete posts
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'post_ids' => 'required|array',
+            'post_ids.*' => 'exists:blog_posts,id',
+        ]);
+
+        try {
+            $count = 0;
+            foreach ($request->post_ids as $postId) {
+                $this->postService->deletePost($postId);
+                $count++;
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => "{$count}টি পোস্ট মুছে ফেলা হয়েছে",
+                'deleted' => $count,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
