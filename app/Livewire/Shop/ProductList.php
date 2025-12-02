@@ -292,7 +292,7 @@ class ProductList extends Component
                 break;
             case 'latest':
             default:
-                $query->latest();
+                $query->orderBy('created_at', 'desc');
                 break;
         }
 

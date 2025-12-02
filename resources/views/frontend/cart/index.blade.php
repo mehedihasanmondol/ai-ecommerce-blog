@@ -490,7 +490,7 @@ function cartPage() {
             return weight;
         },
         
-        // Calculate discounts for selected items
+        // Calculate discounts for selected items (for display purposes only)
         calculateDiscounts() {
             let discounts = 0;
             this.selectedItems.forEach(key => {
@@ -504,9 +504,9 @@ function cartPage() {
             return discounts;
         },
         
-        // Calculate subtotal (items total - discounts)
+        // Calculate subtotal (item.price is already the sale price, so no need to subtract discounts)
         calculateSubtotal() {
-            return this.calculateItemsTotal() - this.calculateDiscounts();
+            return this.calculateItemsTotal();
         },
         
         // Get shipping cost from Livewire component
