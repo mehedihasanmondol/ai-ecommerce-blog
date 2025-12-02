@@ -125,17 +125,11 @@ class MigrateFromWordPress extends Command
                 [
                     'name' => $wpUser['name'] ?? $wpUser['slug'],
                     'password' => bcrypt(Str::random(32)), // Random password
-                    'email_verified_at' => $timestamps['created_at']->format('Y-m-d H:i:s'),
+                    'email_verified_at' => $timestamps['created_at'],
+                    'created_at' => $timestamps['created_at'],
+                    'updated_at' => $timestamps['updated_at'],
                 ]
             );
-            
-            // Force set timestamps using DB query to bypass Eloquent
-            DB::table('users')
-                ->where('id', $user->id)
-                ->update([
-                    'created_at' => $timestamps['created_at']->format('Y-m-d H:i:s'),
-                    'updated_at' => $timestamps['updated_at']->format('Y-m-d H:i:s'),
-                ]);
 
             // Create AuthorProfile for each migrated user
             $authorSlug = generate_slug($wpUser['name'] ?? $wpUser['slug']);
@@ -145,7 +139,7 @@ class MigrateFromWordPress extends Command
             
             $profileTimestamps = $this->getNextTimestamp();
             
-            $profile = AuthorProfile::updateOrCreate(
+            AuthorProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'slug' => $authorSlug,
@@ -153,16 +147,10 @@ class MigrateFromWordPress extends Command
                     'website' => $wpUser['url'] ?? null,
                     'is_featured' => false,
                     'display_order' => 0,
+                    'created_at' => $profileTimestamps['created_at'],
+                    'updated_at' => $profileTimestamps['updated_at'],
                 ]
             );
-            
-            // Force set timestamps using DB query
-            DB::table('author_profiles')
-                ->where('id', $profile->id)
-                ->update([
-                    'created_at' => $profileTimestamps['created_at']->format('Y-m-d H:i:s'),
-                    'updated_at' => $profileTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                ]);
 
             $this->userMapping[$wpUser['id']] = $user->id;
             $this->info("    ✓ Migrated: {$wpUser['name']} → User ID: {$user->id}");
@@ -195,16 +183,10 @@ class MigrateFromWordPress extends Command
                     'description' => $wpCat['description'] ?? null,
                     'meta_title' => $wpCat['name'],
                     'meta_description' => $wpCat['description'] ?? null,
+                    'created_at' => $catTimestamps['created_at'],
+                    'updated_at' => $catTimestamps['updated_at'],
                 ]
             );
-            
-            // Force set timestamps using DB query
-            DB::table('blog_categories')
-                ->where('id', $category->id)
-                ->update([
-                    'created_at' => $catTimestamps['created_at']->format('Y-m-d H:i:s'),
-                    'updated_at' => $catTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                ]);
 
             $this->categoryMapping['blog'][$wpCat['id']] = $category->id;
             $this->info("    ✓ {$wpCat['name']} → ID: {$category->id}");
@@ -227,16 +209,10 @@ class MigrateFromWordPress extends Command
                 [
                     'name' => $wpTag['name'],
                     'description' => $wpTag['description'] ?? null,
+                    'created_at' => $tagTimestamps['created_at'],
+                    'updated_at' => $tagTimestamps['updated_at'],
                 ]
             );
-            
-            // Force set timestamps using DB query
-            DB::table('blog_tags')
-                ->where('id', $tag->id)
-                ->update([
-                    'created_at' => $tagTimestamps['created_at']->format('Y-m-d H:i:s'),
-                    'updated_at' => $tagTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                ]);
 
             $this->tagMapping[$wpTag['id']] = $tag->id;
             $this->info("    ✓ {$wpTag['name']} → ID: {$tag->id}");
@@ -263,16 +239,10 @@ class MigrateFromWordPress extends Command
                         'parent_id' => $wpCat['parent'] > 0 ? ($this->categoryMapping['product'][$wpCat['parent']] ?? null) : null,
                         'meta_title' => $wpCat['name'],
                         'meta_description' => $wpCat['description'] ?? null,
+                        'created_at' => $prodCatTimestamps['created_at'],
+                        'updated_at' => $prodCatTimestamps['updated_at'],
                     ]
                 );
-                
-                // Force set timestamps using DB query
-                DB::table('categories')
-                    ->where('id', $category->id)
-                    ->update([
-                        'created_at' => $prodCatTimestamps['created_at']->format('Y-m-d H:i:s'),
-                        'updated_at' => $prodCatTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                    ]);
 
                 $this->categoryMapping['product'][$wpCat['id']] = $category->id;
                 $this->info("    ✓ {$wpCat['name']} → ID: {$category->id}");
@@ -381,8 +351,8 @@ class MigrateFromWordPress extends Command
             isset($wpPost['modified']) ? $wpPost['modified'] : null
         );
 
-        // Create post using DB::table to preserve custom timestamps
-        $postData = [
+        // Create post
+        $post = Post::create([
             'slug' => $postSlug,
             'title' => html_entity_decode($wpPost['title']['rendered'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'excerpt' => $this->stripHtml($wpPost['excerpt']['rendered'] ?? ''),
@@ -395,12 +365,9 @@ class MigrateFromWordPress extends Command
             'meta_description' => isset($wpPost['yoast_head_json']['og_description']) ? html_entity_decode($wpPost['yoast_head_json']['og_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8') : null,
             'meta_keywords' => isset($wpPost['yoast_head_json']['keywords']) ? implode(', ', $wpPost['yoast_head_json']['keywords']) : null,
             'allow_comments' => $wpPost['comment_status'] === 'open',
-            'created_at' => $postTimestamps['created_at']->format('Y-m-d H:i:s'),
-            'updated_at' => $postTimestamps['updated_at']->format('Y-m-d H:i:s'),
-        ];
-        
-        $postId = DB::table('blog_posts')->insertGetId($postData);
-        $post = Post::find($postId);
+            'created_at' => $postTimestamps['created_at'],
+            'updated_at' => $postTimestamps['updated_at'],
+        ]);
 
         // Attach categories
         if (!empty($wpPost['categories'])) {
@@ -548,8 +515,8 @@ class MigrateFromWordPress extends Command
             isset($wcProduct['date_modified']) ? $wcProduct['date_modified'] : null
         );
 
-        // Create product using DB::table to preserve custom timestamps
-        $productData = [
+        // Create product
+        $product = Product::create([
             'slug' => $productSlug,
             'name' => html_entity_decode($wcProduct['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'description' => $description,
@@ -563,12 +530,9 @@ class MigrateFromWordPress extends Command
             'is_featured' => $wcProduct['featured'],
             'meta_title' => html_entity_decode($wcProduct['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'meta_description' => $this->stripHtml(html_entity_decode($wcProduct['short_description'], ENT_QUOTES | ENT_HTML5, 'UTF-8')),
-            'created_at' => $productTimestamps['created_at']->format('Y-m-d H:i:s'),
-            'updated_at' => $productTimestamps['updated_at']->format('Y-m-d H:i:s'),
-        ];
-        
-        $productId = DB::table('products')->insertGetId($productData);
-        $product = Product::find($productId);
+            'created_at' => $productTimestamps['created_at'],
+            'updated_at' => $productTimestamps['updated_at'],
+        ]);
 
         // Attach categories
         if (!empty($wcProduct['categories'])) {
@@ -602,6 +566,9 @@ class MigrateFromWordPress extends Command
             isset($wcProduct['date_modified']) ? $wcProduct['date_modified'] : null
         );
         
+        $variantData['created_at'] = $variantTimestamps['created_at'];
+        $variantData['updated_at'] = $variantTimestamps['updated_at'];
+        
         $variant = ProductVariant::updateOrCreate(
             [
                 'product_id' => $product->id,
@@ -609,14 +576,6 @@ class MigrateFromWordPress extends Command
             ],
             $variantData
         );
-        
-        // Force set timestamps using DB query
-        DB::table('product_variants')
-            ->where('id', $variant->id)
-            ->update([
-                'created_at' => $variantTimestamps['created_at']->format('Y-m-d H:i:s'),
-                'updated_at' => $variantTimestamps['updated_at']->format('Y-m-d H:i:s'),
-            ]);
 
         // Download and attach product images
         if (!$this->option('skip-images')) {
@@ -640,7 +599,7 @@ class MigrateFromWordPress extends Command
             if ($mediaId) {
                 $imageTimestamps = $this->getNextTimestamp();
                 
-                $productImage = ProductImage::updateOrCreate(
+                ProductImage::updateOrCreate(
                     [
                         'product_id' => $product->id,
                         'media_id' => $mediaId,
@@ -649,16 +608,10 @@ class MigrateFromWordPress extends Command
                         'is_primary' => $sortOrder === 0,
                         'sort_order' => $sortOrder++,
                         'alt_text' => $image['alt'] ?? $product->name,
+                        'created_at' => $imageTimestamps['created_at'],
+                        'updated_at' => $imageTimestamps['updated_at'],
                     ]
                 );
-                
-                // Force set timestamps using DB query
-                DB::table('product_images')
-                    ->where('id', $productImage->id)
-                    ->update([
-                        'created_at' => $imageTimestamps['created_at']->format('Y-m-d H:i:s'),
-                        'updated_at' => $imageTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                    ]);
             }
         }
     }
@@ -692,7 +645,7 @@ class MigrateFromWordPress extends Command
                 isset($variation['date_modified']) ? $variation['date_modified'] : null
             );
             
-            $variantModel = ProductVariant::updateOrCreate(
+            ProductVariant::updateOrCreate(
                 [
                     'product_id' => $product->id,
                     'sku' => $variation['sku'] ?: 'VAR-' . $variation['id'],
@@ -709,16 +662,10 @@ class MigrateFromWordPress extends Command
                     'height' => $this->emptyToNull($variation['dimensions']['height'] ?? null),
                     'media_id' => $mediaId,
                     'is_default' => false,
+                    'created_at' => $variationTimestamps['created_at'],
+                    'updated_at' => $variationTimestamps['updated_at'],
                 ]
             );
-            
-            // Force set timestamps using DB query
-            DB::table('product_variants')
-                ->where('id', $variantModel->id)
-                ->update([
-                    'created_at' => $variationTimestamps['created_at']->format('Y-m-d H:i:s'),
-                    'updated_at' => $variationTimestamps['updated_at']->format('Y-m-d H:i:s'),
-                ]);
         }
     }
 
@@ -795,10 +742,10 @@ class MigrateFromWordPress extends Command
                 }
             }
 
-            // Create Media record with correct field names using DB::table
+            // Create Media record with correct field names
             $mediaTimestamps = $this->getNextTimestamp();
             
-            $mediaData = [
+            $media = Media::create([
                 'user_id' => User::first()->id ?? null,
                 'original_filename' => $originalFilename,
                 'filename' => $filename,
@@ -812,15 +759,13 @@ class MigrateFromWordPress extends Command
                 'path' => $wordpressPath,
                 'alt_text' => $altText,
                 'scope' => 'global',
-                'created_at' => $mediaTimestamps['created_at']->format('Y-m-d H:i:s'),
-                'updated_at' => $mediaTimestamps['updated_at']->format('Y-m-d H:i:s'),
-            ];
-            
-            $mediaId = DB::table('media')->insertGetId($mediaData);
+                'created_at' => $mediaTimestamps['created_at'],
+                'updated_at' => $mediaTimestamps['updated_at'],
+            ]);
 
-            $this->imageMapping[$url] = $mediaId;
+            $this->imageMapping[$url] = $media->id;
 
-            return $mediaId;
+            return $media->id;
 
         } catch (\Exception $e) {
             $this->warn("  ⚠️  Failed to download image: {$url} - " . $e->getMessage());
