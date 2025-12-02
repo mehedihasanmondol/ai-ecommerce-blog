@@ -71,45 +71,58 @@
                                         </svg>
                                     </div>
 
-                                    <!-- Product Image -->
-                                    @if($newArrival->product->getPrimaryThumbnailUrl())
-                                        <img 
-                                            src="{{ $newArrival->product->getPrimaryThumbnailUrl() }}" 
-                                            alt="{{ $newArrival->product->name }}"
-                                            class="w-16 h-16 object-cover rounded-md"
-                                        >
+                                    @if($newArrival->product)
+                                        <!-- Product Image -->
+                                        @if($newArrival->product->getPrimaryThumbnailUrl())
+                                            <img 
+                                                src="{{ $newArrival->product->getPrimaryThumbnailUrl() }}" 
+                                                alt="{{ $newArrival->product->name }}"
+                                                class="w-16 h-16 object-cover rounded-md"
+                                            >
+                                        @else
+                                            <div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                        @endif
+
+                                        <!-- Product Info -->
+                                        <div class="flex-1">
+                                            <h3 class="font-semibold text-gray-900">{{ $newArrival->product->name }}</h3>
+                                            <div class="flex items-center space-x-3 mt-1">
+                                                <span class="text-sm text-gray-600">Order: {{ $newArrival->sort_order }}</span>
+                                                @if($newArrival->product->sale_price)
+                                                    <span class="text-sm font-semibold text-green-600">
+                                                        {{ currency_format($newArrival->product->sale_price) }}
+                                                    </span>
+                                                    <span class="text-sm text-gray-400 line-through">
+                                                        {{ currency_format($newArrival->product->price) }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-sm font-semibold text-gray-900">
+                                                        {{ currency_format($newArrival->product->price) }}
+                                                    </span>
+                                                @endif
+                                                @if($newArrival->product->variants->first())
+                                                    <span class="text-xs text-gray-500">
+                                                        Stock: {{ $newArrival->product->variants->first()->stock_quantity }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     @else
-                                        <div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
-                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        <!-- Product Deleted/Missing -->
+                                        <div class="w-16 h-16 bg-red-100 rounded-md flex items-center justify-center">
+                                            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                             </svg>
                                         </div>
-                                    @endif
-
-                                    <!-- Product Info -->
-                                    <div class="flex-1">
-                                        <h3 class="font-semibold text-gray-900">{{ $newArrival->product->name }}</h3>
-                                        <div class="flex items-center space-x-3 mt-1">
-                                            <span class="text-sm text-gray-600">Order: {{ $newArrival->sort_order }}</span>
-                                            @if($newArrival->product->sale_price)
-                                                <span class="text-sm font-semibold text-green-600">
-                                                    {{ currency_format($newArrival->product->sale_price) }}
-                                                </span>
-                                                <span class="text-sm text-gray-400 line-through">
-                                                    {{ currency_format($newArrival->product->price) }}
-                                                </span>
-                                            @else
-                                                <span class="text-sm font-semibold text-gray-900">
-                                                    {{ currency_format($newArrival->product->price) }}
-                                                </span>
-                                            @endif
-                                            @if($newArrival->product->variants->first())
-                                                <span class="text-xs text-gray-500">
-                                                    Stock: {{ $newArrival->product->variants->first()->stock_quantity }}
-                                                </span>
-                                            @endif
+                                        <div class="flex-1">
+                                            <h3 class="font-semibold text-red-600">Product Deleted</h3>
+                                            <p class="text-sm text-gray-600">This product no longer exists</p>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
 
                                 <!-- Actions -->
@@ -128,7 +141,7 @@
                                         @method('DELETE')
                                         <button 
                                             type="button"
-                                            onclick="confirmDelete({{ $newArrival->id }}, '{{ addslashes($newArrival->product->name) }}')"
+                                            onclick="confirmDelete({{ $newArrival->id }}, '{{ $newArrival->product ? addslashes($newArrival->product->name) : 'Deleted Product' }}')"
                                             class="p-2 text-red-600 hover:bg-red-50 rounded-md transition"
                                         >
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
