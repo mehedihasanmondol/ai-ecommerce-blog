@@ -378,6 +378,8 @@ class MigrateFromWordPress extends Command
                     'per_page' => $batchSize,
                     'page' => $page,
                     'status' => 'publish', // Only published products
+                    'orderby' => 'date', // Sort by date_created
+                    'order' => 'asc', // Ascending order (oldest → newest)
                 ]);
 
             if (!$response->successful()) {
