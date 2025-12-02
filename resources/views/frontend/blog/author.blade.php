@@ -134,7 +134,7 @@
                                                 </a>
                                             @endif
                                             @if($author->authorProfile->youtube)
-                                                <a href="https://youtube.com/@{{ $author->authorProfile->youtube }}" target="_blank" rel="noopener noreferrer"
+                                                <a href="{{'https://youtube.com/@'}}{{ $author->authorProfile->youtube }}" target="_blank" rel="noopener noreferrer"
                                                    title="YouTube"
                                                    class="p-2  hover:bg-red-200 text-red-700  transition-colors">
                                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
