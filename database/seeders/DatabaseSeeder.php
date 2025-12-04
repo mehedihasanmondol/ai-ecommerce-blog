@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ImageUploadSettingSeeder::class,
             SecondaryMenuSeeder::class,
             BlogTickMarkSeeder::class,
+            ModuleSettingSeeder::class,
         ]);
 
         // Phase 2: User Management & Permissions (Depends on settings)

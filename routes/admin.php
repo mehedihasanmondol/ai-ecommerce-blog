@@ -152,8 +152,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
     });
     
-    // Footer Management Routes - Only Super Admin
-    Route::middleware(['permission:users.view'])->group(function () {
+    // Footer Management Routes - Requires footer.manage permission
+    Route::middleware(['permission:footer.manage'])->group(function () {
         Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
         Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
         Route::post('footer-management/toggle-section', [FooterManagementController::class, 'toggleSection'])->name('footer-management.toggle-section');
@@ -237,8 +237,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
     });
     
-    // Site Settings Routes - Only Super Admin
-    Route::middleware(['permission:users.view'])->group(function () {
+    // Site Settings Routes - Requires settings.view permission
+    Route::middleware(['permission:settings.view'])->group(function () {
         Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
         Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
         Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
@@ -248,6 +248,12 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     // System Settings Routes - Requires system settings permission
     Route::middleware(['permission:system.settings.view'])->group(function () {
         Route::get('system-settings', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'index'])->name('system-settings.index');
+    });
+    
+    // Module Settings Routes - Requires system settings permission
+    Route::middleware(['permission:system.settings.view'])->group(function () {
+        Route::get('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'index'])->name('module-settings.index');
+        Route::put('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'update'])->name('module-settings.update');
     });
     
     // Stock Management Routes - Requires stock permissions
@@ -278,8 +284,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
     });
 
-    // Reports Routes - Accessible to all admin users
-    Route::prefix('reports')->name('reports.')->group(function () {
+    // Reports Routes - Requires reports.view permission
+    Route::middleware(['permission:reports.view'])->prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('index');
         Route::get('/sales', [\App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('sales');
         Route::get('/products', [\App\Http\Controllers\Admin\ReportController::class, 'products'])->name('products');

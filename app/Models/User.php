@@ -8,6 +8,7 @@ use App\Modules\User\Models\Role;
 use App\Modules\User\Models\UserActivity;
 use App\Modules\Ecommerce\Delivery\Models\DeliveryZone;
 use App\Modules\Ecommerce\Delivery\Models\DeliveryMethod;
+use App\Traits\ModuleAccess;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -36,7 +37,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, ModuleAccess;
 
     /**
      * The attributes that are mass assignable.

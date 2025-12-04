@@ -139,21 +139,29 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         return view('admin.users.show', compact('user'));
     })->name('profile');
 
-    // Product Management Routes
-    Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
-    Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
-    Route::get('/products/{product}/images', function(\App\Modules\Ecommerce\Product\Models\Product $product) {
-        return view('admin.product.images', compact('product'));
-    })->name('products.images');
+    // Product Management Routes - Requires products.view permission
+    Route::middleware(['permission:products.view'])->group(function () {
+        Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
+        Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
+        Route::middleware(['permission:products.images'])->group(function () {
+            Route::get('/products/{product}/images', function(\App\Modules\Ecommerce\Product\Models\Product $product) {
+                return view('admin.product.images', compact('product'));
+            })->name('products.images');
+        });
+    });
     
-    // Product Attributes Routes
-    Route::resource('attributes', \App\Modules\Ecommerce\Product\Controllers\AttributeController::class)->except(['show']);
+    // Product Attributes Routes - Requires attributes.view permission
+    Route::middleware(['permission:attributes.view'])->group(function () {
+        Route::resource('attributes', \App\Modules\Ecommerce\Product\Controllers\AttributeController::class)->except(['show']);
+    });
     
-    // Homepage Settings Routes
-    Route::get('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
-    Route::put('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
-    Route::put('/homepage-settings/group/{group}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateGroup'])->name('homepage-settings.update-group');
+    // Homepage Settings Routes - Requires homepage-settings.view permission
+    Route::middleware(['permission:homepage-settings.view'])->group(function () {
+        Route::get('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
+        Route::put('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
+        Route::put('/homepage-settings/group/{group}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateGroup'])->name('homepage-settings.update-group');
+    });
     
     // Theme Settings Routes
     Route::get('/theme-settings', [\App\Http\Controllers\Admin\ThemeController::class, 'index'])->name('theme-settings.index');
@@ -170,30 +178,36 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::delete('/homepage-settings/slider/{slider}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'destroySlider'])->name('homepage-settings.slider.destroy');
     Route::post('/homepage-settings/slider/reorder', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'reorderSliders'])->name('homepage-settings.slider.reorder');
     
-    // Secondary Menu Routes
-    Route::get('/secondary-menu', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'index'])->name('secondary-menu.index');
-    Route::post('/secondary-menu', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'store'])->name('secondary-menu.store');
-    Route::put('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'update'])->name('secondary-menu.update');
-    Route::delete('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'destroy'])->name('secondary-menu.destroy');
-    Route::post('/secondary-menu/reorder', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'reorder'])->name('secondary-menu.reorder');
+    // Secondary Menu Routes - Requires secondary-menu.manage permission
+    Route::middleware(['permission:secondary-menu.manage'])->group(function () {
+        Route::get('/secondary-menu', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'index'])->name('secondary-menu.index');
+        Route::post('/secondary-menu', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'store'])->name('secondary-menu.store');
+        Route::put('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'update'])->name('secondary-menu.update');
+        Route::delete('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'destroy'])->name('secondary-menu.destroy');
+        Route::post('/secondary-menu/reorder', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'reorder'])->name('secondary-menu.reorder');
+    });
     
-    // Sale Offers Routes
-    Route::get('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'index'])->name('sale-offers.index');
-    Route::post('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'store'])->name('sale-offers.store');
-    Route::delete('/sale-offers/{saleOffer}', [\App\Http\Controllers\Admin\SaleOfferController::class, 'destroy'])->name('sale-offers.destroy');
-    Route::post('/sale-offers/reorder', [\App\Http\Controllers\Admin\SaleOfferController::class, 'reorder'])->name('sale-offers.reorder');
-    Route::patch('/sale-offers/{saleOffer}/toggle', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleStatus'])->name('sale-offers.toggle');
-    Route::post('/sale-offers/toggle-section', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleSection'])->name('sale-offers.toggle-section');
-    Route::post('/sale-offers/update-title', [\App\Http\Controllers\Admin\SaleOfferController::class, 'updateSectionTitle'])->name('sale-offers.update-title');
+    // Sale Offers Routes - Requires sale-offers.view permission
+    Route::middleware(['permission:sale-offers.view'])->group(function () {
+        Route::get('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'index'])->name('sale-offers.index');
+        Route::post('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'store'])->name('sale-offers.store');
+        Route::delete('/sale-offers/{saleOffer}', [\App\Http\Controllers\Admin\SaleOfferController::class, 'destroy'])->name('sale-offers.destroy');
+        Route::post('/sale-offers/reorder', [\App\Http\Controllers\Admin\SaleOfferController::class, 'reorder'])->name('sale-offers.reorder');
+        Route::patch('/sale-offers/{saleOffer}/toggle', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleStatus'])->name('sale-offers.toggle');
+        Route::post('/sale-offers/toggle-section', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleSection'])->name('sale-offers.toggle-section');
+        Route::post('/sale-offers/update-title', [\App\Http\Controllers\Admin\SaleOfferController::class, 'updateSectionTitle'])->name('sale-offers.update-title');
+    });
     
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     
-    // Payment Gateway Management Routes
-    Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
-    Route::get('/payment-gateways/{gateway}/edit', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'edit'])->name('payment-gateways.edit');
-    Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
-    Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
+    // Payment Gateway Management Routes - Requires payment-gateways.view permission
+    Route::middleware(['permission:payment-gateways.view'])->group(function () {
+        Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+        Route::get('/payment-gateways/{gateway}/edit', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'edit'])->name('payment-gateways.edit');
+        Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+        Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
+    });
     
     // Stock Report Routes
     Route::prefix('stock')->name('stock.')->group(function () {

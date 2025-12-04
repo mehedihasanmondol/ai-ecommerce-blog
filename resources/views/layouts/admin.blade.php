@@ -169,7 +169,7 @@
                 </a>
 
                 <!-- User Management Section -->
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">User Management</p>
                 </div>
@@ -203,7 +203,7 @@
                 @endif
 
                 <!-- E-commerce Section (Placeholder) -->
-                @if(auth()->user()->hasPermission('products.view'))
+                @if(auth()->user()->hasModulePermission('products.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
@@ -315,7 +315,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('orders.view'))
+                @if(auth()->user()->hasModulePermission('orders.view'))
                 <a href="{{ route('admin.coupons.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.coupons.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-ticket-alt w-5 mr-3"></i>
@@ -359,7 +359,7 @@
                 @endif
 
                 <!-- Payments Section -->
-                @if(auth()->user()->hasPermission('orders.view'))
+                @if(auth()->user()->hasModulePermission('orders.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments</p>
                 </div>
@@ -375,7 +375,7 @@
                 @endif
 
                 <!-- Inventory Section -->
-                @if(auth()->user()->hasPermission('stock.view'))
+                @if(auth()->user()->hasModulePermission('stock.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                 </div>
@@ -424,7 +424,7 @@
                 @endif
 
                 <!-- Content Section (Placeholder) -->
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                 </div>
@@ -494,7 +494,7 @@
                 @endif
 
                 <!-- Blog Section -->
-                @if(auth()->user()->hasPermission('posts.view'))
+                @if(auth()->user()->hasModulePermission('posts.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
                 </div>
@@ -537,7 +537,7 @@
                 @endif
 
                 <!-- Feedback Section -->
-                @if(auth()->user()->hasPermission('feedback.view'))
+                @if(auth()->user()->hasModulePermission('feedback.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Feedback</p>
                 </div>
@@ -563,12 +563,12 @@
                 @endif
 
                 <!-- Appointments Section -->
-                @if(auth()->user()->hasPermission('appointments.view') || auth()->user()->hasPermission('chambers.manage'))
+                @if(auth()->user()->hasModulePermission('appointments.view') || auth()->user()->hasModulePermission('chambers.manage'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Appointments</p>
                 </div>
 
-                @if(auth()->user()->hasPermission('appointments.view'))
+                @if(auth()->user()->hasModulePermission('appointments.view'))
                 <a href="{{ route('admin.appointments.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.appointments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-calendar-check w-5 mr-3"></i>
@@ -586,7 +586,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('chambers.manage'))
+                @if(auth()->user()->hasModulePermission('chambers.manage'))
                 <a href="{{ route('admin.chambers.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.chambers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-building w-5 mr-3"></i>
@@ -596,7 +596,7 @@
                 @endif
 
                 <!-- Finance Section (Placeholder) -->
-                @if(auth()->user()->hasPermission('finance.view'))
+                @if(auth()->user()->hasModulePermission('finance.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Finance</p>
                 </div>
@@ -615,7 +615,7 @@
                 @endif
 
                 <!-- Communication Section -->
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Communication</p>
                 </div>
@@ -641,12 +641,12 @@
                 @endif
 
                 <!-- Settings Section -->
-                @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('system.settings.view'))
+                @if(auth()->user()->hasModulePermission('users.view') || auth()->user()->hasModulePermission('system.settings.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
                 </div>
                 
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <a href="{{ route('admin.site-settings.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.site-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-cog w-5 mr-3"></i>
@@ -666,12 +666,21 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('system.settings.view'))
+                @if(auth()->user()->hasModulePermission('system.settings.view'))
                 <a href="{{ route('admin.system-settings.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.system-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-server w-5 mr-3"></i>
                     <span>System Settings</span>
                     @if(request()->routeIs('admin.system-settings.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.module-settings.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.module-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-shield-alt w-5 mr-3"></i>
+                    <span>Permission Settings</span>
+                    @if(request()->routeIs('admin.module-settings.*'))
                         <i class="fas fa-chevron-right ml-auto text-xs"></i>
                     @endif
                 </a>
@@ -698,7 +707,7 @@
                     <span>Dashboard</span>
                 </a>
 
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">User Management</p>
                 </div>
@@ -722,7 +731,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('products.view'))
+                @if(auth()->user()->hasModulePermission('products.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">E-commerce</p>
                 </div>
@@ -813,7 +822,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('orders.view'))
+                @if(auth()->user()->hasModulePermission('orders.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipping & Delivery</p>
                 </div>
@@ -837,7 +846,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('stock.view'))
+                @if(auth()->user()->hasModulePermission('stock.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                 </div>
@@ -867,7 +876,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasModulePermission('users.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                 </div>
@@ -885,7 +894,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('posts.view'))
+                @if(auth()->user()->hasModulePermission('posts.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Blog</p>
                 </div>
@@ -915,7 +924,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('feedback.view'))
+                @if(auth()->user()->hasModulePermission('feedback.view'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Feedback</p>
                 </div>
@@ -937,12 +946,12 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('appointments.view') || auth()->user()->hasPermission('chambers.manage'))
+                @if(auth()->user()->hasModulePermission('appointments.view') || auth()->user()->hasModulePermission('chambers.manage'))
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Appointments</p>
                 </div>
 
-                @if(auth()->user()->hasPermission('appointments.view'))
+                @if(auth()->user()->hasModulePermission('appointments.view'))
                 <a href="{{ route('admin.appointments.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.appointments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-calendar-check w-5 mr-3"></i>
@@ -960,7 +969,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->hasPermission('chambers.manage'))
+                @if(auth()->user()->hasModulePermission('chambers.manage'))
                 <a href="{{ route('admin.chambers.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.chambers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-building w-5 mr-3"></i>

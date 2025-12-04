@@ -3,19 +3,61 @@
 @section('title', 'Edit Role')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <!-- Page Header -->
-    <div class="mb-6">
-        <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <a href="{{ route('admin.roles.index') }}" class="hover:text-blue-600">Roles</a>
-            <span>/</span>
-            <span class="text-gray-900">Edit Role</span>
+<div class="container-fluid px-4 py-6">
+    <!-- Sticky Top Bar -->
+    <div class="bg-white border-b border-gray-200 -mx-4 -mt-6 px-4 py-3 mb-6 sticky top-16 z-10 shadow-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.roles.index') }}" 
+                   class="text-gray-600 hover:text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Roles
+                </a>
+                <span class="text-gray-300">|</span>
+                <h1 class="text-xl font-semibold text-gray-900">Edit Role: {{ $role->name }}</h1>
+                <!-- Permission Counter -->
+                <div class="hidden md:flex items-center gap-2 text-sm">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg">
+                        <i class="fas fa-shield-alt"></i>
+                        <span class="font-medium" x-text="selectedCount">0</span>
+                        <span class="text-blue-600">/</span>
+                        <span class="font-medium" x-text="totalCount">{{ $permissions->count() }}</span>
+                    </div>
+                    @if($role->users->count() > 0)
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-lg">
+                        <i class="fas fa-users"></i>
+                        <span class="font-medium">{{ $role->users->count() }}</span>
+                        <span class="text-yellow-600">users</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.roles.index') }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit" form="role-form"
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-save mr-2"></i>Update Role
+                </button>
+            </div>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">Edit Role: {{ $role->name }}</h1>
     </div>
 
-    <div class="max-w-4xl">
-        <form action="{{ route('admin.roles.update', $role->id) }}" method="POST" class="bg-white rounded-lg shadow">
+    <div class="max-w-7xl mx-auto">
+        <form action="{{ route('admin.roles.update', $role->id) }}" method="POST" id="role-form" class="bg-white rounded-lg shadow" x-data="{
+            selectedCount: 0,
+            totalCount: {{ $permissions->count() }},
+            init() {
+                this.updateCount();
+            },
+            updateCount() {
+                this.selectedCount = this.$el.querySelectorAll('input[name=\"permissions[]\"]:checked').length;
+            }
+        }" @change="updateCount()">
             @csrf
             @method('PUT')
 
@@ -131,17 +173,6 @@
                 @endif
             </div>
 
-            <!-- Form Actions -->
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                <a href="{{ route('admin.roles.index') }}" 
-                   class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition duration-150">
-                    Cancel
-                </a>
-                <button type="submit" 
-                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-150">
-                    <i class="fas fa-save mr-2"></i>Update Role
-                </button>
-            </div>
         </form>
     </div>
 </div>

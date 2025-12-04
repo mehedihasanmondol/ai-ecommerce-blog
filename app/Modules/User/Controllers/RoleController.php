@@ -51,10 +51,11 @@ class RoleController extends Controller
 
     /**
      * Show the form for creating a new role
+     * Only shows permissions for modules that are enabled in system settings
      */
     public function create()
     {
-        $permissions = $this->permissionRepository->getActive();
+        $permissions = $this->permissionRepository->getActiveByEnabledModules();
         return view('admin.roles.create', compact('permissions'));
     }
 
@@ -95,6 +96,7 @@ class RoleController extends Controller
 
     /**
      * Show the form for editing the specified role
+     * Only shows permissions for modules that are enabled in system settings
      */
     public function edit(int $id)
     {
@@ -106,7 +108,7 @@ class RoleController extends Controller
                 ->with('error', 'Role not found');
         }
 
-        $permissions = $this->permissionRepository->getActive();
+        $permissions = $this->permissionRepository->getActiveByEnabledModules();
         return view('admin.roles.edit', compact('role', 'permissions'));
     }
 
