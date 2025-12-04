@@ -84,7 +84,10 @@ class CouponEdit extends Component
         $this->excluded_products = $coupon->excluded_products ?? [];
 
         $this->categories = Category::select('id', 'name')->get();
-        $this->products = Product::select('id', 'name')->get();
+        $this->products = Product::select('id', 'name')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
     }
 
     public function update(CouponService $couponService)

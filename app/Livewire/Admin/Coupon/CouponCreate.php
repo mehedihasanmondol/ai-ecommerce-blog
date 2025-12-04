@@ -60,7 +60,10 @@ class CouponCreate extends Component
     public function mount()
     {
         $this->categories = Category::select('id', 'name')->get();
-        $this->products = Product::select('id', 'name')->get();
+        $this->products = Product::select('id', 'name')
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get();
     }
 
     public function generateCode(CouponService $couponService)

@@ -3,38 +3,39 @@
 @section('title', 'Edit User')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <!-- Page Header with Animation -->
-    <div class="mb-8 animate-fade-in">
-        <div class="flex items-center justify-between">
-            <div>
-                <div class="flex items-center gap-2 text-sm text-gray-600 mb-3">
-                    <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 transition-colors flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        Users
-                    </a>
-                    <span>/</span>
-                    <span class="text-gray-900 font-medium">Edit User</span>
-                </div>
-                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+<div class="container-fluid px-4 py-6">
+    <!-- Sticky Top Bar -->
+    <div class="bg-white border-b border-gray-200 -mx-4 -mt-6 px-4 py-3 mb-6 sticky top-16 z-10 shadow-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.users.index') }}" 
+                   class="text-gray-600 hover:text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Edit User: {{ $user->name }}
-                </h1>
-            </div>
-            <div class="flex items-center gap-2">
+                    Users
+                </a>
+                <span class="text-gray-300">|</span>
+                <h1 class="text-xl font-semibold text-gray-900">Edit: {{ $user->name }}</h1>
                 <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                 </span>
             </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.users.index') }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit" form="user-form"
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-save mr-2"></i>Update User
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="max-w-5xl">
-        <form action="{{ route('admin.users.update', $user->id) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div class="max-w-7xl mx-auto">
+        <form action="{{ route('admin.users.update', $user->id) }}" method="POST" id="user-form" enctype="multipart/form-data" class="bg-white rounded-lg shadow">
             @csrf
             @method('PUT')
 

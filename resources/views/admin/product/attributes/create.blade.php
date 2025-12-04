@@ -3,16 +3,36 @@
 @section('title', 'Create Attribute')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-6">
-        <a href="{{ route('admin.attributes.index') }}" class="text-blue-600 hover:text-blue-800 text-sm">
-            <i class="fas fa-arrow-left mr-1"></i> Back to Attributes
-        </a>
-        <h1 class="text-2xl font-bold text-gray-900 mt-2">Create New Attribute</h1>
-        <p class="text-sm text-gray-600 mt-1">Add a new attribute for product variations</p>
+<div class="container-fluid px-4 py-6">
+    <!-- Sticky Top Bar -->
+    <div class="bg-white border-b border-gray-200 -mx-4 -mt-6 px-4 py-3 mb-6 sticky top-16 z-10 shadow-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.attributes.index') }}" 
+                   class="text-gray-600 hover:text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Attributes
+                </a>
+                <span class="text-gray-300">|</span>
+                <h1 class="text-xl font-semibold text-gray-900">Create Attribute</h1>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.attributes.index') }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit" form="attribute-form"
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-save mr-2"></i>Create Attribute
+                </button>
+            </div>
+        </div>
     </div>
 
-    <form action="{{ route('admin.attributes.store') }}" method="POST" x-data="attributeForm()">
+    <div class="max-w-7xl mx-auto">
+        <form action="{{ route('admin.attributes.store') }}" method="POST" id="attribute-form" x-data="attributeForm()">
         @csrf
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">

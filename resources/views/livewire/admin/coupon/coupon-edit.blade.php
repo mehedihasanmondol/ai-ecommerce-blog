@@ -1,15 +1,36 @@
-<div class="p-6">
-    <!-- Header -->
-    <div class="mb-6">
-        <div class="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-            <a href="{{ route('admin.coupons.index') }}" class="hover:text-blue-600">Coupons</a>
-            <span>/</span>
-            <span class="text-gray-900">Edit</span>
+<div>
+    <!-- Sticky Top Bar -->
+    <div class="bg-white border-b border-gray-200 -mx-4 -mt-6 px-4 py-3 mb-6 sticky top-16 z-10 shadow-sm">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <a href="{{ route('admin.coupons.index') }}" 
+                   class="text-gray-600 hover:text-gray-900 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Coupons
+                </a>
+                <span class="text-gray-300">|</span>
+                <h1 class="text-xl font-semibold text-gray-900">Edit: {{ $coupon->code }}</h1>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $coupon->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                    {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.coupons.index') }}" 
+                   class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </a>
+                <button type="submit" form="coupon-form"
+                        class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-save mr-2"></i>Update Coupon
+                </button>
+            </div>
         </div>
-        <h1 class="text-2xl font-bold text-gray-900">Edit Coupon: {{ $coupon->code }}</h1>
     </div>
 
-    <form wire:submit="update">
+    <div class="max-w-7xl mx-auto px-4">
+        <form wire:submit="update" id="coupon-form">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Main Form -->
             <div class="lg:col-span-2 space-y-6">
@@ -329,20 +350,8 @@
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <div class="space-y-3">
-                        <button type="submit" 
-                                class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                            Update Coupon
-                        </button>
-                        <a href="{{ route('admin.coupons.index') }}" 
-                           class="block w-full px-4 py-2 bg-gray-100 text-gray-700 text-center rounded-lg hover:bg-gray-200 transition">
-                            Cancel
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </form>
+    </div>
 </div>
