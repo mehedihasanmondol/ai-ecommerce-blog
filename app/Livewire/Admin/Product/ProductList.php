@@ -90,6 +90,12 @@ class ProductList extends Component
 
     public function toggleFeatured($productId, ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.edit')) {
+            session()->flash('error', 'You do not have permission to edit products.');
+            return;
+        }
+        
         $product = Product::find($productId);
         if ($product) {
             $service->toggleFeatured($product);
@@ -99,6 +105,12 @@ class ProductList extends Component
 
     public function toggleActive($productId, ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.edit')) {
+            session()->flash('error', 'You do not have permission to edit products.');
+            return;
+        }
+        
         $product = Product::find($productId);
         if ($product) {
             $service->toggleActive($product);
@@ -108,12 +120,26 @@ class ProductList extends Component
 
     public function confirmDelete($productId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.delete')) {
+            session()->flash('error', 'You do not have permission to delete products.');
+            return;
+        }
+        
         $this->productToDelete = $productId;
         $this->showDeleteModal = true;
     }
 
     public function deleteProduct(ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.delete')) {
+            session()->flash('error', 'You do not have permission to delete products.');
+            $this->showDeleteModal = false;
+            $this->productToDelete = null;
+            return;
+        }
+        
         if ($this->productToDelete) {
             $product = Product::find($this->productToDelete);
             if ($product) {
@@ -144,6 +170,12 @@ class ProductList extends Component
 
     public function confirmBulkDelete()
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.delete')) {
+            session()->flash('error', 'You do not have permission to delete products.');
+            return;
+        }
+        
         if (count($this->selectedProducts) > 0) {
             $this->showBulkDeleteModal = true;
         }
@@ -151,6 +183,13 @@ class ProductList extends Component
 
     public function bulkDelete(ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.delete')) {
+            session()->flash('error', 'You do not have permission to delete products.');
+            $this->showBulkDeleteModal = false;
+            return;
+        }
+        
         if (count($this->selectedProducts) > 0) {
             foreach ($this->selectedProducts as $productId) {
                 $product = Product::find($productId);

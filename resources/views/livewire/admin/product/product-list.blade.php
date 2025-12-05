@@ -6,6 +6,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Products</h1>
             <p class="text-sm text-gray-600 mt-1">Manage your product catalog</p>
         </div>
+        @if(auth()->user()->hasPermission('products.create'))
         <a href="{{ route('admin.products.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,6 +14,7 @@
             </svg>
             Add Product
         </a>
+        @endif
     </div>
 
     {{-- Filters Bar --}}
@@ -137,7 +139,7 @@
                         </th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider relative">
                             <span class="{{ count($selectedProducts) > 0 ? 'invisible' : '' }}">Actions</span>
-                            @if(count($selectedProducts) > 0)
+                            @if(count($selectedProducts) > 0 && auth()->user()->hasPermission('products.delete'))
                             <div class="absolute inset-0 flex items-center justify-end px-6">
                                 <button wire:click="confirmBulkDelete" 
                                         class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm">
@@ -219,12 +221,18 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-center gap-2">
+                                    @if(auth()->user()->hasPermission('products.edit'))
                                     <button wire:click="toggleActive({{ $product->id }})" 
                                             class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors
                                             {{ $product->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
                                         <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform
                                             {{ $product->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
                                     </button>
+                                    @else
+                                    <span class="text-sm {{ $product->is_active ? 'text-green-600' : 'text-gray-400' }}">
+                                        {{ $product->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
+                                    @endif
                                     @if($product->is_featured)
                                     <span class="text-yellow-500" title="Featured">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -241,6 +249,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
+                                @if(auth()->user()->hasPermission('products.edit'))
                                 <a href="{{ route('admin.products.edit', $product) }}" 
                                    class="text-blue-600 hover:text-blue-900" title="Edit Product">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,12 +262,15 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                                     </svg>
                                 </button>
+                                @endif
+                                @if(auth()->user()->hasPermission('products.delete'))
                                 <button wire:click="confirmDelete({{ $product->id }})" 
                                         class="text-red-600 hover:text-red-900" title="Delete Product">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
+                                @endif
                             </div>
                         </td>
                     </tr>
