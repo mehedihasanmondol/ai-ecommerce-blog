@@ -49,6 +49,8 @@ class OrderController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('orders.create'), 403, 'You do not have permission to create orders.');
+        
         return view('admin.orders.create');
     }
 
@@ -57,6 +59,8 @@ class OrderController extends Controller
      */
     public function store(CreateOrderRequest $request)
     {
+        abort_if(!auth()->user()->hasPermission('orders.create'), 403, 'You do not have permission to create orders.');
+        
         try {
             $validated = $request->validated();
             
@@ -197,6 +201,8 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Order $order)
     {
+        abort_if(!auth()->user()->hasPermission('orders.edit'), 403, 'You do not have permission to edit orders.');
+        
         try {
             $this->orderService->updateOrder($order, $request->validated());
 
@@ -216,6 +222,8 @@ class OrderController extends Controller
      */
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order)
     {
+        abort_if(!auth()->user()->hasPermission('orders.edit'), 403, 'You do not have permission to update order status.');
+        
         try {
             $validated = $request->validated();
 
@@ -250,6 +258,8 @@ class OrderController extends Controller
      */
     public function cancel(Request $request, Order $order)
     {
+        abort_if(!auth()->user()->hasPermission('orders.cancel'), 403, 'You do not have permission to cancel orders.');
+        
         try {
             $reason = $request->input('reason', 'Cancelled by admin');
             $this->orderService->cancelOrder($order, $reason);
@@ -269,6 +279,8 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
+        abort_if(!auth()->user()->hasPermission('orders.delete'), 403, 'You do not have permission to delete orders.');
+        
         try {
             $this->orderRepository->delete($order);
 

@@ -71,23 +71,46 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
             ->name('brands.duplicate');
     });
     
-    // Order Management Routes - Requires order permissions
+    // Order Management Routes 
+    // NOTE: Specific routes (orders/create) must come BEFORE parameterized routes (orders/{order})
+    
+    // View orders list
     Route::middleware(['permission:orders.view'])->group(function () {
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    });
+
+    // Create order (must come before orders/{order})
+    Route::middleware(['permission:orders.create'])->group(function () {
         Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
         Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
-        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    });
+
+    // Edit order (must come before orders/{order})
+    Route::middleware(['permission:orders.edit'])->group(function () {
         Route::get('orders/{order}/edit', function (\App\Modules\Ecommerce\Order\Models\Order $order) {
             return view('admin.orders.edit-livewire', compact('order'));
         })->name('orders.edit');
         Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
-        Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
             ->name('orders.update-status');
-        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
-            ->name('orders.cancel');
+    });
+
+    // View single order & invoice (parameterized routes come after specific routes)
+    Route::middleware(['permission:orders.view'])->group(function () {
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::get('orders/{order}/invoice', [OrderController::class, 'invoice'])
             ->name('orders.invoice');
+    });
+
+    // Cancel order
+    Route::middleware(['permission:orders.cancel'])->group(function () {
+        Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])
+            ->name('orders.cancel');
+    });
+
+    // Delete order
+    Route::middleware(['permission:orders.delete'])->group(function () {
+        Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     });
     
     // Customer Management Routes

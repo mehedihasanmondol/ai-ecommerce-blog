@@ -138,8 +138,24 @@
                                 ৳{{ number_format($order->total_amount, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.orders.show', $order) }}" 
-                                   class="text-blue-600 hover:text-blue-900">View</a>
+                                <div class="flex items-center justify-end gap-3">
+                                    <a href="{{ route('admin.orders.show', $order) }}" 
+                                       class="text-blue-600 hover:text-blue-900">View</a>
+                                    @if(auth()->user()->hasPermission('orders.edit'))
+                                    <a href="{{ route('admin.orders.edit', $order) }}" 
+                                       class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                    @endif
+                                    @if(auth()->user()->hasPermission('orders.delete'))
+                                    <form action="{{ route('admin.orders.destroy', $order) }}" 
+                                          method="POST" 
+                                          class="inline"
+                                          onsubmit="return confirm('Are you sure you want to delete this order? This action cannot be undone.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                    </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

@@ -24,6 +24,7 @@
                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
                 Print Invoice
             </a>
+            @if(auth()->user()->hasPermission('orders.edit'))
             <a href="{{ route('admin.orders.edit', $order) }}"
                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,6 +32,7 @@
                 </svg>
                 Edit Order
             </a>
+            @endif
         </div>
     </div>
 
@@ -614,6 +616,7 @@
             @endif
 
             <!-- Actions -->
+            @if(auth()->user()->hasPermission('orders.cancel'))
             @if($order->canBeCancelled())
                 <form id="cancel-order-form" action="{{ route('admin.orders.cancel', $order) }}" method="POST">
                     @csrf
@@ -629,6 +632,7 @@
                         Cancel Order
                     </button>
                 </form>
+            @endif
             @endif
         </div>
     </div>
