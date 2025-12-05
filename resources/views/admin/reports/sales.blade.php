@@ -8,26 +8,6 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Sales Report</h1>
-            <p class="text-gray-600 mt-1">Detailed sales and revenue analysis</p>
-        </div>
-        <div class="flex items-center space-x-3">
-            <a href="{{ route('admin.reports.index') }}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                ← Back to Dashboard
-            </a>
-            <a href="{{ route('admin.reports.export-sales-pdf', ['start_date' => $startDate, 'end_date' => $endDate, 'group_by' => $groupBy]) }}" 
-               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                Export PDF
-            </a>
-        </div>
-    </div>
-
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <form method="GET" action="{{ route('admin.reports.sales') }}" class="flex items-end space-x-4">
-            <div class="flex-1">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                 <input type="date" name="start_date" value="{{ $startDate }}" 
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">

@@ -29,6 +29,9 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -54,6 +57,9 @@ class ReportController extends Controller
      */
     public function sales(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
         $groupBy = $request->get('group_by', 'day');
@@ -68,6 +74,9 @@ class ReportController extends Controller
      */
     public function products(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -89,6 +98,9 @@ class ReportController extends Controller
      */
     public function inventory(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $inventory = $this->reportService->getInventoryReport();
         $lowStock = $this->reportService->getLowStockProducts(10);
         $outOfStock = $this->reportService->getOutOfStockProducts();
@@ -101,6 +113,9 @@ class ReportController extends Controller
      */
     public function customers(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfYear()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -114,6 +129,9 @@ class ReportController extends Controller
      */
     public function delivery(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.view'), 403, 'You do not have permission to view reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -127,6 +145,9 @@ class ReportController extends Controller
      */
     public function exportSalesPdf(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.export'), 403, 'You do not have permission to export reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
         $groupBy = $request->get('group_by', 'day');
@@ -143,6 +164,9 @@ class ReportController extends Controller
      */
     public function exportInventoryPdf()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.export'), 403, 'You do not have permission to export reports.');
+        
         $inventory = $this->reportService->getInventoryReport();
         $lowStock = $this->reportService->getLowStockProducts(10);
         $outOfStock = $this->reportService->getOutOfStockProducts();
@@ -157,6 +181,9 @@ class ReportController extends Controller
      */
     public function exportProductsPdf(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.export'), 403, 'You do not have permission to export reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -173,6 +200,9 @@ class ReportController extends Controller
      */
     public function exportCustomersPdf(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.export'), 403, 'You do not have permission to export reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
@@ -188,6 +218,9 @@ class ReportController extends Controller
      */
     public function exportDeliveryPdf(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('reports.export'), 403, 'You do not have permission to export reports.');
+        
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $endDate = $request->get('end_date', Carbon::now()->format('Y-m-d'));
 
