@@ -191,12 +191,19 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @if(auth()->user()->hasPermission('users.toggle-status'))
                             <button wire:click="toggleActive({{ $user->id }})" 
                                     class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors
                                     {{ $user->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
                                 <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform
                                     {{ $user->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
                             </button>
+                            @else
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ $user->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}
@@ -213,18 +220,22 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </a>
+                                @if(auth()->user()->hasPermission('users.edit'))
                                 <a href="{{ route('admin.users.edit', $user) }}" 
                                    class="text-green-600 hover:text-green-900" title="Edit User">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </a>
+                                @endif
+                                @if(auth()->user()->hasPermission('users.delete'))
                                 <button wire:click="confirmDelete({{ $user->id }})" 
                                         class="text-red-600 hover:text-red-900" title="Delete User">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

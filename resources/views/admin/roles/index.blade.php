@@ -6,10 +6,12 @@
 <div class="container mx-auto px-4 py-6">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-900">Role Management</h1>
+        @if(auth()->user()->hasPermission('roles.create'))
         <a href="{{ route('admin.roles.create') }}" 
            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
             <i class="fas fa-plus mr-2"></i>Add New Role
         </a>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -41,10 +43,14 @@
             </div>
 
             <div class="flex gap-2">
+                @if(auth()->user()->hasPermission('roles.edit'))
                 <a href="{{ route('admin.roles.edit', $role->id) }}" 
                    class="flex-1 text-center px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100">
                     <i class="fas fa-edit mr-1"></i>Edit
                 </a>
+                @endif
+                
+                @if(auth()->user()->hasPermission('roles.delete'))
                 <form id="delete-role-{{ $role->id }}" action="{{ route('admin.roles.destroy', $role->id) }}" 
                       method="POST" 
                       class="flex-1">
@@ -62,6 +68,7 @@
                         <i class="fas fa-trash mr-1"></i>Delete
                     </button>
                 </form>
+                @endif
             </div>
         </div>
         @endforeach

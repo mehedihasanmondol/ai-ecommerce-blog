@@ -63,6 +63,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('users.create'), 403, 'You do not have permission to create users.');
+        
         $roles = $this->roleService->getActiveRoles();
         return view('admin.users.create', compact('roles'));
     }
@@ -72,6 +74,8 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        abort_if(!auth()->user()->hasPermission('users.create'), 403, 'You do not have permission to create users.');
+        
         $result = $this->userService->createUser($request->validated());
 
         if ($result['success']) {
@@ -107,6 +111,8 @@ class UserController extends Controller
      */
     public function edit(int $id)
     {
+        abort_if(!auth()->user()->hasPermission('users.edit'), 403, 'You do not have permission to edit users.');
+        
         $user = $this->userService->getUserById($id);
         
         if (!$user) {
@@ -124,6 +130,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, int $id)
     {
+        abort_if(!auth()->user()->hasPermission('users.edit'), 403, 'You do not have permission to edit users.');
+        
         $result = $this->userService->updateUser($id, $request->validated());
 
         if ($result['success']) {
@@ -143,6 +151,8 @@ class UserController extends Controller
      */
     public function destroy(int $id)
     {
+        abort_if(!auth()->user()->hasPermission('users.delete'), 403, 'You do not have permission to delete users.');
+        
         $result = $this->userService->deleteUser($id);
 
         if ($result['success']) {
@@ -161,6 +171,8 @@ class UserController extends Controller
      */
     public function toggleStatus(int $id)
     {
+        abort_if(!auth()->user()->hasPermission('users.toggle-status'), 403, 'You do not have permission to toggle user status.');
+        
         $result = $this->userService->toggleUserStatus($id);
 
         return response()->json($result);

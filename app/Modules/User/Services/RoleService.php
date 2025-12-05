@@ -68,9 +68,13 @@ class RoleService
 
             $role = $this->roleRepository->create($data);
 
-            // Assign permissions if provided
+            // Assign permissions if provided (only if user has permission)
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                $this->roleRepository->assignPermissions($role->id, $data['permissions']);
+                // Check if current user has permission to assign permissions
+                if (auth()->user()->hasPermission('roles.assign-permissions')) {
+                    $this->roleRepository->assignPermissions($role->id, $data['permissions']);
+                }
+                // If no permission, silently skip permission assignment
             }
 
             return [
@@ -107,9 +111,13 @@ class RoleService
 
             $this->roleRepository->update($id, $data);
 
-            // Update permissions if provided
+            // Update permissions if provided (only if user has permission)
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                $this->roleRepository->assignPermissions($id, $data['permissions']);
+                // Check if current user has permission to assign permissions
+                if (auth()->user()->hasPermission('roles.assign-permissions')) {
+                    $this->roleRepository->assignPermissions($id, $data['permissions']);
+                }
+                // If no permission, silently skip permission assignment
             }
 
             return [

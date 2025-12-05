@@ -107,7 +107,7 @@
                 </div>
 
                 <!-- Permissions -->
-                @if($permissions->count() > 0)
+                @if($permissions->count() > 0 && auth()->user()->hasPermission('roles.assign-permissions'))
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Assign Permissions</h3>
                     

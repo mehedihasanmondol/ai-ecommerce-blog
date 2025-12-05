@@ -83,9 +83,13 @@ class UserService
                 $this->autoAssignRolePermissions($user->id, $data['role']);
             }
 
-            // Assign roles if provided
+            // Assign roles if provided (only if user has permission)
             if (isset($data['roles']) && is_array($data['roles'])) {
-                $this->userRepository->syncRoles($user->id, $data['roles']);
+                // Check if current user has permission to assign roles
+                if (auth()->user()->canAccess('roles.view', 'users.edit')) {
+                    $this->userRepository->syncRoles($user->id, $data['roles']);
+                }
+                // If no permission, silently skip role assignment
             }
 
             // Create author profile if user has author role
@@ -157,9 +161,13 @@ class UserService
                 $this->autoAssignRolePermissions($id, $data['role']);
             }
 
-            // Sync roles if provided
+            // Sync roles if provided (only if user has permission)
             if (isset($data['roles']) && is_array($data['roles'])) {
-                $this->userRepository->syncRoles($id, $data['roles']);
+                // Check if current user has permission to assign roles
+                if (auth()->user()->canAccess('roles.view', 'users.edit')) {
+                    $this->userRepository->syncRoles($id, $data['roles']);
+                }
+                // If no permission, silently skip role sync (don't assign roles)
             }
 
             // Reload user with updated roles

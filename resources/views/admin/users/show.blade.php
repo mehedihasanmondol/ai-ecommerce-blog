@@ -13,12 +13,14 @@
         </div>
         <div class="flex justify-between items-center">
             <h1 class="text-3xl font-bold text-gray-900">User Details</h1>
+            @if(auth()->user()->hasPermission('users.edit'))
             <div class="flex gap-2">
                 <a href="{{ route('admin.users.edit', $user->id) }}" 
                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-150">
                     <i class="fas fa-edit mr-2"></i>Edit User
                 </a>
             </div>
+            @endif
         </div>
     </div>
 

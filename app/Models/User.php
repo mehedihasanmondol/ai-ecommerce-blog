@@ -151,6 +151,35 @@ class User extends Authenticatable
     }
 
     /**
+     * Hybrid permission check: tries specific permission first, then falls back to inherited
+     * 
+     * @param string $specificPermission The specific permission to check (e.g., 'roles.view')
+     * @param string|array $fallbackPermissions Fallback permission(s) if specific doesn't exist (e.g., 'users.view')
+     * @return bool
+     */
+    public function canAccess(string $specificPermission, $fallbackPermissions = null): bool
+    {
+        // First, try the specific permission
+        if ($this->hasPermission($specificPermission)) {
+            return true;
+        }
+        
+        // If specific permission doesn't exist or user doesn't have it, try fallback permission(s)
+        if ($fallbackPermissions) {
+            // Handle single fallback or array of fallbacks
+            $fallbacks = is_array($fallbackPermissions) ? $fallbackPermissions : [$fallbackPermissions];
+            
+            foreach ($fallbacks as $fallback) {
+                if ($this->hasPermission($fallback)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
      * Check if user is admin
      */
     public function isAdmin(): bool

@@ -39,11 +39,41 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     // Dashboard - Accessible to all admin panel users
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // User Management Routes - Only Super Admin
+    // User Management Routes
+    // NOTE: Specific routes (users/create) must come BEFORE parameterized routes (users/{user})
+    
+    // View users list
     Route::middleware(['permission:users.view'])->group(function () {
-        Route::resource('users', UserController::class);
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+    });
+
+    // Create user (must come before users/{user})
+    Route::middleware(['permission:users.create'])->group(function () {
+        Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+    });
+
+    // Edit user (must come before users/{user})
+    Route::middleware(['permission:users.edit'])->group(function () {
+        Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::patch('users/{user}', [UserController::class, 'update']);
+    });
+
+    // View single user (parameterized route comes after specific routes)
+    Route::middleware(['permission:users.view'])->group(function () {
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    });
+
+    // Toggle status
+    Route::middleware(['permission:users.toggle-status'])->group(function () {
         Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])
             ->name('users.toggle-status');
+    });
+
+    // Delete user
+    Route::middleware(['permission:users.delete'])->group(function () {
+        Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 
     // Role Management Routes - Only Super Admin

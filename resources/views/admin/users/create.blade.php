@@ -273,7 +273,7 @@
                 </div>
 
                 <!-- Additional Roles -->
-                @if($roles->count() > 0)
+                @if($roles->count() > 0 && auth()->user()->canAccess('roles.view', 'users.edit'))
                 <div class="space-y-6">
                     <div class="flex items-center gap-3 pb-4 border-b-2 border-purple-100">
                         <div class="p-2 bg-purple-100 rounded-lg">
