@@ -86,7 +86,7 @@ class UserService
             // Assign roles if provided (only if user has permission)
             if (isset($data['roles']) && is_array($data['roles'])) {
                 // Check if current user has permission to assign roles
-                if (auth()->user()->canAccess('roles.view', 'users.edit')) {
+                if (auth()->user()->hasPermission('roles.view')) {
                     $this->userRepository->syncRoles($user->id, $data['roles']);
                 }
                 // If no permission, silently skip role assignment
@@ -164,7 +164,7 @@ class UserService
             // Sync roles if provided (only if user has permission)
             if (isset($data['roles']) && is_array($data['roles'])) {
                 // Check if current user has permission to assign roles
-                if (auth()->user()->canAccess('roles.view', 'users.edit')) {
+                if (auth()->user()->hasPermission('roles.view')) {
                     $this->userRepository->syncRoles($id, $data['roles']);
                 }
                 // If no permission, silently skip role sync (don't assign roles)

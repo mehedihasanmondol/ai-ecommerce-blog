@@ -183,7 +183,7 @@
                     @endif
                 </a>
 
-                @if(auth()->user()->canAccess('roles.view', 'users.view'))
+                @if(auth()->user()->hasPermission('roles.view'))
                 <a href="{{ route('admin.roles.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shield-alt w-5 mr-3"></i>
@@ -194,7 +194,7 @@
                 </a>
                 @endif
 
-                @if(auth()->user()->canAccess('email-preferences.view', 'users.view'))
+                @if(auth()->user()->hasPermission('email-preferences.view'))
                 <a href="{{ route('admin.email-preferences.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.email-preferences.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-envelope-open-text w-5 mr-3"></i>
@@ -726,17 +726,21 @@
                     <span>Users</span>
                 </a>
 
+                @if(auth()->user()->hasPermission('roles.view'))
                 <a href="{{ route('admin.roles.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.roles.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shield-alt w-5 mr-3"></i>
                     <span>Roles & Permissions</span>
                 </a>
+                @endif
 
+                @if(auth()->user()->canAccess('email-preferences.view', 'users.view'))
                 <a href="{{ route('admin.email-preferences.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.email-preferences.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-envelope-open-text w-5 mr-3"></i>
                     <span>Email Preferences</span>
                 </a>
+                @endif
                 @endif
 
                 @if(auth()->user()->hasPermission('products.view'))
@@ -750,13 +754,16 @@
                     <span>Products</span>
                 </a>
 
+                @if(auth()->user()->canAccess('orders.view', 'products.view'))
                 <a href="{{ route('admin.orders.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.orders.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shopping-cart w-5 mr-3"></i>
                     <span>Orders</span>
                 </a>
+                @endif
 
                 <!-- Reports Section (Mobile) -->
+                @if(auth()->user()->canAccess('reports.view', 'products.view'))
                 <div x-data="{ open: {{ request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }" class="space-y-1">
                     <button @click="open = !open" 
                             class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -798,6 +805,7 @@
                         </a>
                     </div>
                 </div>
+                @endif
 
                 <a href="{{ route('admin.categories.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -831,6 +839,13 @@
                 @endif
 
                 @if(auth()->user()->hasPermission('orders.view'))
+                <a href="{{ route('admin.coupons.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.coupons.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-ticket-alt w-5 mr-3"></i>
+                    <span>Coupons</span>
+                </a>
+
+                <!-- Shipping & Delivery Section -->
                 <div class="pt-4 pb-2">
                     <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Shipping & Delivery</p>
                 </div>
@@ -851,6 +866,17 @@
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.rates.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-dollar-sign w-5 mr-3"></i>
                     <span>Delivery Rates</span>
+                </a>
+
+                <!-- Payments Section -->
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments</p>
+                </div>
+                
+                <a href="{{ route('admin.payment-gateways.index') }}" 
+                   class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.payment-gateways.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-credit-card w-5 mr-3"></i>
+                    <span>Payment Gateways</span>
                 </a>
                 @endif
 

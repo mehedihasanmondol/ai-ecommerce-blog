@@ -216,8 +216,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/reports/export-excel', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportExcel'])->name('reports.excel');
     });
     
-    // Email Preferences Management Routes
-    Route::prefix('email-preferences')->name('email-preferences.')->group(function () {
+    // Email Preferences Management Routes - Requires email-preferences.view permission
+    Route::middleware(['permission:email-preferences.view'])->prefix('email-preferences')->name('email-preferences.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'index'])->name('index');
         Route::get('/guideline', function () { return view('admin.email-preferences.guideline'); })->name('guideline');
         Route::get('/schedule-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'scheduleSetup'])->name('schedule-setup');

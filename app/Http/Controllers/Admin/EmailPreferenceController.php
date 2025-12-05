@@ -25,7 +25,7 @@ class EmailPreferenceController extends Controller
     public function index(Request $request)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.view')) {
+        if (!auth()->user()->hasPermission('email-preferences.view')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -85,7 +85,7 @@ class EmailPreferenceController extends Controller
     public function update(Request $request, User $user)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.edit')) {
+        if (!auth()->user()->hasPermission('email-preferences.edit')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
         }
 
@@ -127,7 +127,7 @@ class EmailPreferenceController extends Controller
     public function bulkUpdate(Request $request)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.edit')) {
+        if (!auth()->user()->hasPermission('email-preferences.edit')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
         }
 
@@ -167,7 +167,7 @@ class EmailPreferenceController extends Controller
     public function export(Request $request)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.view')) {
+        if (!auth()->user()->hasPermission('email-preferences.view')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -238,7 +238,7 @@ class EmailPreferenceController extends Controller
     public function newsletterSubscribers()
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.view')) {
+        if (!auth()->user()->hasPermission('email-preferences.view')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -259,7 +259,7 @@ class EmailPreferenceController extends Controller
     public function scheduleSetup()
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.view')) {
+        if (!auth()->user()->hasPermission('email-preferences.view')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -297,7 +297,7 @@ class EmailPreferenceController extends Controller
     public function mailSetup()
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.view')) {
+        if (!auth()->user()->hasPermission('email-preferences.view')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -337,7 +337,7 @@ class EmailPreferenceController extends Controller
     public function sendTestEmail(Request $request)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.edit')) {
+        if (!auth()->user()->hasPermission('email-preferences.edit')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 

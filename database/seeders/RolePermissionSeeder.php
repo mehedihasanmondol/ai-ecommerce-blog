@@ -40,6 +40,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Delete Roles', 'slug' => 'roles.delete', 'module' => 'user'],
             ['name' => 'Assign Permissions', 'slug' => 'roles.assign-permissions', 'module' => 'user'],
             
+            // Email Preferences Management
+            ['name' => 'View Email Preferences', 'slug' => 'email-preferences.view', 'module' => 'user'],
+            ['name' => 'Edit Email Preferences', 'slug' => 'email-preferences.edit', 'module' => 'user'],
+            
             // ===================================
             // PRODUCT MANAGEMENT MODULE
             // ===================================
