@@ -17,17 +17,23 @@ class SupplierController extends Controller
 
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.view'), 403, 'You do not have permission to view suppliers.');
+
         $suppliers = $this->supplierRepo->getAll(20);
         return view('admin.stock.suppliers.index', compact('suppliers'));
     }
 
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.create'), 403, 'You do not have permission to create suppliers.');
+
         return view('admin.stock.suppliers.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.create'), 403, 'You do not have permission to create suppliers.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:suppliers,code',
@@ -50,12 +56,16 @@ class SupplierController extends Controller
 
     public function edit($id)
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.edit'), 403, 'You do not have permission to edit suppliers.');
+
         $supplier = $this->supplierRepo->find($id);
         return view('admin.stock.suppliers.edit', compact('supplier'));
     }
 
     public function update(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.edit'), 403, 'You do not have permission to edit suppliers.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:suppliers,code,' . $id,
@@ -78,6 +88,8 @@ class SupplierController extends Controller
 
     public function destroy($id)
     {
+        abort_if(!auth()->user()->hasPermission('suppliers.delete'), 403, 'You do not have permission to delete suppliers.');
+
         try {
             $this->supplierRepo->delete($id);
             return redirect()->route('admin.suppliers.index')

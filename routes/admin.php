@@ -393,32 +393,88 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::put('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'update'])->name('module-settings.update');
     });
 
-    // Stock Management Routes - Requires stock permissions
+    // Stock Management Routes - Granular permissions
     Route::middleware(['permission:stock.view'])->prefix('stock')->name('stock.')->group(function () {
         Route::get('/', [\App\Modules\Stock\Controllers\StockController::class, 'index'])->name('index');
-        Route::get('/movements', [\App\Modules\Stock\Controllers\StockController::class, 'movements'])->name('movements');
-        Route::get('/add', [\App\Modules\Stock\Controllers\StockController::class, 'createAddStock'])->name('add');
-        Route::post('/add', [\App\Modules\Stock\Controllers\StockController::class, 'storeAddStock'])->name('add.store');
-        Route::get('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'createRemoveStock'])->name('remove');
-        Route::post('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'storeRemoveStock'])->name('remove.store');
-        Route::get('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'createAdjustStock'])->name('adjust');
-        Route::post('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'storeAdjustStock'])->name('adjust.store');
-        Route::get('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'createTransfer'])->name('transfer');
-        Route::post('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'storeTransfer'])->name('transfer.store');
-        Route::get('/alerts', [\App\Modules\Stock\Controllers\StockController::class, 'alerts'])->name('alerts');
-        Route::post('/alerts/{id}/resolve', [\App\Modules\Stock\Controllers\StockController::class, 'resolveAlert'])->name('alerts.resolve');
         Route::get('/current-stock', [\App\Modules\Stock\Controllers\StockController::class, 'getCurrentStock'])->name('current-stock');
     });
 
-    // Warehouse Management Routes - Requires stock permissions
-    Route::middleware(['permission:stock.view'])->group(function () {
-        Route::resource('warehouses', \App\Modules\Stock\Controllers\WarehouseController::class)->names('warehouses');
+    Route::middleware(['permission:stock.movements'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/movements', [\App\Modules\Stock\Controllers\StockController::class, 'movements'])->name('movements');
+    });
+
+    Route::middleware(['permission:stock.add'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/add', [\App\Modules\Stock\Controllers\StockController::class, 'createAddStock'])->name('add');
+        Route::post('/add', [\App\Modules\Stock\Controllers\StockController::class, 'storeAddStock'])->name('add.store');
+    });
+
+    Route::middleware(['permission:stock.remove'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'createRemoveStock'])->name('remove');
+        Route::post('/remove', [\App\Modules\Stock\Controllers\StockController::class, 'storeRemoveStock'])->name('remove.store');
+    });
+
+    Route::middleware(['permission:stock.adjust'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'createAdjustStock'])->name('adjust');
+        Route::post('/adjust', [\App\Modules\Stock\Controllers\StockController::class, 'storeAdjustStock'])->name('adjust.store');
+    });
+
+    Route::middleware(['permission:stock.transfer'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'createTransfer'])->name('transfer');
+        Route::post('/transfer', [\App\Modules\Stock\Controllers\StockController::class, 'storeTransfer'])->name('transfer.store');
+    });
+
+    Route::middleware(['permission:stock.alerts'])->prefix('stock')->name('stock.')->group(function () {
+        Route::get('/alerts', [\App\Modules\Stock\Controllers\StockController::class, 'alerts'])->name('alerts');
+    });
+
+    Route::middleware(['permission:stock.alerts-resolve'])->prefix('stock')->name('stock.')->group(function () {
+        Route::post('/alerts/{id}/resolve', [\App\Modules\Stock\Controllers\StockController::class, 'resolveAlert'])->name('alerts.resolve');
+    });
+
+    // Warehouse Management Routes - Granular permissions
+    Route::middleware(['permission:warehouses.view'])->group(function () {
+        Route::get('/warehouses', [\App\Modules\Stock\Controllers\WarehouseController::class, 'index'])->name('warehouses.index');
+        Route::get('/warehouses/{warehouse}', [\App\Modules\Stock\Controllers\WarehouseController::class, 'show'])->name('warehouses.show');
+    });
+
+    Route::middleware(['permission:warehouses.create'])->group(function () {
+        Route::get('/warehouses/create', [\App\Modules\Stock\Controllers\WarehouseController::class, 'create'])->name('warehouses.create');
+        Route::post('/warehouses', [\App\Modules\Stock\Controllers\WarehouseController::class, 'store'])->name('warehouses.store');
+    });
+
+    Route::middleware(['permission:warehouses.edit'])->group(function () {
+        Route::get('/warehouses/{warehouse}/edit', [\App\Modules\Stock\Controllers\WarehouseController::class, 'edit'])->name('warehouses.edit');
+        Route::put('/warehouses/{warehouse}', [\App\Modules\Stock\Controllers\WarehouseController::class, 'update'])->name('warehouses.update');
+        Route::patch('/warehouses/{warehouse}', [\App\Modules\Stock\Controllers\WarehouseController::class, 'update']);
+    });
+
+    Route::middleware(['permission:warehouses.delete'])->group(function () {
+        Route::delete('/warehouses/{warehouse}', [\App\Modules\Stock\Controllers\WarehouseController::class, 'destroy'])->name('warehouses.destroy');
+    });
+
+    Route::middleware(['permission:warehouses.set-default'])->group(function () {
         Route::post('warehouses/{id}/set-default', [\App\Modules\Stock\Controllers\WarehouseController::class, 'setDefault'])->name('warehouses.set-default');
     });
 
-    // Supplier Management Routes - Requires stock permissions
-    Route::middleware(['permission:stock.view'])->group(function () {
-        Route::resource('suppliers', \App\Modules\Stock\Controllers\SupplierController::class)->names('suppliers');
+    // Supplier Management Routes - Granular permissions
+    Route::middleware(['permission:suppliers.view'])->group(function () {
+        Route::get('/suppliers', [\App\Modules\Stock\Controllers\SupplierController::class, 'index'])->name('suppliers.index');
+        Route::get('/suppliers/{supplier}', [\App\Modules\Stock\Controllers\SupplierController::class, 'show'])->name('suppliers.show');
+    });
+
+    Route::middleware(['permission:suppliers.create'])->group(function () {
+        Route::get('/suppliers/create', [\App\Modules\Stock\Controllers\SupplierController::class, 'create'])->name('suppliers.create');
+        Route::post('/suppliers', [\App\Modules\Stock\Controllers\SupplierController::class, 'store'])->name('suppliers.store');
+    });
+
+    Route::middleware(['permission:suppliers.edit'])->group(function () {
+        Route::get('/suppliers/{supplier}/edit', [\App\Modules\Stock\Controllers\SupplierController::class, 'edit'])->name('suppliers.edit');
+        Route::put('/suppliers/{supplier}', [\App\Modules\Stock\Controllers\SupplierController::class, 'update'])->name('suppliers.update');
+        Route::patch('/suppliers/{supplier}', [\App\Modules\Stock\Controllers\SupplierController::class, 'update']);
+    });
+
+    Route::middleware(['permission:suppliers.delete'])->group(function () {
+        Route::delete('/suppliers/{supplier}', [\App\Modules\Stock\Controllers\SupplierController::class, 'destroy'])->name('suppliers.destroy');
     });
 
     // Reports Routes - Requires reports.view permission

@@ -17,17 +17,23 @@ class WarehouseController extends Controller
 
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.view'), 403, 'You do not have permission to view warehouses.');
+
         $warehouses = $this->warehouseRepo->getAll(20);
         return view('admin.stock.warehouses.index', compact('warehouses'));
     }
 
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.create'), 403, 'You do not have permission to create warehouses.');
+
         return view('admin.stock.warehouses.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.create'), 403, 'You do not have permission to create warehouses.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:warehouses,code',
@@ -49,12 +55,16 @@ class WarehouseController extends Controller
 
     public function edit($id)
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.edit'), 403, 'You do not have permission to edit warehouses.');
+
         $warehouse = $this->warehouseRepo->find($id);
         return view('admin.stock.warehouses.edit', compact('warehouse'));
     }
 
     public function update(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.edit'), 403, 'You do not have permission to edit warehouses.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|unique:warehouses,code,' . $id,
@@ -76,6 +86,8 @@ class WarehouseController extends Controller
 
     public function destroy($id)
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.delete'), 403, 'You do not have permission to delete warehouses.');
+
         try {
             $this->warehouseRepo->delete($id);
             return redirect()->route('admin.warehouses.index')
@@ -87,6 +99,8 @@ class WarehouseController extends Controller
 
     public function setDefault($id)
     {
+        abort_if(!auth()->user()->hasPermission('warehouses.set-default'), 403, 'You do not have permission to set default warehouse.');
+
         $this->warehouseRepo->setAsDefault($id);
         return back()->with('success', 'Default warehouse set successfully');
     }

@@ -10,13 +10,15 @@
             <h1 class="text-2xl font-bold text-gray-900">Warehouses</h1>
             <p class="text-gray-600 mt-1">Manage your storage locations and inventory centers</p>
         </div>
-        <a href="{{ route('admin.warehouses.create') }}" 
-           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Create Warehouse
-        </a>
+        @if(auth()->user()->hasPermission('warehouses.create'))
+            <a href="{{ route('admin.warehouses.create') }}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Warehouse
+            </a>
+        @endif
     </div>
 
 
@@ -100,7 +102,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end space-x-2">
-                                    @if(!$warehouse->is_default)
+                                    @if(!$warehouse->is_default && auth()->user()->hasPermission('warehouses.set-default'))
                                         <form method="POST" action="{{ route('admin.warehouses.set-default', $warehouse->id) }}" class="inline">
                                             @csrf
                                             <button type="submit" 
@@ -113,15 +115,17 @@
                                         </form>
                                     @endif
                                     
-                                    <a href="{{ route('admin.warehouses.edit', $warehouse->id) }}" 
-                                       class="text-blue-600 hover:text-blue-900"
-                                       title="Edit">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                        </svg>
-                                    </a>
+                                    @if(auth()->user()->hasPermission('warehouses.edit'))
+                                        <a href="{{ route('admin.warehouses.edit', $warehouse->id) }}" 
+                                           class="text-blue-600 hover:text-blue-900"
+                                           title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                        </a>
+                                    @endif
                                     
-                                    @if(!$warehouse->is_default)
+                                    @if(!$warehouse->is_default && auth()->user()->hasPermission('warehouses.delete'))
                                         <form method="POST" action="{{ route('admin.warehouses.destroy', $warehouse->id) }}" 
                                               class="inline"
                                               onsubmit="return confirm('Are you sure you want to delete this warehouse?');">
@@ -148,6 +152,7 @@
                                 <h3 class="mt-2 text-sm font-medium text-gray-900">No warehouses</h3>
                                 <p class="mt-1 text-sm text-gray-500">Get started by creating a new warehouse.</p>
                                 <div class="mt-6">
+                                @if(auth()->user()->hasPermission('warehouses.create'))
                                     <a href="{{ route('admin.warehouses.create') }}" 
                                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                                         <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,6 +160,7 @@
                                         </svg>
                                         Create Warehouse
                                     </a>
+                                @endif
                                 </div>
                             </td>
                         </tr>

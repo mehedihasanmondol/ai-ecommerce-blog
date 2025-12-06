@@ -16,18 +16,22 @@
             <p class="text-gray-600 mt-1">Monitor and manage inventory across all warehouses</p>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('admin.stock.add') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Add Stock
-            </a>
-            <a href="{{ route('admin.stock.adjust') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-                </svg>
-                Adjust Stock
-            </a>
+            @if(auth()->user()->hasPermission('stock.add'))
+                <a href="{{ route('admin.stock.add') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add Stock
+                </a>
+            @endif
+            @if(auth()->user()->hasPermission('stock.adjust'))
+                <a href="{{ route('admin.stock.adjust') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                    </svg>
+                    Adjust Stock
+                </a>
+            @endif
         </div>
     </div>
 
@@ -61,7 +65,9 @@
                     </svg>
                 </div>
             </div>
-            <a href="{{ route('admin.stock.alerts') }}" class="text-red-600 text-sm font-medium hover:text-red-700 mt-3 inline-block">View Alerts →</a>
+            @if(auth()->user()->hasPermission('stock.alerts'))
+                <a href="{{ route('admin.stock.alerts') }}" class="text-red-600 text-sm font-medium hover:text-red-700 mt-3 inline-block">View Alerts →</a>
+            @endif
         </div>
 
         <!-- Recent Movements -->
@@ -101,7 +107,9 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                     <h2 class="text-lg font-semibold text-gray-900">Recent Stock Movements</h2>
-                    <a href="{{ route('admin.stock.movements') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All →</a>
+                    @if(auth()->user()->hasPermission('stock.movements'))
+                        <a href="{{ route('admin.stock.movements') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All →</a>
+                    @endif
                 </div>
                 <div class="p-6">
                     @if($recentMovements->count() > 0)
@@ -164,7 +172,9 @@
                             @endforeach
                         </div>
                         @if($pendingAlerts->count() > 5)
-                            <a href="{{ route('admin.stock.alerts') }}" class="block text-center text-blue-600 hover:text-blue-700 text-sm font-medium mt-4">View All {{ $pendingAlerts->count() }} Alerts →</a>
+                            @if(auth()->user()->hasPermission('stock.alerts'))
+                                <a href="{{ route('admin.stock.alerts') }}" class="block text-center text-blue-600 hover:text-blue-700 text-sm font-medium mt-4">View All {{ $pendingAlerts->count() }} Alerts →</a>
+                            @endif
                         @endif
                     @else
                         <div class="text-center py-8">

@@ -41,6 +41,8 @@ class StockController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('stock.view'), 403, 'You do not have permission to view stock.');
+
         $recentMovements = $this->stockMovementRepo->getRecent(10);
         $pendingAlerts = $this->alertRepo->getPending();
         $warehouses = $this->warehouseRepo->getActive();
@@ -53,6 +55,8 @@ class StockController extends Controller
      */
     public function movements(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('stock.movements'), 403, 'You do not have permission to view stock movements.');
+
         $filters = $request->only(['type', 'warehouse_id', 'product_id', 'start_date', 'end_date', 'search']);
         $movements = $this->stockMovementRepo->getAll($filters, 20);
         $warehouses = $this->warehouseRepo->getActive();
@@ -65,6 +69,8 @@ class StockController extends Controller
      */
     public function createAddStock()
     {
+        abort_if(!auth()->user()->hasPermission('stock.add'), 403, 'You do not have permission to add stock.');
+
         $warehouses = $this->warehouseRepo->getActive();
         $suppliers = $this->supplierRepo->getActive();
         $products = $this->productRepo->getAllActive();
@@ -77,6 +83,8 @@ class StockController extends Controller
      */
     public function storeAddStock(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('stock.add'), 403, 'You do not have permission to add stock.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'variant_id' => 'nullable|exists:product_variants,id',
@@ -102,6 +110,8 @@ class StockController extends Controller
      */
     public function createRemoveStock()
     {
+        abort_if(!auth()->user()->hasPermission('stock.remove'), 403, 'You do not have permission to remove stock.');
+
         $warehouses = $this->warehouseRepo->getActive();
         $products = $this->productRepo->getAllActive();
 
@@ -113,6 +123,8 @@ class StockController extends Controller
      */
     public function storeRemoveStock(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('stock.remove'), 403, 'You do not have permission to remove stock.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'variant_id' => 'nullable|exists:product_variants,id',
@@ -137,6 +149,8 @@ class StockController extends Controller
      */
     public function createAdjustStock()
     {
+        abort_if(!auth()->user()->hasPermission('stock.adjust'), 403, 'You do not have permission to adjust stock.');
+
         $warehouses = $this->warehouseRepo->getActive();
         $products = $this->productRepo->getAllActive();
 
@@ -148,6 +162,8 @@ class StockController extends Controller
      */
     public function storeAdjustStock(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('stock.adjust'), 403, 'You do not have permission to adjust stock.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'variant_id' => 'nullable|exists:product_variants,id',
@@ -171,6 +187,8 @@ class StockController extends Controller
      */
     public function createTransfer()
     {
+        abort_if(!auth()->user()->hasPermission('stock.transfer'), 403, 'You do not have permission to transfer stock.');
+
         $warehouses = $this->warehouseRepo->getActive();
         $products = $this->productRepo->getAllActive();
 
@@ -182,6 +200,8 @@ class StockController extends Controller
      */
     public function storeTransfer(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('stock.transfer'), 403, 'You do not have permission to transfer stock.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'variant_id' => 'nullable|exists:product_variants,id',
@@ -205,6 +225,8 @@ class StockController extends Controller
      */
     public function alerts()
     {
+        abort_if(!auth()->user()->hasPermission('stock.alerts'), 403, 'You do not have permission to view stock alerts.');
+
         $alerts = $this->alertRepo->getAll(20);
 
         return view('admin.stock.alerts.index', compact('alerts'));
@@ -215,6 +237,8 @@ class StockController extends Controller
      */
     public function resolveAlert($id)
     {
+        abort_if(!auth()->user()->hasPermission('stock.alerts-resolve'), 403, 'You do not have permission to resolve stock alerts.');
+
         try {
             $this->alertRepo->markAsResolved($id);
             return back()->with('success', 'Alert resolved successfully');
@@ -228,6 +252,14 @@ class StockController extends Controller
      */
     public function getCurrentStock(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('stock.view')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to view stock.',
+            ], 403);
+        }
+
         $stock = $this->stockService->getCurrentStock(
             $request->product_id,
             $request->variant_id,

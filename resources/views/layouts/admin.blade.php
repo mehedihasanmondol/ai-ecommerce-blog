@@ -410,52 +410,60 @@
                 @endif
 
                 <!-- Inventory Section -->
-                @if(auth()->user()->hasPermission('stock.view'))
+                @if(auth()->user()->hasPermission('stock.view') || auth()->user()->hasPermission('warehouses.view') || auth()->user()->hasPermission('suppliers.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                     </div>
 
-                    <a href="{{ route('admin.stock.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-boxes w-5 mr-3"></i>
-                        <span>Stock Management</span>
-                        @php
-                            $stockAlerts = \App\Modules\Stock\Models\StockAlert::where('status', 'pending')->count();
-                        @endphp
-                        @if($stockAlerts > 0)
-                            <span class="ml-auto text-xs bg-red-500 text-white px-2 py-1 rounded-full">{{ $stockAlerts }}</span>
-                        @endif
-                        @if(request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('stock.view'))
+                        <a href="{{ route('admin.stock.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-boxes w-5 mr-3"></i>
+                            <span>Stock Management</span>
+                            @php
+                                $stockAlerts = \App\Modules\Stock\Models\StockAlert::where('status', 'pending')->count();
+                            @endphp
+                            @if($stockAlerts > 0)
+                                <span class="ml-auto text-xs bg-red-500 text-white px-2 py-1 rounded-full">{{ $stockAlerts }}</span>
+                            @endif
+                            @if(request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.warehouses.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.warehouses.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-warehouse w-5 mr-3"></i>
-                        <span>Warehouses</span>
-                        @if(request()->routeIs('admin.warehouses.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('warehouses.view'))
+                        <a href="{{ route('admin.warehouses.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.warehouses.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-warehouse w-5 mr-3"></i>
+                            <span>Warehouses</span>
+                            @if(request()->routeIs('admin.warehouses.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.suppliers.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-truck w-5 mr-3"></i>
-                        <span>Suppliers</span>
-                        @if(request()->routeIs('admin.suppliers.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('suppliers.view'))
+                        <a href="{{ route('admin.suppliers.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-truck w-5 mr-3"></i>
+                            <span>Suppliers</span>
+                            @if(request()->routeIs('admin.suppliers.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.stock.reports.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-chart-bar w-5 mr-3"></i>
-                        <span>Stock Reports</span>
-                        @if(request()->routeIs('admin.stock.reports.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('stock.view'))
+                        <a href="{{ route('admin.stock.reports.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Stock Reports</span>
+                            @if(request()->routeIs('admin.stock.reports.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
                 @endif
 
                 <!-- Content Section (Placeholder) -->
@@ -924,34 +932,42 @@
                     @endif
                 @endif
 
-                @if(auth()->user()->hasPermission('stock.view'))
+                @if(auth()->user()->hasPermission('stock.view') || auth()->user()->hasPermission('warehouses.view') || auth()->user()->hasPermission('suppliers.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Inventory</p>
                     </div>
 
-                    <a href="{{ route('admin.stock.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-boxes w-5 mr-3"></i>
-                        <span>Stock Management</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('stock.view'))
+                        <a href="{{ route('admin.stock.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.stock.*') || request()->routeIs('admin.warehouses.*') || request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-boxes w-5 mr-3"></i>
+                            <span>Stock Management</span>
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.warehouses.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.warehouses.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-warehouse w-5 mr-3"></i>
-                        <span>Warehouses</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('warehouses.view'))
+                        <a href="{{ route('admin.warehouses.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.warehouses.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-warehouse w-5 mr-3"></i>
+                            <span>Warehouses</span>
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.suppliers.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-truck w-5 mr-3"></i>
-                        <span>Suppliers</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('suppliers.view'))
+                        <a href="{{ route('admin.suppliers.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.suppliers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-truck w-5 mr-3"></i>
+                            <span>Suppliers</span>
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.stock.reports.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-chart-bar w-5 mr-3"></i>
-                        <span>Stock Reports</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('stock.view'))
+                        <a href="{{ route('admin.stock.reports.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.stock.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-chart-bar w-5 mr-3"></i>
+                            <span>Stock Reports</span>
+                        </a>
+                    @endif
                 @endif
 
                 @if(auth()->user()->hasPermission('users.view'))
