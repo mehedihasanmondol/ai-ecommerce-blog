@@ -25,7 +25,7 @@ class PostList extends Component
     public $showFilters = false;
     public $showDeleteModal = false;
     public $postToDelete = null;
-    
+
     // Bulk delete properties
     public $selectedPosts = [];
     public $selectAll = false;
@@ -83,6 +83,12 @@ class PostList extends Component
 
     public function toggleFeatured($postId, PostService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.edit')) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
         $post = Post::find($postId);
         if ($post) {
             $service->toggleFeatured($post);
@@ -98,6 +104,14 @@ class PostList extends Component
 
     public function deletePost(PostService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.delete')) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showDeleteModal = false;
+            $this->postToDelete = null;
+            return;
+        }
+
         if ($this->postToDelete) {
             $post = Post::find($this->postToDelete);
             if ($post) {
@@ -135,6 +149,13 @@ class PostList extends Component
 
     public function bulkDelete(PostService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.delete')) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showBulkDeleteModal = false;
+            return;
+        }
+
         if (count($this->selectedPosts) > 0) {
             foreach ($this->selectedPosts as $postId) {
                 $post = Post::find($postId);
@@ -142,7 +163,7 @@ class PostList extends Component
                     $service->deletePost($postId);
                 }
             }
-            
+
             session()->flash('success', count($this->selectedPosts) . ' posts deleted successfully!');
             $this->selectedPosts = [];
             $this->selectAll = false;
@@ -164,36 +185,36 @@ class PostList extends Component
         ];
 
         // Remove empty filters
-        $filters = array_filter($filters, function($value) {
+        $filters = array_filter($filters, function ($value) {
             return $value !== '' && $value !== null;
         });
 
         $posts = Post::with(['author', 'categories', 'tags'])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     $q->where('title', 'like', '%' . $this->search . '%')
-                      ->orWhere('content', 'like', '%' . $this->search . '%')
-                      ->orWhere('excerpt', 'like', '%' . $this->search . '%');
+                        ->orWhere('content', 'like', '%' . $this->search . '%')
+                        ->orWhere('excerpt', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->statusFilter, function($query) {
+            ->when($this->statusFilter, function ($query) {
                 $query->where('status', $this->statusFilter);
             })
-            ->when($this->categoryFilter, function($query) {
-                $query->whereHas('categories', function($q) {
+            ->when($this->categoryFilter, function ($query) {
+                $query->whereHas('categories', function ($q) {
                     $q->where('blog_categories.id', $this->categoryFilter);
                 });
             })
-            ->when($this->authorFilter, function($query) {
+            ->when($this->authorFilter, function ($query) {
                 $query->where('author_id', $this->authorFilter);
             })
-            ->when($this->featuredFilter !== '', function($query) {
+            ->when($this->featuredFilter !== '', function ($query) {
                 $query->where('is_featured', (bool) $this->featuredFilter);
             })
-            ->when($this->dateFrom, function($query) {
+            ->when($this->dateFrom, function ($query) {
                 $query->whereDate('created_at', '>=', $this->dateFrom);
             })
-            ->when($this->dateTo, function($query) {
+            ->when($this->dateTo, function ($query) {
                 $query->whereDate('created_at', '<=', $this->dateTo);
             })
             ->latest('created_at')
@@ -201,7 +222,7 @@ class PostList extends Component
 
         $categories = BlogCategory::active()->ordered()->get();
         $authors = User::orderBy('name')->get();
-        
+
         // Get counts
         $counts = [
             'all' => Post::count(),

@@ -35,6 +35,11 @@ class CommentController extends Controller
 
     public function approve($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.approve')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->commentService->approveComment($id);
 
         return response()->json([
@@ -45,6 +50,11 @@ class CommentController extends Controller
 
     public function spam($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.approve')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->commentService->markAsSpam($id);
 
         return response()->json([
@@ -55,6 +65,11 @@ class CommentController extends Controller
 
     public function trash($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.delete')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->commentService->moveToTrash($id);
 
         return response()->json([
@@ -65,6 +80,11 @@ class CommentController extends Controller
 
     public function destroy($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.delete')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->commentService->deleteComment($id);
 
         return response()->json([

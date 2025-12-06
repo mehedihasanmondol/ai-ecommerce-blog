@@ -26,35 +26,39 @@ function generateSlug(text) {
         '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
         '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
     };
-    
+
     // Replace Bangla characters with English equivalents
     let slug = text.split('').map(char => banglaToEnglish[char] || char).join('');
-    
+
     // Convert to lowercase
     slug = slug.toLowerCase();
-    
+
     // Replace any non-alphanumeric characters with hyphen
     slug = slug.replace(/[^a-z0-9]+/g, '-');
-    
+
     // Remove hyphen from start and end
     slug = slug.replace(/^-+|-+$/g, '');
-    
+
     // Replace multiple hyphens with single hyphen
     slug = slug.replace(/-+/g, '-');
-    
+
     return slug;
 }
 
 // Initialize CKEditor when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    // Check if user has image upload permission (set by Blade template)
+    const canUploadImages = window.canUploadImages !== undefined ? window.canUploadImages : true;
+
     // Initialize CKEditor
     initCKEditor('#ckeditor', {
         wordCountContainer: '#word-count',
-        placeholder: 'Write your blog post content here...'
+        placeholder: 'Write your blog post content here...',
+        canUploadImages: canUploadImages
     }).then(editorInstance => {
         editor = editorInstance;
         console.log('CKEditor initialized for blog post');
-        
+
         // Setup auto-save on editor change
         editor.model.document.on('change:data', () => {
             autoSave();
@@ -64,40 +68,40 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for CKEditor uploader event and trigger Livewire modal
     window.addEventListener('open-ckeditor-uploader', (event) => {
         const { field, multiple } = event.detail;
-        
+
         // Dispatch Livewire event to open the media library (Library tab by default)
-        Livewire.dispatch('openMediaLibrary', { 
-            field: field, 
-            multiple: multiple 
+        Livewire.dispatch('openMediaLibrary', {
+            field: field,
+            multiple: multiple
         });
     });
-    
+
     // WordPress-style Editor Functions
     const titleInput = document.getElementById('post-title');
     const slugInput = document.getElementById('post-slug');
-    
+
     // Auto-generate slug from title with Bangla support
     if (titleInput && slugInput) {
-        titleInput.addEventListener('input', function() {
+        titleInput.addEventListener('input', function () {
             if (!slugInput.dataset.manualEdit) {
                 const slug = generateSlug(this.value);
                 slugInput.value = slug;
             }
         });
-        
+
         // Auto-save on title change
         titleInput.addEventListener('input', autoSave);
     }
-    
+
     // Focus title on load
     if (titleInput) {
         titleInput.focus();
     }
-    
+
     // Form validation before submit
     const postForm = document.getElementById('post-form');
     if (postForm) {
-        postForm.addEventListener('submit', function(e) {
+        postForm.addEventListener('submit', function (e) {
             // Check if title is empty
             if (!titleInput || !titleInput.value.trim()) {
                 e.preventDefault();
@@ -105,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (titleInput) titleInput.focus();
                 return false;
             }
-            
+
             // Check if content is empty
             if (editor) {
                 const content = editor.getData().replace(/<[^>]*>/g, '').trim();
@@ -116,15 +120,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
             }
-            
+
             return true;
         });
-        
+
         // Warn before leaving with unsaved changes
         let formChanged = false;
         postForm.addEventListener('input', () => formChanged = true);
         postForm.addEventListener('submit', () => formChanged = false);
-        
+
         window.addEventListener('beforeunload', (e) => {
             if (formChanged) {
                 e.preventDefault();
@@ -135,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Mark slug as manually edited
-window.editSlug = function() {
+window.editSlug = function () {
     const slugInput = document.getElementById('post-slug');
     if (slugInput) {
         slugInput.dataset.manualEdit = 'true';
@@ -154,38 +158,38 @@ function autoSave() {
 }
 
 // Save draft function
-window.saveDraft = function(isAutoSave = false) {
+window.saveDraft = function (isAutoSave = false) {
     const postForm = document.getElementById('post-form');
     if (!postForm) return;
-    
+
     const formData = new FormData(postForm);
     formData.set('status', 'draft');
-    
+
     // Show indicator
     const indicator = document.getElementById('autosave-indicator');
     if (indicator) {
         indicator.classList.remove('hidden');
-        
+
         // Hide after 2 seconds
         setTimeout(() => {
             indicator.classList.add('hidden');
         }, 2000);
     }
-    
+
     console.log(isAutoSave ? 'Auto-saving draft...' : 'Saving draft...');
 }
 
 // Preview post with CKEditor
-window.previewPost = function() {
+window.previewPost = function () {
     const titleInput = document.getElementById('post-title');
     const title = titleInput ? titleInput.value : '';
     const content = editor ? editor.getData() : '';
-    
+
     if (!title || !content) {
         alert('Please add a title and content first.');
         return;
     }
-    
+
     // Open preview in new window
     const previewWindow = window.open('', 'preview', 'width=900,height=700');
     previewWindow.document.write(`
@@ -252,10 +256,10 @@ window.previewPost = function() {
 }
 
 // Status change handler
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const statusSelect = document.querySelector('select[name="status"]');
     if (statusSelect) {
-        statusSelect.addEventListener('change', function() {
+        statusSelect.addEventListener('change', function () {
             const scheduledDiv = document.getElementById('scheduled-date');
             if (scheduledDiv) {
                 scheduledDiv.style.display = this.value === 'scheduled' ? 'block' : 'none';

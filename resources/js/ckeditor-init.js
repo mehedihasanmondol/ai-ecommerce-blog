@@ -98,7 +98,8 @@ export function initCKEditor(selector, options = {}) {
             SpecialCharactersEssentials,
             WordCount,
             Fullscreen,
-            UniversalImageUploadPlugin
+            // Conditionally add UniversalImageUploadPlugin
+            ...(options.canUploadImages !== false ? [UniversalImageUploadPlugin] : [])
         ],
         toolbar: {
             items: [
@@ -108,7 +109,9 @@ export function initCKEditor(selector, options = {}) {
                 '|',
                 'bold', 'italic', 'underline',
                 '|',
-                 'mediaLibrary', 'blockQuote',
+                // Conditionally add mediaLibrary button
+                ...(options.canUploadImages !== false ? ['mediaLibrary'] : []),
+                'blockQuote',
                 '|',
                 'bulletedList', 'numberedList',
                 '|',
@@ -136,34 +139,34 @@ export function initCKEditor(selector, options = {}) {
         },
         heading: {
             options: [
-                { 
-                    model: 'paragraph', 
-                    title: 'Paragraph', 
+                {
+                    model: 'paragraph',
+                    title: 'Paragraph',
                     class: 'ck-heading_paragraph'
                 },
-                { 
-                    model: 'heading1', 
-                    view: { name: 'h1', classes: 'text-4xl font-extrabold text-gray-900 leading-tight mt-0 mb-4' }, 
-                    title: 'Heading 1', 
-                    class: 'text-4xl font-extrabold ck-heading_heading1' 
+                {
+                    model: 'heading1',
+                    view: { name: 'h1', classes: 'text-4xl font-extrabold text-gray-900 leading-tight mt-0 mb-4' },
+                    title: 'Heading 1',
+                    class: 'text-4xl font-extrabold ck-heading_heading1'
                 },
-                { 
-                    model: 'heading2', 
-                    view: { name: 'h2', classes: 'text-3xl font-bold text-gray-800 leading-snug mt-6 mb-3' }, 
-                    title: 'Heading 2', 
-                    class: 'text-3xl font-bold ck-heading_heading2' 
+                {
+                    model: 'heading2',
+                    view: { name: 'h2', classes: 'text-3xl font-bold text-gray-800 leading-snug mt-6 mb-3' },
+                    title: 'Heading 2',
+                    class: 'text-3xl font-bold ck-heading_heading2'
                 },
-                { 
-                    model: 'heading3', 
-                    view: { name: 'h3', classes: 'text-2xl font-semibold text-gray-700 leading-normal mt-5 mb-2' }, 
-                    title: 'Heading 3', 
-                    class: 'text-2xl font-semibold ck-heading_heading3' 
+                {
+                    model: 'heading3',
+                    view: { name: 'h3', classes: 'text-2xl font-semibold text-gray-700 leading-normal mt-5 mb-2' },
+                    title: 'Heading 3',
+                    class: 'text-2xl font-semibold ck-heading_heading3'
                 },
-                { 
-                    model: 'heading4', 
-                    view: { name: 'h4', classes: 'text-xl font-semibold text-gray-600 leading-relaxed mt-4 mb-2' }, 
-                    title: 'Heading 4', 
-                    class: 'text-xl font-semibold ck-heading_heading4' 
+                {
+                    model: 'heading4',
+                    view: { name: 'h4', classes: 'text-xl font-semibold text-gray-600 leading-relaxed mt-4 mb-2' },
+                    title: 'Heading 4',
+                    class: 'text-xl font-semibold ck-heading_heading4'
                 }
             ]
         },
@@ -350,10 +353,10 @@ export function initCKEditor(selector, options = {}) {
                         const id = match[1];
                         return (
                             '<div class="aspect-w-16 aspect-h-9 my-6">' +
-                                `<iframe src="https://www.youtube.com/embed/${id}" ` +
-                                'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen ' +
-                                'class="w-full h-full rounded-lg shadow-lg">' +
-                                '</iframe>' +
+                            `<iframe src="https://www.youtube.com/embed/${id}" ` +
+                            'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen ' +
+                            'class="w-full h-full rounded-lg shadow-lg">' +
+                            '</iframe>' +
                             '</div>'
                         );
                     }
@@ -365,10 +368,10 @@ export function initCKEditor(selector, options = {}) {
                         const id = match[1];
                         return (
                             '<div class="aspect-w-16 aspect-h-9 my-6">' +
-                                `<iframe src="https://player.vimeo.com/video/${id}" ` +
-                                'frameborder="0" allow="autoplay; fullscreen" allowfullscreen ' +
-                                'class="w-full h-full rounded-lg shadow-lg">' +
-                                '</iframe>' +
+                            `<iframe src="https://player.vimeo.com/video/${id}" ` +
+                            'frameborder="0" allow="autoplay; fullscreen" allowfullscreen ' +
+                            'class="w-full h-full rounded-lg shadow-lg">' +
+                            '</iframe>' +
                             '</div>'
                         );
                     }
@@ -389,12 +392,12 @@ export function initCKEditor(selector, options = {}) {
         .create(element, defaultConfig)
         .then(editor => {
             window.editor = editor; // Make editor globally accessible for debugging
-            
+
             // Word count tracking
             const wordCountPlugin = editor.plugins.get('WordCount');
             const wordCountContainer = options.wordCountContainer || '#word-count';
             const wordCountElement = document.querySelector(wordCountContainer);
-            
+
             if (wordCountElement) {
                 wordCountElement.appendChild(wordCountPlugin.wordCountContainer);
             }

@@ -54,6 +54,11 @@ class PostController extends Controller
 
     public function create()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.create')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $categories = $this->categoryService->getCategoriesForDropdown();
         $tags = $this->tagRepository->all();
         $products = \App\Modules\Ecommerce\Product\Models\Product::where('status', 'published')
@@ -66,7 +71,19 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $post = $this->postService->createPost($request->validated());
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.create')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $data = $request->validated();
+
+        // If user doesn't have publish permission, force status to draft
+        if (in_array($data['status'] ?? 'draft', ['published', 'scheduled']) && !auth()->user()->hasPermission('posts.publish')) {
+            $data['status'] = 'draft';
+        }
+
+        $post = $this->postService->createPost($data);
 
         // Attach products for "Shop This Article" if provided
         if ($request->has('products')) {
@@ -89,6 +106,11 @@ class PostController extends Controller
 
     public function edit($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $post = $this->postService->getPost($id);
         $post->load('products'); // Load attached products
         $categories = $this->categoryService->getCategoriesForDropdown();
@@ -103,7 +125,20 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, $id)
     {
-        $post = $this->postService->updatePost($id, $request->validated());
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $data = $request->validated();
+        $post = $this->postService->getPost($id);
+
+        // If user doesn't have publish permission, preserve the existing status
+        if (in_array($data['status'] ?? $post->status, ['published', 'scheduled']) && !auth()->user()->hasPermission('posts.publish')) {
+            $data['status'] = $post->status; // Keep the original status
+        }
+
+        $post = $this->postService->updatePost($id, $data);
 
         // Sync products for "Shop This Article"
         if ($request->has('products')) {
@@ -123,6 +158,11 @@ class PostController extends Controller
 
     public function destroy($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.delete')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $this->postService->deletePost($id);
 
         return response()->json([
@@ -133,6 +173,11 @@ class PostController extends Controller
 
     public function publish($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.publish')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $this->postService->publishPost($id);
 
         return response()->json([
@@ -149,6 +194,11 @@ class PostController extends Controller
      */
     public function uploadImage(Request $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.upload-image')) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
         try {
             // Validate the uploaded file
             $request->validate([
@@ -157,13 +207,13 @@ class PostController extends Controller
 
             if ($request->hasFile('file')) {
                 $image = $request->file('file');
-                
+
                 // Generate unique filename
                 $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                
+
                 // Store in public/storage/blog/images
                 $path = $image->storeAs('blog/images', $filename, 'public');
-                
+
                 // Return JSON response for TinyMCE
                 return response()->json([
                     'location' => asset('storage/' . $path)
@@ -186,8 +236,13 @@ class PostController extends Controller
      */
     public function tickMarkStats()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
         $stats = $this->tickMarkService->getStatistics();
-        
+
         return response()->json([
             'success' => true,
             'data' => $stats,
@@ -199,10 +254,15 @@ class PostController extends Controller
      */
     public function toggleFeatured($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.edit')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         try {
             $post = $this->postService->getPost($id);
             $this->postService->toggleFeatured($post);
-            
+
             return response()->json([
                 'success' => true,
                 'is_featured' => !$post->is_featured,
@@ -221,9 +281,14 @@ class PostController extends Controller
      */
     public function toggleVerification($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         try {
             $post = $this->tickMarkService->toggleVerification($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $post->is_verified ? 'পোস্ট যাচাইকৃত হয়েছে' : 'যাচাইকরণ সরানো হয়েছে',
@@ -242,9 +307,14 @@ class PostController extends Controller
      */
     public function toggleEditorChoice($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         try {
             $post = $this->tickMarkService->toggleEditorChoice($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $post->is_editor_choice ? 'সম্পাদকের পছন্দে যোগ করা হয়েছে' : 'সম্পাদকের পছন্দ থেকে সরানো হয়েছে',
@@ -263,9 +333,14 @@ class PostController extends Controller
      */
     public function toggleTrending($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         try {
             $post = $this->tickMarkService->toggleTrending($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $post->is_trending ? 'ট্রেন্ডিং হিসেবে চিহ্নিত করা হয়েছে' : 'ট্রেন্ডিং থেকে সরানো হয়েছে',
@@ -284,9 +359,14 @@ class PostController extends Controller
      */
     public function togglePremium($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         try {
             $post = $this->tickMarkService->togglePremium($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => $post->is_premium ? 'প্রিমিয়াম হিসেবে চিহ্নিত করা হয়েছে' : 'প্রিমিয়াম থেকে সরানো হয়েছে',
@@ -305,6 +385,11 @@ class PostController extends Controller
      */
     public function bulkUpdateTickMarks(Request $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.tick-marks')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $request->validate([
             'post_ids' => 'required|array',
             'post_ids.*' => 'exists:blog_posts,id',
@@ -318,7 +403,7 @@ class PostController extends Controller
                 $request->tick_mark_type,
                 $request->value
             );
-            
+
             return response()->json([
                 'success' => true,
                 'message' => "{$affected}টি পোস্ট আপডেট করা হয়েছে",
@@ -337,6 +422,11 @@ class PostController extends Controller
      */
     public function bulkDelete(Request $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('posts.delete')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $request->validate([
             'post_ids' => 'required|array',
             'post_ids.*' => 'exists:blog_posts,id',
@@ -348,7 +438,7 @@ class PostController extends Controller
                 $this->postService->deletePost($postId);
                 $count++;
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => "{$count}টি পোস্ট মুছে ফেলা হয়েছে",

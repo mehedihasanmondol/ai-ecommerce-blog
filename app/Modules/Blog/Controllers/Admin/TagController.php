@@ -32,11 +32,21 @@ class TagController extends Controller
 
     public function create()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.create')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('admin.blog.tags.create');
     }
 
     public function store(StoreTagRequest $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.create')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $tag = $this->tagService->createTag($request->validated());
 
         // Return JSON response for AJAX requests (modal)
@@ -60,12 +70,22 @@ class TagController extends Controller
 
     public function edit($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $tag = $this->tagService->getTag($id);
         return view('admin.blog.tags.edit', compact('tag'));
     }
 
     public function update(UpdateTagRequest $request, $id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $this->tagService->updateTag($id, $request->validated());
 
         return redirect()->route('admin.blog.tags.index')
@@ -74,6 +94,11 @@ class TagController extends Controller
 
     public function destroy($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.delete')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->tagService->deleteTag($id);
 
         return response()->json([

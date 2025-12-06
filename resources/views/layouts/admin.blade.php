@@ -563,32 +563,38 @@
                         @endif
                     </a>
 
-                    <a href="{{ route('admin.blog.categories.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-folder w-5 mr-3"></i>
-                        <span>Categories</span>
-                        @if(request()->routeIs('admin.blog.categories.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('blog-categories.view'))
+                        <a href="{{ route('admin.blog.categories.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-folder w-5 mr-3"></i>
+                            <span>Categories</span>
+                            @if(request()->routeIs('admin.blog.categories.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.blog.tags.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.tags.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-tag w-5 mr-3"></i>
-                        <span>Tags</span>
-                        @if(request()->routeIs('admin.blog.tags.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('blog-tags.view'))
+                        <a href="{{ route('admin.blog.tags.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.tags.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-tag w-5 mr-3"></i>
+                            <span>Tags</span>
+                            @if(request()->routeIs('admin.blog.tags.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.blog.comments.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-comments w-5 mr-3"></i>
-                        <span>Comments</span>
-                        @if(request()->routeIs('admin.blog.comments.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('blog-comments.view'))
+                        <a href="{{ route('admin.blog.comments.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-comments w-5 mr-3"></i>
+                            <span>Comments</span>
+                            @if(request()->routeIs('admin.blog.comments.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
                 @endif
 
                 <!-- Feedback Section -->

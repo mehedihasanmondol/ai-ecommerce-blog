@@ -174,10 +174,6 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Publish Posts', 'slug' => 'posts.publish', 'module' => 'blog'],
             ['name' => 'Upload Images', 'slug' => 'posts.upload-image', 'module' => 'blog'],
             ['name' => 'Manage Tick Marks', 'slug' => 'posts.tick-marks', 'module' => 'blog'],
-            ['name' => 'Toggle Verification', 'slug' => 'posts.toggle-verification', 'module' => 'blog'],
-            ['name' => 'Toggle Editor Choice', 'slug' => 'posts.toggle-editor-choice', 'module' => 'blog'],
-            ['name' => 'Toggle Trending', 'slug' => 'posts.toggle-trending', 'module' => 'blog'],
-            ['name' => 'Toggle Premium', 'slug' => 'posts.toggle-premium', 'module' => 'blog'],
 
             // Blog Categories
             ['name' => 'View Blog Categories', 'slug' => 'blog-categories.view', 'module' => 'blog'],
@@ -397,10 +393,6 @@ class RolePermissionSeeder extends Seeder
             'posts.publish',
             'posts.upload-image',
             'posts.tick-marks',
-            'posts.toggle-verification',
-            'posts.toggle-editor-choice',
-            'posts.toggle-trending',
-            'posts.toggle-premium',
             // Blog Categories (Read Only)
             'blog-categories.view',
             // Blog Tags (Read Only)

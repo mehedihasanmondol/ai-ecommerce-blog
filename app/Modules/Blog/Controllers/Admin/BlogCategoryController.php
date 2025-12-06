@@ -32,12 +32,22 @@ class BlogCategoryController extends Controller
 
     public function create()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.create')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $categories = $this->categoryService->getCategoriesForDropdown();
         return view('admin.blog.categories.create', compact('categories'));
     }
 
     public function store(StoreBlogCategoryRequest $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.create')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $category = $this->categoryService->createCategory($request->validated());
 
         // Return JSON for AJAX requests
@@ -59,6 +69,11 @@ class BlogCategoryController extends Controller
 
     public function edit($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $category = $this->categoryService->getCategory($id);
         $categories = $this->categoryService->getCategoriesForDropdown($id); // Exclude current category and its descendants
 
@@ -67,6 +82,11 @@ class BlogCategoryController extends Controller
 
     public function update(UpdateBlogCategoryRequest $request, $id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.edit')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $this->categoryService->updateCategory($id, $request->validated());
 
         return redirect()->route('admin.blog.categories.index')
@@ -75,6 +95,11 @@ class BlogCategoryController extends Controller
 
     public function destroy($id)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.delete')) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action.'], 403);
+        }
+
         $this->categoryService->deleteCategory($id);
 
         return response()->json([
