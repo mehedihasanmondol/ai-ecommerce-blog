@@ -23,7 +23,7 @@ use App\Modules\Contact\Controllers\Admin\ContactFaqController;
 use App\Modules\Contact\Controllers\Admin\ContactMessageController;
 
 // CSRF Token Refresh Route (for Livewire session maintenance)
-Route::get('/refresh-csrf', function() {
+Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh-csrf');
 
@@ -33,7 +33,7 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.x
 
 // Public Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/ecommerce', function() {
+Route::get('/ecommerce', function () {
     return app(HomeController::class)->showDefaultHomepage();
 })->name('ecommerce');
 Route::get('/shop', \App\Livewire\Shop\ProductList::class)->name('shop');
@@ -44,7 +44,7 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact.index
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 // TEMPORARY: Test contact email
-Route::get('/test-contact-email', function() {
+Route::get('/test-contact-email', function () {
     $message = \App\Models\ContactMessage::latest()->first();
     if ($message) {
         try {
@@ -80,7 +80,7 @@ Route::get('/wishlist/count', [WishlistController::class, 'count'])->name('wishl
 Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
 
 // Promotional Banner Routes
-Route::post('/promo-banners/dismiss', function(\Illuminate\Http\Request $request) {
+Route::post('/promo-banners/dismiss', function (\Illuminate\Http\Request $request) {
     $dismissedBanners = session()->get('dismissed_banners', []);
     $dismissedBanners[] = $request->input('banner_id');
     session()->put('dismissed_banners', $dismissedBanners);
@@ -119,7 +119,7 @@ Route::post('/feedback/{feedback}/helpful', [FeedbackController::class, 'helpful
 Route::post('/feedback/{feedback}/not-helpful', [FeedbackController::class, 'notHelpful'])->name('feedback.notHelpful');
 
 // Blog Routes (must be before catch-all product route)
-require __DIR__.'/blog.php';
+require __DIR__ . '/blog.php';
 
 // Admin Dashboard (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -129,7 +129,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         }
         return view('admin.dashboard');
     })->name('dashboard');
-    
+
     // Admin Profile
     Route::get('/profile', function () {
         if (auth()->user()->role !== 'admin') {
@@ -145,24 +145,24 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
         Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
         Route::middleware(['permission:products.images'])->group(function () {
-            Route::get('/products/{product}/images', function(\App\Modules\Ecommerce\Product\Models\Product $product) {
+            Route::get('/products/{product}/images', function (\App\Modules\Ecommerce\Product\Models\Product $product) {
                 return view('admin.product.images', compact('product'));
             })->name('products.images');
         });
     });
-    
+
     // Product Attributes Routes - Requires attributes.view permission
     Route::middleware(['permission:attributes.view'])->group(function () {
         Route::resource('attributes', \App\Modules\Ecommerce\Product\Controllers\AttributeController::class)->except(['show']);
     });
-    
+
     // Homepage Settings Routes - Requires homepage-settings.view permission
     Route::middleware(['permission:homepage-settings.view'])->group(function () {
         Route::get('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'index'])->name('homepage-settings.index');
         Route::put('/homepage-settings', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'update'])->name('homepage-settings.update');
         Route::put('/homepage-settings/group/{group}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateGroup'])->name('homepage-settings.update-group');
     });
-    
+
     // Theme Settings Routes
     Route::get('/theme-settings', [\App\Http\Controllers\Admin\ThemeController::class, 'index'])->name('theme-settings.index');
     Route::get('/theme-settings/{theme}/edit', [\App\Http\Controllers\Admin\ThemeController::class, 'edit'])->name('theme-settings.edit');
@@ -171,13 +171,13 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/theme-settings/{theme}/duplicate', [\App\Http\Controllers\Admin\ThemeController::class, 'duplicate'])->name('theme-settings.duplicate');
     Route::patch('/theme-settings/{theme}/reset', [\App\Http\Controllers\Admin\ThemeController::class, 'reset'])->name('theme-settings.reset');
     Route::delete('/theme-settings/{theme}', [\App\Http\Controllers\Admin\ThemeController::class, 'destroy'])->name('theme-settings.destroy');
-    
+
     // Hero Slider Routes
     Route::post('/homepage-settings/slider', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'storeSlider'])->name('homepage-settings.slider.store');
     Route::put('/homepage-settings/slider/{slider}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateSlider'])->name('homepage-settings.slider.update');
     Route::delete('/homepage-settings/slider/{slider}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'destroySlider'])->name('homepage-settings.slider.destroy');
     Route::post('/homepage-settings/slider/reorder', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'reorderSliders'])->name('homepage-settings.slider.reorder');
-    
+
     // Secondary Menu Routes - Requires secondary-menu.manage permission
     Route::middleware(['permission:secondary-menu.manage'])->group(function () {
         Route::get('/secondary-menu', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'index'])->name('secondary-menu.index');
@@ -186,7 +186,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/secondary-menu/{secondaryMenu}', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'destroy'])->name('secondary-menu.destroy');
         Route::post('/secondary-menu/reorder', [\App\Http\Controllers\Admin\SecondaryMenuController::class, 'reorder'])->name('secondary-menu.reorder');
     });
-    
+
     // Sale Offers Routes - Requires sale-offers.view permission
     Route::middleware(['permission:sale-offers.view'])->group(function () {
         Route::get('/sale-offers', [\App\Http\Controllers\Admin\SaleOfferController::class, 'index'])->name('sale-offers.index');
@@ -197,10 +197,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/sale-offers/toggle-section', [\App\Http\Controllers\Admin\SaleOfferController::class, 'toggleSection'])->name('sale-offers.toggle-section');
         Route::post('/sale-offers/update-title', [\App\Http\Controllers\Admin\SaleOfferController::class, 'updateSectionTitle'])->name('sale-offers.update-title');
     });
-    
+
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
-    
+
     // Payment Gateway Management Routes - Requires payment-gateways.view permission
     Route::middleware(['permission:payment-gateways.view'])->group(function () {
         Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
@@ -208,40 +208,41 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
         Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
     });
-    
+
     // Stock Report Routes
     Route::prefix('stock')->name('stock.')->group(function () {
         Route::get('/reports', [\App\Modules\Stock\Controllers\StockReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/export-pdf', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportPdf'])->name('reports.pdf');
         Route::get('/reports/export-excel', [\App\Modules\Stock\Controllers\StockReportController::class, 'exportExcel'])->name('reports.excel');
     });
-    
+
     // Email Preferences Management Routes - Requires email-preferences.view permission
     Route::middleware(['permission:email-preferences.view'])->prefix('email-preferences')->name('email-preferences.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'index'])->name('index');
-        Route::get('/guideline', function () { return view('admin.email-preferences.guideline'); })->name('guideline');
+        Route::get('/guideline', function () {
+            return view('admin.email-preferences.guideline'); })->name('guideline');
         Route::get('/schedule-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'scheduleSetup'])->name('schedule-setup');
-        Route::get('/mail-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'mailSetup'])->name('mail-setup');
-        Route::post('/update-schedule', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'updateSchedule'])->name('update-schedule');
-        Route::post('/send-test-email', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'sendTestEmail'])->name('send-test-email');
-        Route::put('/{user}', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'update'])->name('update');
-        Route::post('/bulk-update', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'bulkUpdate'])->name('bulk-update');
+        Route::get('/mail-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'mailSetup'])->name('mail-setup')->middleware('permission:email-preferences.edit');
+        Route::post('/update-schedule', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'updateSchedule'])->name('update-schedule')->middleware('permission:email-preferences.edit');
+        Route::post('/send-test-email', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'sendTestEmail'])->name('send-test-email')->middleware('permission:email-preferences.edit');
+        Route::put('/{user}', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'update'])->name('update')->middleware('permission:email-preferences.edit');
+        Route::post('/bulk-update', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'bulkUpdate'])->name('bulk-update')->middleware('permission:email-preferences.edit');
         Route::get('/export', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'export'])->name('export');
         Route::get('/newsletter-subscribers', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'newsletterSubscribers'])->name('newsletter-subscribers');
     });
-    
+
     // Contact Management Routes
     Route::prefix('contact')->name('contact.')->group(function () {
         // Contact Settings (includes FAQs management)
         Route::get('/settings', [ContactSettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [ContactSettingController::class, 'update'])->name('settings.update');
-        
+
         // FAQ Management (within settings)
         Route::post('/settings/faqs', [ContactSettingController::class, 'storeFaq'])->name('settings.faqs.store');
         Route::put('/settings/faqs/{faq}', [ContactSettingController::class, 'updateFaq'])->name('settings.faqs.update');
         Route::delete('/settings/faqs/{faq}', [ContactSettingController::class, 'destroyFaq'])->name('settings.faqs.destroy');
         Route::post('/settings/faqs/{faq}/toggle', [ContactSettingController::class, 'toggleFaq'])->name('settings.faqs.toggle');
-        
+
         // Contact Messages
         Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
         Route::get('/messages/{message}', [ContactMessageController::class, 'show'])->name('messages.show');
@@ -255,31 +256,31 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::middleware(['auth'])->prefix('my')->name('customer.')->group(function () {
     // Dashboard
     Route::get('dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
-    
+
     // Profile Management
     Route::get('profile', [CustomerController::class, 'profile'])->name('profile');
     Route::put('profile', [CustomerController::class, 'updateProfile'])->name('profile.update');
-    
+
     // Address Management
     Route::get('addresses', [CustomerController::class, 'addresses'])->name('addresses.index');
-    
+
     // Account Settings
     Route::get('settings', [CustomerController::class, 'settings'])->name('settings');
     Route::put('password', [CustomerController::class, 'updatePassword'])->name('password.update');
     Route::put('preferences', [CustomerController::class, 'updatePreferences'])->name('preferences.update');
     Route::delete('account', [CustomerController::class, 'deleteAccount'])->name('account.delete');
-    
+
     // Order Management
     Route::get('orders', [CustomerOrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [CustomerOrderController::class, 'show'])->name('orders.show');
     Route::post('orders/{order}/cancel', [CustomerOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('orders/{order}/invoice', [CustomerOrderController::class, 'invoice'])->name('orders.invoice');
-    
+
     // Appointment Management
     Route::get('appointments', [App\Http\Controllers\Customer\AppointmentController::class, 'index'])->name('appointments.index');
     Route::get('appointments/{appointment}', [App\Http\Controllers\Customer\AppointmentController::class, 'show'])->name('appointments.show');
     Route::post('appointments/{appointment}/cancel', [App\Http\Controllers\Customer\AppointmentController::class, 'cancel'])->name('appointments.cancel');
-    
+
     // Feedback Management
     Route::get('feedback', [App\Http\Controllers\Customer\FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('feedback/{feedback}', [App\Http\Controllers\Customer\FeedbackController::class, 'show'])->name('feedback.show');
@@ -307,13 +308,13 @@ Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerz
 // Public Product and Blog Post Routes (must be last to avoid conflicts)
 // This route handles both products and blog posts by slug
 // Named 'products.show' as primary, but works for both products and blog posts
-Route::get('/{slug}', function($slug) {
+Route::get('/{slug}', function ($slug) {
     // Try to find product first
     $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
     if ($product) {
         return app(\App\Http\Controllers\ProductController::class)->show($slug);
     }
-    
+
     // Then try to find blog post (published or unlisted)
     $post = \App\Modules\Blog\Models\Post::where('slug', $slug)
         ->whereIn('status', ['published', 'unlisted'])
@@ -321,7 +322,7 @@ Route::get('/{slug}', function($slug) {
     if ($post) {
         return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->show($slug);
     }
-    
+
     // Neither found
     abort(404);
 })->name('products.show');

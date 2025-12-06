@@ -43,10 +43,10 @@ class EmailPreferenceController extends Controller
 
         // Apply search filter
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('mobile', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('mobile', 'like', "%{$search}%");
             });
         }
 
@@ -191,15 +191,15 @@ class EmailPreferenceController extends Controller
     private function exportCsv($users)
     {
         $filename = 'email-preferences-' . date('Y-m-d-His') . '.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($users) {
+        $callback = function () use ($users) {
             $file = fopen('php://output', 'w');
-            
+
             // Add CSV headers
             fputcsv($file, [
                 'Name',
@@ -310,7 +310,7 @@ class EmailPreferenceController extends Controller
     public function updateSchedule(Request $request)
     {
         // Check permission
-        if (!auth()->user()->hasPermission('users.edit')) {
+        if (!auth()->user()->hasPermission('email-preferences.edit')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -354,7 +354,7 @@ class EmailPreferenceController extends Controller
                 strip_tags($validated['content']),
                 function ($message) use ($validated) {
                     $message->to($validated['test_email'])
-                            ->subject('[TEST] ' . $validated['subject']);
+                        ->subject('[TEST] ' . $validated['subject']);
                 }
             );
 
