@@ -12,15 +12,19 @@ class DeliveryRateController extends Controller
     public function __construct(
         protected DeliveryService $deliveryService,
         protected DeliveryRepository $deliveryRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of delivery rates.
      */
     public function index()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.view'), 403, 'You do not have permission to view delivery rates.');
+
         $rates = $this->deliveryService->getAllRates(15);
-        
+
         return view('admin.delivery.rates.index', compact('rates'));
     }
 
@@ -29,9 +33,12 @@ class DeliveryRateController extends Controller
      */
     public function create()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.create'), 403, 'You do not have permission to create delivery rates.');
+
         $zones = $this->deliveryRepository->getActiveZones();
         $methods = $this->deliveryRepository->getActiveMethods();
-        
+
         return view('admin.delivery.rates.create', compact('zones', 'methods'));
     }
 
@@ -40,6 +47,9 @@ class DeliveryRateController extends Controller
      */
     public function store(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.create'), 403, 'You do not have permission to create delivery rates.');
+
         $validated = $request->validate([
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'delivery_method_id' => 'required|exists:delivery_methods,id',
@@ -71,6 +81,9 @@ class DeliveryRateController extends Controller
      */
     public function edit(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.edit'), 403, 'You do not have permission to edit delivery rates.');
+
         $rate = $this->deliveryService->getAllRates(999999)
             ->firstWhere('id', $id);
 
@@ -91,6 +104,9 @@ class DeliveryRateController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.edit'), 403, 'You do not have permission to edit delivery rates.');
+
         $validated = $request->validate([
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'delivery_method_id' => 'required|exists:delivery_methods,id',
@@ -122,6 +138,9 @@ class DeliveryRateController extends Controller
      */
     public function destroy(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-rates.delete'), 403, 'You do not have permission to delete delivery rates.');
+
         $this->deliveryService->deleteRate($id);
 
         return redirect()
@@ -134,6 +153,14 @@ class DeliveryRateController extends Controller
      */
     public function toggleStatus(int $id)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-rates.toggle-status')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle rate status.',
+            ], 403);
+        }
+
         $rate = $this->deliveryService->getAllRates(999999)
             ->firstWhere('id', $id);
 

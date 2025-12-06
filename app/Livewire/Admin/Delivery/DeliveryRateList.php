@@ -88,11 +88,18 @@ class DeliveryRateList extends Component
 
     public function toggleStatus($rateId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-rates.toggle-status')) {
+            session()->flash('error', 'You do not have permission to toggle rate status.');
+            return;
+        }
+
         $rate = DeliveryRate::find($rateId);
         if ($rate) {
             $rate->is_active = !$rate->is_active;
             $rate->save();
             $this->dispatch('rate-updated');
+            session()->flash('success', 'Rate status updated successfully.');
         }
     }
 
@@ -110,13 +117,13 @@ class DeliveryRateList extends Component
             // Search filter
             if ($this->search) {
                 $search = $this->search;
-                $query->where(function($q) use ($search) {
-                    $q->whereHas('zone', function($zq) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('zone', function ($zq) use ($search) {
                         $zq->where('name', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('method', function($mq) use ($search) {
-                        $mq->where('name', 'like', "%{$search}%");
-                    });
+                        ->orWhereHas('method', function ($mq) use ($search) {
+                            $mq->where('name', 'like', "%{$search}%");
+                        });
                 });
             }
 

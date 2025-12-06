@@ -76,11 +76,18 @@ class DeliveryMethodList extends Component
 
     public function toggleStatus($methodId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-methods.toggle-status')) {
+            session()->flash('error', 'You do not have permission to toggle method status.');
+            return;
+        }
+
         $method = DeliveryMethod::find($methodId);
         if ($method) {
             $method->is_active = !$method->is_active;
             $method->save();
             $this->dispatch('method-updated');
+            session()->flash('success', 'Method status updated successfully.');
         }
     }
 
@@ -98,10 +105,10 @@ class DeliveryMethodList extends Component
             // Search filter
             if ($this->search) {
                 $search = $this->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhere('carrier_name', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('carrier_name', 'like', "%{$search}%");
                 });
             }
 

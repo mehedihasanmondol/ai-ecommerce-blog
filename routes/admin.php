@@ -305,15 +305,65 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
                 ->name('zones.toggle-status');
         });
 
-        // Delivery Methods
-        Route::resource('methods', DeliveryMethodController::class);
-        Route::post('methods/{method}/toggle-status', [DeliveryMethodController::class, 'toggleStatus'])
-            ->name('methods.toggle-status');
 
-        // Delivery Rates
-        Route::resource('rates', DeliveryRateController::class);
-        Route::post('rates/{rate}/toggle-status', [DeliveryRateController::class, 'toggleStatus'])
-            ->name('rates.toggle-status');
+        // Delivery Methods - Granular permissions
+        Route::middleware(['permission:delivery-methods.view'])->group(function () {
+            Route::get('methods', [DeliveryMethodController::class, 'index'])->name('methods.index');
+        });
+
+        Route::middleware(['permission:delivery-methods.create'])->group(function () {
+            Route::get('methods/create', [DeliveryMethodController::class, 'create'])->name('methods.create');
+            Route::post('methods', [DeliveryMethodController::class, 'store'])->name('methods.store');
+        });
+
+        Route::middleware(['permission:delivery-methods.edit'])->group(function () {
+            Route::get('methods/{method}/edit', [DeliveryMethodController::class, 'edit'])->name('methods.edit');
+            Route::put('methods/{method}', [DeliveryMethodController::class, 'update'])->name('methods.update');
+            Route::patch('methods/{method}', [DeliveryMethodController::class, 'update']);
+        });
+
+        Route::middleware(['permission:delivery-methods.view'])->group(function () {
+            Route::get('methods/{method}', [DeliveryMethodController::class, 'show'])->name('methods.show');
+        });
+
+        Route::middleware(['permission:delivery-methods.delete'])->group(function () {
+            Route::delete('methods/{method}', [DeliveryMethodController::class, 'destroy'])->name('methods.destroy');
+        });
+
+        Route::middleware(['permission:delivery-methods.toggle-status'])->group(function () {
+            Route::post('methods/{method}/toggle-status', [DeliveryMethodController::class, 'toggleStatus'])
+                ->name('methods.toggle-status');
+        });
+
+
+        // Delivery Rates - Granular permissions
+        Route::middleware(['permission:delivery-rates.view'])->group(function () {
+            Route::get('rates', [DeliveryRateController::class, 'index'])->name('rates.index');
+        });
+
+        Route::middleware(['permission:delivery-rates.create'])->group(function () {
+            Route::get('rates/create', [DeliveryRateController::class, 'create'])->name('rates.create');
+            Route::post('rates', [DeliveryRateController::class, 'store'])->name('rates.store');
+        });
+
+        Route::middleware(['permission:delivery-rates.edit'])->group(function () {
+            Route::get('rates/{rate}/edit', [DeliveryRateController::class, 'edit'])->name('rates.edit');
+            Route::put('rates/{rate}', [DeliveryRateController::class, 'update'])->name('rates.update');
+            Route::patch('rates/{rate}', [DeliveryRateController::class, 'update']);
+        });
+
+        Route::middleware(['permission:delivery-rates.view'])->group(function () {
+            Route::get('rates/{rate}', [DeliveryRateController::class, 'show'])->name('rates.show');
+        });
+
+        Route::middleware(['permission:delivery-rates.delete'])->group(function () {
+            Route::delete('rates/{rate}', [DeliveryRateController::class, 'destroy'])->name('rates.destroy');
+        });
+
+        Route::middleware(['permission:delivery-rates.toggle-status'])->group(function () {
+            Route::post('rates/{rate}/toggle-status', [DeliveryRateController::class, 'toggleStatus'])
+                ->name('rates.toggle-status');
+        });
     });
 
     // Coupon Management Routes - Requires coupons.view permission

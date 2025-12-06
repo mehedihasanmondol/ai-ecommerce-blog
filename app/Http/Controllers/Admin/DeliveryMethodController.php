@@ -10,15 +10,19 @@ class DeliveryMethodController extends Controller
 {
     public function __construct(
         protected DeliveryService $deliveryService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of delivery methods.
      */
     public function index()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.view'), 403, 'You do not have permission to view delivery methods.');
+
         $methods = $this->deliveryService->getAllMethods(15);
-        
+
         return view('admin.delivery.methods.index', compact('methods'));
     }
 
@@ -27,6 +31,9 @@ class DeliveryMethodController extends Controller
      */
     public function create()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.create'), 403, 'You do not have permission to create delivery methods.');
+
         return view('admin.delivery.methods.create');
     }
 
@@ -35,6 +42,9 @@ class DeliveryMethodController extends Controller
      */
     public function store(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.create'), 403, 'You do not have permission to create delivery methods.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:255|unique:delivery_methods,code',
@@ -68,6 +78,9 @@ class DeliveryMethodController extends Controller
      */
     public function edit(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.edit'), 403, 'You do not have permission to edit delivery methods.');
+
         $method = $this->deliveryService->getAllMethods(999999)
             ->firstWhere('id', $id);
 
@@ -85,6 +98,9 @@ class DeliveryMethodController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.edit'), 403, 'You do not have permission to edit delivery methods.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:255|unique:delivery_methods,code,' . $id,
@@ -118,6 +134,9 @@ class DeliveryMethodController extends Controller
      */
     public function destroy(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-methods.delete'), 403, 'You do not have permission to delete delivery methods.');
+
         $this->deliveryService->deleteMethod($id);
 
         return redirect()
@@ -130,6 +149,14 @@ class DeliveryMethodController extends Controller
      */
     public function toggleStatus(int $id)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-methods.toggle-status')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle method status.',
+            ], 403);
+        }
+
         $method = $this->deliveryService->getAllMethods(999999)
             ->firstWhere('id', $id);
 

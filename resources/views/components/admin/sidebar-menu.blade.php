@@ -92,26 +92,32 @@
 @endif
 
 <!-- Delivery Section -->
-@if(auth()->user()->hasPermission('delivery-zones.view'))
+@if(auth()->user()->hasPermission('delivery-zones.view') || auth()->user()->hasPermission('delivery-methods.view') || auth()->user()->hasPermission('delivery-rates.view'))
     <div class="pt-4 pb-2">
         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery</p>
     </div>
 
-    <a href="{{ route('admin.delivery.zones.index') }}"
-        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.zones.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-        <i class="fas fa-map-marked-alt w-5 mr-3"></i>
-        <span>Delivery Zones</span>
-    </a>
+    @if(auth()->user()->hasPermission('delivery-zones.view'))
+        <a href="{{ route('admin.delivery.zones.index') }}"
+            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.zones.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i class="fas fa-map-marked-alt w-5 mr-3"></i>
+            <span>Delivery Zones</span>
+        </a>
+    @endif
 
-    <a href="{{ route('admin.delivery.methods.index') }}"
-        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.methods.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-        <i class="fas fa-shipping-fast w-5 mr-3"></i>
-        <span>Delivery Methods</span>
-    </a>
+    @if(auth()->user()->hasPermission('delivery-methods.view'))
+        <a href="{{ route('admin.delivery.methods.index') }}"
+            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.methods.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i class="fas fa-shipping-fast w-5 mr-3"></i>
+            <span>Delivery Methods</span>
+        </a>
+    @endif
 
-    <a href="{{ route('admin.delivery.rates.index') }}"
-        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.rates.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-        <i class="fas fa-dollar-sign w-5 mr-3"></i>
-        <span>Delivery Rates</span>
-    </a>
+    @if(auth()->user()->hasPermission('delivery-rates.view'))
+        <a href="{{ route('admin.delivery.rates.index') }}"
+            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.delivery.rates.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i class="fas fa-dollar-sign w-5 mr-3"></i>
+            <span>Delivery Rates</span>
+        </a>
+    @endif
 @endif
