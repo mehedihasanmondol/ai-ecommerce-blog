@@ -26,6 +26,11 @@ class CommentController extends Controller
 
     public function index(Request $request)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.view')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $filters = $request->only(['status', 'post_id']);
         $comments = $this->commentService->getAllComments(config('app.paginate', 20), $filters);
         $counts = $this->commentService->getCommentsCountByStatus();

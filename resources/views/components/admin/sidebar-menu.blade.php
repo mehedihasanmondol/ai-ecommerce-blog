@@ -65,11 +65,13 @@
         </a>
     @endif
 
-    <a href="{{ route('admin.blog.comments.index') }}"
-        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-        <i class="fas fa-comments w-5 mr-3"></i>
-        <span>Comments</span>
-    </a>
+    @if(auth()->user()->hasPermission('blog-comments.view'))
+        <a href="{{ route('admin.blog.comments.index') }}"
+            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.comments.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i class="fas fa-comments w-5 mr-3"></i>
+            <span>Comments</span>
+        </a>
+    @endif
 @endif
 
 <!-- Feedback Section -->

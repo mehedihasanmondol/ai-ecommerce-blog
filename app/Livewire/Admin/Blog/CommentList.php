@@ -16,7 +16,7 @@ class CommentList extends Component
     public $sortBy = 'created_at';
     public $sortOrder = 'desc';
     public $perPage = 15;
-    
+
     public $showFilters = false;
     public $showDeleteModal = false;
     public $showViewModal = false;
@@ -63,6 +63,12 @@ class CommentList extends Component
 
     public function approveComment($commentId)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.approve')) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
         $comment = Comment::findOrFail($commentId);
         $comment->status = 'approved';
         $comment->approved_at = now();
@@ -74,6 +80,12 @@ class CommentList extends Component
 
     public function markAsSpam($commentId)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.approve')) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
         $comment = Comment::findOrFail($commentId);
         $comment->status = 'spam';
         $comment->save();
@@ -89,6 +101,14 @@ class CommentList extends Component
 
     public function deleteComment()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-comments.delete')) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showDeleteModal = false;
+            $this->commentToDelete = null;
+            return;
+        }
+
         if ($this->commentToDelete) {
             try {
                 Comment::findOrFail($this->commentToDelete)->delete();
