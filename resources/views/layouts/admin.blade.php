@@ -514,14 +514,16 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('admin.best-seller-products.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.best-seller-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-trophy w-5 mr-3"></i>
-                        <span>Best Sellers</span>
-                        @if(request()->routeIs('admin.best-seller-products.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('best-sellers.view'))
+                        <a href="{{ route('admin.best-seller-products.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.best-seller-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-medal w-5 mr-3"></i>
+                            <span>Best Sellers</span>
+                            @if(request()->routeIs('admin.best-seller-products.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
                     <a href="{{ route('admin.new-arrival-products.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.new-arrival-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">

@@ -15,6 +15,8 @@ class BestSellerProductController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('best-sellers.view'), 403, 'You do not have permission to view best seller products.');
+
         $bestSellerProducts = BestSellerProduct::with('product.variants')
             ->orderBy('sort_order')
             ->get();
@@ -31,6 +33,8 @@ class BestSellerProductController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('best-sellers.create'), 403, 'You do not have permission to add best seller products.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id|unique:best_seller_products,product_id',
             'sort_order' => 'nullable|integer|min:0',
@@ -50,6 +54,14 @@ class BestSellerProductController extends Controller
      */
     public function updateOrder(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('best-sellers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to reorder best seller products.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:best_seller_products,id',
@@ -69,6 +81,14 @@ class BestSellerProductController extends Controller
      */
     public function toggleStatus(BestSellerProduct $bestSellerProduct)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('best-sellers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle best seller product status.',
+            ], 403);
+        }
+
         $bestSellerProduct->is_active = !$bestSellerProduct->is_active;
         $bestSellerProduct->save();
 
@@ -83,6 +103,8 @@ class BestSellerProductController extends Controller
      */
     public function destroy(BestSellerProduct $bestSellerProduct)
     {
+        abort_if(!auth()->user()->hasPermission('best-sellers.delete'), 403, 'You do not have permission to remove best seller products.');
+
         $bestSellerProduct->delete();
 
         return redirect()->route('admin.best-seller-products.index')
@@ -94,6 +116,14 @@ class BestSellerProductController extends Controller
      */
     public function toggleSection(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('best-sellers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle section visibility.',
+            ], 403);
+        }
+
         SiteSetting::updateOrCreate(
             ['key' => 'best_sellers_section_enabled'],
             ['value' => $request->enabled ? '1' : '0']
@@ -107,6 +137,14 @@ class BestSellerProductController extends Controller
      */
     public function updateSectionTitle(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('best-sellers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update section title.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
         ]);
@@ -124,24 +162,32 @@ class BestSellerProductController extends Controller
      */
     public function searchProducts(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('best-sellers.create')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to search products.',
+            ], 403);
+        }
+
         $search = $request->get('q', '');
-        
+
         if (empty($search)) {
             return response()->json([]);
         }
-        
+
         $existingProductIds = BestSellerProduct::pluck('product_id')->toArray();
-        
-        $products = Product::where(function($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%");
-            })
+
+        $products = Product::where(function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('sku', 'like', "%{$search}%");
+        })
             ->whereNotIn('id', $existingProductIds)
             ->where('is_active', true)
             ->with(['variants', 'images'])
             ->limit(10)
             ->get()
-            ->map(function($product) {
+            ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
