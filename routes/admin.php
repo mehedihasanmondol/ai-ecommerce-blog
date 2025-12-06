@@ -87,8 +87,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::resource('roles', RoleController::class)->except(['edit']);
     });
 
-    // Category Management Routes - Requires product permissions
-    Route::middleware(['permission:products.view'])->group(function () {
+    // Category Management Routes - Requires categories.view permission
+    Route::middleware(['permission:categories.view'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
             ->name('categories.toggle-status');
@@ -96,8 +96,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
             ->name('categories.duplicate');
     });
 
-    // Brand Management Routes - Requires product permissions
-    Route::middleware(['permission:products.view'])->group(function () {
+    // Brand Management Routes - Requires brands.view permission
+    Route::middleware(['permission:brands.view'])->group(function () {
         Route::resource('brands', BrandController::class);
         Route::post('brands/{brand}/toggle-status', [BrandController::class, 'toggleStatus'])
             ->name('brands.toggle-status');
