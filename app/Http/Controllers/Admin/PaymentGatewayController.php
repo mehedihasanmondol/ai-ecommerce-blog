@@ -17,17 +17,26 @@ class PaymentGatewayController extends Controller
 {
     public function index()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('payment-gateways.view'), 403, 'You do not have permission to view payment gateways.');
+
         $gateways = PaymentGateway::orderBy('sort_order')->get();
         return view('admin.payment-gateways.index', compact('gateways'));
     }
 
     public function edit(PaymentGateway $gateway)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('payment-gateways.edit'), 403, 'You do not have permission to edit payment gateways.');
+
         return view('admin.payment-gateways.edit', compact('gateway'));
     }
 
     public function update(Request $request, PaymentGateway $gateway)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('payment-gateways.edit'), 403, 'You do not have permission to edit payment gateways.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -41,12 +50,12 @@ class PaymentGatewayController extends Controller
         // Handle logo upload with WebP compression
         if ($request->hasFile('logo')) {
             $imageService = app(ImageCompressionService::class);
-            
+
             // Delete old logo if exists
             if ($gateway->logo && Storage::disk('public')->exists($gateway->logo)) {
                 Storage::disk('public')->delete($gateway->logo);
             }
-            
+
             // Compress and store as WebP
             $logoPath = $imageService->compressAndStore(
                 $request->file('logo'),
@@ -64,6 +73,14 @@ class PaymentGatewayController extends Controller
 
     public function toggleStatus(PaymentGateway $gateway)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('payment-gateways.toggle-status')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle payment gateway status.',
+            ], 403);
+        }
+
         $gateway->update(['is_active' => !$gateway->is_active]);
 
         return response()->json([

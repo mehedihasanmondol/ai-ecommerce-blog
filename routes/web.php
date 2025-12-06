@@ -201,11 +201,17 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 
-    // Payment Gateway Management Routes - Requires payment-gateways.view permission
+    // Payment Gateway Management Routes - Granular permissions
     Route::middleware(['permission:payment-gateways.view'])->group(function () {
         Route::get('/payment-gateways', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'index'])->name('payment-gateways.index');
+    });
+
+    Route::middleware(['permission:payment-gateways.edit'])->group(function () {
         Route::get('/payment-gateways/{gateway}/edit', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'edit'])->name('payment-gateways.edit');
         Route::put('/payment-gateways/{gateway}', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'update'])->name('payment-gateways.update');
+    });
+
+    Route::middleware(['permission:payment-gateways.toggle-status'])->group(function () {
         Route::patch('/payment-gateways/{gateway}/toggle', [\App\Http\Controllers\Admin\PaymentGatewayController::class, 'toggleStatus'])->name('payment-gateways.toggle');
     });
 

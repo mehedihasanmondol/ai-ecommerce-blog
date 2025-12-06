@@ -392,19 +392,21 @@
                 @endif
 
                 <!-- Payments Section -->
-                @if(auth()->user()->hasPermission('orders.view'))
+                @if(auth()->user()->hasPermission('orders.view') || auth()->user()->hasPermission('payment-gateways.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments</p>
                     </div>
 
-                    <a href="{{ route('admin.payment-gateways.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.payment-gateways.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-credit-card w-5 mr-3"></i>
-                        <span>Payment Gateways</span>
-                        @if(request()->routeIs('admin.payment-gateways.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('payment-gateways.view'))
+                        <a href="{{ route('admin.payment-gateways.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.payment-gateways.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-credit-card w-5 mr-3"></i>
+                            <span>Payment Gateways</span>
+                            @if(request()->routeIs('admin.payment-gateways.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
                 @endif
 
                 <!-- Inventory Section -->
@@ -908,16 +910,18 @@
                 @endif
 
                 <!-- Payments Section (Mobile) -->
-                @if(auth()->user()->hasPermission('orders.view'))
+                @if(auth()->user()->hasPermission('orders.view') || auth()->user()->hasPermission('payment-gateways.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Payments</p>
                     </div>
 
-                    <a href="{{ route('admin.payment-gateways.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.payment-gateways.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-credit-card w-5 mr-3"></i>
-                        <span>Payment Gateways</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('payment-gateways.view'))
+                        <a href="{{ route('admin.payment-gateways.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.payment-gateways.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-credit-card w-5 mr-3"></i>
+                            <span>Payment Gateways</span>
+                        </a>
+                    @endif
                 @endif
 
                 @if(auth()->user()->hasPermission('stock.view'))
@@ -1191,7 +1195,7 @@
                     scrollToActiveMenuItem(mobileSidebar);
                 }
             }
-    });
+        });
     </script>
 </body>
 
