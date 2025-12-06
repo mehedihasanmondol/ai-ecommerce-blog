@@ -215,7 +215,9 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Toggle Sale Offer Status', 'slug' => 'sale-offers.toggle-status', 'module' => 'content'],
 
             ['name' => 'Manage Secondary Menu', 'slug' => 'secondary-menu.manage', 'module' => 'content'],
-            ['name' => 'Manage Footer', 'slug' => 'footer.manage', 'module' => 'content'],
+
+            ['name' => 'View Footer', 'slug' => 'footer.view', 'module' => 'content'],
+            ['name' => 'Edit Footer', 'slug' => 'footer.edit', 'module' => 'content'],
 
             // Trending/Featured Products
             ['name' => 'View Trending Products', 'slug' => 'trending-products.view', 'module' => 'content'],

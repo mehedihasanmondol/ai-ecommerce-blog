@@ -14,6 +14,8 @@ class FooterManagementController extends Controller
 {
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('footer.view'), 403, 'You do not have permission to view footer management.');
+
         $settings = FooterSetting::all()->groupBy('group');
         $blogPosts = FooterBlogPost::orderBy('sort_order')->get();
 
@@ -22,6 +24,8 @@ class FooterManagementController extends Controller
 
     public function updateSettings(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to edit footer settings.');
+
         foreach ($request->except(['_token', 'qr_code_image']) as $key => $value) {
             FooterSetting::where('key', $key)->update(['value' => $value]);
         }
@@ -29,20 +33,20 @@ class FooterManagementController extends Controller
         // Handle QR code image upload with WebP compression
         if ($request->hasFile('qr_code_image')) {
             $imageService = app(ImageCompressionService::class);
-            
+
             // Delete old QR code if exists
             $oldQrCode = FooterSetting::where('key', 'qr_code_image')->first();
             if ($oldQrCode && $oldQrCode->value) {
                 Storage::disk('public')->delete($oldQrCode->value);
             }
-            
+
             // Compress and store as WebP
             $path = $imageService->compressAndStore(
                 $request->file('qr_code_image'),
                 'footer/qr-codes',
                 'public'
             );
-            
+
             FooterSetting::where('key', 'qr_code_image')->update(['value' => $path]);
         }
 
@@ -52,6 +56,8 @@ class FooterManagementController extends Controller
 
     public function storeBlogPost(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to add footer blog posts.');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'url' => 'required|string|max:255',
@@ -76,6 +82,8 @@ class FooterManagementController extends Controller
 
     public function deleteBlogPost(FooterBlogPost $blogPost)
     {
+        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to delete footer blog posts.');
+
         if ($blogPost->image) {
             Storage::disk('public')->delete($blogPost->image);
         }
@@ -88,6 +96,14 @@ class FooterManagementController extends Controller
      */
     public function toggleSection(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('footer.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle footer sections.',
+            ], 403);
+        }
+
         try {
             $validated = $request->validate([
                 'section_key' => 'required|string',

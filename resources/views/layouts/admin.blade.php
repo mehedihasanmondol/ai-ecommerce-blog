@@ -536,14 +536,16 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('admin.footer-management.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.footer-management.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-shoe-prints w-5 mr-3"></i>
-                        <span>Footer Management</span>
-                        @if(request()->routeIs('admin.footer-management.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('footer.view'))
+                        <a href="{{ route('admin.footer-management.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.footer-management.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-shoe-prints w-5 mr-3"></i>
+                            <span>Footer Management</span>
+                            @if(request()->routeIs('admin.footer-management.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
                 @endif
 
                 <!-- Blog Section -->
