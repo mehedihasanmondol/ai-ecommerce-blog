@@ -38,6 +38,8 @@ class SaleOfferController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('sale-offers.view'), 403, 'You do not have permission to view sale offers.');
+
         $saleOffers = SaleOffer::with('product')
             ->ordered()
             ->get();
@@ -57,6 +59,8 @@ class SaleOfferController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('sale-offers.create'), 403, 'You do not have permission to add sale offers.');
+
         $request->validate([
             'product_id' => 'required|exists:products,id|unique:sale_offers,product_id',
         ]);
@@ -83,6 +87,8 @@ class SaleOfferController extends Controller
      */
     public function destroy(SaleOffer $saleOffer)
     {
+        abort_if(!auth()->user()->hasPermission('sale-offers.delete'), 403, 'You do not have permission to remove sale offers.');
+
         $saleOffer->delete();
 
         return redirect()
@@ -98,6 +104,14 @@ class SaleOfferController extends Controller
      */
     public function reorder(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('sale-offers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to reorder sale offers.',
+            ], 403);
+        }
+
         $request->validate([
             'orders' => 'required|array',
             'orders.*.id' => 'required|exists:sale_offers,id',
@@ -123,6 +137,8 @@ class SaleOfferController extends Controller
      */
     public function toggleStatus(SaleOffer $saleOffer)
     {
+        abort_if(!auth()->user()->hasPermission('sale-offers.edit'), 403, 'You do not have permission to toggle sale offer status.');
+
         $saleOffer->update([
             'is_active' => !$saleOffer->is_active,
         ]);
@@ -139,6 +155,14 @@ class SaleOfferController extends Controller
      */
     public function toggleSection(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('sale-offers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle section visibility.',
+            ], 403);
+        }
+
         SiteSetting::updateOrCreate(
             ['key' => 'sale_offers_section_enabled'],
             ['value' => $request->enabled ? '1' : '0']
@@ -152,6 +176,14 @@ class SaleOfferController extends Controller
      */
     public function updateSectionTitle(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('sale-offers.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update section title.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
         ]);

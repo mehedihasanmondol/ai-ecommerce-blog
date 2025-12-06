@@ -21,6 +21,8 @@ class SecondaryMenuController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('secondary-menu.manage'), 403, 'You do not have permission to manage secondary menu.');
+
         return view('admin.secondary-menu.index');
     }
 

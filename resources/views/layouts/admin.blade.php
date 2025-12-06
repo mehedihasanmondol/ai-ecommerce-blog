@@ -481,23 +481,27 @@
                         @endif
                     </a>
 
-                    <a href="{{ route('admin.secondary-menu.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-bars w-5 mr-3"></i>
-                        <span>Secondary Menu</span>
-                        @if(request()->routeIs('admin.secondary-menu.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('secondary-menu.manage'))
+                        <a href="{{ route('admin.secondary-menu.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-bars w-5 mr-3"></i>
+                            <span>Secondary Menu</span>
+                            @if(request()->routeIs('admin.secondary-menu.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
-                    <a href="{{ route('admin.sale-offers.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.sale-offers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-tag w-5 mr-3"></i>
-                        <span>Sale Offers</span>
-                        @if(request()->routeIs('admin.sale-offers.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('sale-offers.view'))
+                        <a href="{{ route('admin.sale-offers.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.sale-offers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-tag w-5 mr-3"></i>
+                            <span>Sale Offers</span>
+                            @if(request()->routeIs('admin.sale-offers.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
                     <a href="{{ route('admin.trending-products.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.trending-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -981,11 +985,13 @@
                         <span>Homepage Settings</span>
                     </a>
 
-                    <a href="{{ route('admin.secondary-menu.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-bars w-5 mr-3"></i>
-                        <span>Secondary Menu</span>
-                    </a>
+                    @if(auth()->user()->hasPermission('secondary-menu.manage'))
+                        <a href="{{ route('admin.secondary-menu.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.secondary-menu.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-bars w-5 mr-3"></i>
+                            <span>Secondary Menu</span>
+                        </a>
+                    @endif
                 @endif
 
                 @if(auth()->user()->hasPermission('posts.view'))
