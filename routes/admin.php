@@ -288,8 +288,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
             ->name('rates.toggle-status');
     });
 
-    // Coupon Management Routes - Requires order permissions
-    Route::middleware(['permission:orders.view'])->group(function () {
+    // Coupon Management Routes - Requires coupons.view permission
+    Route::middleware(['permission:coupons.view'])->group(function () {
         Route::get('coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
         Route::get('coupons/create', [AdminCouponController::class, 'create'])->name('coupons.create');
         Route::get('coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');

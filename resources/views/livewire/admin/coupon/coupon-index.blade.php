@@ -6,13 +6,13 @@
             <p class="mt-1 text-sm text-gray-600">Manage discount coupons and promotional codes</p>
         </div>
         @if(auth()->user()->hasPermission('coupons.create'))
-        <a href="{{ route('admin.coupons.create') }}" 
-           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Create Coupon
-        </a>
+            <a href="{{ route('admin.coupons.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Create Coupon
+            </a>
         @endif
     </div>
 
@@ -28,17 +28,16 @@
             <!-- Search -->
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                <input type="text" 
-                       wire:model.live.debounce.300ms="search"
-                       placeholder="Search by code, name, or description..."
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input type="text" wire:model.live.debounce.300ms="search"
+                    placeholder="Search by code, name, or description..."
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
 
             <!-- Status Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select wire:model.live="statusFilter" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select wire:model.live="statusFilter"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -50,8 +49,8 @@
             <!-- Type Filter -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <select wire:model.live="typeFilter" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select wire:model.live="typeFilter"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="all">All Types</option>
                     <option value="percentage">Percentage</option>
                     <option value="fixed">Fixed Amount</option>
@@ -66,7 +65,7 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th wire:click="sortBy('code')" 
+                        <th wire:click="sortBy('code')"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
                             Code
                             @if($sortBy === 'code')
@@ -82,7 +81,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Discount
                         </th>
-                        <th wire:click="sortBy('total_used')" 
+                        <th wire:click="sortBy('total_used')"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
                             Usage
                             @if($sortBy === 'total_used')
@@ -117,7 +116,8 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $coupon->type === 'percentage' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
+                                <span
+                                    class="px-2 py-1 text-xs font-medium rounded-full {{ $coupon->type === 'percentage' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
                                     {{ ucfirst($coupon->type) }}
                                 </span>
                             </td>
@@ -142,42 +142,46 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if(auth()->user()->hasPermission('coupons.edit'))
-                                <button wire:click="toggleStatus({{ $coupon->id }})"
+                                    <button wire:click="toggleStatus({{ $coupon->id }})"
                                         class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {{ $coupon->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
-                                    <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $coupon->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
-                                </button>
+                                        <span
+                                            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $coupon->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                    </button>
                                 @else
-                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $coupon->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                    {{ $coupon->is_active ? 'Active' : 'Inactive' }}
-                                </span>
+                                    <span
+                                        class="px-2 py-1 text-xs font-medium rounded-full {{ $coupon->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                        {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                                    </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end space-x-2">
-                                    <a href="{{ route('admin.coupons.statistics', $coupon) }}" 
-                                       class="text-purple-600 hover:text-purple-900"
-                                       title="View Statistics">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                                        </svg>
-                                    </a>
+                                    @if(auth()->user()->hasPermission('coupons.statistics'))
+                                        <a href="{{ route('admin.coupons.statistics', $coupon) }}"
+                                            class="text-purple-600 hover:text-purple-900" title="View Statistics">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                        </a>
+                                    @endif
                                     @if(auth()->user()->hasPermission('coupons.edit'))
-                                    <a href="{{ route('admin.coupons.edit', $coupon) }}" 
-                                       class="text-blue-600 hover:text-blue-900"
-                                       title="Edit">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </a>
+                                        <a href="{{ route('admin.coupons.edit', $coupon) }}"
+                                            class="text-blue-600 hover:text-blue-900" title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </a>
                                     @endif
                                     @if(auth()->user()->hasPermission('coupons.delete'))
-                                    <button wire:click="confirmDelete({{ $coupon->id }})" 
-                                            class="text-red-600 hover:text-red-900"
-                                            title="Delete">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
+                                        <button wire:click="confirmDelete({{ $coupon->id }})"
+                                            class="text-red-600 hover:text-red-900" title="Delete">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     @endif
                                 </div>
                             </td>
@@ -185,8 +189,10 @@
                     @empty
                         <tr>
                             <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                 </svg>
                                 <p class="mt-2">No coupons found</p>
                             </td>
@@ -206,32 +212,35 @@
     @if($showDeleteModal)
         <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="$set('showDeleteModal', false)"></div>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                    wire:click="$set('showDeleteModal', false)"></div>
+                <div
+                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
-                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <div
+                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                                 <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                 <h3 class="text-lg leading-6 font-medium text-gray-900">Delete Coupon</h3>
                                 <div class="mt-2">
-                                    <p class="text-sm text-gray-500">Are you sure you want to delete this coupon? This action cannot be undone.</p>
+                                    <p class="text-sm text-gray-500">Are you sure you want to delete this coupon? This
+                                        action cannot be undone.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button wire:click="deleteCoupon" 
-                                type="button" 
-                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        <button wire:click="deleteCoupon" type="button"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
                             Delete
                         </button>
-                        <button wire:click="$set('showDeleteModal', false)" 
-                                type="button" 
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        <button wire:click="$set('showDeleteModal', false)" type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                             Cancel
                         </button>
                     </div>
