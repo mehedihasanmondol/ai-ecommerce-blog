@@ -10,15 +10,19 @@ class DeliveryZoneController extends Controller
 {
     public function __construct(
         protected DeliveryService $deliveryService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of delivery zones.
      */
     public function index()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.view'), 403, 'You do not have permission to view delivery zones.');
+
         $zones = $this->deliveryService->getAllZones(15);
-        
+
         return view('admin.delivery.zones.index', compact('zones'));
     }
 
@@ -27,6 +31,9 @@ class DeliveryZoneController extends Controller
      */
     public function create()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.create'), 403, 'You do not have permission to create delivery zones.');
+
         return view('admin.delivery.zones.create');
     }
 
@@ -35,6 +42,9 @@ class DeliveryZoneController extends Controller
      */
     public function store(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.create'), 403, 'You do not have permission to create delivery zones.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:255|unique:delivery_zones,code',
@@ -63,6 +73,9 @@ class DeliveryZoneController extends Controller
      */
     public function edit(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.edit'), 403, 'You do not have permission to edit delivery zones.');
+
         $zone = $this->deliveryService->getAllZones(999999)
             ->firstWhere('id', $id);
 
@@ -80,6 +93,9 @@ class DeliveryZoneController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.edit'), 403, 'You do not have permission to edit delivery zones.');
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:255|unique:delivery_zones,code,' . $id,
@@ -108,6 +124,9 @@ class DeliveryZoneController extends Controller
      */
     public function destroy(int $id)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('delivery-zones.delete'), 403, 'You do not have permission to delete delivery zones.');
+
         $this->deliveryService->deleteZone($id);
 
         return redirect()
@@ -120,6 +139,14 @@ class DeliveryZoneController extends Controller
      */
     public function toggleStatus(int $id)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-zones.toggle-status')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle zone status.',
+            ], 403);
+        }
+
         $zone = $this->deliveryService->getAllZones(999999)
             ->firstWhere('id', $id);
 

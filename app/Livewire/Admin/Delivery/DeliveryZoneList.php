@@ -68,11 +68,18 @@ class DeliveryZoneList extends Component
 
     public function toggleStatus($zoneId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('delivery-zones.toggle-status')) {
+            session()->flash('error', 'You do not have permission to toggle zone status.');
+            return;
+        }
+
         $zone = DeliveryZone::find($zoneId);
         if ($zone) {
             $zone->is_active = !$zone->is_active;
             $zone->save();
             $this->dispatch('zone-updated');
+            session()->flash('success', 'Zone status updated successfully.');
         }
     }
 
@@ -90,10 +97,10 @@ class DeliveryZoneList extends Component
             // Search filter
             if ($this->search) {
                 $search = $this->search;
-                $query->where(function($q) use ($search) {
+                $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 

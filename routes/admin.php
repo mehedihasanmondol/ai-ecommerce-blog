@@ -274,12 +274,36 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::delete('/{chamber}', [\App\Http\Controllers\Admin\ChamberController::class, 'destroy'])->name('destroy');
     });
 
-    // Delivery Management Routes - Requires order permissions
-    Route::middleware(['permission:orders.view'])->prefix('delivery')->name('delivery.')->group(function () {
-        // Delivery Zones
-        Route::resource('zones', DeliveryZoneController::class);
-        Route::post('zones/{zone}/toggle-status', [DeliveryZoneController::class, 'toggleStatus'])
-            ->name('zones.toggle-status');
+    // Delivery Management Routes - Requires specific delivery permissions
+    Route::prefix('delivery')->name('delivery.')->group(function () {
+        // Delivery Zones - Granular permissions
+        Route::middleware(['permission:delivery-zones.view'])->group(function () {
+            Route::get('zones', [DeliveryZoneController::class, 'index'])->name('zones.index');
+        });
+
+        Route::middleware(['permission:delivery-zones.create'])->group(function () {
+            Route::get('zones/create', [DeliveryZoneController::class, 'create'])->name('zones.create');
+            Route::post('zones', [DeliveryZoneController::class, 'store'])->name('zones.store');
+        });
+
+        Route::middleware(['permission:delivery-zones.edit'])->group(function () {
+            Route::get('zones/{zone}/edit', [DeliveryZoneController::class, 'edit'])->name('zones.edit');
+            Route::put('zones/{zone}', [DeliveryZoneController::class, 'update'])->name('zones.update');
+            Route::patch('zones/{zone}', [DeliveryZoneController::class, 'update']);
+        });
+
+        Route::middleware(['permission:delivery-zones.view'])->group(function () {
+            Route::get('zones/{zone}', [DeliveryZoneController::class, 'show'])->name('zones.show');
+        });
+
+        Route::middleware(['permission:delivery-zones.delete'])->group(function () {
+            Route::delete('zones/{zone}', [DeliveryZoneController::class, 'destroy'])->name('zones.destroy');
+        });
+
+        Route::middleware(['permission:delivery-zones.toggle-status'])->group(function () {
+            Route::post('zones/{zone}/toggle-status', [DeliveryZoneController::class, 'toggleStatus'])
+                ->name('zones.toggle-status');
+        });
 
         // Delivery Methods
         Route::resource('methods', DeliveryMethodController::class);
