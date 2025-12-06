@@ -32,6 +32,7 @@
     </div>
 
     <!-- Settings Form -->
+    @if(auth()->user()->hasPermission('homepage-settings.edit'))
     <form wire:submit.prevent="save">
         <!-- Group Settings -->
         <div class="p-6 space-y-6 bg-gray-50">
@@ -200,4 +201,43 @@
             </div>
         </div>
     </form>
+    @else
+    <!-- Read-Only View -->
+    <div class="p-6 space-y-6 bg-gray-50">
+        @foreach($groupSettings as $setting)
+            <div class="setting-item bg-white p-5 rounded-lg border border-gray-200">
+                <label class="block text-sm font-semibold text-gray-800 mb-3">
+                    <div class="flex items-center justify-between">
+                        <span>{{ $setting['description'] ?? ucfirst(str_replace('_', ' ', $setting['key'])) }}</span>
+                        <span class="text-xs font-normal px-2 py-1 bg-gray-100 text-gray-700 rounded">Read Only</span>
+                    </div>
+                </label>
+
+                @if($setting['type'] === 'image' && $setting['value'])
+                    <img 
+                        src="{{ asset('storage/' . $setting['value']) }}" 
+                        alt="{{ $setting['description'] ?? $setting['key'] }}"
+                        class="max-h-40 rounded-xl border-2 border-gray-200 shadow-sm"
+                    >
+                @elseif($setting['type'] === 'boolean')
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <span class="text-sm text-gray-700">{{ $setting['value'] ? 'Enabled' : 'Disabled' }}</span>
+                    </div>
+                @else
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-700">
+                        {{ $setting['value'] ?: 'Not set' }}
+                    </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+    <div class="px-6 py-4 bg-yellow-50 border-t border-yellow-200">
+        <div class="flex items-center text-sm text-yellow-800">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="font-medium">You have view-only access to these settings.</span>
+        </div>
+    </div>
+    @endif
 </div>

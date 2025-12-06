@@ -467,7 +467,7 @@
                 @endif
 
                 <!-- Content Section (Placeholder) -->
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasPermission('homepage-settings.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                     </div>
@@ -970,7 +970,7 @@
                     @endif
                 @endif
 
-                @if(auth()->user()->hasPermission('users.view'))
+                @if(auth()->user()->hasPermission('homepage-settings.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Content</p>
                     </div>

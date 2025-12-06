@@ -15,6 +15,8 @@ class HomepageSettingController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.view'), 403, 'You do not have permission to view homepage settings.');
+
         $settings = HomepageSetting::orderBy('group')->orderBy('order')->get()->groupBy('group');
         $sliders = HeroSlider::orderBy('order')->get();
 
@@ -26,6 +28,8 @@ class HomepageSettingController extends Controller
      */
     public function update(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to edit homepage settings.');
+
         $validated = $request->validate([
             'settings' => 'required|array',
             'settings.*' => 'nullable',
@@ -33,14 +37,14 @@ class HomepageSettingController extends Controller
 
         foreach ($validated['settings'] as $key => $value) {
             $setting = HomepageSetting::where('key', $key)->first();
-            
+
             if ($setting) {
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
                     // Delete old image
                     if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                         Storage::delete($setting->value);
                     }
-                    
+
                     // Store new image
                     $path = $request->file("settings.{$key}")->store('homepage', 'public');
                     $value = $path;
@@ -63,6 +67,8 @@ class HomepageSettingController extends Controller
      */
     public function updateGroup(Request $request, string $group)
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to edit homepage settings.');
+
         $validated = $request->validate([
             'settings' => 'required|array',
             'settings.*' => 'nullable',
@@ -72,7 +78,7 @@ class HomepageSettingController extends Controller
             $setting = HomepageSetting::where('key', $key)
                 ->where('group', $group)
                 ->first();
-            
+
             if ($setting) {
                 // Handle image uploads
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
@@ -80,11 +86,11 @@ class HomepageSettingController extends Controller
                     if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                         Storage::disk('public')->delete($setting->value);
                     }
-                    
+
                     // Store new image
                     $path = $request->file("settings.{$key}")->store('homepage-settings', 'public');
                     $value = $path;
-                } 
+                }
                 // Handle boolean values
                 elseif ($setting->type === 'boolean') {
                     $value = $request->has("settings.{$key}") ? '1' : '0';
@@ -109,6 +115,8 @@ class HomepageSettingController extends Controller
      */
     public function storeSlider(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
@@ -137,6 +145,8 @@ class HomepageSettingController extends Controller
      */
     public function updateSlider(Request $request, HeroSlider $slider)
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:255',
@@ -152,7 +162,7 @@ class HomepageSettingController extends Controller
             if ($slider->image && !filter_var($slider->image, FILTER_VALIDATE_URL)) {
                 Storage::delete($slider->image);
             }
-            
+
             $validated['image'] = $request->file('image')->store('sliders', 'public');
         }
 
@@ -169,6 +179,8 @@ class HomepageSettingController extends Controller
      */
     public function destroySlider(HeroSlider $slider)
     {
+        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+
         $slider->delete();
 
         return redirect()->route('admin.homepage-settings.index')
@@ -180,6 +192,14 @@ class HomepageSettingController extends Controller
      */
     public function reorderSliders(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('homepage-settings.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to reorder sliders.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'sliders' => 'required|array',
             'sliders.*.id' => 'required|exists:hero_sliders,id',
