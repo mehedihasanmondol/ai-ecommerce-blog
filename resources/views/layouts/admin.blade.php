@@ -306,6 +306,7 @@
                     </a>
                     @endif
 
+                    @if(auth()->user()->hasPermission('attributes.view'))
                     <a href="{{ route('admin.attributes.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.attributes.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <i class="fas fa-sliders-h w-5 mr-3"></i>
@@ -314,6 +315,7 @@
                             <i class="fas fa-chevron-right ml-auto text-xs"></i>
                         @endif
                     </a>
+                    @endif
 
                     <a href="{{ route('admin.product-questions.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
