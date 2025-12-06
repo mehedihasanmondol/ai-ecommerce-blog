@@ -46,7 +46,7 @@ class RoleController extends Controller
     public function index()
     {
         abort_if(!auth()->user()->hasPermission('roles.view'), 403, 'You do not have permission to view roles.');
-        
+
         $roles = $this->roleService->getAllRoles();
         return view('admin.roles.index', compact('roles'));
     }
@@ -58,7 +58,7 @@ class RoleController extends Controller
     public function create()
     {
         abort_if(!auth()->user()->hasPermission('roles.create'), 403, 'You do not have permission to create roles.');
-        
+
         $permissions = $this->permissionRepository->getActiveByEnabledModules();
         return view('admin.roles.create', compact('permissions'));
     }
@@ -69,7 +69,7 @@ class RoleController extends Controller
     public function store(StoreRoleRequest $request)
     {
         abort_if(!auth()->user()->hasPermission('roles.create'), 403, 'You do not have permission to create roles.');
-        
+
         $result = $this->roleService->createRole($request->validated());
 
         if ($result['success']) {
@@ -90,9 +90,9 @@ class RoleController extends Controller
     public function show(int $id)
     {
         abort_if(!auth()->user()->hasPermission('roles.view'), 403, 'You do not have permission to view roles.');
-        
+
         $role = $this->roleService->getRoleById($id);
-        
+
         if (!$role) {
             return redirect()
                 ->route('admin.roles.index')
@@ -109,9 +109,9 @@ class RoleController extends Controller
     public function edit(int $id)
     {
         abort_if(!auth()->user()->hasPermission('roles.edit'), 403, 'You do not have permission to edit roles.');
-        
+
         $role = $this->roleService->getRoleById($id);
-        
+
         if (!$role) {
             return redirect()
                 ->route('admin.roles.index')
@@ -128,12 +128,12 @@ class RoleController extends Controller
     public function update(UpdateRoleRequest $request, int $id)
     {
         abort_if(!auth()->user()->hasPermission('roles.edit'), 403, 'You do not have permission to edit roles.');
-        
+
         $result = $this->roleService->updateRole($id, $request->validated());
 
         if ($result['success']) {
             return redirect()
-                ->route('admin.roles.index')
+                ->route('admin.roles.edit', $id)
                 ->with('success', $result['message']);
         }
 
@@ -149,7 +149,7 @@ class RoleController extends Controller
     public function destroy(int $id)
     {
         abort_if(!auth()->user()->hasPermission('roles.delete'), 403, 'You do not have permission to delete roles.');
-        
+
         $result = $this->roleService->deleteRole($id);
 
         if ($result['success']) {
