@@ -60,6 +60,12 @@ class BlogCategoryList extends Component
 
     public function toggleStatus($categoryId, BlogCategoryService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.edit')) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
         $category = BlogCategory::find($categoryId);
         if ($category) {
             $category->is_active = !$category->is_active;
@@ -76,6 +82,14 @@ class BlogCategoryList extends Component
 
     public function deleteCategory(BlogCategoryService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.delete')) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showDeleteModal = false;
+            $this->categoryToDelete = null;
+            return;
+        }
+
         if ($this->categoryToDelete) {
             try {
                 $service->deleteCategory($this->categoryToDelete);
@@ -102,10 +116,10 @@ class BlogCategoryList extends Component
 
             // Apply search filter
             if ($this->search) {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('slug', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                        ->orWhere('slug', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
                 });
             }
 

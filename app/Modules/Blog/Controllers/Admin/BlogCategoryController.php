@@ -27,6 +27,11 @@ class BlogCategoryController extends Controller
 
     public function index()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-categories.view')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('admin.blog.categories.index-livewire');
     }
 
