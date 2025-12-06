@@ -15,6 +15,8 @@ class NewArrivalProductController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('new-arrivals.view'), 403, 'You do not have permission to view new arrival products.');
+
         $newArrivalProducts = NewArrivalProduct::with('product.variants')
             ->orderBy('sort_order')
             ->get();
@@ -31,6 +33,8 @@ class NewArrivalProductController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('new-arrivals.create'), 403, 'You do not have permission to add new arrival products.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id|unique:new_arrival_products,product_id',
             'sort_order' => 'nullable|integer|min:0',
@@ -50,6 +54,14 @@ class NewArrivalProductController extends Controller
      */
     public function updateOrder(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('new-arrivals.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to reorder new arrival products.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:new_arrival_products,id',
@@ -69,6 +81,14 @@ class NewArrivalProductController extends Controller
      */
     public function toggleStatus(NewArrivalProduct $newArrivalProduct)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('new-arrivals.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle new arrival product status.',
+            ], 403);
+        }
+
         $newArrivalProduct->is_active = !$newArrivalProduct->is_active;
         $newArrivalProduct->save();
 
@@ -83,6 +103,8 @@ class NewArrivalProductController extends Controller
      */
     public function destroy(NewArrivalProduct $newArrivalProduct)
     {
+        abort_if(!auth()->user()->hasPermission('new-arrivals.delete'), 403, 'You do not have permission to remove new arrival products.');
+
         $newArrivalProduct->delete();
 
         return redirect()->route('admin.new-arrival-products.index')
@@ -94,6 +116,14 @@ class NewArrivalProductController extends Controller
      */
     public function toggleSection(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('new-arrivals.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle section visibility.',
+            ], 403);
+        }
+
         SiteSetting::updateOrCreate(
             ['key' => 'new_arrivals_section_enabled'],
             ['value' => $request->enabled ? '1' : '0']
@@ -107,6 +137,14 @@ class NewArrivalProductController extends Controller
      */
     public function updateSectionTitle(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('new-arrivals.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update section title.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
         ]);
@@ -124,24 +162,32 @@ class NewArrivalProductController extends Controller
      */
     public function searchProducts(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('new-arrivals.create')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to search products.',
+            ], 403);
+        }
+
         $search = $request->get('q', '');
-        
+
         if (empty($search)) {
             return response()->json([]);
         }
-        
+
         $existingProductIds = NewArrivalProduct::pluck('product_id')->toArray();
-        
-        $products = Product::where(function($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%");
-            })
+
+        $products = Product::where(function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('sku', 'like', "%{$search}%");
+        })
             ->whereNotIn('id', $existingProductIds)
             ->where('is_active', true)
             ->with(['variants', 'images'])
             ->limit(10)
             ->get()
-            ->map(function($product) {
+            ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,

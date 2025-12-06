@@ -228,7 +228,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit Best Sellers', 'slug' => 'best-sellers.edit', 'module' => 'content'],
             ['name' => 'Delete Best Sellers', 'slug' => 'best-sellers.delete', 'module' => 'content'],
 
-            ['name' => 'Manage New Arrivals', 'slug' => 'new-arrivals.manage', 'module' => 'content'],
+            ['name' => 'View New Arrivals', 'slug' => 'new-arrivals.view', 'module' => 'content'],
+            ['name' => 'Create New Arrivals', 'slug' => 'new-arrivals.create', 'module' => 'content'],
+            ['name' => 'Edit New Arrivals', 'slug' => 'new-arrivals.edit', 'module' => 'content'],
+            ['name' => 'Delete New Arrivals', 'slug' => 'new-arrivals.delete', 'module' => 'content'],
 
             // ===================================
             // REPORTS & ANALYTICS MODULE
