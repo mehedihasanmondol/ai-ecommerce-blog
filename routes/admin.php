@@ -199,8 +199,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('answers/{id}/best', [ProductQuestionController::class, 'markBestAnswer'])->name('answers.best');
     });
 
-    // Product Review Management Routes - Requires product permissions
-    Route::middleware(['permission:products.view'])->group(function () {
+    // Product Reviews Management Routes - Requires reviews.view permission
+    Route::middleware(['permission:reviews.view'])->group(function () {
         Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
         Route::get('reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
         Route::get('reviews/{id}', [ReviewController::class, 'show'])->name('reviews.show');

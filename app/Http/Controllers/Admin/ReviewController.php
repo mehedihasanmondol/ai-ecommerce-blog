@@ -33,7 +33,8 @@ class ReviewController extends Controller
 {
     public function __construct(
         protected ProductReviewService $reviewService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of reviews
@@ -60,7 +61,7 @@ class ReviewController extends Controller
     {
         $review = ProductReview::with(['product', 'user', 'order', 'approver'])
             ->findOrFail($id);
-        
+
         return view('admin.reviews.show', compact('review'));
     }
 
@@ -69,8 +70,8 @@ class ReviewController extends Controller
      */
     public function approve(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('reviews.moderate'), 403, 'You do not have permission to moderate reviews.');
-        
+        abort_if(!auth()->user()->hasPermission('reviews.approve'), 403, 'You do not have permission to approve reviews.');
+
         try {
             $this->reviewService->approveReview($id);
             return redirect()->back()->with('success', 'Review approved successfully.');
@@ -84,8 +85,8 @@ class ReviewController extends Controller
      */
     public function reject(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('reviews.moderate'), 403, 'You do not have permission to moderate reviews.');
-        
+        abort_if(!auth()->user()->hasPermission('reviews.reject'), 403, 'You do not have permission to reject reviews.');
+
         try {
             $this->reviewService->rejectReview($id);
             return redirect()->back()->with('success', 'Review rejected successfully.');
@@ -100,7 +101,7 @@ class ReviewController extends Controller
     public function destroy(int $id)
     {
         abort_if(!auth()->user()->hasPermission('reviews.delete'), 403, 'You do not have permission to delete reviews.');
-        
+
         try {
             $this->reviewService->deleteReview($id);
             return redirect()->back()->with('success', 'Review deleted successfully.');
@@ -114,8 +115,8 @@ class ReviewController extends Controller
      */
     public function bulkApprove(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('reviews.moderate'), 403, 'You do not have permission to moderate reviews.');
-        
+        abort_if(!auth()->user()->hasPermission('reviews.bulk-approve'), 403, 'You do not have permission to bulk approve reviews.');
+
         $request->validate([
             'review_ids' => 'required|array',
             'review_ids.*' => 'exists:product_reviews,id',
@@ -139,8 +140,8 @@ class ReviewController extends Controller
      */
     public function bulkDelete(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('reviews.delete'), 403, 'You do not have permission to delete reviews.');
-        
+        abort_if(!auth()->user()->hasPermission('reviews.bulk-delete'), 403, 'You do not have permission to bulk delete reviews.');
+
         $request->validate([
             'review_ids' => 'required|array',
             'review_ids.*' => 'exists:product_reviews,id',
