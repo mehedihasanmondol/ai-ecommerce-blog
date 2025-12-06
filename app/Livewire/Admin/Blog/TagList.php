@@ -53,6 +53,12 @@ class TagList extends Component
 
     public function toggleStatus($tagId, TagService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.edit')) {
+            session()->flash('error', 'Unauthorized action.');
+            return;
+        }
+
         $tag = Tag::find($tagId);
         if ($tag) {
             $tag->is_active = !$tag->is_active;
@@ -69,6 +75,14 @@ class TagList extends Component
 
     public function deleteTag(TagService $service)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('blog-tags.delete')) {
+            session()->flash('error', 'Unauthorized action.');
+            $this->showDeleteModal = false;
+            $this->tagToDelete = null;
+            return;
+        }
+
         if ($this->tagToDelete) {
             try {
                 $service->deleteTag($this->tagToDelete);
@@ -95,10 +109,10 @@ class TagList extends Component
 
             // Apply search filter
             if ($this->search) {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('slug', 'like', '%' . $this->search . '%')
-                      ->orWhere('description', 'like', '%' . $this->search . '%');
+                        ->orWhere('slug', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%');
                 });
             }
 
