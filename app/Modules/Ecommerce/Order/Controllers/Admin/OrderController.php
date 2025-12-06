@@ -50,7 +50,7 @@ class OrderController extends Controller
     public function create()
     {
         abort_if(!auth()->user()->hasPermission('orders.create'), 403, 'You do not have permission to create orders.');
-        
+
         return view('admin.orders.create');
     }
 
@@ -60,23 +60,23 @@ class OrderController extends Controller
     public function store(CreateOrderRequest $request)
     {
         abort_if(!auth()->user()->hasPermission('orders.create'), 403, 'You do not have permission to create orders.');
-        
+
         try {
             $validated = $request->validated();
-            
+
             // Check stock restriction setting
             $stockRestrictionEnabled = ProductVariant::isStockRestrictionEnabled();
-            
+
             // Prepare items data and validate stock if restriction is enabled
             $items = [];
             foreach ($validated['items'] as $itemData) {
                 $product = Product::find($itemData['product_id']);
-                
+
                 // Get variant if provided (required per .windsurfrules)
                 $variant = null;
                 if (!empty($itemData['variant_id'])) {
                     $variant = ProductVariant::find($itemData['variant_id']);
-                    
+
                     // Validate stock availability if restriction is enabled
                     if ($stockRestrictionEnabled) {
                         if (!$variant) {
@@ -84,13 +84,13 @@ class OrderController extends Controller
                                 ->withInput()
                                 ->with('error', "Product variant not found for {$product->name}");
                         }
-                        
+
                         if (!$variant->canAddToCart()) {
                             return back()
                                 ->withInput()
                                 ->with('error', "Product '{$product->name}' is currently out of stock and cannot be ordered.");
                         }
-                        
+
                         if ($variant->stock_quantity < $itemData['quantity']) {
                             return back()
                                 ->withInput()
@@ -98,7 +98,7 @@ class OrderController extends Controller
                         }
                     }
                 }
-                
+
                 $items[] = [
                     'product' => $product,
                     'variant' => $variant,
@@ -106,12 +106,12 @@ class OrderController extends Controller
                     'price' => $itemData['price'], // Use custom price from form
                 ];
             }
-            
+
             // Split customer name into first and last name
             $nameParts = explode(' ', $validated['customer_name'], 2);
             $firstName = $nameParts[0] ?? '';
             $lastName = $nameParts[1] ?? '';
-            
+
             // Prepare order data
             $orderData = [
                 'user_id' => !empty($validated['user_id']) ? $validated['user_id'] : null,
@@ -136,7 +136,7 @@ class OrderController extends Controller
                 'shipping_cost' => (float) $validated['shipping_cost'],
                 'coupon_code' => $validated['coupon_code'] ?? null,
             ];
-            
+
             // Add shipping address
             if (!empty($validated['same_as_billing'])) {
                 // Use billing address (customer info) for shipping
@@ -157,10 +157,10 @@ class OrderController extends Controller
                     'country' => 'Bangladesh',
                 ];
             }
-            
+
             // Create order
             $order = $this->orderService->createOrder($orderData);
-            
+
             // Update payment status if paid
             if ($validated['payment_status'] === 'paid') {
                 $order->update([
@@ -168,16 +168,16 @@ class OrderController extends Controller
                     'paid_at' => now(),
                 ]);
             }
-            
+
             // Add admin notes
             if (!empty($validated['admin_notes'])) {
                 $order->update(['admin_notes' => $validated['admin_notes']]);
             }
-            
+
             return redirect()
                 ->route('admin.orders.show', $order)
                 ->with('success', 'Order created successfully.');
-                
+
         } catch (\Exception $e) {
             return back()
                 ->withInput()
@@ -202,7 +202,7 @@ class OrderController extends Controller
     public function update(UpdateOrderRequest $request, Order $order)
     {
         abort_if(!auth()->user()->hasPermission('orders.edit'), 403, 'You do not have permission to edit orders.');
-        
+
         try {
             $this->orderService->updateOrder($order, $request->validated());
 
@@ -222,8 +222,8 @@ class OrderController extends Controller
      */
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order)
     {
-        abort_if(!auth()->user()->hasPermission('orders.edit'), 403, 'You do not have permission to update order status.');
-        
+        abort_if(!auth()->user()->hasPermission('orders.update-status'), 403, 'You do not have permission to update order status.');
+
         try {
             $validated = $request->validated();
 
@@ -259,7 +259,7 @@ class OrderController extends Controller
     public function cancel(Request $request, Order $order)
     {
         abort_if(!auth()->user()->hasPermission('orders.cancel'), 403, 'You do not have permission to cancel orders.');
-        
+
         try {
             $reason = $request->input('reason', 'Cancelled by admin');
             $this->orderService->cancelOrder($order, $reason);
@@ -280,7 +280,7 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         abort_if(!auth()->user()->hasPermission('orders.delete'), 403, 'You do not have permission to delete orders.');
-        
+
         try {
             $this->orderRepository->delete($order);
 

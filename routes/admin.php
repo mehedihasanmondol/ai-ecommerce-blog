@@ -127,6 +127,10 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
             return view('admin.orders.edit-livewire', compact('order'));
         })->name('orders.edit');
         Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    });
+
+    // Update order status - Requires orders.update-status permission
+    Route::middleware(['permission:orders.update-status'])->group(function () {
         Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])
             ->name('orders.update-status');
     });

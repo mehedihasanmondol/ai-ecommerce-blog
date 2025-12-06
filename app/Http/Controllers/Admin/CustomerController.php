@@ -14,6 +14,8 @@ class CustomerController extends Controller
      */
     public function updateInfo(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('customers.update-info'), 403, 'You do not have permission to update customer information.');
+
         try {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -30,7 +32,7 @@ class CustomerController extends Controller
             }
 
             $user = User::findOrFail($id);
-            
+
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
