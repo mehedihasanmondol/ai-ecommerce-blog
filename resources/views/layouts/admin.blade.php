@@ -317,14 +317,16 @@
                     </a>
                     @endif
 
-                    <a href="{{ route('admin.product-questions.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-question-circle w-5 mr-3"></i>
-                        <span>Product Q&A</span>
-                        @if(request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                @if(auth()->user()->hasPermission('questions.view'))
+                <a href="{{ route('admin.product-questions.index') }}"
+                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                    <i class="fas fa-question-circle w-5 mr-3"></i>
+                    <span>Product Q&A</span>
+                    @if(request()->routeIs('admin.product-questions.*') || request()->routeIs('admin.questions.*') || request()->routeIs('admin.answers.*'))
+                        <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                    @endif
+                </a>
+                @endif
 
                     <a href="{{ route('admin.reviews.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reviews.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">

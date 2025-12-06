@@ -189,8 +189,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::delete('new-arrival-products/{newArrivalProduct}', [NewArrivalProductController::class, 'destroy'])->name('new-arrival-products.destroy');
     });
 
-    // Product Q&A Management Routes - Requires product permissions
-    Route::middleware(['permission:products.view'])->group(function () {
+    // Product Q&A Management Routes - Requires questions.view permission
+    Route::middleware(['permission:questions.view'])->group(function () {
         Route::resource('product-questions', ProductQuestionController::class);
         Route::post('questions/{id}/approve', [ProductQuestionController::class, 'approve'])->name('questions.approve');
         Route::post('questions/{id}/reject', [ProductQuestionController::class, 'reject'])->name('questions.reject');

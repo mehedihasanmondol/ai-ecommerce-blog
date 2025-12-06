@@ -32,7 +32,8 @@ class ProductQuestionController extends Controller
     public function __construct(
         protected ProductQuestionService $questionService,
         protected ProductAnswerService $answerService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of questions
@@ -50,7 +51,7 @@ class ProductQuestionController extends Controller
     {
         $question = \App\Modules\Ecommerce\Product\Models\ProductQuestion::with(['product', 'user', 'answers.user'])
             ->findOrFail($id);
-        
+
         return view('admin.product-questions.show', compact('question'));
     }
 
@@ -59,10 +60,10 @@ class ProductQuestionController extends Controller
      */
     public function approve(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.moderate'), 403, 'You do not have permission to moderate questions.');
-        
+        abort_if(!auth()->user()->hasPermission('questions.approve'), 403, 'You do not have permission to approve questions.');
+
         $this->questionService->approveQuestion($id);
-        
+
         return redirect()->back()->with('success', 'Question approved successfully.');
     }
 
@@ -71,10 +72,10 @@ class ProductQuestionController extends Controller
      */
     public function reject(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.moderate'), 403, 'You do not have permission to moderate questions.');
-        
+        abort_if(!auth()->user()->hasPermission('questions.reject'), 403, 'You do not have permission to reject questions.');
+
         $this->questionService->rejectQuestion($id);
-        
+
         return redirect()->back()->with('success', 'Question rejected successfully.');
     }
 
@@ -83,10 +84,10 @@ class ProductQuestionController extends Controller
      */
     public function destroy(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.delete'), 403, 'You do not have permission to delete questions.');
-        
+        abort_if(!auth()->user()->hasPermission('questions.delete'), 403, 'You do not have permission to delete questions.');
+
         $this->questionService->deleteQuestion($id);
-        
+
         return redirect()->back()->with('success', 'Question deleted successfully.');
     }
 
@@ -95,10 +96,10 @@ class ProductQuestionController extends Controller
      */
     public function approveAnswer(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.moderate'), 403, 'You do not have permission to moderate answers.');
-        
+        abort_if(!auth()->user()->hasPermission('answers.approve'), 403, 'You do not have permission to approve answers.');
+
         $this->answerService->approveAnswer($id);
-        
+
         return redirect()->back()->with('success', 'Answer approved successfully.');
     }
 
@@ -107,10 +108,10 @@ class ProductQuestionController extends Controller
      */
     public function rejectAnswer(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.moderate'), 403, 'You do not have permission to moderate answers.');
-        
+        abort_if(!auth()->user()->hasPermission('answers.reject'), 403, 'You do not have permission to reject answers.');
+
         $this->answerService->rejectAnswer($id);
-        
+
         return redirect()->back()->with('success', 'Answer rejected successfully.');
     }
 
@@ -119,10 +120,10 @@ class ProductQuestionController extends Controller
      */
     public function markBestAnswer(int $id)
     {
-        abort_if(!auth()->user()->hasPermission('product-qa.moderate'), 403, 'You do not have permission to mark best answers.');
-        
+        abort_if(!auth()->user()->hasPermission('answers.best'), 403, 'You do not have permission to mark best answers.');
+
         $this->answerService->markAsBestAnswer($id);
-        
+
         return redirect()->back()->with('success', 'Answer marked as best answer.');
     }
 }
