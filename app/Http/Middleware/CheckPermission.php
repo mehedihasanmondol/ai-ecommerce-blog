@@ -28,11 +28,6 @@ class CheckPermission
 
         $user = auth()->user();
 
-        // Admin users have all permissions
-        if ($user->isAdmin()) {
-            return $next($request);
-        }
-
         // Check if user has the required permission
         if ($user->hasPermission($permission)) {
             return $next($request);

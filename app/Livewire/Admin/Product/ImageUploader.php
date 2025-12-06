@@ -23,7 +23,7 @@ class ImageUploader extends Component
     protected function rules()
     {
         $maxSize = ImageService::getMaxUploadSize() / 1024; // Convert to KB for Laravel validation
-        
+
         return [
             'images.*' => "image|max:{$maxSize}",
         ];
@@ -41,7 +41,7 @@ class ImageUploader extends Component
     {
         $this->maxUploadSize = ImageService::getMaxUploadSize();
         $this->maxUploadSizeFormatted = ImageService::getMaxUploadSizeFormatted();
-        
+
         if ($productId) {
             $this->product = Product::findOrFail($productId);
             $this->loadExistingImages();
@@ -54,7 +54,7 @@ class ImageUploader extends Component
             ->orderBy('sort_order')
             ->get()
             ->toArray();
-        
+
         $primary = $this->product->images()->where('is_primary', true)->first();
         $this->primaryImageId = $primary?->id;
     }
@@ -66,6 +66,12 @@ class ImageUploader extends Component
 
     public function uploadImages()
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.images')) {
+            session()->flash('error', 'You do not have permission to manage product images.');
+            return;
+        }
+
         $this->validate();
 
         if (!$this->product) {
@@ -87,14 +93,14 @@ class ImageUploader extends Component
 
                 // Process and convert to WebP with compression (quality: 85)
                 $path = ImageService::processAndStore($image, 'products', 85);
-                
+
                 $this->product->images()->create([
                     'image_path' => $path,
                     'thumbnail_path' => $path, // Same path, no separate thumbnail
                     'is_primary' => $this->product->images()->count() === 0,
                     'sort_order' => ++$sortOrder,
                 ]);
-                
+
                 $uploadedCount++;
             } catch (\Exception $e) {
                 $errors[] = "Image " . ($index + 1) . ": " . $e->getMessage();
@@ -104,11 +110,11 @@ class ImageUploader extends Component
         $this->images = [];
         $this->loadExistingImages();
         $this->dispatch('images-uploaded');
-        
+
         if ($uploadedCount > 0) {
             session()->flash('success', "{$uploadedCount} image(s) uploaded and converted to WebP successfully!");
         }
-        
+
         if (!empty($errors)) {
             session()->flash('error', implode('. ', $errors));
         }
@@ -116,16 +122,22 @@ class ImageUploader extends Component
 
     public function setPrimary($imageId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.images')) {
+            session()->flash('error', 'You do not have permission to manage product images.');
+            return;
+        }
+
         if (!$this->product) {
             return;
         }
 
         // Remove primary from all images
         $this->product->images()->update(['is_primary' => false]);
-        
+
         // Set new primary
         $this->product->images()->where('id', $imageId)->update(['is_primary' => true]);
-        
+
         $this->primaryImageId = $imageId;
         $this->loadExistingImages();
         $this->dispatch('primary-updated');
@@ -133,25 +145,31 @@ class ImageUploader extends Component
 
     public function deleteImage($imageId)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.images')) {
+            session()->flash('error', 'You do not have permission to manage product images.');
+            return;
+        }
+
         $image = ProductImage::find($imageId);
-        
+
         if ($image && $image->product_id === $this->product->id) {
             // Delete file from storage
             if (Storage::disk('public')->exists($image->image_path)) {
                 Storage::disk('public')->delete($image->image_path);
             }
-            
+
             if ($image->thumbnail_path && Storage::disk('public')->exists($image->thumbnail_path)) {
                 Storage::disk('public')->delete($image->thumbnail_path);
             }
-            
+
             $image->delete();
-            
+
             // If deleted image was primary, set first image as primary
             if ($image->is_primary && $this->product->images()->count() > 0) {
                 $this->product->images()->first()->update(['is_primary' => true]);
             }
-            
+
             $this->loadExistingImages();
             $this->dispatch('image-deleted');
             session()->flash('success', 'Image deleted successfully!');
@@ -160,12 +178,18 @@ class ImageUploader extends Component
 
     public function updateSortOrder($orderedIds)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.images')) {
+            session()->flash('error', 'You do not have permission to manage product images.');
+            return;
+        }
+
         foreach ($orderedIds as $index => $id) {
             ProductImage::where('id', $id)
                 ->where('product_id', $this->product->id)
                 ->update(['sort_order' => $index + 1]);
         }
-        
+
         $this->loadExistingImages();
         $this->dispatch('sort-updated');
     }

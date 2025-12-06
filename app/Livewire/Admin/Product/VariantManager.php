@@ -45,13 +45,19 @@ class VariantManager extends Component
 
     public function generateVariants()
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.variants')) {
+            session()->flash('error', 'You do not have permission to manage product variants.');
+            return;
+        }
+
         if (empty($this->selectedAttributes)) {
             session()->flash('error', 'Please select at least one attribute.');
             return;
         }
 
         $combinations = $this->generateCombinations();
-        
+
         $this->generatedVariants = collect($combinations)->map(function ($combination) {
             return [
                 'name' => implode(' - ', array_column($combination, 'value')),
@@ -69,7 +75,7 @@ class VariantManager extends Component
     protected function generateCombinations()
     {
         $attributeValues = [];
-        
+
         foreach ($this->selectedAttributes as $attributeId) {
             $attribute = $this->attributes->find($attributeId);
             if ($attribute) {
@@ -90,7 +96,7 @@ class VariantManager extends Component
     protected function cartesianProduct($arrays)
     {
         $result = [[]];
-        
+
         foreach ($arrays as $key => $values) {
             $append = [];
             foreach ($result as $product) {
@@ -101,12 +107,18 @@ class VariantManager extends Component
             }
             $result = $append;
         }
-        
+
         return $result;
     }
 
     public function saveVariants(ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.variants')) {
+            session()->flash('error', 'You do not have permission to manage product variants.');
+            return;
+        }
+
         foreach ($this->generatedVariants as $variantData) {
             if (empty($variantData['price'])) {
                 continue;
@@ -135,6 +147,12 @@ class VariantManager extends Component
 
     public function deleteVariant($variantId, ProductService $service)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('products.variants')) {
+            session()->flash('error', 'You do not have permission to manage product variants.');
+            return;
+        }
+
         $variant = $this->product->variants()->find($variantId);
         if ($variant) {
             $service->deleteVariant($variant);

@@ -122,7 +122,7 @@ Route::post('/feedback/{feedback}/not-helpful', [FeedbackController::class, 'not
 require __DIR__ . '/blog.php';
 
 // Admin Dashboard (Protected)
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access');
@@ -142,8 +142,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Product Management Routes - Requires products.view permission
     Route::middleware(['permission:products.view'])->group(function () {
         Route::get('/products', [\App\Http\Controllers\Admin\ProductController::class, 'index'])->name('products.index');
-        Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create');
-        Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit');
+        Route::get('/products/create', [\App\Http\Controllers\Admin\ProductController::class, 'create'])->name('products.create')->middleware('permission:products.create');
+        Route::get('/products/{product}/edit', [\App\Http\Controllers\Admin\ProductController::class, 'edit'])->name('products.edit')->middleware('permission:products.edit');
         Route::middleware(['permission:products.images'])->group(function () {
             Route::get('/products/{product}/images', function (\App\Modules\Ecommerce\Product\Models\Product $product) {
                 return view('admin.product.images', compact('product'));
@@ -220,7 +220,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::middleware(['permission:email-preferences.view'])->prefix('email-preferences')->name('email-preferences.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'index'])->name('index');
         Route::get('/guideline', function () {
-            return view('admin.email-preferences.guideline'); })->name('guideline');
+            return view('admin.email-preferences.guideline');
+        })->name('guideline');
         Route::get('/schedule-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'scheduleSetup'])->name('schedule-setup');
         Route::get('/mail-setup', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'mailSetup'])->name('mail-setup')->middleware('permission:email-preferences.edit');
         Route::post('/update-schedule', [\App\Http\Controllers\Admin\EmailPreferenceController::class, 'updateSchedule'])->name('update-schedule')->middleware('permission:email-preferences.edit');
