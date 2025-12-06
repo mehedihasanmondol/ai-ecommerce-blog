@@ -15,6 +15,8 @@ class TrendingProductController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('trending-products.view'), 403, 'You do not have permission to view trending products.');
+
         $trendingProducts = TrendingProduct::with('product.variants')
             ->orderBy('sort_order')
             ->get();
@@ -31,6 +33,8 @@ class TrendingProductController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('trending-products.create'), 403, 'You do not have permission to add trending products.');
+
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id|unique:trending_products,product_id',
             'sort_order' => 'nullable|integer|min:0',
@@ -50,6 +54,14 @@ class TrendingProductController extends Controller
      */
     public function updateOrder(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('trending-products.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to reorder trending products.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'required|exists:trending_products,id',
@@ -69,6 +81,14 @@ class TrendingProductController extends Controller
      */
     public function toggleStatus(TrendingProduct $trendingProduct)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('trending-products.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle trending product status.',
+            ], 403);
+        }
+
         $trendingProduct->is_active = !$trendingProduct->is_active;
         $trendingProduct->save();
 
@@ -83,6 +103,8 @@ class TrendingProductController extends Controller
      */
     public function destroy(TrendingProduct $trendingProduct)
     {
+        abort_if(!auth()->user()->hasPermission('trending-products.delete'), 403, 'You do not have permission to remove trending products.');
+
         $trendingProduct->delete();
 
         return redirect()->route('admin.trending-products.index')
@@ -94,6 +116,14 @@ class TrendingProductController extends Controller
      */
     public function toggleSection(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('trending-products.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to toggle section visibility.',
+            ], 403);
+        }
+
         SiteSetting::updateOrCreate(
             ['key' => 'trending_section_enabled'],
             ['value' => $request->enabled ? '1' : '0']
@@ -107,6 +137,14 @@ class TrendingProductController extends Controller
      */
     public function updateSectionTitle(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('trending-products.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to update section title.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
         ]);
@@ -124,24 +162,32 @@ class TrendingProductController extends Controller
      */
     public function searchProducts(Request $request)
     {
+        // Check permission for AJAX request
+        if (!auth()->user()->hasPermission('trending-products.create')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to search products.',
+            ], 403);
+        }
+
         $search = $request->get('q', '');
-        
+
         if (empty($search)) {
             return response()->json([]);
         }
-        
+
         $existingProductIds = TrendingProduct::pluck('product_id')->toArray();
-        
-        $products = Product::where(function($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%");
-            })
+
+        $products = Product::where(function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('sku', 'like', "%{$search}%");
+        })
             ->whereNotIn('id', $existingProductIds)
             ->where('is_active', true)
             ->with(['variants', 'images'])
             ->limit(10)
             ->get()
-            ->map(function($product) {
+            ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,

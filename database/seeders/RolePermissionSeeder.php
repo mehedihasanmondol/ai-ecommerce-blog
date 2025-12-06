@@ -218,7 +218,11 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Footer', 'slug' => 'footer.manage', 'module' => 'content'],
 
             // Trending/Featured Products
-            ['name' => 'Manage Trending Products', 'slug' => 'trending-products.manage', 'module' => 'content'],
+            ['name' => 'View Trending Products', 'slug' => 'trending-products.view', 'module' => 'content'],
+            ['name' => 'Create Trending Products', 'slug' => 'trending-products.create', 'module' => 'content'],
+            ['name' => 'Edit Trending Products', 'slug' => 'trending-products.edit', 'module' => 'content'],
+            ['name' => 'Delete Trending Products', 'slug' => 'trending-products.delete', 'module' => 'content'],
+
             ['name' => 'Manage Best Sellers', 'slug' => 'best-sellers.manage', 'module' => 'content'],
             ['name' => 'Manage New Arrivals', 'slug' => 'new-arrivals.manage', 'module' => 'content'],
 

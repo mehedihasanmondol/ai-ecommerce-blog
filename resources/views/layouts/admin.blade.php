@@ -503,14 +503,16 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('admin.trending-products.index') }}"
-                        class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.trending-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                        <i class="fas fa-fire w-5 mr-3"></i>
-                        <span>Trending Products</span>
-                        @if(request()->routeIs('admin.trending-products.*'))
-                            <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                        @endif
-                    </a>
+                    @if(auth()->user()->hasPermission('trending-products.view'))
+                        <a href="{{ route('admin.trending-products.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.trending-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-fire w-5 mr-3"></i>
+                            <span>Trending Products</span>
+                            @if(request()->routeIs('admin.trending-products.*'))
+                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+                            @endif
+                        </a>
+                    @endif
 
                     <a href="{{ route('admin.best-seller-products.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.best-seller-products.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
