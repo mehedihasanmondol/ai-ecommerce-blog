@@ -73,6 +73,11 @@ class CouponCreate extends Component
 
     public function save(CouponService $couponService)
     {
+        if (!auth()->user()->hasPermission('coupons.create')) {
+            session()->flash('error', 'You do not have permission to create coupons.');
+            return redirect()->route('admin.coupons.index');
+        }
+        
         $validated = $this->validate();
 
         // Convert empty strings to null

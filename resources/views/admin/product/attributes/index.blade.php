@@ -9,11 +9,13 @@
             <h1 class="text-2xl font-bold text-gray-900">Product Attributes</h1>
             <p class="text-sm text-gray-600 mt-1">Manage attributes for product variations</p>
         </div>
+        @if(auth()->user()->hasPermission('attributes.create'))
         <a href="{{ route('admin.attributes.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <i class="fas fa-plus mr-2"></i>
             Add Attribute
         </a>
+        @endif
     </div>
 
     @if($attributes->isEmpty())
@@ -21,11 +23,13 @@
         <i class="fas fa-tags text-6xl text-gray-300 mb-4"></i>
         <h3 class="text-lg font-medium text-gray-900 mb-2">No attributes yet</h3>
         <p class="text-gray-500 mb-6">Create your first attribute to enable product variations</p>
+        @if(auth()->user()->hasPermission('attributes.create'))
         <a href="{{ route('admin.attributes.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <i class="fas fa-plus mr-2"></i>
             Create First Attribute
         </a>
+        @endif
     </div>
     @else
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -103,10 +107,13 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            @if(auth()->user()->hasPermission('attributes.edit'))
                             <a href="{{ route('admin.attributes.edit', $attribute) }}" 
                                class="text-blue-600 hover:text-blue-900 mr-3">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            @endif
+                            @if(auth()->user()->hasPermission('attributes.delete'))
                             <form id="delete-attribute-{{ $attribute->id }}" action="{{ route('admin.attributes.destroy', $attribute) }}" 
                                   method="POST" 
                                   class="inline">
@@ -124,6 +131,7 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @endforeach

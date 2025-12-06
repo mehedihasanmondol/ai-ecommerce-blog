@@ -5,6 +5,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Coupon Management</h1>
             <p class="mt-1 text-sm text-gray-600">Manage discount coupons and promotional codes</p>
         </div>
+        @if(auth()->user()->hasPermission('coupons.create'))
         <a href="{{ route('admin.coupons.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,6 +13,7 @@
             </svg>
             Create Coupon
         </a>
+        @endif
     </div>
 
     @if (session()->has('success'))
@@ -139,10 +141,16 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                @if(auth()->user()->hasPermission('coupons.edit'))
                                 <button wire:click="toggleStatus({{ $coupon->id }})"
                                         class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 {{ $coupon->is_active ? 'bg-blue-600' : 'bg-gray-200' }}">
                                     <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform {{ $coupon->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
                                 </button>
+                                @else
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $coupon->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                    {{ $coupon->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end space-x-2">
@@ -153,6 +161,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                                         </svg>
                                     </a>
+                                    @if(auth()->user()->hasPermission('coupons.edit'))
                                     <a href="{{ route('admin.coupons.edit', $coupon) }}" 
                                        class="text-blue-600 hover:text-blue-900"
                                        title="Edit">
@@ -160,6 +169,8 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                         </svg>
                                     </a>
+                                    @endif
+                                    @if(auth()->user()->hasPermission('coupons.delete'))
                                     <button wire:click="confirmDelete({{ $coupon->id }})" 
                                             class="text-red-600 hover:text-red-900"
                                             title="Delete">
@@ -167,6 +178,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
                                     </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

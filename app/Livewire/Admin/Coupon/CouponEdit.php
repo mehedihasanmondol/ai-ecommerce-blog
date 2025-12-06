@@ -92,6 +92,11 @@ class CouponEdit extends Component
 
     public function update(CouponService $couponService)
     {
+        if (!auth()->user()->hasPermission('coupons.edit')) {
+            session()->flash('error', 'You do not have permission to edit coupons.');
+            return redirect()->route('admin.coupons.index');
+        }
+        
         $validated = $this->validate();
 
         // Convert empty strings to null

@@ -221,7 +221,7 @@
                     @endif
                 </a>
 
-                @if(auth()->user()->canAccess('orders.view', 'products.view'))
+                @if(auth()->user()->hasPermission('orders.view'))
                 <a href="{{ route('admin.orders.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shopping-cart w-5 mr-3"></i>
@@ -233,7 +233,7 @@
                 @endif
 
                 <!-- Reports Section -->
-                @if(auth()->user()->canAccess('reports.view', 'products.view'))
+                @if(auth()->user()->hasPermission('reports.view'))
                 <div x-data="{ open: {{ request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }" class="space-y-1">
                     <button @click="open = !open" 
                             class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
@@ -754,7 +754,7 @@
                     <span>Products</span>
                 </a>
 
-                @if(auth()->user()->canAccess('orders.view', 'products.view'))
+                @if(auth()->user()->hasPermission('orders.view'))
                 <a href="{{ route('admin.orders.index') }}" 
                    class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.orders.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     <i class="fas fa-shopping-cart w-5 mr-3"></i>
@@ -763,7 +763,7 @@
                 @endif
 
                 <!-- Reports Section (Mobile) -->
-                @if(auth()->user()->canAccess('reports.view', 'products.view'))
+                @if(auth()->user()->hasPermission('reports.view'))
                 <div x-data="{ open: {{ request()->routeIs('admin.reports.*') ? 'true' : 'false' }} }" class="space-y-1">
                     <button @click="open = !open" 
                             class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">

@@ -6,6 +6,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
             <p class="text-sm text-gray-600 mt-1">Manage product categories with SEO configuration</p>
         </div>
+        @if(auth()->user()->hasPermission('categories.create'))
         <a href="{{ route('admin.categories.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -13,6 +14,7 @@
             </svg>
             Add Category
         </a>
+        @endif
     </div>
 
     {{-- Statistics Cards --}}
@@ -203,12 +205,18 @@
                             <span class="text-sm text-gray-900">{{ $category->children_count }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            @if(auth()->user()->hasPermission('categories.edit'))
                             <button wire:click="toggleStatus({{ $category->id }})" 
                                     class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors
                                     {{ $category->is_active ? 'bg-green-600' : 'bg-gray-200' }}">
                                 <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform
                                     {{ $category->is_active ? 'translate-x-6' : 'translate-x-1' }}"></span>
                             </button>
+                            @else
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $category->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ $category->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ $category->sort_order }}
@@ -222,12 +230,15 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                     </svg>
                                 </a>
+                                @if(auth()->user()->hasPermission('categories.edit'))
                                 <a href="{{ route('admin.categories.edit', $category) }}" 
                                    class="text-indigo-600 hover:text-indigo-900" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
                                 </a>
+                                @endif
+                                @if(auth()->user()->hasPermission('categories.create'))
                                 <form action="{{ route('admin.categories.duplicate', $category) }}" 
                                       method="POST" 
                                       class="inline">
@@ -240,6 +251,8 @@
                                         </svg>
                                     </button>
                                 </form>
+                                @endif
+                                @if(auth()->user()->hasPermission('categories.delete'))
                                 <button wire:click="confirmDelete({{ $category->id }})"
                                         class="text-red-600 hover:text-red-900"
                                         title="Delete">
@@ -247,6 +260,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
                                 </button>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -257,6 +271,7 @@
                                 <i class="fas fa-tags text-4xl text-gray-300 mb-4"></i>
                                 <p class="text-gray-500 text-lg font-medium">No categories found</p>
                                 <p class="text-gray-400 text-sm mt-1">Try adjusting your search or filters</p>
+                                @if(auth()->user()->hasPermission('categories.create'))
                                 <a href="{{ route('admin.categories.create') }}" 
                                    class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,6 +279,7 @@
                                     </svg>
                                     Create First Category
                                 </a>
+                                @endif
                             </div>
                         </td>
                     </tr>

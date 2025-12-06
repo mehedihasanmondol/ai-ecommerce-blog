@@ -37,6 +37,8 @@ class BrandController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('brands.create'), 403, 'You do not have permission to create brands.');
+        
         return view('admin.brands.create');
     }
 
@@ -45,6 +47,8 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $request)
     {
+        abort_if(!auth()->user()->hasPermission('brands.create'), 403, 'You do not have permission to create brands.');
+        
         try {
             $brand = $this->service->create($request->validated());
 
@@ -72,6 +76,8 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
+        abort_if(!auth()->user()->hasPermission('brands.edit'), 403, 'You do not have permission to edit brands.');
+        
         return view('admin.brands.edit', compact('brand'));
     }
 
@@ -80,8 +86,9 @@ class BrandController extends Controller
      */
     public function update(UpdateBrandRequest $request, Brand $brand)
     {
-        try {
-            $this->service->update($brand, $request->validated());
+        abort_if(!auth()->user()->hasPermission('brands.edit'), 403, 'You do not have permission to edit brands.');
+        
+        try {            $this->service->update($brand, $request->validated());
 
             return redirect()
                 ->route('admin.brands.index')
@@ -99,6 +106,8 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
+        abort_if(!auth()->user()->hasPermission('brands.delete'), 403, 'You do not have permission to delete brands.');
+        
         try {
             $this->service->delete($brand);
 
@@ -117,6 +126,13 @@ class BrandController extends Controller
      */
     public function toggleStatus(Brand $brand)
     {
+        if (!auth()->user()->hasPermission('brands.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to edit brands.',
+            ], 403);
+        }
+        
         try {
             $this->service->toggleStatus($brand);
 
@@ -138,6 +154,13 @@ class BrandController extends Controller
      */
     public function toggleFeatured(Brand $brand)
     {
+        if (!auth()->user()->hasPermission('brands.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to edit brands.',
+            ], 403);
+        }
+        
         try {
             $this->service->toggleFeatured($brand);
 
@@ -159,6 +182,8 @@ class BrandController extends Controller
      */
     public function duplicate(Brand $brand)
     {
+        abort_if(!auth()->user()->hasPermission('brands.create'), 403, 'You do not have permission to create brands.');
+        
         try {
             $newBrand = $this->service->duplicate($brand);
 

@@ -54,12 +54,24 @@ class CouponIndex extends Component
 
     public function confirmDelete($couponId)
     {
+        if (!auth()->user()->hasPermission('coupons.delete')) {
+            session()->flash('error', 'You do not have permission to delete coupons.');
+            return;
+        }
+        
         $this->couponToDelete = $couponId;
         $this->showDeleteModal = true;
     }
 
     public function deleteCoupon(CouponService $couponService)
     {
+        if (!auth()->user()->hasPermission('coupons.delete')) {
+            session()->flash('error', 'You do not have permission to delete coupons.');
+            $this->showDeleteModal = false;
+            $this->couponToDelete = null;
+            return;
+        }
+        
         if ($this->couponToDelete) {
             $coupon = Coupon::find($this->couponToDelete);
             
@@ -75,6 +87,11 @@ class CouponIndex extends Component
 
     public function toggleStatus($couponId)
     {
+        if (!auth()->user()->hasPermission('coupons.edit')) {
+            session()->flash('error', 'You do not have permission to edit coupons.');
+            return;
+        }
+        
         $coupon = Coupon::find($couponId);
         
         if ($coupon) {

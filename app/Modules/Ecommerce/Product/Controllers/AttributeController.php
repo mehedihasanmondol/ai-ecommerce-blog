@@ -18,11 +18,15 @@ class AttributeController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('attributes.create'), 403, 'You do not have permission to create attributes.');
+        
         return view('admin.product.attributes.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasPermission('attributes.create'), 403, 'You do not have permission to create attributes.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:product_attributes,name',
             'slug' => 'nullable|string|max:255|unique:product_attributes,slug',
@@ -62,12 +66,16 @@ class AttributeController extends Controller
 
     public function edit(ProductAttribute $attribute)
     {
+        abort_if(!auth()->user()->hasPermission('attributes.edit'), 403, 'You do not have permission to edit attributes.');
+        
         $attribute->load('values');
         return view('admin.product.attributes.edit', compact('attribute'));
     }
 
     public function update(Request $request, ProductAttribute $attribute)
     {
+        abort_if(!auth()->user()->hasPermission('attributes.edit'), 403, 'You do not have permission to edit attributes.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:product_attributes,name,' . $attribute->id,
             'slug' => 'nullable|string|max:255|unique:product_attributes,slug,' . $attribute->id,
@@ -128,6 +136,8 @@ class AttributeController extends Controller
 
     public function destroy(ProductAttribute $attribute)
     {
+        abort_if(!auth()->user()->hasPermission('attributes.delete'), 403, 'You do not have permission to delete attributes.');
+        
         $attribute->delete();
         return redirect()->route('admin.attributes.index')
             ->with('success', 'Attribute deleted successfully!');

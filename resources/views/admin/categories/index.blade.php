@@ -9,11 +9,13 @@
                 <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
                 <p class="mt-1 text-sm text-gray-600">Manage product categories with SEO configuration</p>
             </div>
+            @if(auth()->user()->hasPermission('categories.create'))
             <a href="{{ route('admin.categories.create') }}" 
                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                 <i class="fas fa-plus mr-2"></i>
                 Add Category
             </a>
+            @endif
         </div>
     </div>
 
@@ -220,6 +222,7 @@
                         <span class="text-sm text-gray-900">{{ $category->children_count }}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        @if(auth()->user()->hasPermission('categories.edit'))
                         <button onclick="toggleStatus({{ $category->id }})" 
                                 class="status-toggle-{{ $category->id }}">
                             @if($category->is_active)
@@ -232,6 +235,17 @@
                                 </span>
                             @endif
                         </button>
+                        @else
+                        @if($category->is_active)
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        @else
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                Inactive
+                            </span>
+                        @endif
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {{ $category->sort_order }}
@@ -243,11 +257,14 @@
                                title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
+                            @if(auth()->user()->hasPermission('categories.edit'))
                             <a href="{{ route('admin.categories.edit', $category) }}" 
                                class="text-indigo-600 hover:text-indigo-900"
                                title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            @endif
+                            @if(auth()->user()->hasPermission('categories.create'))
                             <form action="{{ route('admin.categories.duplicate', $category) }}" 
                                   method="POST" 
                                   class="inline">
@@ -258,6 +275,8 @@
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </form>
+                            @endif
+                            @if(auth()->user()->hasPermission('categories.delete'))
                             <form id="delete-category-{{ $category->id }}" action="{{ route('admin.categories.destroy', $category) }}" 
                                   method="POST" 
                                   class="inline">
@@ -276,6 +295,7 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -284,11 +304,13 @@
                     <td colspan="7" class="px-6 py-12 text-center">
                         <i class="fas fa-tags text-4xl text-gray-300 mb-4"></i>
                         <p class="text-gray-500">No categories found.</p>
+                        @if(auth()->user()->hasPermission('categories.create'))
                         <a href="{{ route('admin.categories.create') }}" 
                            class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                             <i class="fas fa-plus mr-2"></i>
                             Create First Category
                         </a>
+                        @endif
                     </td>
                 </tr>
                 @endforelse

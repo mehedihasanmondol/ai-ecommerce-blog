@@ -20,6 +20,8 @@ class CouponController extends Controller
      */
     public function create()
     {
+        abort_if(!auth()->user()->hasPermission('coupons.create'), 403, 'You do not have permission to create coupons.');
+        
         return view('admin.coupons.create-livewire');
     }
 
@@ -28,6 +30,8 @@ class CouponController extends Controller
      */
     public function edit($couponId)
     {
+        abort_if(!auth()->user()->hasPermission('coupons.edit'), 403, 'You do not have permission to edit coupons.');
+        
         $coupon = \App\Models\Coupon::findOrFail($couponId);
         return view('admin.coupons.edit-livewire', compact('coupon'));
     }

@@ -28,6 +28,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.create'), 403, 'You do not have permission to create categories.');
+        
         $parentCategories = Category::whereNull('parent_id')
             ->where('is_active', true)
             ->orderBy('name')
@@ -44,6 +47,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.create'), 403, 'You do not have permission to create categories.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:categories',
@@ -81,6 +87,9 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.edit'), 403, 'You do not have permission to edit categories.');
+        
         $parentCategories = Category::whereNull('parent_id')
             ->where('is_active', true)
             ->where('id', '!=', $category->id)
@@ -99,6 +108,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.edit'), 403, 'You do not have permission to edit categories.');
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:categories,slug,' . $category->id,
@@ -146,6 +158,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.delete'), 403, 'You do not have permission to delete categories.');
+        
         $category->delete();
 
         return redirect()->route('admin.categories.index')
@@ -160,6 +175,14 @@ class CategoryController extends Controller
      */
     public function toggleStatus(Category $category)
     {
+        // Check permission
+        if (!auth()->user()->hasPermission('categories.edit')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to edit categories.',
+            ], 403);
+        }
+        
         try {
             $category->is_active = !$category->is_active;
             $category->save();
@@ -185,6 +208,9 @@ class CategoryController extends Controller
      */
     public function duplicate(Category $category)
     {
+        // Check permission
+        abort_if(!auth()->user()->hasPermission('categories.create'), 403, 'You do not have permission to create categories.');
+        
         try {
             $newCategory = $category->replicate();
             $newCategory->name = $category->name . ' (Copy)';

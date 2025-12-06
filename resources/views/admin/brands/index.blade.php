@@ -9,11 +9,13 @@
                 <h1 class="text-2xl font-bold text-gray-900">Brands</h1>
                 <p class="mt-1 text-sm text-gray-600">Manage product brands with SEO configuration</p>
             </div>
+            @if(auth()->user()->hasPermission('brands.create'))
             <a href="{{ route('admin.brands.create') }}" 
                class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                 <i class="fas fa-plus mr-2"></i>
                 Add Brand
             </a>
+            @endif
         </div>
     </div>
 
@@ -211,6 +213,7 @@
                         <span class="text-sm text-gray-600 font-mono">{{ $brand->slug }}</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        @if(auth()->user()->hasPermission('brands.edit'))
                         <button onclick="toggleStatus({{ $brand->id }})" 
                                 class="status-toggle-{{ $brand->id }}">
                             @if($brand->is_active)
@@ -223,8 +226,20 @@
                                 </span>
                             @endif
                         </button>
+                        @else
+                        @if($brand->is_active)
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Active
+                            </span>
+                        @else
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                Inactive
+                            </span>
+                        @endif
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
+                        @if(auth()->user()->hasPermission('brands.edit'))
                         <button onclick="toggleFeatured({{ $brand->id }})" 
                                 class="featured-toggle-{{ $brand->id }}">
                             @if($brand->is_featured)
@@ -237,6 +252,17 @@
                                 </span>
                             @endif
                         </button>
+                        @else
+                        @if($brand->is_featured)
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-star mr-1"></i>Featured
+                            </span>
+                        @else
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                Not Featured
+                            </span>
+                        @endif
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex items-center justify-end space-x-2">
@@ -245,11 +271,14 @@
                                title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
+                            @if(auth()->user()->hasPermission('brands.edit'))
                             <a href="{{ route('admin.brands.edit', $brand) }}" 
                                class="text-indigo-600 hover:text-indigo-900"
                                title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            @endif
+                            @if(auth()->user()->hasPermission('brands.create'))
                             <form action="{{ route('admin.brands.duplicate', $brand) }}" 
                                   method="POST" 
                                   class="inline">
@@ -260,6 +289,8 @@
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </form>
+                            @endif
+                            @if(auth()->user()->hasPermission('brands.delete'))
                             <form id="delete-brand-{{ $brand->id }}" action="{{ route('admin.brands.destroy', $brand) }}" 
                                   method="POST" 
                                   class="inline">
@@ -278,6 +309,7 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -286,11 +318,13 @@
                     <td colspan="6" class="px-6 py-12 text-center">
                         <i class="fas fa-copyright text-4xl text-gray-300 mb-4"></i>
                         <p class="text-gray-500">No brands found.</p>
+                        @if(auth()->user()->hasPermission('brands.create'))
                         <a href="{{ route('admin.brands.create') }}" 
                            class="mt-4 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                             <i class="fas fa-plus mr-2"></i>
                             Create First Brand
                         </a>
+                        @endif
                     </td>
                 </tr>
                 @endforelse
