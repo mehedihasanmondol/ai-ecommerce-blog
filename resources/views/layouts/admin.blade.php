@@ -295,6 +295,7 @@
                         </a>
                     @endif
 
+                    @if(auth()->user()->hasPermission('brands.view'))
                     <a href="{{ route('admin.brands.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.brands.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                         <i class="fas fa-copyright w-5 mr-3"></i>
@@ -303,6 +304,7 @@
                             <i class="fas fa-chevron-right ml-auto text-xs"></i>
                         @endif
                     </a>
+                    @endif
 
                     <a href="{{ route('admin.attributes.index') }}"
                         class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.attributes.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
