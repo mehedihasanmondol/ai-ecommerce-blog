@@ -31,6 +31,11 @@ class FeedbackController extends Controller
      */
     public function index()
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('feedback.view')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return view('admin.feedback.index');
     }
 
@@ -40,7 +45,7 @@ class FeedbackController extends Controller
     public function show(Feedback $feedback)
     {
         $feedback->load('user', 'approver');
-        
+
         return view('admin.feedback.show', compact('feedback'));
     }
 
@@ -49,6 +54,11 @@ class FeedbackController extends Controller
      */
     public function approve(Feedback $feedback)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('feedback.approve')) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
+
         $this->feedbackService->approveFeedback($feedback);
 
         return redirect()
@@ -61,6 +71,11 @@ class FeedbackController extends Controller
      */
     public function reject(Feedback $feedback)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('feedback.reject')) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
+
         $this->feedbackService->rejectFeedback($feedback);
 
         return redirect()
@@ -73,6 +88,11 @@ class FeedbackController extends Controller
      */
     public function toggleFeature(Feedback $feedback)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('feedback.feature')) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
+
         $this->feedbackService->toggleFeatured($feedback);
 
         return redirect()
@@ -85,6 +105,11 @@ class FeedbackController extends Controller
      */
     public function destroy(Feedback $feedback)
     {
+        // Authorization check
+        if (!auth()->user()->hasPermission('feedback.delete')) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
+
         $feedback->delete();
 
         return redirect()
