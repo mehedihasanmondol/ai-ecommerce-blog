@@ -32,7 +32,7 @@
     </div>
 
     <!-- Settings Form -->
-    @if(auth()->user()->hasPermission('homepage-settings.edit'))
+    @if(auth()->user()->hasPermission('homepage-' . $group . '.manage'))
     <form wire:submit.prevent="save">
         <!-- Group Settings -->
         <div class="p-6 space-y-6 bg-gray-50">

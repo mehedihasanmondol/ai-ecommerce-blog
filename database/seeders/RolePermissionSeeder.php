@@ -195,8 +195,13 @@ class RolePermissionSeeder extends Seeder
             // ===================================
             // CONTENT MANAGEMENT MODULE
             // ===================================
-            ['name' => 'View Homepage Settings', 'slug' => 'homepage-settings.view', 'module' => 'content'],
-            ['name' => 'Edit Homepage Settings', 'slug' => 'homepage-settings.edit', 'module' => 'content'],
+            // Homepage Content Sections (Granular Permissions)
+            ['name' => 'Manage Hero Sliders', 'slug' => 'hero-sliders.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage Banner', 'slug' => 'homepage-banner.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage Featured', 'slug' => 'homepage-featured.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage General', 'slug' => 'homepage-general.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage Top Header', 'slug' => 'homepage-top_header.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage Mega Menu', 'slug' => 'homepage-mega_menu.manage', 'module' => 'content'],
 
             ['name' => 'View Promotional Banners', 'slug' => 'banners.view', 'module' => 'content'],
             ['name' => 'Create Promotional Banners', 'slug' => 'banners.create', 'module' => 'content'],

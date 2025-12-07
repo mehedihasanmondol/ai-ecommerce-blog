@@ -66,7 +66,8 @@ class RoleEdit extends Component
         $enabledPermissionIds = $this->allPermissions->pluck('id')->toArray();
 
         // Only include permissions that are both assigned to role AND enabled in module settings
-        $this->permissions = array_intersect($allRolePermissionIds, $enabledPermissionIds);
+        // Use array_values to re-index the array (remove keys from array_intersect)
+        $this->permissions = array_values(array_intersect($allRolePermissionIds, $enabledPermissionIds));
 
         $this->userCount = $this->role->users->count();
     }
@@ -74,6 +75,11 @@ class RoleEdit extends Component
     public function toggleAllPermissionsInModule($module)
     {
         abort_if(!auth()->user()->hasPermission('roles.edit'), 403, 'You do not have permission to edit roles.');
+
+        // Ensure permissions is always an array
+        if (!is_array($this->permissions)) {
+            $this->permissions = [];
+        }
 
         // Get all permission IDs for this module
         $modulePermissionIds = $this->allPermissions

@@ -18,7 +18,7 @@ class HeroSliderManager extends Component
     public $showModal = false;
     public $showDeleteModal = false;
     public $deleteId = null;
-    
+
     // Form fields
     public $title;
     public $subtitle;
@@ -59,7 +59,7 @@ class HeroSliderManager extends Component
     public function openEditModal($id)
     {
         $slider = HeroSlider::with('media')->findOrFail($id);
-        
+
         $this->editingId = $slider->id;
         $this->title = $slider->title;
         $this->subtitle = $slider->subtitle;
@@ -69,12 +69,14 @@ class HeroSliderManager extends Component
         $this->button_text = $slider->button_text;
         $this->is_active = $slider->is_active;
         $this->order = $slider->order;
-        
+
         $this->showModal = true;
     }
 
     public function save()
     {
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
+
         $this->validate();
 
         try {
@@ -106,7 +108,7 @@ class HeroSliderManager extends Component
             $this->loadSliders();
             $this->showModal = false;
             $this->resetForm();
-            
+
             $this->dispatch('slider-saved', [
                 'message' => $message,
                 'type' => 'success'
@@ -128,15 +130,17 @@ class HeroSliderManager extends Component
 
     public function deleteSlider()
     {
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
+
         try {
             if ($this->deleteId) {
                 $slider = HeroSlider::findOrFail($this->deleteId);
                 $slider->delete();
-                
+
                 $this->loadSliders();
                 $this->showDeleteModal = false;
                 $this->deleteId = null;
-                
+
                 $this->dispatch('slider-saved', [
                     'message' => 'Slider deleted successfully!',
                     'type' => 'success'
@@ -154,12 +158,14 @@ class HeroSliderManager extends Component
 
     public function toggleActive($id)
     {
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
+
         try {
             $slider = HeroSlider::findOrFail($id);
             $slider->update(['is_active' => !$slider->is_active]);
-            
+
             $this->loadSliders();
-            
+
             $this->dispatch('slider-saved', [
                 'message' => 'Slider status updated!',
                 'type' => 'success'
@@ -174,13 +180,15 @@ class HeroSliderManager extends Component
 
     public function updateOrder($orderedIds)
     {
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
+
         try {
             foreach ($orderedIds as $index => $id) {
                 HeroSlider::where('id', $id)->update(['order' => $index + 1]);
             }
-            
+
             $this->loadSliders();
-            
+
             $this->dispatch('slider-saved', [
                 'message' => 'Slider order updated!',
                 'type' => 'success'

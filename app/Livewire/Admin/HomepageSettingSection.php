@@ -28,7 +28,7 @@ class HomepageSettingSection extends Component
     {
         $this->group = $group;
         $this->groupSettings = $groupSettings;
-        
+
         // Initialize settings values
         foreach ($groupSettings as $setting) {
             if ($setting['type'] !== 'image') {
@@ -47,25 +47,29 @@ class HomepageSettingSection extends Component
      */
     public function save()
     {
+        $permission = "homepage-{$this->group}.manage";
+        abort_if(!auth()->user()->hasPermission($permission), 403, 'You do not have permission to edit this section.');
+
         $this->loading = true;
 
         try {
             foreach ($this->groupSettings as $setting) {
                 $homepageSetting = HomepageSetting::where('key', $setting['key'])->first();
-                
-                if (!$homepageSetting) continue;
-                
+
+                if (!$homepageSetting)
+                    continue;
+
                 // Handle image uploads
                 if ($setting['type'] === 'image' && isset($this->images[$setting['key']])) {
                     // Delete old image
                     if ($homepageSetting->value && !filter_var($homepageSetting->value, FILTER_VALIDATE_URL)) {
                         Storage::disk('public')->delete($homepageSetting->value);
                     }
-                    
+
                     // Store new image
                     $path = $this->images[$setting['key']]->store('homepage-settings', 'public');
                     $homepageSetting->update(['value' => $path]);
-                    
+
                     // Clear uploaded image from memory
                     unset($this->images[$setting['key']]);
                 }
@@ -120,9 +124,9 @@ class HomepageSettingSection extends Component
                 }
             }
         }
-        
+
         $this->images = [];
-        
+
         $this->dispatch('setting-saved', [
             'message' => 'Settings reset to original values',
             'type' => 'info'
@@ -134,24 +138,27 @@ class HomepageSettingSection extends Component
      */
     public function removeImage($key)
     {
+        $permission = "homepage-{$this->group}.manage";
+        abort_if(!auth()->user()->hasPermission($permission), 403, 'You do not have permission to edit this section.');
+
         $setting = HomepageSetting::where('key', $key)->first();
-        
+
         if ($setting && $setting->type === 'image' && $setting->value) {
             // Delete the image file
             if (!filter_var($setting->value, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete($setting->value);
             }
-            
+
             // Clear the value
             $setting->update(['value' => null]);
             HomepageSetting::clearCache();
-            
+
             // Refresh the component
             $this->groupSettings = HomepageSetting::where('group', $this->group)
                 ->orderBy('order')
                 ->get()
                 ->toArray();
-            
+
             $this->dispatch('setting-saved', [
                 'message' => 'Image removed successfully!',
                 'type' => 'success'

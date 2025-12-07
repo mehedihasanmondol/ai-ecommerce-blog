@@ -15,7 +15,14 @@ class HomepageSettingController extends Controller
      */
     public function index()
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.view'), 403, 'You do not have permission to view homepage settings.');
+        // Allow access if user has any homepage section permission
+        $hasAccess = auth()->user()->hasPermission('hero-sliders.manage') ||
+            auth()->user()->hasPermission('homepage-banner.manage') ||
+            auth()->user()->hasPermission('homepage-featured.manage') ||
+            auth()->user()->hasPermission('homepage-general.manage') ||
+            auth()->user()->hasPermission('homepage-top-header.manage');
+
+        abort_if(!$hasAccess, 403, 'You do not have permission to access homepage settings.');
 
         $settings = HomepageSetting::orderBy('group')->orderBy('order')->get()->groupBy('group');
         $sliders = HeroSlider::orderBy('order')->get();
@@ -28,7 +35,8 @@ class HomepageSettingController extends Controller
      */
     public function update(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to edit homepage settings.');
+        // This method is deprecated - use updateGroup instead
+        abort(404);
 
         $validated = $request->validate([
             'settings' => 'required|array',
@@ -67,7 +75,8 @@ class HomepageSettingController extends Controller
      */
     public function updateGroup(Request $request, string $group)
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to edit homepage settings.');
+        $permission = "homepage-{$group}.manage";
+        abort_if(!auth()->user()->hasPermission($permission), 403, 'You do not have permission to edit this section.');
 
         $validated = $request->validate([
             'settings' => 'required|array',
@@ -115,7 +124,7 @@ class HomepageSettingController extends Controller
      */
     public function storeSlider(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -145,7 +154,7 @@ class HomepageSettingController extends Controller
      */
     public function updateSlider(Request $request, HeroSlider $slider)
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -179,7 +188,7 @@ class HomepageSettingController extends Controller
      */
     public function destroySlider(HeroSlider $slider)
     {
-        abort_if(!auth()->user()->hasPermission('homepage-settings.edit'), 403, 'You do not have permission to manage sliders.');
+        abort_if(!auth()->user()->hasPermission('hero-sliders.manage'), 403, 'You do not have permission to manage sliders.');
 
         $slider->delete();
 
@@ -193,7 +202,7 @@ class HomepageSettingController extends Controller
     public function reorderSliders(Request $request)
     {
         // Check permission for AJAX request
-        if (!auth()->user()->hasPermission('homepage-settings.edit')) {
+        if (!auth()->user()->hasPermission('hero-sliders.manage')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have permission to reorder sliders.',
