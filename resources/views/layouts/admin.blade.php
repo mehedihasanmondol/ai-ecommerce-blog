@@ -680,7 +680,7 @@
                 @endif
 
                 <!-- Communication Section -->
-                @if(auth()->user()->canAccess('contact.view', 'users.view'))
+                @if(auth()->user()->hasPermission('contact-messages.view'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Communication</p>
                     </div>

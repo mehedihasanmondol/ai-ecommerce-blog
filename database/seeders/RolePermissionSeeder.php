@@ -285,6 +285,14 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Delete Appointments', 'slug' => 'appointments.delete', 'module' => 'appointments'],
             ['name' => 'Edit Appointment Notes', 'slug' => 'appointments.edit-notes', 'module' => 'appointments'],
             ['name' => 'Manage Chambers', 'slug' => 'chambers.manage', 'module' => 'appointments'],
+
+            // ===================================
+            // CONTACT MESSAGES MODULE
+            // ===================================
+            ['name' => 'View Contact Messages', 'slug' => 'contact-messages.view', 'module' => 'contact'],
+            ['name' => 'Update Message Status', 'slug' => 'contact-messages.update-status', 'module' => 'contact'],
+            ['name' => 'Delete Contact Messages', 'slug' => 'contact-messages.delete', 'module' => 'contact'],
+            ['name' => 'Bulk Actions on Messages', 'slug' => 'contact-messages.bulk-action', 'module' => 'contact'],
         ];
 
         foreach ($permissions as $permission) {

@@ -33,32 +33,52 @@ class ContactMessageTable extends Component
 
     public function markAsRead($messageId)
     {
+        if (!auth()->user()->hasPermission('contact-messages.update-status')) {
+            session()->flash('error', 'You do not have permission to update message status.');
+            return;
+        }
+
         $message = ContactMessage::findOrFail($messageId);
         $message->update(['status' => 'read']);
-        
+
         session()->flash('success', 'Message marked as read.');
     }
 
     public function markAsReplied($messageId)
     {
+        if (!auth()->user()->hasPermission('contact-messages.update-status')) {
+            session()->flash('error', 'You do not have permission to update message status.');
+            return;
+        }
+
         $message = ContactMessage::findOrFail($messageId);
         $message->update(['status' => 'replied']);
-        
+
         session()->flash('success', 'Message marked as replied.');
     }
 
     public function archive($messageId)
     {
+        if (!auth()->user()->hasPermission('contact-messages.update-status')) {
+            session()->flash('error', 'You do not have permission to update message status.');
+            return;
+        }
+
         $message = ContactMessage::findOrFail($messageId);
         $message->update(['status' => 'archived']);
-        
+
         session()->flash('success', 'Message archived.');
     }
 
     public function viewMessage($messageId)
     {
+        if (!auth()->user()->hasPermission('contact-messages.view')) {
+            session()->flash('error', 'You do not have permission to view contact messages.');
+            return;
+        }
+
         $this->viewingMessage = ContactMessage::findOrFail($messageId);
-        
+
         // Mark as read when viewing
         if ($this->viewingMessage->status === 'unread') {
             $this->viewingMessage->update(['status' => 'read']);
@@ -77,13 +97,21 @@ class ContactMessageTable extends Component
 
     public function deleteMessage()
     {
-        if ($this->deletingMessageId) {
-            $message = ContactMessage::findOrFail($this->deletingMessageId);
-            $message->delete();
-            
-            $this->deletingMessageId = null;
-            session()->flash('success', 'Message deleted successfully.');
+        if (!$this->deletingMessageId) {
+            return;
         }
+
+        if (!auth()->user()->hasPermission('contact-messages.delete')) {
+            session()->flash('error', 'You do not have permission to delete contact messages.');
+            $this->deletingMessageId = null;
+            return;
+        }
+
+        $message = ContactMessage::findOrFail($this->deletingMessageId);
+        $message->delete();
+
+        $this->deletingMessageId = null;
+        session()->flash('success', 'Message deleted successfully.');
     }
 
     public function cancelDelete()
@@ -97,12 +125,12 @@ class ContactMessageTable extends Component
 
         // Apply search filter
         if ($this->search) {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('email', 'like', '%' . $this->search . '%')
-                  ->orWhere('subject', 'like', '%' . $this->search . '%')
-                  ->orWhere('message', 'like', '%' . $this->search . '%')
-                  ->orWhere('phone', 'like', '%' . $this->search . '%');
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhere('subject', 'like', '%' . $this->search . '%')
+                    ->orWhere('message', 'like', '%' . $this->search . '%')
+                    ->orWhere('phone', 'like', '%' . $this->search . '%');
             });
         }
 

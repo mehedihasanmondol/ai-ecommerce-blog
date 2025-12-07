@@ -15,6 +15,10 @@ class ContactMessageController extends Controller
      */
     public function index(): View
     {
+        if (!auth()->user()->hasPermission('contact-messages.view')) {
+            abort(403, 'You do not have permission to view contact messages.');
+        }
+
         return view('admin.contact.messages.index');
     }
 
@@ -23,6 +27,10 @@ class ContactMessageController extends Controller
      */
     public function show(ContactMessage $message): View
     {
+        if (!auth()->user()->hasPermission('contact-messages.view')) {
+            abort(403, 'You do not have permission to view contact messages.');
+        }
+
         // Mark as read if unread
         if ($message->status === 'unread') {
             $message->markAsRead();
@@ -36,6 +44,10 @@ class ContactMessageController extends Controller
      */
     public function updateStatus(Request $request, ContactMessage $message): RedirectResponse
     {
+        if (!auth()->user()->hasPermission('contact-messages.update-status')) {
+            abort(403, 'You do not have permission to update message status.');
+        }
+
         $validated = $request->validate([
             'status' => 'required|in:unread,read,replied,archived',
             'admin_note' => 'nullable|string',
@@ -57,6 +69,10 @@ class ContactMessageController extends Controller
      */
     public function destroy(ContactMessage $message): RedirectResponse
     {
+        if (!auth()->user()->hasPermission('contact-messages.delete')) {
+            abort(403, 'You do not have permission to delete contact messages.');
+        }
+
         $message->delete();
 
         return redirect()
@@ -69,6 +85,10 @@ class ContactMessageController extends Controller
      */
     public function bulkAction(Request $request): RedirectResponse
     {
+        if (!auth()->user()->hasPermission('contact-messages.bulk-action')) {
+            abort(403, 'You do not have permission to perform bulk actions on messages.');
+        }
+
         $validated = $request->validate([
             'action' => 'required|in:mark_read,mark_replied,archive,delete',
             'messages' => 'required|array',

@@ -250,12 +250,24 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::delete('/settings/faqs/{faq}', [ContactSettingController::class, 'destroyFaq'])->name('settings.faqs.destroy');
         Route::post('/settings/faqs/{faq}/toggle', [ContactSettingController::class, 'toggleFaq'])->name('settings.faqs.toggle');
 
-        // Contact Messages
-        Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
-        Route::get('/messages/{message}', [ContactMessageController::class, 'show'])->name('messages.show');
-        Route::put('/messages/{message}/status', [ContactMessageController::class, 'updateStatus'])->name('messages.update-status');
-        Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
-        Route::post('/messages/bulk-action', [ContactMessageController::class, 'bulkAction'])->name('messages.bulk-action');
+
+        // Contact Messages - Granular permissions
+        Route::middleware(['permission:contact-messages.view'])->group(function () {
+            Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
+            Route::get('/messages/{message}', [ContactMessageController::class, 'show'])->name('messages.show');
+        });
+
+        Route::middleware(['permission:contact-messages.update-status'])->group(function () {
+            Route::put('/messages/{message}/status', [ContactMessageController::class, 'updateStatus'])->name('messages.update-status');
+        });
+
+        Route::middleware(['permission:contact-messages.delete'])->group(function () {
+            Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
+        });
+
+        Route::middleware(['permission:contact-messages.bulk-action'])->group(function () {
+            Route::post('/messages/bulk-action', [ContactMessageController::class, 'bulkAction'])->name('messages.bulk-action');
+        });
     });
 });
 
