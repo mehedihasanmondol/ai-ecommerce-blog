@@ -85,15 +85,28 @@
                             </h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 @foreach($modulePermissions as $permission)
-                                <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                @php
+                                    $isRequired = $permission->slug === 'permissions.manage';
+                                @endphp
+                                <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg {{ $isRequired ? 'bg-blue-50 border-blue-300' : 'hover:bg-gray-50' }} {{ $isRequired ? 'cursor-not-allowed' : 'cursor-pointer' }}" 
+                                       {{ $isRequired ? 'title=This permission is required to access Permission Settings and cannot be disabled' : '' }}>
                                     <input type="checkbox" 
                                            name="permissions[]" 
                                            value="{{ $permission->id }}"
-                                           {{ in_array($permission->id, old('permissions', $enabledPermissions)) ? 'checked' : '' }}
-                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                           {{ in_array($permission->id, old('permissions', $enabledPermissions)) || $isRequired ? 'checked' : '' }}
+                                           {{ $isRequired ? 'disabled' : '' }}
+                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 {{ $isRequired ? 'opacity-50' : '' }}">
+                                    @if($isRequired)
+                                        <input type="hidden" name="permissions[]" value="{{ $permission->id }}">
+                                    @endif
                                     <div class="flex-1">
-                                        <span class="text-sm font-medium text-gray-700">{{ $permission->name }}</span>
-                                        <p class="text-xs text-gray-500">{{ $permission->slug }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sm font-medium {{ $isRequired ? 'text-blue-700' : 'text-gray-700' }}">{{ $permission->name }}</span>
+                                            @if($isRequired)
+                                                <i class="fas fa-lock text-xs text-blue-600" title="Required permission"></i>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs {{ $isRequired ? 'text-blue-600' : 'text-gray-500' }}">{{ $permission->slug }}</p>
                                     </div>
                                 </label>
                                 @endforeach
