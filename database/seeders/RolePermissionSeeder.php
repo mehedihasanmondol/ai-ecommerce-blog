@@ -256,14 +256,14 @@ class RolePermissionSeeder extends Seeder
             // ===================================
             // SYSTEM SETTINGS MODULE
             // ===================================
-            ['name' => 'View Site Settings', 'slug' => 'settings.view', 'module' => 'system'],
-            ['name' => 'Edit Site Settings', 'slug' => 'settings.edit', 'module' => 'system'],
+            ['name' => 'Manage Site Settings', 'slug' => 'settings.manage', 'module' => 'system'],
             ['name' => 'Manage Logo', 'slug' => 'settings.logo', 'module' => 'system'],
 
             // System Settings (Cache & Maintenance)
-            ['name' => 'View System Settings', 'slug' => 'system.settings.view', 'module' => 'system'],
+            ['name' => 'Manage System Settings', 'slug' => 'system.settings.manage', 'module' => 'system'],
             ['name' => 'Manage Cache', 'slug' => 'system.cache', 'module' => 'system'],
             ['name' => 'Manage Maintenance Mode', 'slug' => 'system.maintenance', 'module' => 'system'],
+            ['name' => 'Execute Artisan Commands', 'slug' => 'system.artisan', 'module' => 'system'],
             ['name' => 'View System Logs', 'slug' => 'system.logs', 'module' => 'system'],
 
             // ===================================
@@ -366,13 +366,23 @@ class RolePermissionSeeder extends Seeder
         $superAdminRole->permissions()->sync(Permission::all());
         $this->command->info('✓ Super Admin: All permissions (' . Permission::count() . ' permissions)');
 
-        // 2. ADMIN - Administrative Access (All except user/role/system management)
-        $adminPermissions = Permission::whereNotIn('module', ['user', 'system'])->get();
+        // 2. ADMIN - Administrative Access (All except user/role management + selected system permissions)
+        $adminPermissions = Permission::whereNotIn('module', ['user'])->get();
+
+        // Add specific system permissions for Admin (only manage, no cache/maintenance)
+        $systemPermissions = Permission::whereIn('slug', [
+            'settings.manage',
+            'system.settings.manage',
+        ])->get();
+
+        // Merge permissions
+        $adminPermissions = $adminPermissions->merge($systemPermissions)->unique('id');
+
         $adminRole->permissions()->sync($adminPermissions);
         $this->command->info('✓ Admin: ' . $adminPermissions->count() . ' permissions');
 
-        // 3. MANAGER - Business Operations (Product, Order, Stock, Delivery, Reports)
-        $managerPermissions = Permission::whereIn('module', ['product', 'order', 'stock', 'delivery', 'reports'])
+        // 3. MANAGER - Business Operations + View System Settings (Product, Order, Stock, Delivery, Reports, Appointments)
+        $managerPermissions = Permission::whereIn('module', ['product', 'order', 'stock', 'delivery', 'reports', 'appointments'])
             ->where(function ($query) {
                 // Exclude sensitive actions
                 $query->whereNotIn('slug', [
@@ -381,10 +391,21 @@ class RolePermissionSeeder extends Seeder
                     'brands.delete',
                     'orders.delete',
                     'warehouses.delete',
-                    'suppliers.delete'
+                    'suppliers.delete',
+                    'appointments.delete'
                 ]);
             })
             ->get();
+
+        // Add view-only system settings permissions for Manager
+        $managerSystemPermissions = Permission::whereIn('slug', [
+            'settings.manage',
+            'system.settings.manage',
+        ])->get();
+
+        // Merge permissions
+        $managerPermissions = $managerPermissions->merge($managerSystemPermissions)->unique('id');
+
         $managerRole->permissions()->sync($managerPermissions);
         $this->command->info('✓ Manager: ' . $managerPermissions->count() . ' permissions');
 

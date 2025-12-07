@@ -707,12 +707,12 @@
                 @endif
 
                 <!-- Settings Section -->
-                @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('system.settings.view'))
+                @if(auth()->user()->hasPermission('users.view') || auth()->user()->hasPermission('system.settings.manage') || auth()->user()->hasPermission('settings.manage'))
                     <div class="pt-4 pb-2">
                         <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
                     </div>
 
-                    @if(auth()->user()->canAccess('settings.view', 'users.view'))
+                    @if(auth()->user()->hasPermission('settings.manage'))
                         <a href="{{ route('admin.site-settings.index') }}"
                             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.site-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                             <i class="fas fa-cog w-5 mr-3"></i>
@@ -732,7 +732,7 @@
                         </a>
                     @endif
 
-                    @if(auth()->user()->hasPermission('system.settings.view'))
+                    @if(auth()->user()->hasPermission('system.settings.manage'))
                         <a href="{{ route('admin.system-settings.index') }}"
                             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.system-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                             <i class="fas fa-server w-5 mr-3"></i>

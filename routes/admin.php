@@ -374,8 +374,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::get('coupons/{coupon}/statistics', [AdminCouponController::class, 'statistics'])->name('coupons.statistics');
     });
 
-    // Site Settings Routes - Requires settings.view permission
-    Route::middleware(['permission:settings.view'])->group(function () {
+    // Site Settings Routes - Requires settings.manage permission
+    Route::middleware(['permission:settings.manage'])->group(function () {
         Route::get('site-settings', [SiteSettingController::class, 'index'])->name('site-settings.index');
         Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
         Route::put('site-settings/{group}', [SiteSettingController::class, 'updateGroup'])->name('site-settings.update-group');
@@ -383,12 +383,12 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     });
 
     // System Settings Routes - Requires system settings permission
-    Route::middleware(['permission:system.settings.view'])->group(function () {
+    Route::middleware(['permission:system.settings.manage'])->group(function () {
         Route::get('system-settings', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'index'])->name('system-settings.index');
     });
 
     // Module Settings Routes - Requires system settings permission
-    Route::middleware(['permission:system.settings.view'])->group(function () {
+    Route::middleware(['permission:system.settings.manage'])->group(function () {
         Route::get('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'index'])->name('module-settings.index');
         Route::put('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'update'])->name('module-settings.update');
     });

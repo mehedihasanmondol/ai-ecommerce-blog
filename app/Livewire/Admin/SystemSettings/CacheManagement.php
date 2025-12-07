@@ -16,6 +16,11 @@ class CacheManagement extends Component
      */
     public function clearAppCache()
     {
+        if (!auth()->user()->hasPermission('system.cache')) {
+            session()->flash('error', 'You do not have permission to manage cache.');
+            return;
+        }
+
         try {
             Artisan::call('cache:clear');
             $this->successMessage = 'Application cache cleared successfully!';
@@ -30,6 +35,11 @@ class CacheManagement extends Component
      */
     public function clearRouteCache()
     {
+        if (!auth()->user()->hasPermission('system.cache')) {
+            session()->flash('error', 'You do not have permission to manage cache.');
+            return;
+        }
+
         try {
             Artisan::call('route:clear');
             $this->successMessage = 'Route cache cleared successfully!';
@@ -44,6 +54,11 @@ class CacheManagement extends Component
      */
     public function clearConfigCache()
     {
+        if (!auth()->user()->hasPermission('system.cache')) {
+            session()->flash('error', 'You do not have permission to manage cache.');
+            return;
+        }
+
         try {
             Artisan::call('config:clear');
             $this->successMessage = 'Configuration cache cleared successfully!';
@@ -58,6 +73,11 @@ class CacheManagement extends Component
      */
     public function clearViewCache()
     {
+        if (!auth()->user()->hasPermission('system.cache')) {
+            session()->flash('error', 'You do not have permission to manage cache.');
+            return;
+        }
+
         try {
             Artisan::call('view:clear');
             $this->successMessage = 'View cache cleared successfully!';
@@ -72,13 +92,18 @@ class CacheManagement extends Component
      */
     public function clearAllCache()
     {
+        if (!auth()->user()->hasPermission('system.cache')) {
+            session()->flash('error', 'You do not have permission to manage cache.');
+            return;
+        }
+
         try {
             Artisan::call('cache:clear');
             Artisan::call('route:clear');
             Artisan::call('config:clear');
             Artisan::call('view:clear');
             Artisan::call('optimize:clear');
-            
+
             $this->successMessage = 'All caches cleared successfully!';
             $this->dispatch('cache-cleared', type: 'all');
         } catch (\Exception $e) {

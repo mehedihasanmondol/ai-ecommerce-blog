@@ -28,18 +28,28 @@ class ConstructionMode extends Component
 
     public function toggleMaintenanceMode()
     {
+        if (!auth()->user()->hasPermission('system.maintenance')) {
+            session()->flash('error', 'You do not have permission to manage maintenance mode.');
+            return;
+        }
+
         $this->maintenanceMode = !$this->maintenanceMode;
         SystemSetting::set('maintenance_mode', $this->maintenanceMode ? '1' : '0', 'boolean', 'maintenance');
-        
-        $this->successMessage = $this->maintenanceMode 
-            ? 'Maintenance mode enabled successfully!' 
+
+        $this->successMessage = $this->maintenanceMode
+            ? 'Maintenance mode enabled successfully!'
             : 'Maintenance mode disabled successfully!';
-        
+
         $this->dispatch('maintenance-toggled', enabled: $this->maintenanceMode);
     }
 
     public function updateSettings()
     {
+        if (!auth()->user()->hasPermission('system.maintenance')) {
+            session()->flash('error', 'You do not have permission to manage maintenance mode.');
+            return;
+        }
+
         $this->validate([
             'maintenanceTitle' => 'required|string|max:255',
             'maintenanceMessage' => 'required|string',
@@ -69,6 +79,11 @@ class ConstructionMode extends Component
 
     public function removeImage()
     {
+        if (!auth()->user()->hasPermission('system.maintenance')) {
+            session()->flash('error', 'You do not have permission to manage maintenance mode.');
+            return;
+        }
+
         if ($this->currentImage) {
             Storage::disk('public')->delete($this->currentImage);
             SystemSetting::set('maintenance_image', '', 'file', 'maintenance');

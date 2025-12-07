@@ -27,22 +27,22 @@ class ArtisanCommandRunner extends Component
         'view:clear' => 'Clear compiled view files',
         'optimize:clear' => 'Clear all cached bootstrap files',
         'optimize' => 'Cache framework bootstrap files',
-        
+
         // Database Commands
         'migrate:status' => 'Show migration status',
         'db:show' => 'Display database information',
-        
+
         // Queue Commands
         'queue:failed' => 'List all failed queue jobs',
         'queue:restart' => 'Restart queue worker daemons',
-        
+
         // Storage Commands
         'storage:link' => 'Create symbolic link for storage',
-        
+
         // Maintenance Commands
         'down' => 'Put application into maintenance mode',
         'up' => 'Bring application out of maintenance mode',
-        
+
         // Other Useful Commands
         'about' => 'Display application information',
         'env' => 'Display current framework environment',
@@ -56,10 +56,10 @@ class ArtisanCommandRunner extends Component
     public function executeCommand()
     {
         $this->resetMessages();
-        
+
         // Determine which command to execute
-        $command = $this->selectedCommand === 'custom' 
-            ? $this->customCommand 
+        $command = $this->selectedCommand === 'custom'
+            ? $this->customCommand
             : $this->selectedCommand;
 
         // Validate command
@@ -67,6 +67,15 @@ class ArtisanCommandRunner extends Component
             $this->errorMessage = 'Please select or enter a command to execute.';
             return;
         }
+
+        // Permission check - require system.artisan for all commands
+        if (!auth()->user()->hasPermission('system.artisan')) {
+            $this->errorMessage = 'You do not have permission to execute artisan commands.';
+            return;
+        }
+
+        // Extract base command for whitelist validation
+        $baseCommand = explode(' ', trim($command))[0];
 
         // Security check: Validate command is in whitelist or custom is allowed
         if ($this->selectedCommand !== 'custom' && !array_key_exists($command, $this->allowedCommands)) {
@@ -81,8 +90,6 @@ class ArtisanCommandRunner extends Component
 
         // For custom commands, extract base command and validate
         if ($this->selectedCommand === 'custom') {
-            $baseCommand = explode(' ', trim($command))[0];
-            
             // Block dangerous commands
             $blockedCommands = [
                 'db:wipe',
@@ -105,10 +112,10 @@ class ArtisanCommandRunner extends Component
 
         try {
             $this->loading = true;
-            
+
             // Execute artisan command
             Artisan::call($command);
-            
+
             // Capture output
             $output = Artisan::output();
             $this->commandOutput = $output ?: 'Command executed successfully (no output).';
@@ -126,7 +133,7 @@ class ArtisanCommandRunner extends Component
         } catch (\Exception $e) {
             $this->errorMessage = 'Error executing command: ' . $e->getMessage();
             $this->commandOutput = '';
-            
+
             Log::error('Artisan command execution failed', [
                 'command' => $command,
                 'error' => $e->getMessage(),

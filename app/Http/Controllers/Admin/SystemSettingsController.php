@@ -12,6 +12,10 @@ class SystemSettingsController extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->hasPermission('system.settings.manage')) {
+            abort(403, 'You do not have permission to manage system settings.');
+        }
+
         // System settings sections
         $sections = [
             'cache' => [
