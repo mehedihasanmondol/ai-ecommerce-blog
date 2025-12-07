@@ -139,15 +139,29 @@ class User extends Authenticatable
 
     /**
      * Check if user has a specific permission
+     * Also checks if the permission is enabled in module settings
      */
     public function hasPermission(string $permissionSlug): bool
     {
-        return $this->roles()
+        // First check if user's role has the permission
+        $hasRolePermission = $this->roles()
             ->whereHas('permissions', function ($query) use ($permissionSlug) {
                 $query->where('slug', $permissionSlug)
                     ->where('is_active', true);
             })
             ->exists();
+
+        // If user doesn't have the permission in their role, return false
+        if (!$hasRolePermission) {
+            return false;
+        }
+
+        // Check if the permission is enabled in module settings
+        // Default to true if not set (backward compatibility)
+        $settingKey = "permission_{$permissionSlug}_enabled";
+        $isEnabledInSettings = SystemSetting::get($settingKey, true);
+
+        return $isEnabledInSettings;
     }
 
     /**
@@ -163,19 +177,19 @@ class User extends Authenticatable
         if ($this->hasPermission($specificPermission)) {
             return true;
         }
-        
+
         // If specific permission doesn't exist or user doesn't have it, try fallback permission(s)
         if ($fallbackPermissions) {
             // Handle single fallback or array of fallbacks
             $fallbacks = is_array($fallbackPermissions) ? $fallbackPermissions : [$fallbackPermissions];
-            
+
             foreach ($fallbacks as $fallback) {
                 if ($this->hasPermission($fallback)) {
                     return true;
                 }
             }
         }
-        
+
         return false;
     }
 
