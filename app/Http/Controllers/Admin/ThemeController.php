@@ -21,6 +21,8 @@ class ThemeController extends Controller
      */
     public function index()
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $themes = $this->themeService->getAllThemes();
         $activeTheme = $this->themeService->getActiveTheme();
         $categories = $this->themeService->getThemeCategories();
@@ -33,6 +35,8 @@ class ThemeController extends Controller
      */
     public function activate(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $success = $this->themeService->activateTheme($id);
 
         if ($success) {
@@ -51,6 +55,8 @@ class ThemeController extends Controller
      */
     public function edit($id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $theme = ThemeSetting::findOrFail($id);
         $categories = $this->themeService->getThemeCategories();
 
@@ -62,6 +68,8 @@ class ThemeController extends Controller
      */
     public function update(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $theme = ThemeSetting::findOrFail($id);
 
         $validated = $request->validate([
@@ -134,6 +142,8 @@ class ThemeController extends Controller
      */
     public function duplicate(Request $request, $id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $request->validate([
             'name' => 'required|string|max:255|unique:theme_settings,name',
             'label' => 'required|string|max:255',
@@ -151,6 +161,8 @@ class ThemeController extends Controller
      */
     public function destroy($id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $success = $this->themeService->deleteTheme($id);
 
         if ($success) {
@@ -169,6 +181,8 @@ class ThemeController extends Controller
      */
     public function reset($id)
     {
+        abort_if(!auth()->user()->hasPermission('theme.manage'), 403, 'You do not have permission to manage themes.');
+
         $success = $this->themeService->resetToDefault($id);
 
         if ($success) {

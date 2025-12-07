@@ -717,18 +717,18 @@
                             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.site-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                             <i class="fas fa-cog w-5 mr-3"></i>
                             <span>Site Settings</span>
-                            @if(request()->routeIs('admin.site-settings.*'))
-                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                            @endif
                         </a>
+                    @endif
 
+                    @if(auth()->user()->hasPermission('theme.manage'))
                         <a href="{{ route('admin.theme-settings.index') }}"
-                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.theme-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
-                            <i class="fas fa-palette w-5 mr-3"></i>
+                            class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200 {{ request()->routeIs('admin.theme-settings.*') ? 'bg-gray-100 text-blue-600' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
+                                </path>
+                            </svg>
                             <span>Theme Settings</span>
-                            @if(request()->routeIs('admin.theme-settings.*'))
-                                <i class="fas fa-chevron-right ml-auto text-xs"></i>
-                            @endif
                         </a>
                     @endif
 
@@ -1233,7 +1233,7 @@
                     scrollToActiveMenuItem(mobileSidebar);
                 }
             }
-        });
+            });
     </script>
 </body>
 

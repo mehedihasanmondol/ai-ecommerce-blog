@@ -163,14 +163,16 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::put('/homepage-settings/group/{group}', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'updateGroup'])->name('homepage-settings.update-group');
     });
 
-    // Theme Settings Routes
-    Route::get('/theme-settings', [\App\Http\Controllers\Admin\ThemeController::class, 'index'])->name('theme-settings.index');
-    Route::get('/theme-settings/{theme}/edit', [\App\Http\Controllers\Admin\ThemeController::class, 'edit'])->name('theme-settings.edit');
-    Route::put('/theme-settings/{theme}', [\App\Http\Controllers\Admin\ThemeController::class, 'update'])->name('theme-settings.update');
-    Route::patch('/theme-settings/{theme}/activate', [\App\Http\Controllers\Admin\ThemeController::class, 'activate'])->name('theme-settings.activate');
-    Route::post('/theme-settings/{theme}/duplicate', [\App\Http\Controllers\Admin\ThemeController::class, 'duplicate'])->name('theme-settings.duplicate');
-    Route::patch('/theme-settings/{theme}/reset', [\App\Http\Controllers\Admin\ThemeController::class, 'reset'])->name('theme-settings.reset');
-    Route::delete('/theme-settings/{theme}', [\App\Http\Controllers\Admin\ThemeController::class, 'destroy'])->name('theme-settings.destroy');
+    // Theme Settings Routes - Requires theme.manage permission
+    Route::middleware(['permission:theme.manage'])->group(function () {
+        Route::get('/theme-settings', [\App\Http\Controllers\Admin\ThemeController::class, 'index'])->name('theme-settings.index');
+        Route::get('/theme-settings/{theme}/edit', [\App\Http\Controllers\Admin\ThemeController::class, 'edit'])->name('theme-settings.edit');
+        Route::put('/theme-settings/{theme}', [\App\Http\Controllers\Admin\ThemeController::class, 'update'])->name('theme-settings.update');
+        Route::patch('/theme-settings/{theme}/activate', [\App\Http\Controllers\Admin\ThemeController::class, 'activate'])->name('theme-settings.activate');
+        Route::post('/theme-settings/{theme}/duplicate', [\App\Http\Controllers\Admin\ThemeController::class, 'duplicate'])->name('theme-settings.duplicate');
+        Route::patch('/theme-settings/{theme}/reset', [\App\Http\Controllers\Admin\ThemeController::class, 'reset'])->name('theme-settings.reset');
+        Route::delete('/theme-settings/{theme}', [\App\Http\Controllers\Admin\ThemeController::class, 'destroy'])->name('theme-settings.destroy');
+    });
 
     // Hero Slider Routes
     Route::post('/homepage-settings/slider', [\App\Http\Controllers\Admin\HomepageSettingController::class, 'storeSlider'])->name('homepage-settings.slider.store');

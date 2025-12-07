@@ -270,6 +270,7 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Maintenance Mode', 'slug' => 'system.maintenance', 'module' => 'system'],
             ['name' => 'Execute Artisan Commands', 'slug' => 'system.artisan', 'module' => 'system'],
             ['name' => 'Manage Permissions', 'slug' => 'permissions.manage', 'module' => 'system'],
+            ['name' => 'Manage Themes', 'slug' => 'theme.manage', 'module' => 'system'],
             ['name' => 'View System Logs', 'slug' => 'system.logs', 'module' => 'system'],
 
             // ===================================
