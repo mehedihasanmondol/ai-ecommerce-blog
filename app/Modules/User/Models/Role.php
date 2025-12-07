@@ -67,6 +67,18 @@ class Role extends Model
     }
 
     /**
+     * Get count of permissions that are enabled in module settings
+     * This ensures permission counts respect system-level permission settings
+     */
+    public function getEnabledPermissionsCountAttribute(): int
+    {
+        return $this->permissions->filter(function ($permission) {
+            $key = "permission_{$permission->slug}_enabled";
+            return \App\Models\SystemSetting::get($key, true);
+        })->count();
+    }
+
+    /**
      * Scope to get only active roles
      */
     public function scopeActive($query)

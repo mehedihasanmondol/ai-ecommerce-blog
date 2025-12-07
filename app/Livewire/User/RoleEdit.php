@@ -57,11 +57,18 @@ class RoleEdit extends Component
         $this->slug = $this->role->slug;
         $this->description = $this->role->description;
         $this->isActive = $this->role->is_active;
-        $this->permissions = $this->role->permissions->pluck('id')->toArray();
-        $this->userCount = $this->role->users->count();
 
-        // Get all permissions
+        // Get all enabled permissions (filtered by module settings)
         $this->allPermissions = $permissionRepository->getActiveByEnabledModules();
+
+        // Get role's permissions and filter by module settings
+        $allRolePermissionIds = $this->role->permissions->pluck('id')->toArray();
+        $enabledPermissionIds = $this->allPermissions->pluck('id')->toArray();
+
+        // Only include permissions that are both assigned to role AND enabled in module settings
+        $this->permissions = array_intersect($allRolePermissionIds, $enabledPermissionIds);
+
+        $this->userCount = $this->role->users->count();
     }
 
     public function toggleAllPermissionsInModule($module)
