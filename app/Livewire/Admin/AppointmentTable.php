@@ -27,7 +27,7 @@ class AppointmentTable extends Component
     public $chamberFilter = 'all';
     public $dateFilter = 'all'; // all, today, upcoming, past
     public $perPage = 20;
-    
+
     // For modals
     public $selectedAppointment = null;
     public $cancellationReason = '';
@@ -71,7 +71,7 @@ class AppointmentTable extends Component
     public function confirm($appointmentId)
     {
         $appointment = Appointment::findOrFail($appointmentId);
-        
+
         if (!auth()->user()->hasPermission('appointments.confirm')) {
             session()->flash('error', 'You do not have permission to confirm appointments');
             return;
@@ -79,7 +79,7 @@ class AppointmentTable extends Component
 
         $service = app(AppointmentService::class);
         $service->confirm($appointment, auth()->id());
-        
+
         session()->flash('success', 'Appointment confirmed successfully');
     }
 
@@ -111,7 +111,7 @@ class AppointmentTable extends Component
         $appointment = Appointment::findOrFail($this->selectedAppointment);
         $service = app(AppointmentService::class);
         $service->cancel($appointment, auth()->id(), $this->cancellationReason);
-        
+
         session()->flash('success', 'Appointment cancelled successfully');
         $this->showCancelModal = false;
         $this->selectedAppointment = null;
@@ -124,7 +124,7 @@ class AppointmentTable extends Component
     public function complete($appointmentId)
     {
         $appointment = Appointment::findOrFail($appointmentId);
-        
+
         if (!auth()->user()->hasPermission('appointments.complete')) {
             session()->flash('error', 'You do not have permission to complete appointments');
             return;
@@ -132,7 +132,7 @@ class AppointmentTable extends Component
 
         $service = app(AppointmentService::class);
         $service->complete($appointment, auth()->id());
-        
+
         session()->flash('success', 'Appointment marked as completed');
     }
 
@@ -148,7 +148,7 @@ class AppointmentTable extends Component
 
         $appointment = Appointment::findOrFail($appointmentId);
         $appointment->delete();
-        
+
         session()->flash('success', 'Appointment deleted successfully');
     }
 
@@ -157,6 +157,11 @@ class AppointmentTable extends Component
      */
     public function openNotesModal($appointmentId)
     {
+        if (!auth()->user()->hasPermission('appointments.edit-notes')) {
+            session()->flash('error', 'You do not have permission to edit appointment notes');
+            return;
+        }
+
         $appointment = Appointment::findOrFail($appointmentId);
         $this->selectedAppointment = $appointmentId;
         $this->adminNotes = $appointment->admin_notes ?? '';
@@ -172,9 +177,15 @@ class AppointmentTable extends Component
             return;
         }
 
+        if (!auth()->user()->hasPermission('appointments.edit-notes')) {
+            session()->flash('error', 'You do not have permission to edit appointment notes');
+            $this->showNotesModal = false;
+            return;
+        }
+
         $appointment = Appointment::findOrFail($this->selectedAppointment);
         $appointment->update(['admin_notes' => $this->adminNotes]);
-        
+
         session()->flash('success', 'Notes saved successfully');
         $this->showNotesModal = false;
         $this->selectedAppointment = null;
@@ -187,27 +198,27 @@ class AppointmentTable extends Component
     public function getAppointmentsProperty()
     {
         return Appointment::with(['chamber', 'user', 'confirmedBy', 'cancelledBy', 'completedBy'])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
-                    $q->where('customer_name', 'like', '%'.$this->search.'%')
-                      ->orWhere('customer_email', 'like', '%'.$this->search.'%')
-                      ->orWhere('customer_mobile', 'like', '%'.$this->search.'%');
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('customer_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('customer_email', 'like', '%' . $this->search . '%')
+                        ->orWhere('customer_mobile', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->statusFilter !== 'all', function($query) {
+            ->when($this->statusFilter !== 'all', function ($query) {
                 $query->where('status', $this->statusFilter);
             })
-            ->when($this->chamberFilter !== 'all', function($query) {
+            ->when($this->chamberFilter !== 'all', function ($query) {
                 $query->where('chamber_id', $this->chamberFilter);
             })
-            ->when($this->dateFilter === 'today', function($query) {
+            ->when($this->dateFilter === 'today', function ($query) {
                 $query->whereDate('appointment_date', today());
             })
-            ->when($this->dateFilter === 'upcoming', function($query) {
+            ->when($this->dateFilter === 'upcoming', function ($query) {
                 $query->where('appointment_date', '>=', today())
-                      ->whereIn('status', ['pending', 'confirmed']);
+                    ->whereIn('status', ['pending', 'confirmed']);
             })
-            ->when($this->dateFilter === 'past', function($query) {
+            ->when($this->dateFilter === 'past', function ($query) {
                 $query->where('appointment_date', '<', today());
             })
             ->orderByRaw("CASE 

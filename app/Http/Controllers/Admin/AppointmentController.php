@@ -21,6 +21,11 @@ class AppointmentController extends Controller
      */
     public function index()
     {
+        // Verify user has permission to view appointments
+        if (!auth()->user()->hasPermission('appointments.view')) {
+            abort(403, 'You do not have permission to view appointments.');
+        }
+
         return view('admin.appointments.index');
     }
 }

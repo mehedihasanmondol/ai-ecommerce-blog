@@ -283,6 +283,7 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Cancel Appointments', 'slug' => 'appointments.cancel', 'module' => 'appointments'],
             ['name' => 'Complete Appointments', 'slug' => 'appointments.complete', 'module' => 'appointments'],
             ['name' => 'Delete Appointments', 'slug' => 'appointments.delete', 'module' => 'appointments'],
+            ['name' => 'Edit Appointment Notes', 'slug' => 'appointments.edit-notes', 'module' => 'appointments'],
             ['name' => 'Manage Chambers', 'slug' => 'chambers.manage', 'module' => 'appointments'],
         ];
 
