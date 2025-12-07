@@ -741,7 +741,9 @@
                                 <i class="fas fa-chevron-right ml-auto text-xs"></i>
                             @endif
                         </a>
+                    @endif
 
+                    @if(auth()->user()->hasPermission('permissions.manage'))
                         <a href="{{ route('admin.module-settings.index') }}"
                             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.module-settings.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                             <i class="fas fa-shield-alt w-5 mr-3"></i>

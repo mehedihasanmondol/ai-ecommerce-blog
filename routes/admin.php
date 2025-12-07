@@ -387,8 +387,8 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::get('system-settings', [\App\Http\Controllers\Admin\SystemSettingsController::class, 'index'])->name('system-settings.index');
     });
 
-    // Module Settings Routes - Requires system settings permission
-    Route::middleware(['permission:system.settings.manage'])->group(function () {
+    // Module Settings Routes - Requires permissions management permission
+    Route::middleware(['permission:permissions.manage'])->group(function () {
         Route::get('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'index'])->name('module-settings.index');
         Route::put('module-settings', [\App\Http\Controllers\Admin\ModuleSettingsController::class, 'update'])->name('module-settings.update');
     });
