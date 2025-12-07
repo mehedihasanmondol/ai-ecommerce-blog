@@ -64,6 +64,28 @@ class RoleEdit extends Component
         $this->allPermissions = $permissionRepository->getActiveByEnabledModules();
     }
 
+    public function toggleAllPermissionsInModule($module)
+    {
+        abort_if(!auth()->user()->hasPermission('roles.edit'), 403, 'You do not have permission to edit roles.');
+
+        // Get all permission IDs for this module
+        $modulePermissionIds = $this->allPermissions
+            ->where('module', $module)
+            ->pluck('id')
+            ->toArray();
+
+        // Check if all permissions in this module are already selected
+        $allSelected = empty(array_diff($modulePermissionIds, $this->permissions));
+
+        if ($allSelected) {
+            // Unmark all - remove all module permissions from selected permissions
+            $this->permissions = array_values(array_diff($this->permissions, $modulePermissionIds));
+        } else {
+            // Mark all - add all module permissions to selected permissions
+            $this->permissions = array_values(array_unique(array_merge($this->permissions, $modulePermissionIds)));
+        }
+    }
+
     public function updateRole(RoleService $roleService)
     {
         abort_if(!auth()->user()->hasPermission('roles.edit'), 403, 'You do not have permission to edit roles.');

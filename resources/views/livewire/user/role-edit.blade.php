@@ -99,11 +99,22 @@
 
                         <div class="space-y-6">
                             @foreach($groupedPermissions as $module => $modulePermissions)
+                                @php
+                                    $modulePermissionIds = $modulePermissions->pluck('id')->toArray();
+                                    $allSelected = empty(array_diff($modulePermissionIds, $permissions));
+                                @endphp
                                 <div class="border border-gray-200 rounded-lg p-4">
-                                    <h4 class="font-semibold text-gray-900 mb-3 capitalize">
-                                        <i class="fas fa-folder mr-2 text-blue-600"></i>
-                                        {{ $module ?? 'General' }} Module
-                                    </h4>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h4 class="font-semibold text-gray-900 capitalize">
+                                            <i class="fas fa-folder mr-2 text-blue-600"></i>
+                                            {{ $module ?? 'General' }} Module
+                                        </h4>
+                                        <button type="button" wire:click="toggleAllPermissionsInModule('{{ $module }}')"
+                                            class="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors {{ $allSelected ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' : 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200' }}">
+                                            <i class="fas {{ $allSelected ? 'fa-times-circle' : 'fa-check-circle' }} mr-1"></i>
+                                            {{ $allSelected ? 'Unmark All' : 'Mark All' }}
+                                        </button>
+                                    </div>
                                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                         @foreach($modulePermissions as $permission)
                                             <label
