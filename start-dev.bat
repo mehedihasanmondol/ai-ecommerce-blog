@@ -15,6 +15,15 @@ start "" /D "%PROJECT_DIR%" "C:\Program Files\Git\git-bash.exe" -c "git status; 
 :: --- Open Antigravity Editor ---
 start "" "%USERPROFILE%\AppData\Local\Programs\Antigravity\antigravity.exe" "%PROJECT_DIR%"
 
+:: --- Wait for Server to Start (Check Port 8000) ---
+echo Waiting for Laravel server (port 8000)...
+:wait_loop
+timeout /t 1 >nul
+netstat -an | find "LISTENING" | find ":8000" >nul
+if errorlevel 1 goto wait_loop
+
+echo Server detected on port 8000!
+
 :: --- Open Browser with Laravel URLs ---
 start "" chrome "http://localhost:8000"
 start "" chrome "http://localhost:8000/login"
