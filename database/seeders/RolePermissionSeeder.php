@@ -203,6 +203,17 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Homepage Top Header', 'slug' => 'homepage-top_header.manage', 'module' => 'content'],
             ['name' => 'Manage Homepage Mega Menu', 'slug' => 'homepage-mega_menu.manage', 'module' => 'content'],
 
+            // Site Settings Sections (Granular Permissions)
+            ['name' => 'Manage Site General Settings', 'slug' => 'site-settings-general.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Appearance Settings', 'slug' => 'site-settings-appearance.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Social Settings', 'slug' => 'site-settings-social.manage', 'module' => 'content'],
+            ['name' => 'Manage Site SEO Settings', 'slug' => 'site-settings-seo.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Invoice Settings', 'slug' => 'site-settings-invoice.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Login Settings', 'slug' => 'site-settings-login.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Feedback Settings', 'slug' => 'site-settings-feedback.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Author Page Settings', 'slug' => 'site-settings-author_page.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Blog Settings', 'slug' => 'site-settings-blog.manage', 'module' => 'content'],
+
             ['name' => 'View Promotional Banners', 'slug' => 'banners.view', 'module' => 'content'],
             ['name' => 'Create Promotional Banners', 'slug' => 'banners.create', 'module' => 'content'],
             ['name' => 'Edit Promotional Banners', 'slug' => 'banners.edit', 'module' => 'content'],
@@ -261,7 +272,7 @@ class RolePermissionSeeder extends Seeder
             // ===================================
             // SYSTEM SETTINGS MODULE
             // ===================================
-            ['name' => 'Manage Site Settings', 'slug' => 'settings.manage', 'module' => 'system'],
+            // Note: Site Settings permissions moved to CONTENT MODULE (granular per-tab permissions)
             ['name' => 'Manage Logo', 'slug' => 'settings.logo', 'module' => 'system'],
 
             // System Settings (Cache & Maintenance)

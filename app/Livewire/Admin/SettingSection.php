@@ -30,7 +30,7 @@ class SettingSection extends Component
     {
         $this->group = $group;
         $this->groupSettings = $groupSettings;
-        
+
         // Initialize settings values
         foreach ($groupSettings as $setting) {
             if ($setting->type !== 'image') {
@@ -49,11 +49,22 @@ class SettingSection extends Component
      */
     public function save()
     {
+        // Check permission for specific group
+        $permission = "site-settings-{$this->group}.manage";
+
+        if (!auth()->user()->hasPermission($permission)) {
+            $this->dispatch('setting-saved', [
+                'message' => 'You do not have permission to edit this section.',
+                'type' => 'error'
+            ]);
+            return;
+        }
+
         $this->loading = true;
 
         try {
             $imageService = app(ImageCompressionService::class);
-            
+
             foreach ($this->groupSettings as $setting) {
                 // Handle image uploads with WebP compression
                 if ($setting->type === 'image') {
@@ -63,7 +74,7 @@ class SettingSection extends Component
                         if ($setting->value && !filter_var($setting->value, FILTER_VALIDATE_URL)) {
                             Storage::disk('public')->delete($setting->value);
                         }
-                        
+
                         // Compress and store as WebP
                         $path = $imageService->compressAndStore(
                             $this->images[$setting->key],
@@ -71,7 +82,7 @@ class SettingSection extends Component
                             'public'
                         );
                         $setting->update(['value' => $path]);
-                        
+
                         // Clear uploaded image from memory
                         unset($this->images[$setting->key]);
                     }
@@ -138,9 +149,9 @@ class SettingSection extends Component
                 }
             }
         }
-        
+
         $this->images = [];
-        
+
         $this->dispatch('setting-saved', [
             'message' => 'Settings reset to original values',
             'type' => 'info'
@@ -153,22 +164,22 @@ class SettingSection extends Component
     public function removeImage($key)
     {
         $setting = SiteSetting::where('key', $key)->first();
-        
+
         if ($setting && $setting->type === 'image' && $setting->value) {
             // Delete the image file
             if (!filter_var($setting->value, FILTER_VALIDATE_URL)) {
                 Storage::disk('public')->delete($setting->value);
             }
-            
+
             // Clear the value
             $setting->update(['value' => null]);
             SiteSetting::clearCache();
-            
+
             // Refresh the component
             $this->groupSettings = SiteSetting::where('group', $this->group)
                 ->orderBy('order')
                 ->get();
-            
+
             $this->dispatch('setting-saved', [
                 'message' => 'Image removed successfully!',
                 'type' => 'success'
@@ -179,7 +190,7 @@ class SettingSection extends Component
     public function render()
     {
         $data = [];
-        
+
         // Pass additional data for homepage settings
         if ($this->group === 'homepage') {
             $data['authors'] = User::where('role', 'author')
@@ -189,7 +200,7 @@ class SettingSection extends Component
                 ->get();
             $data['homepageTypes'] = config('homepage.types', []);
         }
-        
+
         return view('livewire.admin.setting-section', $data);
     }
 }
