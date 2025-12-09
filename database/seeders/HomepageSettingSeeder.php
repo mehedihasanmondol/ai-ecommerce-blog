@@ -81,7 +81,7 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 3,
                 'description' => 'Promotional banner text',
             ],
-            
+
             // Top Header Settings
             [
                 'key' => 'top_header_link1_text',
@@ -139,7 +139,7 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 7,
                 'description' => 'Show top header announcement bar',
             ],
-            
+
             // Mega Menu Settings
             [
                 'key' => 'mega_menu_trending_brands_enabled',
@@ -181,6 +181,38 @@ class HomepageSettingSeeder extends Seeder
                 'order' => 5,
                 'description' => 'Show featured brands when no sales data available (if disabled, brands section will be hidden)',
             ],
+
+            // Newspaper Menu Settings
+            [
+                'key' => 'newspaper_menu_category_limit',
+                'value' => '8',
+                'type' => 'text',
+                'group' => 'newspaper_menu',
+                'order' => 1,
+                'description' => 'Number of categories to display in newspaper theme header menu (default: 8)',
+            ],
+            [
+                'key' => 'newspaper_menu_enabled',
+                'value' => '1',
+                'type' => 'boolean',
+                'group' => 'newspaper_menu',
+                'order' => 2,
+                'description' => 'Enable/disable newspaper menu category display',
+            ],
+            [
+                'key' => 'newspaper_menu_subcategory_style',
+                'value' => 'megamenu',
+                'type' => 'select',
+                'group' => 'newspaper_menu',
+                'order' => 3,
+                'description' => 'Subcategory display style for mega menu',
+                'options' => json_encode([
+                    'megamenu' => 'Mega Menu (Full Grid)',
+                    'grid' => 'Grid Layout (Enhanced)',
+                    'compact' => 'List Compact (Minimal)',
+                    'dropdown' => 'Simple Dropdown'
+                ]),
+            ],
         ];
 
         foreach ($generalSettings as $setting) {
@@ -208,10 +240,11 @@ class HomepageSettingSeeder extends Seeder
             $updates = [];
 
             foreach ($settingData as $field => $newValue) {
-                if (in_array($field, $excludeFields)) continue;
-                
+                if (in_array($field, $excludeFields))
+                    continue;
+
                 $oldValue = $existing->{$field};
-                
+
                 // Compare metadata fields only
                 if ($oldValue != $newValue) {
                     $needsUpdate = true;

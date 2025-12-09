@@ -20,7 +20,8 @@ class HomepageSettingController extends Controller
             auth()->user()->hasPermission('homepage-banner.manage') ||
             auth()->user()->hasPermission('homepage-featured.manage') ||
             auth()->user()->hasPermission('homepage-general.manage') ||
-            auth()->user()->hasPermission('homepage-top-header.manage');
+            auth()->user()->hasPermission('homepage-top-header.manage') ||
+            auth()->user()->hasPermission('homepage-newspaper_menu.manage');
 
         abort_if(!$hasAccess, 403, 'You do not have permission to access homepage settings.');
 

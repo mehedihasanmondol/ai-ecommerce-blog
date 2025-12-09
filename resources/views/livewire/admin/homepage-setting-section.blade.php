@@ -152,6 +152,19 @@
                             </label>
                         </div>
 
+                    @elseif($setting['type'] === 'select')
+                        @php
+                            $options = isset($setting['options']) ? json_decode($setting['options'], true) : [];
+                        @endphp
+                        <select 
+                            wire:model="settings.{{ $setting['key'] }}"
+                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                        >
+                            @foreach($options as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+
                     @endif
 
                     @error('settings.' . $setting['key'])

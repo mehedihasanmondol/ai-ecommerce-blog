@@ -144,6 +144,15 @@ class SiteSettingSeeder extends Seeder
                 'description' => 'Your YouTube channel URL',
                 'order' => 4,
             ],
+            [
+                'key' => 'whatsapp_url',
+                'value' => '',
+                'type' => 'text',
+                'group' => 'social',
+                'label' => 'WhatsApp URL',
+                'description' => 'Your WhatsApp contact URL (e.g., https://wa.me/1234567890)',
+                'order' => 5,
+            ],
 
             // SEO Settings
             [
@@ -951,10 +960,11 @@ class SiteSettingSeeder extends Seeder
             $updates = [];
 
             foreach ($settingData as $field => $newValue) {
-                if (in_array($field, $excludeFields)) continue;
-                
+                if (in_array($field, $excludeFields))
+                    continue;
+
                 $oldValue = $existing->{$field};
-                
+
                 // Compare metadata fields only
                 if ($oldValue != $newValue) {
                     $needsUpdate = true;

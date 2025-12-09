@@ -41,12 +41,15 @@ class HomeController extends Controller
     {
         // Check homepage type setting
         $homepageType = SiteSetting::get('homepage_type', config('homepage.default_type', 'default'));
-        
+
         // Handle different homepage types
         switch ($homepageType) {
             case 'author_profile':
                 return $this->showAuthorHomepage();
-                
+
+            case 'newspaper':
+                return $this->showNewspaperHomepage();
+
             // Future extensible types can be added here:
             // case 'category_page':
             //     return $this->showCategoryHomepage();
@@ -54,13 +57,13 @@ class HomeController extends Controller
             //     return redirect()->route('blog.index');
             // case 'custom_page':
             //     return $this->showCustomPageHomepage();
-                
+
             case 'default':
             default:
                 return $this->showDefaultHomepage();
         }
     }
-    
+
     /**
      * Display default homepage with products
      *
@@ -137,7 +140,7 @@ class HomeController extends Controller
         $siteName = SiteSetting::get('site_name', config('app.name'));
         $siteTagline = SiteSetting::get('site_tagline', '');
         $siteLogo = SiteSetting::get('site_logo');
-        
+
         $seoData = [
             'title' => $siteTagline ? $siteName . ' | ' . $siteTagline : $siteName,
             'description' => SiteSetting::get('meta_description', 'Shop health, wellness and beauty products'),
@@ -160,7 +163,7 @@ class HomeController extends Controller
             'seoData'
         ));
     }
-    
+
     /**
      * Display author profile as homepage
      *
@@ -169,47 +172,126 @@ class HomeController extends Controller
     protected function showAuthorHomepage()
     {
         $authorId = SiteSetting::get('homepage_author_id');
-        
+
         if (!$authorId) {
             // If no author is selected, fall back to default homepage
             return $this->showDefaultHomepage();
         }
-        
+
         $author = User::with('authorProfile')->find($authorId);
-        
+
         if (!$author || !$author->authorProfile) {
             // If author not found or has no profile, fall back to default
             return $this->showDefaultHomepage();
         }
-        
+
         // Get categories for sidebar
         $categories = Category::whereNull('parent_id')
             ->where('is_active', true)
             ->withCount('activeChildren')
             ->orderBy('name')
             ->get();
-        
+
         // Prepare SEO data for author profile homepage
         $authorProfile = $author->authorProfile;
         $authorProfile->load('media'); // Eager load media library image
         $jobTitle = $authorProfile->job_title ?? 'Author Profile';
-        
+
         $seoData = [
             'title' => $author->name . ' | ' . $jobTitle,
             'description' => $authorProfile->bio ? \Illuminate\Support\Str::limit(strip_tags($authorProfile->bio), 160) : 'View profile and articles by ' . $author->name,
             'keywords' => $author->name . ', author, blog, articles, writer' . ($authorProfile->job_title ? ', ' . $authorProfile->job_title : ''),
             'og_image' => ($authorProfile->media && $authorProfile->media->large_url)
                 ? $authorProfile->media->large_url
-                : ($authorProfile->avatar 
-                    ? asset('storage/' . $authorProfile->avatar) 
+                : ($authorProfile->avatar
+                    ? asset('storage/' . $authorProfile->avatar)
                     : asset('images/default-avatar.jpg')),
             'og_type' => 'profile',
             'canonical' => url('/'),
             'author_name' => $author->name,
         ];
-        
+
         // Render author profile page as homepage
         return view('frontend.blog.author', compact('author', 'categories', 'seoData'));
+    }
+
+    /**
+     * Display newspaper-style homepage
+     *
+     * @return \Illuminate\View\View
+     */
+    protected function showNewspaperHomepage()
+    {
+        // Get published blog posts
+        $posts = \App\Modules\Blog\Models\Post::with(['author', 'categories', 'media'])
+            ->where('status', 'published')
+            ->latest('published_at')
+            ->get();
+
+        // Featured post (most recent featured or first post)
+        $featuredPost = $posts->where('is_featured', true)->first() ?? $posts->first();
+
+        // Top stories (next 6 posts after featured)
+        $topStories = $posts->skip($featuredPost ? 1 : 0)->take(6);
+
+        // Get active categories with published posts
+        $categories = \App\Modules\Blog\Models\BlogCategory::where('is_active', true)
+            ->withCount([
+                'posts' => function ($q) {
+                    $q->where('status', 'published');
+                }
+            ])
+            ->having('posts_count', '>', 0)
+            ->orderBy('name')
+            ->limit(4)
+            ->get();
+
+        // Get posts by category for sections
+        $categorySections = [];
+        foreach ($categories as $category) {
+            $categoryPosts = $posts->filter(function ($post) use ($category) {
+                return $post->categories->contains('id', $category->id);
+            })->take(4);
+
+            if ($categoryPosts->isNotEmpty()) {
+                $categorySections[$category->slug] = [
+                    'category' => $category,
+                    'posts' => $categoryPosts
+                ];
+            }
+        }
+
+        // Latest posts for sidebar
+        $latestPosts = $posts->take(5);
+
+        // Popular posts (most viewed)
+        $popularPosts = \App\Modules\Blog\Models\Post::with(['author', 'categories'])
+            ->where('status', 'published')
+            ->orderBy('views_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // SEO data
+        $siteName = SiteSetting::get('site_name', config('app.name'));
+        $seoData = [
+            'title' => $siteName . ' | Latest News & Articles',
+            'description' => SiteSetting::get('meta_description', 'Read the latest news, articles, and stories'),
+            'keywords' => SiteSetting::get('meta_keywords', 'news, blog, articles, stories'),
+            'og_image' => $featuredPost && $featuredPost->media
+                ? $featuredPost->media->large_url
+                : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => url('/'),
+        ];
+
+        return view('frontend.home.newspaper', compact(
+            'featuredPost',
+            'topStories',
+            'categorySections',
+            'latestPosts',
+            'popularPosts',
+            'seoData'
+        ));
     }
 
     /**
@@ -225,10 +307,10 @@ class HomeController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
@@ -248,12 +330,12 @@ class HomeController extends Controller
 
         // Price Range Filter
         if ($request->filled('min_price')) {
-            $query->whereHas('variants', function($q) use ($request) {
+            $query->whereHas('variants', function ($q) use ($request) {
                 $q->where('price', '>=', $request->min_price);
             });
         }
         if ($request->filled('max_price')) {
-            $query->whereHas('variants', function($q) use ($request) {
+            $query->whereHas('variants', function ($q) use ($request) {
                 $q->where('price', '<=', $request->max_price);
             });
         }
@@ -265,16 +347,16 @@ class HomeController extends Controller
 
         // In Stock Filter
         if ($request->filled('in_stock') && $request->in_stock == '1') {
-            $query->whereHas('variants', function($q) {
+            $query->whereHas('variants', function ($q) {
                 $q->where('stock_quantity', '>', 0);
             });
         }
 
         // On Sale Filter
         if ($request->filled('on_sale') && $request->on_sale == '1') {
-            $query->whereHas('variants', function($q) {
+            $query->whereHas('variants', function ($q) {
                 $q->whereNotNull('sale_price')
-                  ->whereColumn('sale_price', '<', 'price');
+                    ->whereColumn('sale_price', '<', 'price');
             });
         }
 
@@ -311,17 +393,21 @@ class HomeController extends Controller
 
         // Get all categories and brands for filters
         $categories = Category::where('is_active', true)
-            ->withCount(['products' => function($q) {
-                $q->where('is_active', true);
-            }])
+            ->withCount([
+                'products' => function ($q) {
+                    $q->where('is_active', true);
+                }
+            ])
             ->having('products_count', '>', 0)
             ->orderBy('name')
             ->get();
 
         $brands = Brand::where('is_active', true)
-            ->withCount(['products' => function($q) {
-                $q->where('is_active', true);
-            }])
+            ->withCount([
+                'products' => function ($q) {
+                    $q->where('is_active', true);
+                }
+            ])
             ->having('products_count', '>', 0)
             ->orderBy('name')
             ->get();

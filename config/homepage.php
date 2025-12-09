@@ -23,7 +23,7 @@ return [
             'icon' => 'home',
             'requires' => [],
         ],
-        
+
         'author_profile' => [
             'key' => 'author_profile',
             'label' => 'Author Profile',
@@ -31,7 +31,15 @@ return [
             'icon' => 'user',
             'requires' => ['author_id'],
         ],
-        
+
+        'newspaper' => [
+            'key' => 'newspaper',
+            'label' => 'Newspaper Layout',
+            'description' => 'Display blog content in a traditional newspaper-style layout with columns and category sections.',
+            'icon' => 'newspaper',
+            'requires' => [],
+        ],
+
         // Future extensible types:
         // 'category_page' => [
         //     'key' => 'category_page',
@@ -40,7 +48,7 @@ return [
         //     'icon' => 'folder',
         //     'requires' => ['category_id'],
         // ],
-        
+
         // 'custom_page' => [
         //     'key' => 'custom_page',
         //     'label' => 'Custom Page',
@@ -48,7 +56,7 @@ return [
         //     'icon' => 'file',
         //     'requires' => ['page_id'],
         // ],
-        
+
         // 'blog_index' => [
         //     'key' => 'blog_index',
         //     'label' => 'Blog Index',

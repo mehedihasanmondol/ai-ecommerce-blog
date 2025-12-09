@@ -202,6 +202,7 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Homepage General', 'slug' => 'homepage-general.manage', 'module' => 'content'],
             ['name' => 'Manage Homepage Top Header', 'slug' => 'homepage-top_header.manage', 'module' => 'content'],
             ['name' => 'Manage Homepage Mega Menu', 'slug' => 'homepage-mega_menu.manage', 'module' => 'content'],
+            ['name' => 'Manage Homepage Newspaper Menu', 'slug' => 'homepage-newspaper_menu.manage', 'module' => 'content'],
 
             // Site Settings Sections (Granular Permissions)
             ['name' => 'Manage Site General Settings', 'slug' => 'site-settings-general.manage', 'module' => 'content'],
@@ -213,6 +214,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Site Feedback Settings', 'slug' => 'site-settings-feedback.manage', 'module' => 'content'],
             ['name' => 'Manage Site Author Page Settings', 'slug' => 'site-settings-author_page.manage', 'module' => 'content'],
             ['name' => 'Manage Site Blog Settings', 'slug' => 'site-settings-blog.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Appointment Settings', 'slug' => 'site-settings-appointment.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Homepage Settings', 'slug' => 'site-settings-homepage.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Product Features Settings', 'slug' => 'site-settings-product_features.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Stock Settings', 'slug' => 'site-settings-stock.manage', 'module' => 'content'],
 
             ['name' => 'View Promotional Banners', 'slug' => 'banners.view', 'module' => 'content'],
             ['name' => 'Create Promotional Banners', 'slug' => 'banners.create', 'module' => 'content'],

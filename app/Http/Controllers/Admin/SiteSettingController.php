@@ -33,7 +33,11 @@ class SiteSettingController extends Controller
             auth()->user()->hasPermission('site-settings-login.manage') ||
             auth()->user()->hasPermission('site-settings-feedback.manage') ||
             auth()->user()->hasPermission('site-settings-author_page.manage') ||
-            auth()->user()->hasPermission('site-settings-blog.manage');
+            auth()->user()->hasPermission('site-settings-blog.manage') ||
+            auth()->user()->hasPermission('site-settings-appointment.manage') ||
+            auth()->user()->hasPermission('site-settings-homepage.manage') ||
+            auth()->user()->hasPermission('site-settings-product_features.manage') ||
+            auth()->user()->hasPermission('site-settings-stock.manage');
 
         abort_if(!$hasAccess, 403, 'You do not have permission to access site settings.');
 
