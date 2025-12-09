@@ -35,6 +35,11 @@
         @endphp
         <x-dynamic-component :component="'frontend.header-' . $headerType" />
 
+        {{-- Headline Banner (Breaking News) --}}
+        @if(isset($headlineBanner))
+            <x-blog.headline-banner :settings="$headlineBanner" />
+        @endif
+
         {{-- Main Content --}}
         @yield('content')
     </div>

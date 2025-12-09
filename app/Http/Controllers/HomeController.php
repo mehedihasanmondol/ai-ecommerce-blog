@@ -271,6 +271,9 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
+        // Get headline banner settings
+        $headlineBanner = \App\Models\HeadlineBannerSettings::getSettings();
+
         // SEO data
         $siteName = SiteSetting::get('site_name', config('app.name'));
         $seoData = [
@@ -290,6 +293,7 @@ class HomeController extends Controller
             'categorySections',
             'latestPosts',
             'popularPosts',
+            'headlineBanner',
             'seoData'
         ));
     }

@@ -192,6 +192,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Approve Blog Comments', 'slug' => 'blog-comments.approve', 'module' => 'blog'],
             ['name' => 'Delete Blog Comments', 'slug' => 'blog-comments.delete', 'module' => 'blog'],
 
+            // Headline Banner
+            ['name' => 'View Headline Banner Settings', 'slug' => 'headline-banner.view', 'module' => 'blog'],
+            ['name' => 'Edit Headline Banner Settings', 'slug' => 'headline-banner.edit', 'module' => 'blog'],
+
             // ===================================
             // CONTENT MANAGEMENT MODULE
             // ===================================
