@@ -555,6 +555,36 @@ php artisan migrate:rollback
 php artisan migrate:reset
 ```
 
+#### **Featured Seeder: NewspaperSeeder (বাংলা সংবাদপত্র)**
+
+Comprehensive Bangla newspaper content generator with automatic author user creation:
+
+```bash
+# Run newspaper seeder
+php artisan db:seed --class=NewspaperSeeder
+```
+
+**What it creates:**
+- ✅ **Default Author User** - Automatically creates author account (if not exists)
+  - Role: `author`
+  - Email: `author@newspaper.com`
+  - Password: `author123`
+  - Author Profile with unique slug
+- ✅ **8 Bangla Categories** - রাজনীতি, ব্যবসা-বাণিজ্য, প্রযুক্তি, খেলাধুলা, বিনোদন, আন্তর্জাতিক, বিজ্ঞান, মতামত
+- ✅ **15 Bangla Tags** - জরুরি সংবাদ, বিশ্লেষণ, এক্সক্লুসিভ, ফিচার, etc.
+- ✅ **16 News Articles** - Complete Bangla content with titles, excerpts, and rich HTML content
+- ✅ **Featured Images** - Downloads from Picsum Photos API and processes through media library
+- ✅ **Author Profile** - Bio, job title, featured status with auto-generated slug
+
+**Features:**
+- 🔄 **Idempotent** - Safe to run multiple times (uses `firstOrCreate`)
+- 🖼️ **Media Integration** - Images stored properly in media library with variants
+- 📝 **Rich Content** - Realistic Bangla news articles across 8 categories
+- 👤 **User Management** - Creates complete author user with profile automatically
+- 🔗 **Slug Generation** - Uses `HasUniqueSlug` trait for SEO-friendly URLs
+
+
+
 ---
 
 ### **Cache Management**

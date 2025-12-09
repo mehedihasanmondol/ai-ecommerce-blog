@@ -2,3 +2,8 @@ php artisan migrate --path=database/migrations/2025_12_08_171202_add_options_col
 
 
  php artisan migrate --path=database/migrations/2025_12_09_091250_create_headline_banner_settings_table.php
+
+
+
+
+ php artisan db:seed --class=NewspaperSeeder
