@@ -28,7 +28,8 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
 
         // Share categories with frontend header
-        View::composer('components.frontend.header', CategoryComposer::class);
+        // Register view composers for header components
+        View::composer('components.frontend.header-default', CategoryComposer::class);
 
         // Register custom Blade directives for currency
         Blade::directive('currency', function ($expression) {

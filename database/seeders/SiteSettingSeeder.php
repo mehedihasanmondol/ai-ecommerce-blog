@@ -940,6 +940,40 @@ class SiteSettingSeeder extends Seeder
         foreach ($appointmentSettings as $setting) {
             $this->upsertSetting($setting);
         }
+
+        // Frontend Layout Settings
+        $frontendLayoutSettings = [
+            [
+                'key' => 'frontend_header_type',
+                'value' => 'default',
+                'type' => 'select',
+                'group' => 'frontend_layout',
+                'label' => 'Header Type',
+                'description' => 'Select which header to display on the frontend',
+                'options' => json_encode([
+                    'default' => 'Default Header (E-commerce)',
+                    'newspaper' => 'Newspaper Header'
+                ]),
+                'order' => 1,
+            ],
+            [
+                'key' => 'frontend_footer_type',
+                'value' => 'default',
+                'type' => 'select',
+                'group' => 'frontend_layout',
+                'label' => 'Footer Type',
+                'description' => 'Select which footer to display on the frontend',
+                'options' => json_encode([
+                    'default' => 'Default Footer (E-commerce)',
+                    'newspaper' => 'Newspaper Footer'
+                ]),
+                'order' => 2,
+            ],
+        ];
+
+        foreach ($frontendLayoutSettings as $setting) {
+            $this->upsertSetting($setting);
+        }
     }
 
     /**
