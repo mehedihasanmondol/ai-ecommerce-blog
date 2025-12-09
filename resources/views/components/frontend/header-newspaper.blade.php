@@ -1,5 +1,6 @@
 {{-- Newspaper Header Component with Smart Sticky Navigation --}}
-<div x-data="{ isSticky: false }" @scroll.window="isSticky = (window.pageYOffset > 100)" class="relative">
+<div x-data="{ isSticky: false, searchOpen: false }" @scroll.window="isSticky = (window.pageYOffset > 100)"
+    class="relative">
     {{-- Top Header Bar (Scrolls Away) --}}
     <div class="bg-white relative z-40">
         <div class="container mx-auto px-4">
@@ -87,7 +88,7 @@
 
     {{-- Navigation Menu - Becomes Sticky with Smart Logo --}}
     <nav class="bg-red-600 text-white transition-all duration-300"
-        :class="{ 'fixed top-0 left-0 right-0 z-50 shadow-lg': isSticky }"
+        :class="{ 'fixed top-0 left-0 right-0 z-50 shadow-lg': isSticky, 'relative': !isSticky }"
         x-data="{ activeMenu: null, closeTimeout: null, interactionMode: '{{ $interactionMode }}', clickedMenu: null }"
         @click.outside="if(interactionMode === 'click') clickedMenu = null">
         <div class="container mx-auto px-4">
@@ -152,10 +153,11 @@
 
                     @foreach($menuCategories as $category)
                         {{-- Category Menu Item --}}
-                        <li class="relative flex-shrink-0" x-bind="interactionMode === 'hover' ? {
-                                                        '@mouseenter': 'clearTimeout(closeTimeout); activeMenu = \'{{ $category->slug }}\'',
-                                                        '@mouseleave': 'closeTimeout = setTimeout(() => { activeMenu = null }, 200)'
-                                                    } : {}">
+                        <li class="relative flex-shrink-0"
+                            x-bind="interactionMode === 'hover' ? {
+                                                                                                                                    '@mouseenter': 'clearTimeout(closeTimeout); activeMenu = \'{{ $category->slug }}\'',
+                                                                                                                                    '@mouseleave': 'closeTimeout = setTimeout(() => { activeMenu = null }, 200)'
+                                                                                                                                } : {}">
                             <a href="{{ route('blog.category', $category->slug) }}"
                                 class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap"
                                 :class="{ 'bg-white text-red-600': interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}' }"
@@ -173,9 +175,9 @@
                                     {{-- Simple Dropdown --}}
                                     <div x-show="interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}'"
                                         x-bind="interactionMode === 'hover' ? {
-                                                                                                                                '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
-                                                                                                                                '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
-                                                                                                                            } : {}"
+                                                                                                                                                                                                                                                                                                                                                                    '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
+                                                                                                                                                                                                                                                                                                                                                                    '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                                                                                                                                                                                                                                                                                                                                } : {}"
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -195,9 +197,9 @@
                                     {{-- Full Mega Menu --}}
                                     <div x-show="interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}'"
                                         x-bind="interactionMode === 'hover' ? {
-                                                                                                                                '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
-                                                                                                                                '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
-                                                                                                                            } : {}"
+                                                                                                                                                                                                                                                                                                                                                                    '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
+                                                                                                                                                                                                                                                                                                                                                                    '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                                                                                                                                                                                                                                                                                                                                } : {}"
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
@@ -301,10 +303,14 @@
                     </li>
 
                     <li class="relative static flex-shrink-0">
-                        <a href="#"
-                            class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
+                        <button @click="searchOpen = true"
+                            class="flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
                             খুজুন
-                        </a>
+                        </button>
                     </li>
 
                     <li class="relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
@@ -412,7 +418,45 @@
                 </ul>
             </div>
         </div>
+
+        {{-- Full-Width Search Overlay (covers the entire red menu) --}}
+        <div x-show="searchOpen" x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 -translate-y-2" @click.away="searchOpen = false"
+            x-init="$watch('searchOpen', value => { if(value) { setTimeout(() => $refs.searchInput.focus(), 100) } })"
+            class="absolute inset-0 bg-red-600 z-[60]" style="display: none;">
+            <div class="container mx-auto px-4 h-full">
+                <div class="flex items-center gap-4 h-full">
+                    <form action="{{ route('blog.index') }}" method="GET" class="flex-1 flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" name="search" placeholder="পোস্ট, ক্যাটাগরি বা ট্যাগ খুঁজুন..."
+                                class="w-full px-4 py-2.5 pr-12 text-gray-900 bg-white border border-red-400 focus:outline-none focus:ring-1 focus:ring-red-300 focus:border-red-300 placeholder-gray-400"
+                                value="{{ request('search') }}" x-ref="searchInput"
+                                @keydown.escape="searchOpen = false">
+                            <button type="submit"
+                                class="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-red-600 text-white hover:bg-red-700 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <button @click="searchOpen = false"
+                        class="p-2 text-white hover:bg-red-700 rounded-lg transition flex-shrink-0"
+                        aria-label="Close search">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
     </nav>
+
+
 
     {{-- Spacer to prevent content jump when nav becomes fixed --}}
     <div x-show="isSticky" class="h-12" style="display: none;"></div>
@@ -427,5 +471,14 @@
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+
+    /* Search Overlay Animations */
+    [x-ref="searchOverlay"].active {
+        opacity: 1 !important;
+    }
+
+    [x-ref="searchOverlay"].active>div {
+        transform: translateY(0) !important;
     }
 </style>
