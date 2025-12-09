@@ -213,6 +213,18 @@ class HomepageSettingSeeder extends Seeder
                     'dropdown' => 'Simple Dropdown'
                 ]),
             ],
+            [
+                'key' => 'newspaper_menu_interaction_mode',
+                'value' => 'hover',
+                'type' => 'select',
+                'group' => 'newspaper_menu',
+                'order' => 4,
+                'description' => 'Choose how users interact with dropdown menus',
+                'options' => json_encode([
+                    'hover' => 'Hover (Default)',
+                    'click' => 'Click to Open/Close'
+                ]),
+            ],
         ];
 
         foreach ($generalSettings as $setting) {

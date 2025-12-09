@@ -94,8 +94,15 @@
                 </div>
             </div>
 
+            @php
+                // Get the menu interaction mode setting
+                $interactionMode = \App\Models\HomepageSetting::get('newspaper_menu_interaction_mode', 'hover');
+            @endphp
+
             {{-- Navigation Menu - Full Width Red Background with Mega Menu --}}
-            <nav class="bg-red-600 text-white relative" x-data="{ activeMenu: null, closeTimeout: null }">
+            <nav class="bg-red-600 text-white relative"
+                x-data="{ activeMenu: null, closeTimeout: null, interactionMode: '{{ $interactionMode }}', clickedMenu: null }"
+                @click.outside="if(interactionMode === 'click') clickedMenu = null">
                 <div class="container mx-auto px-4">
                     <div class="">
                         <ul class="flex items-center">
@@ -137,12 +144,14 @@
 
                             @foreach($menuCategories as $category)
                                 {{-- Category Menu Item --}}
-                                <li class="relative flex-shrink-0"
-                                    @mouseenter="clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'"
-                                    @mouseleave="closeTimeout = setTimeout(() => { activeMenu = null }, 200)">
+                                <li class="relative flex-shrink-0" x-bind="interactionMode === 'hover' ? {
+                                                                                                                    '@mouseenter': 'clearTimeout(closeTimeout); activeMenu = \'{{ $category->slug }}\'',
+                                                                                                                    '@mouseleave': 'closeTimeout = setTimeout(() => { activeMenu = null }, 200)'
+                                                                                                                } : {}">
                                     <a href="{{ route('blog.category', $category->slug) }}"
                                         class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap"
-                                        :class="{ 'bg-white text-red-600': activeMenu === '{{ $category->slug }}' }">
+                                        :class="{ 'bg-white text-red-600': interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}' }"
+                                        @click="if(interactionMode === 'click') { $event.preventDefault(); clickedMenu = (clickedMenu === '{{ $category->slug }}' ? null : '{{ $category->slug }}'); }">
                                         {{ $category->name }}
                                     </a>
 
@@ -154,9 +163,11 @@
                                     @if($subcategories->count() > 0)
                                         @if($subcategoryStyle === 'dropdown')
                                             {{-- Dropdown Style: Simple dropdown below menu item (NO mega menu container) --}}
-                                            <div x-show="activeMenu === '{{ $category->slug }}'"
-                                                @mouseenter="clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'"
-                                                @mouseleave="closeTimeout = setTimeout(() => { activeMenu = null }, 200)"
+                                            <div x-show="interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}'"
+                                                x-bind="interactionMode === 'hover' ? {
+                                                                                '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
+                                                                                                                                                                        '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                                                                                                                                    } : {}"
                                                 x-transition:enter="transition ease-out duration-200"
                                                 x-transition:enter-start="opacity-0 translate-y-1"
                                                 x-transition:enter-end="opacity-100 translate-y-0"
@@ -174,9 +185,11 @@
                                             </div>
                                         @else
                                             {{-- Other Styles: Use full-width mega menu container --}}
-                                            <div x-show="activeMenu === '{{ $category->slug }}'"
-                                                @mouseenter="clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'"
-                                                @mouseleave="closeTimeout = setTimeout(() => { activeMenu = null }, 200)"
+                                            <div x-show="interactionMode === 'click' ? clickedMenu === '{{ $category->slug }}' : activeMenu === '{{ $category->slug }}'"
+                                                x-bind="interactionMode === 'hover' ? {
+                                                                                                                                                                    '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = '{{ $category->slug }}'; },
+                                                                                                            '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                                                                                                                                } : {}"
                                                 x-transition:enter="transition ease-out duration-200"
                                                 x-transition:enter-start="opacity-0 translate-y-1"
                                                 x-transition:enter-end="opacity-100 translate-y-0"
@@ -380,11 +393,14 @@
                             </li>
 
                             {{-- সব বিভাগ (All Categories) with Hamburger Icon --}}
-                            <li class="relative static flex-shrink-0 ml-auto"
-                                @mouseenter="clearTimeout(closeTimeout); activeMenu = 'all-categories'"
-                                @mouseleave="closeTimeout = setTimeout(() => { activeMenu = null }, 200)">
+                            <li class="relative static flex-shrink-0 ml-auto" x-bind="interactionMode === 'hover' ? {
+                                            '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = 'all-categories'; },
+                                            '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                            } : {}">
                                 <a href="#"
                                     class="flex items-center gap-2 px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap"
+                                    :class="{ 'bg-white text-red-600': interactionMode === 'click' ? clickedMenu === 'all-categories' : activeMenu === 'all-categories' }"
+                                    @click="if(interactionMode === 'click') { $event.preventDefault(); clickedMenu = (clickedMenu === 'all-categories' ? null : 'all-categories'); }"
                                     aria-label="All Categories">
                                     {{-- Hamburger Icon --}}
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,10 +418,11 @@
                                     ->get();
                             @endphp
 
-                            <div x-show="activeMenu === 'all-categories'"
-                                @mouseenter="clearTimeout(closeTimeout); activeMenu = 'all-categories'"
-                                @mouseleave="closeTimeout = setTimeout(() => { activeMenu = null }, 200)"
-                                x-transition:enter="transition ease-out duration-200"
+                            <div x-show="interactionMode === 'click' ? clickedMenu === 'all-categories' : activeMenu === 'all-categories'"
+                                x-bind="interactionMode === 'hover' ? {
+                                                            '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = 'all-categories'; },
+                                                            '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
+                                                        } : {}" x-transition:enter="transition ease-out duration-200"
                                 x-transition:enter-start="opacity-0 translate-y-1"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-150"
