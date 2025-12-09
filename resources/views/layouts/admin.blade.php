@@ -595,6 +595,13 @@
                             @endif
                         </a>
                     @endif
+                    @if(auth()->user()->hasPermission('headline-banner.view'))
+                        <a href="{{ route('admin.blog.headline-banner.index') }}"
+                            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg {{ request()->routeIs('admin.blog.headline-banner.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                            <i class="fas fa-bullhorn w-5 mr-3"></i>
+                            <span>শিরোনাম ব্যানার</span>
+                        </a>
+                    @endif
                 @endif
 
                 <!-- Feedback Section -->

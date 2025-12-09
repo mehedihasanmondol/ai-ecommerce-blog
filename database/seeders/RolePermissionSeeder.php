@@ -287,6 +287,7 @@ class RolePermissionSeeder extends Seeder
 
             // System Settings (Cache & Maintenance)
             ['name' => 'Manage System Settings', 'slug' => 'system.settings.manage', 'module' => 'system'],
+            ['name' => 'Site Settings', 'slug' => 'settings.manage', 'module' => 'system'],
             ['name' => 'Manage Cache', 'slug' => 'system.cache', 'module' => 'system'],
             ['name' => 'Manage Maintenance Mode', 'slug' => 'system.maintenance', 'module' => 'system'],
             ['name' => 'Execute Artisan Commands', 'slug' => 'system.artisan', 'module' => 'system'],
