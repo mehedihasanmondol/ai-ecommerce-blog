@@ -343,12 +343,6 @@ Route::get('/api/category/{slug}/posts', [\App\Modules\Blog\Controllers\Frontend
 // This route handles products, blog posts, and nested blog categories
 // Named 'products.show' as primary, but works for products, blog posts, and categories
 Route::get('/{slug}', function ($slug) {
-    // Try to find product first
-    $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
-    if ($product) {
-        return app(\App\Http\Controllers\ProductController::class)->show($slug);
-    }
-
     // Then try to find blog category (for routes like /category-slug or /category-slug/subcategory-slug)
     $category = \App\Modules\Blog\Models\BlogCategory::where('slug', $slug)
         ->where('is_active', true)
@@ -356,6 +350,14 @@ Route::get('/{slug}', function ($slug) {
     if ($category) {
         return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->category(request(), $slug);
     }
+
+    // Try to find product first
+    $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
+    if ($product) {
+        return app(\App\Http\Controllers\ProductController::class)->show($slug);
+    }
+
+
 
     // Then try to find blog post (published or unlisted)
     $post = \App\Modules\Blog\Models\Post::where('slug', $slug)
@@ -390,4 +392,4 @@ Route::get('/{parentSlug}/{childSlug}', function ($parentSlug, $childSlug) {
 
     // Not a valid category path
     abort(404);
-});
+})->where('parentSlug', '^(?!admin|api|my|login|register|cart|checkout|wishlist|categories|brands|blog|search|contact|feedback).*$');
