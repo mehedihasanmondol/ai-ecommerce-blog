@@ -16,7 +16,7 @@
 <div class="bg-gray-50 min-h-screen">
     <div class="container mx-auto px-4 py-6">
         {{-- Breadcrumbs and Filter Toggle --}}
-        <div class="mb-6 relative">
+        <div class="mb-3 relative">
             <div id="breadcrumbs-section" class="flex items-center justify-between px-4 py-3">
                 {{-- Breadcrumbs --}}
                 <nav class="flex items-center gap-2 text-sm text-gray-600">
@@ -62,6 +62,21 @@
                         </select>
                     </div>
 
+                    {{-- Subcategory Filter (only if category has children) --}}
+                    @if($category->children()->where('is_active', true)->count() > 0)
+                    <div class="flex items-center gap-2">
+                        <label for="subcategory" class="text-sm font-semibold text-gray-700 whitespace-nowrap">বিভাগ:</label>
+                        <select name="subcategory" id="subcategory" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <option value="">সকল {{ $category->name }}</option>
+                            @foreach($category->children()->where('is_active', true)->orderBy('sort_order')->get() as $subcat)
+                            <option value="{{ $subcat->slug }}" {{ request('subcategory') == $subcat->slug ? 'selected' : '' }}>
+                                {{ $subcat->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @endif
+
                     {{-- Search --}}
                     <div class="flex items-center gap-2 flex-1">
                         <label for="search" class="text-sm font-semibold text-gray-700 whitespace-nowrap">অনুসন্ধান:</label>
@@ -88,6 +103,82 @@
                 </form>
             </div>
         </div>
+
+        {{-- Active Filters Display --}}
+        @if(request('sort') || request('search') || request('subcategory'))
+        <div class="mb-4 px-4">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm font-semibold text-gray-700">সক্রিয় ফিল্টার:</span>
+
+                {{-- Sort Filter Badge --}}
+                @if(request('sort') && request('sort') !== 'latest')
+                <span class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                    <span>সাজান:
+                        @if(request('sort') == 'oldest') পুরাতন
+                        @elseif(request('sort') == 'popular') জনপ্রিয়
+                        @elseif(request('sort') == 'featured') ফিচারড
+                        @endif
+                    </span>
+                    <a href="{{ url()->current() }}?{{ http_build_query(array_filter(request()->except('sort'))) }}"
+                        class="hover:text-blue-900 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                </span>
+                @endif
+
+                {{-- Subcategory Filter Badge --}}
+                @if(request('subcategory'))
+                @php
+                $selectedSubcat = $category->children()->where('is_active', true)->where('slug', request('subcategory'))->first();
+                @endphp
+                @if($selectedSubcat)
+                <span class="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    <span>বিভাগ: {{ $selectedSubcat->name }}</span>
+                    <a href="{{ url()->current() }}?{{ http_build_query(array_filter(request()->except('subcategory'))) }}"
+                        class="hover:text-purple-900 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                </span>
+                @endif
+                @endif
+
+                {{-- Search Filter Badge --}}
+                @if(request('search'))
+                <span class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>অনুসন্ধান: "{{ Str::limit(request('search'), 30) }}"</span>
+                    <a href="{{ url()->current() }}?{{ http_build_query(array_filter(request()->except('search'))) }}"
+                        class="hover:text-green-900 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                </span>
+                @endif
+
+                {{-- Clear All Button --}}
+                <a href="{{ url()->current() }}"
+                    class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    সব মুছুন
+                </a>
+            </div>
+        </div>
+        @endif
 
         {{-- Main Content Grid --}}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -354,11 +445,15 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const sort = urlParams.get('sort') || 'latest';
                 const search = urlParams.get('search') || '';
+                const subcategory = urlParams.get('subcategory') || '';
 
                 // Build API URL with all parameters
                 let apiUrl = `/api/category/${categorySlug}/posts?page=${page}&offset=14&sort=${sort}`;
                 if (search) {
                     apiUrl += `&search=${encodeURIComponent(search)}`;
+                }
+                if (subcategory) {
+                    apiUrl += `&subcategory=${encodeURIComponent(subcategory)}`;
                 }
 
                 // Fetch more posts

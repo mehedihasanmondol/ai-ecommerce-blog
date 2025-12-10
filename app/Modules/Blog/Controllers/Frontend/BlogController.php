@@ -320,6 +320,7 @@ class BlogController extends Controller
         // Get filter parameters
         $search = $request->input('search');
         $sort = $request->input('sort', 'latest');
+        $subcategory = $request->input('subcategory');
         // For newspaper layout, we display 6 main + 8 remaining = 14 initially, so we need to fetch enough for load more
         $initialLimit = 30; // Fetch 30 posts initially (6 main + 8 remaining + 16 for load more)
 
@@ -327,6 +328,13 @@ class BlogController extends Controller
         $query = $category->posts()
             ->where('status', 'published')
             ->where('published_at', '<=', now());
+
+        // Filter by subcategory if selected
+        if ($subcategory) {
+            $query->whereHas('categories', function ($q) use ($subcategory) {
+                $q->where('blog_categories.slug', $subcategory);
+            });
+        }
 
         // Apply search
         if ($search) {
@@ -404,7 +412,8 @@ class BlogController extends Controller
             'canonical' => route('blog.category', $category->slug),
         ];
 
-        $currentUrl = route('blog.category', $category->slug);
+        // Use current request URL to keep same route (/business instead of /blog/category/business)
+        $currentUrl = url()->current();
 
         return view('frontend.blog.category-newspaper', compact(
             'category',
@@ -594,11 +603,19 @@ class BlogController extends Controller
         // Get filter parameters
         $search = $request->input('search');
         $sort = $request->input('sort', 'latest');
+        $subcategory = $request->input('subcategory');
 
         // Build query for category posts
         $query = $category->posts()
             ->where('status', 'published')
             ->where('published_at', '<=', now());
+
+        // Filter by subcategory if selected
+        if ($subcategory) {
+            $query->whereHas('categories', function ($q) use ($subcategory) {
+                $q->where('blog_categories.slug', $subcategory);
+            });
+        }
 
         // Apply search
         if ($search) {
