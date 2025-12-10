@@ -211,6 +211,17 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('/top-stories/update-title', [\App\Http\Controllers\Admin\TopStoryController::class, 'updateSectionTitle'])->name('top-stories.update-title');
     });
 
+    // Featured Categories Routes (Newspaper) - Requires featured-categories.view permission
+    Route::middleware(['permission:featured-categories.view'])->group(function () {
+        Route::get('/featured-categories', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'index'])->name('featured-categories.index');
+        Route::post('/featured-categories', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'store'])->name('featured-categories.store');
+        Route::delete('/featured-categories/{featuredCategory}', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'destroy'])->name('featured-categories.destroy');
+        Route::post('/featured-categories/reorder', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'reorder'])->name('featured-categories.reorder');
+        Route::post('/featured-categories/{featuredCategory}/toggle-status', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'toggleStatus'])->name('featured-categories.toggle-status');
+        Route::post('/featured-categories/toggle-section', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'toggleSection'])->name('featured-categories.toggle-section');
+        Route::post('/featured-categories/update-title', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'updateSectionTitle'])->name('featured-categories.update-title');
+    });
+
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 

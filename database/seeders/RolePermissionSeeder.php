@@ -242,6 +242,12 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Delete Top Stories', 'slug' => 'top-stories.delete', 'module' => 'content'],
             ['name' => 'Toggle Sale Offer Status', 'slug' => 'sale-offers.toggle-status', 'module' => 'content'],
 
+            // Featured Categories (Newspaper)
+            ['name' => 'View Featured Categories', 'slug' => 'featured-categories.view', 'module' => 'content'],
+            ['name' => 'Create Featured Categories', 'slug' => 'featured-categories.create', 'module' => 'content'],
+            ['name' => 'Edit Featured Categories', 'slug' => 'featured-categories.edit', 'module' => 'content'],
+            ['name' => 'Delete Featured Categories', 'slug' => 'featured-categories.delete', 'module' => 'content'],
+
             ['name' => 'Manage Secondary Menu', 'slug' => 'secondary-menu.manage', 'module' => 'content'],
 
             ['name' => 'View Footer', 'slug' => 'footer.view', 'module' => 'content'],

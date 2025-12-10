@@ -50,13 +50,13 @@ class HomeController extends Controller
             case 'newspaper':
                 return $this->showNewspaperHomepage();
 
-            // Future extensible types can be added here:
-            // case 'category_page':
-            //     return $this->showCategoryHomepage();
-            // case 'blog_index':
-            //     return redirect()->route('blog.index');
-            // case 'custom_page':
-            //     return $this->showCustomPageHomepage();
+                // Future extensible types can be added here:
+                // case 'category_page':
+                //     return $this->showCategoryHomepage();
+                // case 'blog_index':
+                //     return redirect()->route('blog.index');
+                // case 'custom_page':
+                //     return $this->showCustomPageHomepage();
 
             case 'default':
             default:
@@ -239,32 +239,34 @@ class HomeController extends Controller
         // Featured post is the first post from top stories
         $featuredPost = $topStories->first() ?? ($posts->where('is_featured', true)->first() ?? $posts->first());
 
-        // Get active categories with published posts
-        $categories = \App\Modules\Blog\Models\BlogCategory::where('is_active', true)
-            ->withCount([
-                'posts' => function ($q) {
-                    $q->where('status', 'published');
-                }
-            ])
-            ->having('posts_count', '>', 0)
-            ->orderBy('name')
-            ->limit(4)
-            ->get();
+        // Get featured categories (managed via admin panel)
+        $featuredCategories = \App\Models\FeaturedCategory::with(['category.posts' => function ($q) {
+            $q->where('status', 'published')
+                ->with(['author', 'categories', 'media'])
+                ->latest('published_at')
+                ->limit(5); // Get 5 posts: 1 main + 4 side posts
+        }])
+            ->active()
+            ->ordered()
+            ->get()
+            ->filter(function ($featured) {
+                return $featured->category && $featured->category->posts->isNotEmpty();
+            });
 
-        // Get posts by category for sections
-        $categorySections = [];
-        foreach ($categories as $category) {
-            $categoryPosts = $posts->filter(function ($post) use ($category) {
-                return $post->categories->contains('id', $category->id);
-            })->take(4);
-
-            if ($categoryPosts->isNotEmpty()) {
-                $categorySections[$category->slug] = [
-                    'category' => $category,
-                    'posts' => $categoryPosts
+        // Build featured category sections
+        $featuredCategorySections = [];
+        foreach ($featuredCategories as $featured) {
+            if ($featured->category) {
+                $featuredCategorySections[] = [
+                    'category' => $featured->category,
+                    'posts' => $featured->category->posts
                 ];
             }
         }
+
+        // Get section settings
+        $featuredCategoriesEnabled = \App\Models\SiteSetting::get('featured_categories_section_enabled', '1');
+        $featuredCategoriesTitle = \App\Models\SiteSetting::get('featured_categories_section_title', 'প্রধান খবর');
 
         // Latest posts for sidebar
         $latestPosts = $posts->take(10);
@@ -295,7 +297,9 @@ class HomeController extends Controller
         return view('frontend.home.newspaper', compact(
             'featuredPost',
             'topStories',
-            'categorySections',
+            'featuredCategorySections',
+            'featuredCategoriesEnabled',
+            'featuredCategoriesTitle',
             'latestPosts',
             'popularPosts',
             'headlineBanner',
