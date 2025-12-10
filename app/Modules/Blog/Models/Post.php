@@ -226,6 +226,14 @@ class Post extends Model
     }
 
     /**
+     * Get the top story associated with this post (if it's a top story)
+     */
+    public function topStory(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\TopStory::class, 'post_id');
+    }
+
+    /**
      * Increment views count
      */
     public function incrementViews(): void

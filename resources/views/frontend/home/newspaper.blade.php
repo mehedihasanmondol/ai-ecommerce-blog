@@ -88,7 +88,7 @@
                             <div class="bg-white">
                                 @if($topStories->isNotEmpty())
                                     <div class="divide-y divide-gray-200">
-                                        @foreach($topStories->take(4) as $story)
+                                        @foreach($topStories->skip(1)->take(4) as $story)
                                             <article class="flex gap-4 p-4 hover:bg-white transition-colors group">
                                                 {{-- Thumbnail --}}
                                                 <div class="flex-shrink-0">
@@ -128,9 +128,9 @@
                     </div>
 
                     {{-- 3-Column News Grid --}}
-                    @if($topStories->count() > 4)
+                    @if($topStories->count() > 5)
                         <div class="grid md:grid-cols-3 gap-6">
-                            @foreach($topStories->skip(4) as $story)
+                            @foreach($topStories->skip(5) as $story)
                                 <article class="bg-white shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
                                     {{-- Image --}}
                                     <div class="relative h-48 overflow-hidden">

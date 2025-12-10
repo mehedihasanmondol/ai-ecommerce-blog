@@ -444,6 +444,24 @@
                 <i class="fas fa-chevron-right ml-auto text-xs"></i>
             @endif
         </a>
+@endif
+@endif
+
+{{-- Newspaper Section --}}
+@if(auth()->user()->hasPermission('top-stories.view') || auth()->user()->hasPermission('headline-banner.view'))
+    <div class="pt-4 pb-2">
+        <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Newspaper</p>
+    </div>
+
+    @if(auth()->user()->hasPermission('top-stories.view'))
+        <a href="{{ route('admin.top-stories.index') }}"
+            class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.top-stories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i class="fas fa-newspaper w-5 mr-3"></i>
+            <span>প্রধান খবর</span>
+            @if(request()->routeIs('admin.top-stories.*'))
+                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+            @endif
+        </a>
     @endif
 
     @if(auth()->user()->hasPermission('headline-banner.view'))
@@ -451,6 +469,9 @@
             class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.blog.headline-banner.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
             <i class="fas fa-bullhorn w-5 mr-3"></i>
             <span>শিরোনাম ব্যানার</span>
+            @if(request()->routeIs('admin.blog.headline-banner.*'))
+                <i class="fas fa-chevron-right ml-auto text-xs"></i>
+            @endif
         </a>
     @endif
 @endif

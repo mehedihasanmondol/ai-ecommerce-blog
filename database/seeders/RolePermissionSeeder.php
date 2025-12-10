@@ -234,6 +234,12 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Create Sale Offers', 'slug' => 'sale-offers.create', 'module' => 'content'],
             ['name' => 'Edit Sale Offers', 'slug' => 'sale-offers.edit', 'module' => 'content'],
             ['name' => 'Delete Sale Offers', 'slug' => 'sale-offers.delete', 'module' => 'content'],
+
+            // Top Stories (Newspaper)
+            ['name' => 'View Top Stories', 'slug' => 'top-stories.view', 'module' => 'content'],
+            ['name' => 'Create Top Stories', 'slug' => 'top-stories.create', 'module' => 'content'],
+            ['name' => 'Edit Top Stories', 'slug' => 'top-stories.edit', 'module' => 'content'],
+            ['name' => 'Delete Top Stories', 'slug' => 'top-stories.delete', 'module' => 'content'],
             ['name' => 'Toggle Sale Offer Status', 'slug' => 'sale-offers.toggle-status', 'module' => 'content'],
 
             ['name' => 'Manage Secondary Menu', 'slug' => 'secondary-menu.manage', 'module' => 'content'],

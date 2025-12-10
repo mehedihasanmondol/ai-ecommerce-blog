@@ -200,6 +200,17 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('/sale-offers/update-title', [\App\Http\Controllers\Admin\SaleOfferController::class, 'updateSectionTitle'])->name('sale-offers.update-title');
     });
 
+    // Top Stories Routes (Newspaper) - Requires top-stories.view permission
+    Route::middleware(['permission:top-stories.view'])->group(function () {
+        Route::get('/top-stories', [\App\Http\Controllers\Admin\TopStoryController::class, 'index'])->name('top-stories.index');
+        Route::post('/top-stories', [\App\Http\Controllers\Admin\TopStoryController::class, 'store'])->name('top-stories.store');
+        Route::delete('/top-stories/{topStory}', [\App\Http\Controllers\Admin\TopStoryController::class, 'destroy'])->name('top-stories.destroy');
+        Route::post('/top-stories/reorder', [\App\Http\Controllers\Admin\TopStoryController::class, 'reorder'])->name('top-stories.reorder');
+        Route::post('/top-stories/{topStory}/toggle-status', [\App\Http\Controllers\Admin\TopStoryController::class, 'toggleStatus'])->name('top-stories.toggle-status');
+        Route::post('/top-stories/toggle-section', [\App\Http\Controllers\Admin\TopStoryController::class, 'toggleSection'])->name('top-stories.toggle-section');
+        Route::post('/top-stories/update-title', [\App\Http\Controllers\Admin\TopStoryController::class, 'updateSectionTitle'])->name('top-stories.update-title');
+    });
+
     // Category Management Routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 

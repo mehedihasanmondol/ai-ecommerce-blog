@@ -228,11 +228,16 @@ class HomeController extends Controller
             ->latest('published_at')
             ->get();
 
-        // Featured post (most recent featured or first post)
-        $featuredPost = $posts->where('is_featured', true)->first() ?? $posts->first();
+        // Top stories from the TopStory model (managed via admin panel)
+        $topStories = \App\Models\TopStory::with(['post.author', 'post.categories', 'post.media'])
+            ->active()
+            ->ordered()
+            ->get()
+            ->pluck('post')
+            ->filter(); // Remove any null posts (if post was deleted)
 
-        // Top stories (next 6 posts after featured)
-        $topStories = $posts->skip($featuredPost ? 1 : 0)->take(6);
+        // Featured post is the first post from top stories
+        $featuredPost = $topStories->first() ?? ($posts->where('is_featured', true)->first() ?? $posts->first());
 
         // Get active categories with published posts
         $categories = \App\Modules\Blog\Models\BlogCategory::where('is_active', true)
