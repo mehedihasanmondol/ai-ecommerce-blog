@@ -45,6 +45,7 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
+        // Default blog index layout
         // Get filter parameters
         $filter = $request->input('filter');
         $sort = $request->input('sort', 'latest');
@@ -133,6 +134,99 @@ class BlogController extends Controller
             'categories',
             'popularTags',
             'filter',
+            'seoData'
+        ));
+    }
+
+    /**
+     * Newspaper-style latest news page
+     */
+    public function latestNewsNewspaper(Request $request)
+    {
+        // Build breadcrumbs
+        $breadcrumbs = [
+            ['name' => 'সর্বশেষ', 'url' => route('blog.latest-news')]
+        ];
+
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+        // For newspaper layout, we display 6 main + 8 remaining = 14 initially
+        $initialLimit = 30; // Fetch 30 posts initially (6 main + 8 remaining + 16 for load more)
+
+        // Build query for all published posts
+        $query = Post::where('status', 'published')
+            ->where('published_at', '<=', now());
+
+        // Apply search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('published_at', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
+                break;
+        }
+
+        // Get total count before limiting
+        $totalPosts = $query->count();
+
+        // Get initial posts (not paginated for newspaper layout)
+        $posts = $query->with(['author', 'categories', 'tags', 'tickMarks', 'media'])
+            ->limit($initialLimit)
+            ->get();
+
+        // Get latest posts for sidebar
+        $latestPosts = Post::where('status', 'published')
+            ->latest('published_at')
+            ->limit(10)
+            ->get();
+
+        // Get popular posts for sidebar
+        $popularPosts = Post::where('status', 'published')
+            ->orderBy('views_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Prepare SEO data
+        $blogTitle = SiteSetting::get('blog_title', 'Blog');
+        $blogTagline = SiteSetting::get('blog_tagline', '');
+        $blogImage = SiteSetting::get('blog_image');
+
+        $seoData = [
+            'title' => $blogTagline ? $blogTitle . ' | ' . $blogTagline : $blogTitle,
+            'description' => SiteSetting::get('blog_description', 'Discover the latest articles and tips'),
+            'keywords' => SiteSetting::get('blog_keywords', 'blog, articles, tips'),
+            'og_image' => $blogImage ? asset('storage/' . $blogImage) : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => route('blog.latest-news'),
+        ];
+
+        $currentUrl = route('blog.latest-news');
+
+        return view('frontend.blog.latest-news', compact(
+            'posts',
+            'totalPosts',
+            'latestPosts',
+            'popularPosts',
+            'breadcrumbs',
+            'currentUrl',
             'seoData'
         ));
     }

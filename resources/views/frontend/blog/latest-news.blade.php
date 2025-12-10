@@ -19,9 +19,8 @@
         :totalPosts="$totalPosts"
         :breadcrumbs="$breadcrumbs"
         :currentUrl="$currentUrl"
-        :category="$category"
-        :pageTitle="$category->name"
-        :loadMoreEndpoint="'/api/category/' . $category->slug . '/posts'"
+        pageTitle="সর্বশেষ"
+        loadMoreEndpoint="/api/latest/posts"
         :latestPosts="$latestPosts"
         :popularPosts="$popularPosts" />
 </div>

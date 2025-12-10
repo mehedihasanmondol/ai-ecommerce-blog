@@ -130,7 +130,7 @@
 
                     {{-- সর্বশেষ (Latest) --}}
                     <li class="relative static flex-shrink-0">
-                        <a href="{{ route('blog.index') }}"
+                        <a href="{{ route('blog.latest-news') }}"
                             class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                             সর্বশেষ
                         </a>

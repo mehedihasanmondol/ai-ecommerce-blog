@@ -148,6 +148,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.access'])->gr
 // Blog Index (listing page)
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 
+// Latest News (newspaper-style)
+Route::get('/latest-news', [BlogController::class, 'latestNewsNewspaper'])->name('blog.latest-news');
+
 // Category Archive
 Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
 
@@ -162,6 +165,10 @@ Route::post('/blog/{post}/comments', [BlogController::class, 'storeComment'])->n
 
 // Author Profile (slug-based)
 Route::get('/author/{slug}', [BlogController::class, 'author'])->name('blog.author');
+
+// API Routes for AJAX load more
+Route::get('/api/latest/posts', [BlogController::class, 'latestPostsApi'])->name('api.latest.posts');
+Route::get('/api/category/{slug}/posts', [BlogController::class, 'categoryPostsApi'])->name('api.category.posts');
 
 // ============================================
 // SINGLE POST ROUTE (NO /blog PREFIX)
