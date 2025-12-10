@@ -255,7 +255,7 @@
                     {{-- Posts List Container --}}
                     <div id="posts-container" class="bg-white shadow-md divide-y divide-gray-200">
                         @foreach($posts->skip(6)->take(8) as $post)
-                        <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item" data-post-id="{{ $post->id }}">
+                        <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
                             {{-- Image - 1/3 Width --}}
                             <div class="col-span-1">
                                 <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
@@ -341,31 +341,35 @@
 
         if (loadMoreBtn) {
             loadMoreBtn.addEventListener('click', function() {
+                const page = parseInt(this.getAttribute('data-page'));
                 const categorySlug = this.getAttribute('data-category');
                 const container = document.getElementById('posts-container');
                 const spinner = document.getElementById('loading-spinner');
-
-                // Get the last post ID from the last article
-                const postItems = container.querySelectorAll('.post-item');
-                let lastPostId = null;
-                if (postItems.length > 0) {
-                    lastPostId = postItems[postItems.length - 1].getAttribute('data-post-id');
-                }
 
                 // Show spinner, hide button
                 this.classList.add('hidden');
                 spinner.classList.remove('hidden');
 
-                // Fetch more posts with cursor
-                const queryString = lastPostId ? `?lastPostId=${lastPostId}` : '';
-                fetch(`/api/category/${categorySlug}/posts${queryString}`)
+                // Get current URL parameters to maintain sort and search filters
+                const urlParams = new URLSearchParams(window.location.search);
+                const sort = urlParams.get('sort') || 'latest';
+                const search = urlParams.get('search') || '';
+
+                // Build API URL with all parameters
+                let apiUrl = `/api/category/${categorySlug}/posts?page=${page}&offset=14&sort=${sort}`;
+                if (search) {
+                    apiUrl += `&search=${encodeURIComponent(search)}`;
+                }
+
+                // Fetch more posts
+                fetch(apiUrl)
                     .then(response => response.json())
                     .then(data => {
                         if (data.posts && data.posts.length > 0) {
                             // Append new posts
                             data.posts.forEach(post => {
                                 const postHtml = `
-                                        <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item" data-post-id="${post.id}">
+                                        <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
                                             <div class="col-span-1">
                                                 <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
                                                     ${post.media_url ? 
@@ -393,13 +397,15 @@
                                 container.insertAdjacentHTML('beforeend', postHtml);
                             });
 
-                            // Hide spinner
+                            // Update page number
+                            loadMoreBtn.setAttribute('data-page', page + 1);
+
+                            // Show button again
+                            loadMoreBtn.classList.remove('hidden');
                             spinner.classList.add('hidden');
 
-                            // Show/hide button based on hasMore from API
-                            if (data.hasMore) {
-                                loadMoreBtn.classList.remove('hidden');
-                            } else {
+                            // Hide button if no more posts
+                            if (!data.hasMore) {
                                 loadMoreBtn.remove();
                                 spinner.remove();
                             }

@@ -230,7 +230,9 @@ class BlogController extends Controller
         $perPage = $request->input('per_page', 10);
 
         // Build query
-        $query = $category->posts()->where('status', 'published');
+        $query = $category->posts()
+            ->where('status', 'published')
+            ->where('published_at', '<=', now());
 
         // Apply search
         if ($search) {
@@ -254,7 +256,7 @@ class BlogController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderBy('published_at', 'desc');
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
                 break;
         }
 
@@ -322,7 +324,9 @@ class BlogController extends Controller
         $initialLimit = 30; // Fetch 30 posts initially (6 main + 8 remaining + 16 for load more)
 
         // Build query for category posts
-        $query = $category->posts()->where('status', 'published');
+        $query = $category->posts()
+            ->where('status', 'published')
+            ->where('published_at', '<=', now());
 
         // Apply search
         if ($search) {
@@ -346,7 +350,7 @@ class BlogController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderBy('published_at', 'desc');
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
                 break;
         }
 
@@ -571,22 +575,30 @@ class BlogController extends Controller
     }
 
     /**
-     * API endpoint for loading more posts in category (cursor-based pagination)
+     * API endpoint for loading more posts in category
      */
     public function categoryPostsApi(Request $request, $slug)
     {
         $category = $this->categoryRepository->findBySlug($slug);
 
-        // Get last post ID from request (cursor-based pagination)
-        $lastPostId = $request->input('lastPostId');
-        $loadCount = 11; // Fetch 11 posts, if we get 11, there are more posts
+        $page = $request->input('page', 1);
+        $offset = $request->input('offset', 14);
+        $perPage = 8;
+
+        // Calculate skip amount
+        // Page 2 (first load more) should skip only offset (14 posts already shown)
+        // Page 3 (second load more) should skip offset + 8 (22 posts)
+        // Formula: offset + ((page - 2) * perPage)
+        $skip = $offset + (($page - 2) * $perPage);
 
         // Get filter parameters
         $search = $request->input('search');
         $sort = $request->input('sort', 'latest');
 
         // Build query for category posts
-        $query = $category->posts()->where('status', 'published');
+        $query = $category->posts()
+            ->where('status', 'published')
+            ->where('published_at', '<=', now());
 
         // Apply search
         if ($search) {
@@ -610,62 +622,25 @@ class BlogController extends Controller
                 break;
             case 'latest':
             default:
-                $query->orderBy('published_at', 'desc');
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
                 break;
         }
 
-        // If lastPostId is provided, get posts after that ID
-        if ($lastPostId) {
-            $lastPost = \App\Modules\Blog\Models\Post::find($lastPostId);
-            if ($lastPost) {
-                // Filter posts that come after the last post based on sorting
-                switch ($sort) {
-                    case 'oldest':
-                        $query->where(function ($q) use ($lastPost) {
-                            $q->where('blog_posts.published_at', '>', $lastPost->published_at)
-                                ->orWhere(function ($subQ) use ($lastPost) {
-                                    $subQ->where('blog_posts.published_at', '=', $lastPost->published_at)
-                                        ->where('blog_posts.id', '>', $lastPost->id);
-                                });
-                        });
-                        break;
-                    case 'popular':
-                        $query->where(function ($q) use ($lastPost) {
-                            $q->where('blog_posts.views_count', '<', $lastPost->views_count)
-                                ->orWhere(function ($subQ) use ($lastPost) {
-                                    $subQ->where('blog_posts.views_count', '=', $lastPost->views_count)
-                                        ->where('blog_posts.id', '>', $lastPost->id);
-                                });
-                        });
-                        break;
-                    case 'featured':
-                    case 'latest':
-                    default:
-                        $query->where(function ($q) use ($lastPost) {
-                            $q->where('blog_posts.published_at', '<', $lastPost->published_at)
-                                ->orWhere(function ($subQ) use ($lastPost) {
-                                    $subQ->where('blog_posts.published_at', '=', $lastPost->published_at)
-                                        ->where('blog_posts.id', '>', $lastPost->id);
-                                });
-                        });
-                        break;
-                }
-            }
-        }
+        // Get total count BEFORE skip/take to check if there are more posts
+        $totalCount = $query->count();
 
-        // Fetch 11 posts
+        // Get posts
         $posts = $query->with(['media'])
-            ->limit($loadCount)
+            ->skip($skip)
+            ->take($perPage)
             ->get();
 
-        // If we got 11 posts, there are more. Show only first 10 and indicate more exist
-        $hasMore = $posts->count() > 10;
-        $postsToReturn = $hasMore ? $posts->take(10) : $posts;
+        // Check if there are more posts after this batch
+        $hasMore = ($skip + $perPage) < $totalCount;
 
         // Format posts for JSON
-        $formattedPosts = $postsToReturn->map(function ($post) {
+        $formattedPosts = $posts->map(function ($post) {
             return [
-                'id' => $post->id,
                 'slug' => $post->slug,
                 'title' => $post->title,
                 'excerpt' => \Illuminate\Support\Str::limit($post->excerpt, 120),
@@ -677,7 +652,8 @@ class BlogController extends Controller
         return response()->json([
             'posts' => $formattedPosts,
             'hasMore' => $hasMore,
-            'lastPostId' => $postsToReturn->last() ? $postsToReturn->last()->id : null,
+            'total' => $totalCount,
+            'currentCount' => $skip + $posts->count(),
         ]);
     }
 }
