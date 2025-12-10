@@ -183,7 +183,7 @@
 
     <div class="container mx-auto px-4 py-6">
         {{-- Main Content Grid --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 ">
             {{-- Left Column: Featured + News Grid (9 columns) --}}
             <div class="lg:col-span-9 space-y-6">
 
@@ -210,11 +210,11 @@
                     </div>
 
                     {{-- Top Section: 2/3 + 1/3 Grid --}}
-                    <div class="grid md:grid-cols-3 gap-4">
+                    <div class="grid md:grid-cols-3 gap-4 ">
                         {{-- Left 2/3: Main Featured Post --}}
                         @if($section['posts']->isNotEmpty())
                         @php $featuredPost = $section['posts']->first(); @endphp
-                        <article class="md:col-span-2">
+                        <article class="md:col-span-2 border-r border-gray-200">
                             {{-- Featured Image --}}
                             <div class="relative overflow-hidden" style="padding-top: 66.67%;">
                                 @if($featuredPost->media)
@@ -303,39 +303,44 @@
 
                     {{-- 3-Column News Grid (Posts 4, 5, 6) --}}
                     @if($section['posts']->count() > 3)
-                    <div class="grid md:grid-cols-3 gap-6 p-4">
-                        @foreach($section['posts']->skip(3)->take(3) as $post)
-                        <article class="bg-white overflow-hidden group hover:shadow-lg transition-shadow">
-                            {{-- Image --}}
-                            <div class="relative h-48 overflow-hidden">
-                                @if($post->media)
-                                <img src="{{ $post->media->medium_url }}"
-                                    alt="{{ $post->title }}"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                @else
-                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-400 text-sm">ছবি নেই</span>
-                                </div>
-                                @endif
-                            </div>
+                    <div class="grid md:grid-cols-2 gap-6 p-4 border-t border-gray-200">
+                        @foreach($section['posts']->skip(3)->take(4) as $post)
 
-                            {{-- Content --}}
-                            <div class="p-4">
-                                <h4 class="font-bold text-base mb-3 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
-                                    <a href="{{ url('/' . $post->slug) }}">
-                                        {{ $post->title }}
-                                    </a>
-                                </h4>
-                                @if($post->excerpt)
-                                <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed">
-                                    {{ Str::limit($post->excerpt, 120) }}
-                                </p>
-                                @endif
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    {{ bengali_date($post->published_at, 'short') }}
+                        <article class="bg-white overflow-hidden group ">
+                            <div class="grid md:grid-cols-2 gap-6 ">
+
+                                {{-- Image --}}
+                                <div class="relative overflow-hidden">
+                                    @if($post->media)
+                                    <img src="{{ $post->media->medium_url }}"
+                                        alt="{{ $post->title }}"
+                                        class="w-full  group-hover:scale-105 transition-transform duration-300">
+                                    @else
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                    </div>
+                                    @endif
+                                </div>
+
+
+                                {{-- Content --}}
+                                <div class="">
+                                    <h4 class="font-bold text-base mb-3 line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+                                        <a href="{{ url('/' . $post->slug) }}">
+                                            {{ $post->title }}
+                                        </a>
+                                    </h4>
+                                    @if($post->excerpt)
+                                    <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed">
+                                        {{ Str::limit($post->excerpt, 120) }}
+                                    </p>
+                                    @endif
+                                    <div class="text-xs text-gray-500 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ bengali_date($post->published_at, 'short') }}
+                                    </div>
                                 </div>
                             </div>
                         </article>
