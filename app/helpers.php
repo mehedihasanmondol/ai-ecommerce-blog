@@ -225,3 +225,17 @@ if (!function_exists('bengali_date')) {
         }
     }
 }
+
+if (!function_exists('bengali_number')) {
+    /**
+     * Convert English numbers to Bengali numbers
+     *
+     * @param int|string $number
+     * @return string
+     */
+    function bengali_number($number): string
+    {
+        $bengaliNumbers = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        return str_replace(range(0, 9), $bengaliNumbers, (string) $number);
+    }
+}

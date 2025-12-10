@@ -267,13 +267,13 @@ class HomeController extends Controller
         }
 
         // Latest posts for sidebar
-        $latestPosts = $posts->take(5);
+        $latestPosts = $posts->take(10);
 
         // Popular posts (most viewed)
         $popularPosts = \App\Modules\Blog\Models\Post::with(['author', 'categories'])
             ->where('status', 'published')
             ->orderBy('views_count', 'desc')
-            ->limit(5)
+            ->limit(10)
             ->get();
 
         // Get headline banner settings
