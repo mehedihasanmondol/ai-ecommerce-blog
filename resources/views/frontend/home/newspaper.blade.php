@@ -198,7 +198,7 @@
                             {{ $section['category']->name }}
                         </h2>
                         @if($siteLogo = \App\Models\SiteSetting::get('site_logo'))
-                        <a href="{{ route('blog.category', $section['category']->slug) }}"
+                        <a href="{{ url('/' . $section['category']->slug) }}"
                             class="flex items-center hover:opacity-80 transition-opacity">
 
                             <img src="{{ asset('storage/' . $siteLogo) }}"
@@ -357,8 +357,6 @@
             <aside class="lg:col-span-3 space-y-6">
 
 
-                {{-- Latest & Popular News Tabs (Reusable Component) --}}
-                <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
 
                 {{-- Ad Placeholder --}}
                 <div class="bg-gray-100 shadow-md p-6 text-center">
