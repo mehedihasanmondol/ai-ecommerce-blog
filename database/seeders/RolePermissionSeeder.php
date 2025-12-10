@@ -257,6 +257,9 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Edit New Arrivals', 'slug' => 'new-arrivals.edit', 'module' => 'content'],
             ['name' => 'Delete New Arrivals', 'slug' => 'new-arrivals.delete', 'module' => 'content'],
 
+            // Homepage Settings
+            ['name' => 'View Homepage Settings', 'slug' => 'homepage-settings.view', 'module' => 'content'],
+
             // ===================================
             // REPORTS & ANALYTICS MODULE
             // ===================================
