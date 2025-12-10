@@ -335,16 +335,26 @@ Route::post('/payment/sslcommerz/success', [PaymentController::class, 'sslcommer
 Route::post('/payment/sslcommerz/fail', [PaymentController::class, 'sslcommerzFail'])->name('payment.sslcommerz.fail');
 Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerzCancel'])->name('payment.sslcommerz.cancel');
 
+// API Routes for AJAX
+Route::get('/api/category/{slug}/posts', [\App\Modules\Blog\Controllers\Frontend\BlogController::class, 'categoryPostsApi'])->name('api.category.posts');
 
 
 // Public Product and Blog Post Routes (must be last to avoid conflicts)
-// This route handles both products and blog posts by slug
-// Named 'products.show' as primary, but works for both products and blog posts
+// This route handles products, blog posts, and nested blog categories
+// Named 'products.show' as primary, but works for products, blog posts, and categories
 Route::get('/{slug}', function ($slug) {
     // Try to find product first
     $product = \App\Modules\Ecommerce\Product\Models\Product::where('slug', $slug)->first();
     if ($product) {
         return app(\App\Http\Controllers\ProductController::class)->show($slug);
+    }
+
+    // Then try to find blog category (for routes like /category-slug or /category-slug/subcategory-slug)
+    $category = \App\Modules\Blog\Models\BlogCategory::where('slug', $slug)
+        ->where('is_active', true)
+        ->first();
+    if ($category) {
+        return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->category(request(), $slug);
     }
 
     // Then try to find blog post (published or unlisted)
@@ -359,3 +369,25 @@ Route::get('/{slug}', function ($slug) {
     abort(404);
 })->name('products.show');
 
+// Nested category route (for routes like /category-slug/subcategory-slug)
+Route::get('/{parentSlug}/{childSlug}', function ($parentSlug, $childSlug) {
+    // Check if parent category exists
+    $parentCategory = \App\Modules\Blog\Models\BlogCategory::where('slug', $parentSlug)
+        ->where('is_active', true)
+        ->first();
+
+    if ($parentCategory) {
+        // Check if child category exists under this parent
+        $childCategory = \App\Modules\Blog\Models\BlogCategory::where('slug', $childSlug)
+            ->where('parent_id', $parentCategory->id)
+            ->where('is_active', true)
+            ->first();
+
+        if ($childCategory) {
+            return app(\App\Modules\Blog\Controllers\Frontend\BlogController::class)->category(request(), $childSlug);
+        }
+    }
+
+    // Not a valid category path
+    abort(404);
+});
