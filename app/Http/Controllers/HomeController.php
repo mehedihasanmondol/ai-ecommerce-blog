@@ -266,7 +266,7 @@ class HomeController extends Controller
 
         // Get section settings
         $featuredCategoriesEnabled = \App\Models\SiteSetting::get('featured_categories_section_enabled', '1');
-        $featuredCategoriesTitle = \App\Models\SiteSetting::get('featured_categories_section_title', 'প্রধান খবর');
+        $featuredCategoriesTitle = \App\Models\SiteSetting::get('featured_categories_section_title', 'গুরুত্বপুর্ন বিভাগ');
 
         // Latest posts for sidebar
         $latestPosts = $posts->take(10);

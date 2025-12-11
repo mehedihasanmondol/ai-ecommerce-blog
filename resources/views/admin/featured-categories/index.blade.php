@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'প্রধান খবর Management')
+@section('title', 'গুরুত্বপুর্ন বিভাগ Management')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
@@ -8,14 +8,14 @@
     @if(auth()->user()->hasPermission('featured-categories.edit'))
     <x-admin.section-settings :sectionEnabled="$sectionEnabled" :sectionTitle="$sectionTitle"
         toggleRoute="{{ route('admin.featured-categories.toggle-section') }}"
-        updateTitleRoute="{{ route('admin.featured-categories.update-title') }}" sectionName="Featured Categories" />
+        updateTitleRoute="{{ route('admin.featured-categories.update-title') }}" sectionName="গুরুত্বপুর্ন বিভাগ" />
     @endif
 
     {{-- Header --}}
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">প্রধান খবর Management</h1>
-            <p class="text-gray-600 mt-1">Manage blog categories displayed in featured section on newspaper homepage</p>
+            <h1 class="text-3xl font-bold text-gray-900">গুরুত্বপুর্ন বিভাগ Management</h1>
+            <p class="text-gray-600 mt-1">Manage important blog categories displayed on newspaper homepage</p>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
         @if(auth()->user()->hasPermission('featured-categories.create'))
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Add Category to Featured List</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Add Category to Important List</h2>
 
                 <form action="{{ route('admin.featured-categories.store') }}" method="POST">
                     @csrf
@@ -53,7 +53,7 @@
 
                     <button type="submit"
                         class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                        Add to Featured List
+                        Add to Important List
                     </button>
                 </form>
 
@@ -74,7 +74,7 @@
         <div class="{{ auth()->user()->hasPermission('featured-categories.create') ? 'lg:col-span-2' : 'lg:col-span-3' }}">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">
-                    Current Featured Categories ({{ $featuredCategories->count() }})
+                    Current Important Categories ({{ $featuredCategories->count() }})
                 </h2>
 
                 @if($featuredCategories->isEmpty())
@@ -85,7 +85,7 @@
                             d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
                         </path>
                     </svg>
-                    <p class="text-gray-600">No featured categories added yet. Add your first category above.</p>
+                    <p class="text-gray-600">No important categories added yet. Add your first category above.</p>
                 </div>
                 @else
                 <div id="featured-categories-list" class="space-y-3">
@@ -161,8 +161,8 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" @click="$dispatch('confirm-modal', {
-                                                                    title: 'Remove Featured Category',
-                                                                    message: 'Are you sure you want to remove {{ $featured->category ? addslashes($featured->category->name) : 'this category' }} from featured list?',
+                                                                    title: 'Remove Important Category',
+                                                                    message: 'Are you sure you want to remove {{ $featured->category ? addslashes($featured->category->name) : 'this category' }} from important list?',
                                                                     onConfirm: () => document.getElementById('delete-form-{{ $featured->id }}').submit()
                                                                 })" class="p-2 text-red-600 hover:bg-red-50 rounded-md transition">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

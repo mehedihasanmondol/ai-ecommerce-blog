@@ -46,7 +46,7 @@ class FeaturedCategoryController extends Controller
 
         // Get section settings
         $sectionEnabled = SiteSetting::get('featured_categories_section_enabled', '1');
-        $sectionTitle = SiteSetting::get('featured_categories_section_title', 'প্রধান খবর');
+        $sectionTitle = SiteSetting::get('featured_categories_section_title', 'গুরুত্বপুর্ন বিভাগ');
 
         return view('admin.featured-categories.index', compact('featuredCategories', 'sectionEnabled', 'sectionTitle'));
     }

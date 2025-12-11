@@ -468,7 +468,7 @@
 <a href="{{ route('admin.featured-categories.index') }}"
     class="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.featured-categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
     <i class="fas fa-layer-group w-5 mr-3"></i>
-    <span>Featured Categories</span>
+    <span>গুরুত্বপুর্ন বিভাগ</span>
     @if(request()->routeIs('admin.featured-categories.*'))
     <i class="fas fa-chevron-right ml-auto text-xs"></i>
     @endif
