@@ -187,10 +187,10 @@
             @if($posts->isNotEmpty())
             {{-- Featured Section: 2/3 + 1/3 Split with Gap --}}
             <div class="bg-white shadow-md overflow-hidden">
-                <div class="grid md:grid-cols-3 gap-4">
+                <div class="grid md:grid-cols-3 gap-4 ">
                     {{-- Left 2/3: Main Featured Post --}}
                     @php $featuredPost = $posts->first(); @endphp
-                    <article class="md:col-span-2">
+                    <article class="md:col-span-2 border-r border-gray-200">
                         {{-- Featured Image --}}
                         <div class="relative overflow-hidden" style="padding-top: 66.67%;">
                             @if($featuredPost->media)
@@ -323,17 +323,19 @@
 
         {{-- Right Sidebar (3 columns) --}}
         <aside class="lg:col-span-3 space-y-6">
-            @if($latestPosts && $popularPosts)
-            {{-- Latest & Popular News Tabs (Reusable Component) --}}
-            <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
-            @endif
-
             {{-- Ad Placeholder --}}
             <div class="bg-gray-100 shadow-md text-center">
                 <div class="h-64 bg-white rounded flex items-center justify-center border-2 border-dashed border-gray-300">
                     <span class="text-gray-400">বিজ্ঞাপন ৩০০ × ২৫০</span>
                 </div>
             </div>
+
+            @if($latestPosts && $popularPosts)
+            {{-- Latest & Popular News Tabs (Reusable Component) --}}
+            <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
+            @endif
+
+
         </aside>
     </div>
 
