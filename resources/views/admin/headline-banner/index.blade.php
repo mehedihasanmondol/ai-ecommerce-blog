@@ -131,7 +131,7 @@
                     <input type="number" name="scroll_speed"
                         x-model="scrollSpeed"
                         value="{{ old('scroll_speed', $settings->scroll_speed) }}"
-                        min="5" max="200"
+                        min="1" max="200"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
                         {{ !auth()->user()->hasPermission('headline-banner.edit') ? 'readonly' : '' }}>
                     @error('scroll_speed')
@@ -239,15 +239,16 @@
 
 @if(auth()->user()->hasPermission('headline-banner.edit'))
 <script>
+    const HEADLINE_TOGGLE_URL = "{{ route('admin.blog.headline-banner.toggle') }}";
+
     function toggleBanner() {
-        fetch('{{ route('
-                admin.blog.headline - banner.toggle ') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
+        fetch(HEADLINE_TOGGLE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
