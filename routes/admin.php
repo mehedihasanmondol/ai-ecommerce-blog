@@ -216,7 +216,7 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
     });
 
     // Footer Management Routes - Requires footer.manage permission
-    Route::middleware(['permission:footer.manage'])->group(function () {
+    Route::middleware(['permission:footer.view'])->group(function () {
         Route::get('footer-management', [FooterManagementController::class, 'index'])->name('footer-management.index');
         Route::post('footer-management/settings', [FooterManagementController::class, 'updateSettings'])->name('footer-management.update-settings');
         Route::post('footer-management/toggle-section', [FooterManagementController::class, 'toggleSection'])->name('footer-management.toggle-section');
