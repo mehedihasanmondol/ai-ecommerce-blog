@@ -240,7 +240,14 @@ class BlogController extends Controller
         $post->load('author.authorProfile'); // Eager load author profile
         $post->load('products.variants', 'products.images', 'products.brand'); // Eager load products for Shop This Article
         $post->load('media'); // Eager load featured image media
-        $relatedPosts = $post->relatedPosts(3);
+
+        // Determine which template to use
+        $defaultDetailsTemplate = SiteSetting::get('blog_default_details_page', 'default');
+
+        // Get related posts (5 for newspaper layout, 3 for default)
+        $relatedPostsCount = $defaultDetailsTemplate === 'newspaper' ? 5 : 3;
+        $relatedPosts = $post->relatedPosts($relatedPostsCount);
+
         $popularPosts = $this->postService->getPopularPosts(5);
         $categories = $this->categoryRepository->getRoots();
 
@@ -276,6 +283,43 @@ class BlogController extends Controller
             'published_at' => $post->published_at,
             'updated_at' => $post->updated_at,
         ];
+
+        // Additional data for newspaper template
+        if ($defaultDetailsTemplate === 'newspaper') {
+            // Get latest posts from current post's category (or all if no category)
+            $latestPosts = Post::where('status', 'published')
+                ->where('id', '!=', $post->id)
+                ->when($post->categories && $post->categories->count() > 0, function ($query) use ($post) {
+                    $query->whereHas('categories', function ($q) use ($post) {
+                        $q->whereIn('blog_categories.id', $post->categories->pluck('id'));
+                    });
+                })
+                ->latest('published_at')
+                ->limit(10)
+                ->get();
+
+            // Get most read posts from current post's category (or all if no category)
+            $mostReadPosts = Post::where('status', 'published')
+                ->where('id', '!=', $post->id)
+                ->when($post->categories && $post->categories->count() > 0, function ($query) use ($post) {
+                    $query->whereHas('categories', function ($q) use ($post) {
+                        $q->whereIn('blog_categories.id', $post->categories->pluck('id'));
+                    });
+                })
+                ->orderBy('views_count', 'desc')
+                ->limit(10)
+                ->get();
+
+            return view('frontend.blog.news-details', compact(
+                'post',
+                'relatedPosts',
+                'latestPosts',
+                'mostReadPosts',
+                'popularPosts',
+                'categories',
+                'seoData'
+            ));
+        }
 
         return view('frontend.blog.show', compact(
             'post',

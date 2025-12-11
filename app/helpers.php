@@ -239,3 +239,64 @@ if (!function_exists('bengali_number')) {
         return str_replace(range(0, 9), $bengaliNumbers, (string) $number);
     }
 }
+
+if (!function_exists('bengali_time_ago')) {
+    /**
+     * Convert time difference to Bangla format
+     * Examples: "২ মিনিট আগে", "২ ঘণ্টা আগে", "গতকাল", "৩ দিন আগে"
+     *
+     * @param \Carbon\Carbon|string|null $datetime
+     * @return string
+     */
+    function bengali_time_ago($datetime): string
+    {
+        $datetime = $datetime ? \Carbon\Carbon::parse($datetime) : now();
+        $now = now();
+
+        $diffInSeconds = $now->diffInSeconds($datetime);
+        $diffInMinutes = $now->diffInMinutes($datetime);
+        $diffInHours = $now->diffInHours($datetime);
+        $diffInDays = $now->diffInDays($datetime);
+
+        // Just now (less than 1 minute)
+        if ($diffInSeconds < 60) {
+            return 'এই মাত্র';
+        }
+
+        // Minutes ago (1-59 minutes)
+        if ($diffInMinutes < 60) {
+            return bengali_number($diffInMinutes) . ' মিনিট আগে';
+        }
+
+        // Hours ago (1-23 hours)
+        if ($diffInHours < 24) {
+            return bengali_number($diffInHours) . ' ঘণ্টা আগে';
+        }
+
+        // Yesterday
+        if ($diffInDays == 1) {
+            return 'গতকাল';
+        }
+
+        // Days ago (2-6 days)
+        if ($diffInDays < 7) {
+            return bengali_number($diffInDays) . ' দিন আগে';
+        }
+
+        // Weeks ago (1-3 weeks)
+        if ($diffInDays < 30) {
+            $weeks = floor($diffInDays / 7);
+            return bengali_number($weeks) . ' সপ্তাহ আগে';
+        }
+
+        // Months ago (1-11 months)
+        if ($diffInDays < 365) {
+            $months = floor($diffInDays / 30);
+            return bengali_number($months) . ' মাস আগে';
+        }
+
+        // Years ago
+        $years = floor($diffInDays / 365);
+        return bengali_number($years) . ' বছর আগে';
+    }
+}

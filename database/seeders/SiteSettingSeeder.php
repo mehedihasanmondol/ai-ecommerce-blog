@@ -397,6 +397,16 @@ class SiteSettingSeeder extends Seeder
                 'description' => 'Display estimated reading time on blog posts',
                 'order' => 12,
             ],
+            [
+                'key' => 'blog_default_details_page',
+                'value' => 'default',
+                'type' => 'select',
+                'group' => 'blog',
+                'label' => 'Default Blog Details Page Template',
+                'description' => 'Choose which template to use for blog post details pages',
+                'options' => json_encode(['default' => 'Default Layout', 'newspaper' => 'News/Newspaper Layout']),
+                'order' => 13,
+            ],
 
             // Homepage Settings
             [
