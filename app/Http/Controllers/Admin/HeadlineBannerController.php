@@ -49,7 +49,7 @@ class HeadlineBannerController extends Controller
             'bg_color' => 'required|string|max:7',
             'text_color' => 'required|string|max:7',
             'label_bg_color' => 'required|string|max:7',
-            'scroll_speed' => 'required|integer|min:5|max:200',
+            'scroll_speed' => 'required|integer|min:1|max:200',
             'auto_scroll' => 'boolean',
             'link_url' => 'nullable|url|max:255',
         ]);
