@@ -284,12 +284,10 @@ class HomeController extends Controller
         // SEO data
         $siteName = SiteSetting::get('site_name', config('app.name'));
         $seoData = [
-            'title' => $siteName . ' | Latest News & Articles',
+            'title' => $siteName . ' | ' . SiteSetting::get('site_tagline', 'Latest News & Articles'),
             'description' => SiteSetting::get('meta_description', 'Read the latest news, articles, and stories'),
             'keywords' => SiteSetting::get('meta_keywords', 'news, blog, articles, stories'),
-            'og_image' => $featuredPost && $featuredPost->media
-                ? $featuredPost->media->large_url
-                : asset('images/og-default.jpg'),
+            'og_image' => SiteSetting::get('site_logo') ? asset('storage/' . SiteSetting::get('site_logo')) : asset('images/og-default.jpg'),
             'og_type' => 'website',
             'canonical' => url('/'),
         ];
