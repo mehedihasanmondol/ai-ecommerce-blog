@@ -127,10 +127,37 @@
                         </a>
 
 
+                    </div>
 
+                    {{-- Font Size and Print Controls --}}
+                    <div class="flex items-center gap-2 mt-4">
+                        {{-- Print Button --}}
+                        <button onclick="printArticle()"
+                            class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-gray-800 transition"
+                            title="প্রিন্ট করুন">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                        </button>
+
+                        {{-- Font Size Decrease --}}
+                        <button onclick="decreaseFontSize()"
+                            class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center hover:bg-orange-700 transition"
+                            title="ফন্ট ছোট করুন">
+                            <span class="text-white font-bold text-lg">A−</span>
+                        </button>
+
+                        {{-- Font Size Increase --}}
+                        <button onclick="increaseFontSize()"
+                            class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center hover:bg-orange-700 transition"
+                            title="ফন্ট বড় করুন">
+                            <span class="text-white font-bold text-xl">A+</span>
+                        </button>
                     </div>
                 </div>
             </aside>
+
 
             <!-- Main Content -->
             <article class="lg:col-span-7">
@@ -178,7 +205,7 @@
 
                     <!-- Content -->
                     <div class="px-8 pb-8">
-                        <div class="prose prose-lg max-w-none">
+                        <div id="article-content" class="prose prose-lg max-w-none">
                             {!! $post->content !!}
                         </div>
                     </div>
@@ -539,4 +566,95 @@
         @endif
     </div>
 </div>
+
+{{-- Print Styles --}}
+<style>
+    @media print {
+
+        /* Hide everything except article content */
+        header,
+        footer,
+        aside,
+        nav,
+        .sidebar,
+        .related-posts,
+        .comments-section {
+            display: none !important;
+        }
+
+        /* Show only the main article */
+        #article-content {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+        }
+
+        /* Ensure proper formatting for print */
+        body {
+            background: white !important;
+            color: black !important;
+        }
+
+        /* Remove shadows and borders for print */
+        * {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+    }
+</style>
+
+{{-- Font Size and Print JavaScript --}}
+<script>
+    // Font size control
+    let currentFontSize = 16; // Default font size in pixels
+    const minFontSize = 12;
+    const maxFontSize = 50;
+    const fontSizeStep = 2;
+
+    function increaseFontSize() {
+        if (currentFontSize < maxFontSize) {
+            currentFontSize += fontSizeStep;
+            applyFontSize();
+        }
+    }
+
+    function decreaseFontSize() {
+        if (currentFontSize > minFontSize) {
+            currentFontSize -= fontSizeStep;
+            applyFontSize();
+        }
+    }
+
+    function applyFontSize() {
+        const articleContent = document.getElementById('article-content');
+        if (articleContent) {
+            // Apply font size directly to the article content container
+            articleContent.style.fontSize = currentFontSize + 'px';
+            articleContent.style.transition = 'font-size 0.3s ease';
+
+            // Save preference to localStorage
+            localStorage.setItem('articleFontSize', currentFontSize);
+
+            console.log('Font size applied:', currentFontSize + 'px');
+        } else {
+            console.error('Article content element not found');
+        }
+    }
+
+    // Print function
+    function printArticle() {
+        window.print();
+    }
+
+    // Load saved font size on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedFontSize = localStorage.getItem('articleFontSize');
+        if (savedFontSize) {
+            currentFontSize = parseInt(savedFontSize);
+            applyFontSize();
+        }
+    });
+</script>
+
 @endsection
