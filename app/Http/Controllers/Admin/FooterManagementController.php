@@ -14,7 +14,16 @@ class FooterManagementController extends Controller
 {
     public function index()
     {
-        abort_if(!auth()->user()->hasPermission('footer.view'), 403, 'You do not have permission to view footer management.');
+        // Allow access if user has any footer section permission
+        $hasAccess = auth()->user()->hasPermission('footer-general.manage') ||
+            auth()->user()->hasPermission('footer-links.manage') ||
+            auth()->user()->hasPermission('footer-blog.manage') ||
+            auth()->user()->hasPermission('footer-social.manage') ||
+            auth()->user()->hasPermission('footer-mobile.manage') ||
+            auth()->user()->hasPermission('footer-rewards.manage') ||
+            auth()->user()->hasPermission('footer-newspaper.manage');
+
+        abort_if(!$hasAccess, 403, 'You do not have permission to access footer management.');
 
         $settings = FooterSetting::all()->groupBy('group');
         $blogPosts = FooterBlogPost::orderBy('sort_order')->get();
@@ -24,7 +33,14 @@ class FooterManagementController extends Controller
 
     public function updateSettings(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to edit footer settings.');
+        // Check permission based on what's being updated (general, social, mobile, or rewards settings)
+        $hasPermission = auth()->user()->hasPermission('footer-general.manage') ||
+            auth()->user()->hasPermission('footer-social.manage') ||
+            auth()->user()->hasPermission('footer-mobile.manage') ||
+            auth()->user()->hasPermission('footer-rewards.manage') ||
+            auth()->user()->hasPermission('footer-newspaper.manage');
+
+        abort_if(!$hasPermission, 403, 'You do not have permission to edit footer settings.');
 
         foreach ($request->except(['_token', 'qr_code_image']) as $key => $value) {
             FooterSetting::where('key', $key)->update(['value' => $value]);
@@ -56,7 +72,7 @@ class FooterManagementController extends Controller
 
     public function storeBlogPost(Request $request)
     {
-        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to add footer blog posts.');
+        abort_if(!auth()->user()->hasPermission('footer-blog.manage'), 403, 'You do not have permission to add footer blog posts.');
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -82,7 +98,7 @@ class FooterManagementController extends Controller
 
     public function deleteBlogPost(FooterBlogPost $blogPost)
     {
-        abort_if(!auth()->user()->hasPermission('footer.edit'), 403, 'You do not have permission to delete footer blog posts.');
+        abort_if(!auth()->user()->hasPermission('footer-blog.manage'), 403, 'You do not have permission to delete footer blog posts.');
 
         if ($blogPost->image) {
             Storage::disk('public')->delete($blogPost->image);
@@ -96,8 +112,16 @@ class FooterManagementController extends Controller
      */
     public function toggleSection(Request $request)
     {
-        // Check permission for AJAX request
-        if (!auth()->user()->hasPermission('footer.edit')) {
+        // Check permission for AJAX request - allow if user has any footer tab permission
+        $hasPermission = auth()->user()->hasPermission('footer-general.manage') ||
+            auth()->user()->hasPermission('footer-links.manage') ||
+            auth()->user()->hasPermission('footer-blog.manage') ||
+            auth()->user()->hasPermission('footer-social.manage') ||
+            auth()->user()->hasPermission('footer-mobile.manage') ||
+            auth()->user()->hasPermission('footer-rewards.manage') ||
+            auth()->user()->hasPermission('footer-newspaper.manage');
+
+        if (!$hasPermission) {
             return response()->json([
                 'success' => false,
                 'message' => 'You do not have permission to toggle footer sections.',

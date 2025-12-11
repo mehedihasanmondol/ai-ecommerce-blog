@@ -16,7 +16,7 @@ let newsletterEditor;
 let copyrightEditor;
 
 // Initialize CKEditors when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize Minimal CKEditor for Newsletter Description
     const newsletterElement = document.getElementById('newsletter-description-editor');
     if (newsletterElement) {
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }).then(editor => {
             newsletterEditor = editor;
             console.log('CKEditor initialized for newsletter description');
-            
+
             // Sync with form
             editor.model.document.on('change:data', () => {
                 newsletterElement.value = editor.getData();
@@ -43,13 +43,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }).then(editor => {
             copyrightEditor = editor;
             console.log('CKEditor initialized for copyright text');
-            
+
             // Sync with form
             editor.model.document.on('change:data', () => {
                 copyrightElement.value = editor.getData();
             });
         }).catch(error => {
             console.error('Error initializing copyright CKEditor:', error);
+        });
+    }
+
+    // Initialize Minimal CKEditor for Newspaper Second Column
+    const newspaperSecondElement = document.getElementById('newspaper-second-column-editor');
+    if (newspaperSecondElement) {
+        initMinimalCKEditor('#newspaper-second-column-editor', {
+            placeholder: 'Enter second column content...'
+        }).then(editor => {
+            console.log('CKEditor initialized for newspaper second column');
+
+            // Sync with form
+            editor.model.document.on('change:data', () => {
+                newspaperSecondElement.value = editor.getData();
+            });
+        }).catch(error => {
+            console.error('Error initializing newspaper second column CKEditor:', error);
+        });
+    }
+
+    // Initialize Minimal CKEditor for Newspaper Third Column
+    const newspaperThirdElement = document.getElementById('newspaper-third-column-editor');
+    if (newspaperThirdElement) {
+        initMinimalCKEditor('#newspaper-third-column-editor', {
+            placeholder: 'Enter third column content...'
+        }).then(editor => {
+            console.log('CKEditor initialized for newspaper third column');
+
+            // Sync with form
+            editor.model.document.on('change:data', () => {
+                newspaperThirdElement.value = editor.getData();
+            });
+        }).catch(error => {
+            console.error('Error initializing newspaper third column CKEditor:', error);
         });
     }
 });
@@ -121,15 +155,15 @@ function initMinimalCKEditor(selector, options = {}) {
         .create(element, minimalConfig)
         .then(editor => {
             console.log('Minimal CKEditor initialized successfully');
-            
+
             // Ensure content is saved on form submit
             const form = element.closest('form');
             if (form) {
-                form.addEventListener('submit', function() {
+                form.addEventListener('submit', function () {
                     element.value = editor.getData();
                 });
             }
-            
+
             return editor;
         })
         .catch(error => {

@@ -253,6 +253,15 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'View Footer', 'slug' => 'footer.view', 'module' => 'content'],
             ['name' => 'Edit Footer', 'slug' => 'footer.edit', 'module' => 'content'],
 
+            // Footer Management Tabs (Granular Permissions)
+            ['name' => 'Manage Footer General Settings', 'slug' => 'footer-general.manage', 'module' => 'content'],
+            ['name' => 'Manage Footer Links', 'slug' => 'footer-links.manage', 'module' => 'content'],
+            ['name' => 'Manage Footer Blog Posts', 'slug' => 'footer-blog.manage', 'module' => 'content'],
+            ['name' => 'Manage Footer Social Media', 'slug' => 'footer-social.manage', 'module' => 'content'],
+            ['name' => 'Manage Footer Mobile Apps', 'slug' => 'footer-mobile.manage', 'module' => 'content'],
+            ['name' => 'Manage Footer Rewards', 'slug' => 'footer-rewards.manage', 'module' => 'content'],
+            ['name' => 'Manage Newspaper Footer', 'slug' => 'footer-newspaper.manage', 'module' => 'content'],
+
             // Trending/Featured Products
             ['name' => 'View Trending Products', 'slug' => 'trending-products.view', 'module' => 'content'],
             ['name' => 'Create Trending Products', 'slug' => 'trending-products.create', 'module' => 'content'],
