@@ -38,9 +38,9 @@ jobs:
       - name: 🚀 Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: host13.registrar-servers.comffff          # <- Your domain
-          username: deploy@alamgiralam.comffff            # <- Your FTP username
-          password: 'dY7!39KBw@Zg'    # <- Paste it locally, not in GitHub
+          server: websitelimited.com          # <- Your domain
+          username: admin_newspaper            # <- Your FTP username
+          password: 'aodk!-JfhJ4nda@P'    # <- Paste it locally, not in GitHub
           protocol: ftp
           port: 21
           local-dir: ./
