@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->command->info('🌱 Starting database seeding...');
-        
+
         // Phase 1: Core Configuration & Settings (No dependencies)
         $this->command->info('📋 Phase 1: Core Configuration & Settings');
         $this->call([
@@ -37,9 +37,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
+            AdSlotSeeder::class,
         ]);
 
-    
+
 
         // Phase 6: Stock & Finance Management (Depends on products)
         $this->command->info('📊 Phase 6: Stock & Finance Management');
@@ -54,7 +55,7 @@ class DatabaseSeeder extends Seeder
             DeliverySystemSeeder::class,
         ]);
 
-   
+
 
         $this->command->info('✅ Database seeding completed successfully!');
     }

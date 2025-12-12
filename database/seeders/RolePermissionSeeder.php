@@ -346,6 +346,15 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Update Message Status', 'slug' => 'contact-messages.update-status', 'module' => 'contact'],
             ['name' => 'Delete Contact Messages', 'slug' => 'contact-messages.delete', 'module' => 'contact'],
             ['name' => 'Bulk Actions on Messages', 'slug' => 'contact-messages.bulk-action', 'module' => 'contact'],
+
+            // ===================================
+            // ADVERTISEMENT MODULE
+            // ===================================
+            ['name' => 'View Advertisements', 'slug' => 'advertisements.view', 'module' => 'advertisement'],
+            ['name' => 'Create Advertisements', 'slug' => 'advertisements.create', 'module' => 'advertisement'],
+            ['name' => 'Edit Advertisements', 'slug' => 'advertisements.edit', 'module' => 'advertisement'],
+            ['name' => 'Delete Advertisements', 'slug' => 'advertisements.delete', 'module' => 'advertisement'],
+            ['name' => 'View Advertisement Analytics', 'slug' => 'advertisements.analytics', 'module' => 'advertisement'],
         ];
 
         foreach ($permissions as $permission) {

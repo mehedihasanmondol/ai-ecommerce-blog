@@ -7,15 +7,18 @@ use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             Route::middleware('web')
                 ->group(base_path('routes/admin.php'));
-            
+
             Route::middleware('web')
                 ->group(base_path('routes/blog.php'));
+
+            Route::middleware('web')
+                ->group(base_path('routes/advertisement.php'));
         },
     )
     ->withSchedule(function ($schedule) {
@@ -59,7 +62,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\CheckMaintenanceMode::class,
         ]);
-        
+
         // Register middleware aliases
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,

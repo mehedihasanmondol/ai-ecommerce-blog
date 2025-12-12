@@ -15,12 +15,9 @@
 @section('content')
 <div class="bg-gray-50 min-h-screen">
 
-    {{-- Full-Width Advertisement Placeholder --}}
+    {{-- Header Banner Advertisement --}}
     <div class="container mx-auto px-4">
-        <div class="h-24 bg-white rounded flex items-center justify-center border-2 border-dashed border-gray-300">
-            <span class="text-gray-400"> বিজ্ঞাপন ৯৭০ × ৯০ (Full Width Banner)</span>
-        </div>
-
+        <x-advertisement.ad-banner slot-slug="header-banner" />
     </div>
 
     <div class="container mx-auto px-4 py-4">
@@ -171,13 +168,8 @@
             {{-- Right Sidebar (3 columns) --}}
             <aside class="lg:col-span-3 space-y-6">
 
-                {{-- Ad Placeholder --}}
-                <div class="bg-gray-100 shadow-md text-center">
-                    <div class="h-64 bg-white rounded flex items-center justify-center border-2 border-dashed border-gray-300">
-                        <span class="text-gray-400">বিজ্ঞাপন ৩০০ × ২৫০</span>
-                    </div>
-
-                </div>
+                {{-- Sidebar Advertisement --}}
+                <x-advertisement.ad-banner slot-slug="sidebar-top" />
 
                 {{-- Latest & Popular News Tabs (Reusable Component) --}}
                 <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
@@ -375,13 +367,8 @@
 
 
 
-                {{-- Ad Placeholder --}}
-                <div class="bg-gray-100 shadow-md p-6 text-center">
-                    <div class="text-xs text-gray-500 mb-2">বিজ্ঞাপন</div>
-                    <div class="h-64 bg-white rounded flex items-center justify-center border-2 border-dashed border-gray-300">
-                        <span class="text-gray-400">৩০০ × ২৫০</span>
-                    </div>
-                </div>
+                {{-- Category Sidebar Advertisement --}}
+                <x-advertisement.ad-banner slot-slug="sidebar-middle" :categoryId="$section['category']->id" />
 
                 {{-- Latest Video Widget --}}
                 @if(isset($section['latestVideo']) && $section['latestVideo'])

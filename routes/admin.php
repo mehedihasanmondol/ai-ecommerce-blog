@@ -19,6 +19,10 @@ use App\Http\Controllers\Admin\DeliveryRateController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Modules\Blog\Controllers\Admin\TickMarkController;
+use App\Modules\Advertisement\Controllers\Admin\AdCampaignController;
+use App\Modules\Advertisement\Controllers\Admin\AdCreativeController;
+use App\Modules\Advertisement\Controllers\Admin\AdSlotController;
+use App\Modules\Advertisement\Controllers\Admin\AdAnalyticsController;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -492,5 +496,36 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::get('/export/products-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportProductsPdf'])->name('export-products-pdf');
         Route::get('/export/customers-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportCustomersPdf'])->name('export-customers-pdf');
         Route::get('/export/delivery-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportDeliveryPdf'])->name('export-delivery-pdf');
+    });
+
+    // Advertisement Management Routes - Requires advertisements.view permission
+    Route::middleware(['permission:advertisements.view'])->prefix('advertisements')->name('advertisements.')->group(function () {
+        // Campaigns
+        Route::get('campaigns', [AdCampaignController::class, 'index'])->name('campaigns.index');
+        Route::get('campaigns/create', [AdCampaignController::class, 'create'])->name('campaigns.create');
+        Route::post('campaigns', [AdCampaignController::class, 'store'])->name('campaigns.store');
+        Route::get('campaigns/{campaign}/edit', [AdCampaignController::class, 'edit'])->name('campaigns.edit');
+        Route::put('campaigns/{campaign}', [AdCampaignController::class, 'update'])->name('campaigns.update');
+        Route::delete('campaigns/{campaign}', [AdCampaignController::class, 'destroy'])->name('campaigns.destroy');
+        Route::post('campaigns/{campaign}/toggle-status', [AdCampaignController::class, 'toggleStatus'])->name('campaigns.toggle-status');
+
+        // Creatives
+        Route::get('campaigns/{campaign}/creatives', [AdCreativeController::class, 'index'])->name('creatives.index');
+        Route::post('campaigns/{campaign}/creatives', [AdCreativeController::class, 'store'])->name('creatives.store');
+        Route::put('creatives/{creative}', [AdCreativeController::class, 'update'])->name('creatives.update');
+        Route::delete('creatives/{creative}', [AdCreativeController::class, 'destroy'])->name('creatives.destroy');
+        Route::post('creatives/upload-image', [AdCreativeController::class, 'uploadImage'])->name('creatives.upload-image');
+
+        // Ad Slots
+        Route::get('slots', [AdSlotController::class, 'index'])->name('slots.index');
+        Route::post('slots', [AdSlotController::class, 'store'])->name('slots.store');
+        Route::put('slots/{slot}', [AdSlotController::class, 'update'])->name('slots.update');
+        Route::delete('slots/{slot}', [AdSlotController::class, 'destroy'])->name('slots.destroy');
+        Route::post('slots/{slot}/toggle-status', [AdSlotController::class, 'toggleStatus'])->name('slots.toggle-status');
+
+        // Analytics
+        Route::get('analytics', [AdAnalyticsController::class, 'index'])->name('analytics.index');
+        Route::get('analytics/campaign/{campaign}', [AdAnalyticsController::class, 'campaign'])->name('analytics.campaign');
+        Route::get('analytics/export', [AdAnalyticsController::class, 'export'])->name('analytics.export');
     });
 });
