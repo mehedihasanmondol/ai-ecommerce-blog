@@ -74,7 +74,7 @@
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ bengali_date($featuredPost->published_at, 'short') }}
+                                        {{ bengali_date($featuredPost->published_at, 'short_time') }}
                                     </span>
                                 </div>
                             </div>
@@ -113,7 +113,7 @@
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            {{ bengali_date($story->published_at, 'short') }}
+                                            {{ bengali_date($story->published_at, 'short_time') }}
                                         </div>
                                     </div>
                                 </article>
@@ -156,7 +156,7 @@
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                {{ bengali_date($story->published_at, 'short') }}
+                                {{ bengali_date($story->published_at, 'short_time') }}
                             </div>
                         </div>
                     </article>
@@ -263,7 +263,7 @@
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ bengali_date($featuredPost->published_at, 'short') }}
+                                        {{ bengali_date($featuredPost->published_at, 'short_time') }}
                                     </span>
                                 </div>
                             </div>
@@ -298,7 +298,7 @@
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ bengali_date($post->published_at, 'short') }}
+                                        {{ bengali_date($post->published_at, 'short_time') }}
                                     </div>
                                 </div>
                             </article>
@@ -346,7 +346,7 @@
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ bengali_date($post->published_at, 'short') }}
+                                        {{ bengali_date($post->published_at, 'short_time') }}
                                     </div>
                                 </div>
                             </div>

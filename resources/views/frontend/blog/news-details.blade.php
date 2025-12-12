@@ -95,7 +95,7 @@
 
                         <!-- Post Time in Bangla -->
                         <div class="post-time border-t border-gray-200 mb-4">
-                            প্রকাশিত: {{ bengali_date($post->published_at) }}
+                            প্রকাশিত: {{ bengali_date($post->published_at, 'short_time') }}
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -480,7 +480,7 @@
                                         <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        {{ bengali_time_ago($latestPost->published_at) }}
+                                        {{ bengali_date($latestPost->published_at, 'short_time') }}
                                     </div>
                                 </div>
                             </div>
@@ -557,7 +557,7 @@
                                 {{ Str::limit($related->title, 50) }}
                             </a>
                         </h3>
-                        <p class="text-sm text-gray-500">{{ $related->published_at->format('M d, Y') }}</p>
+                        <p class="text-sm text-gray-500">{{ bengali_date($related->published_at, 'short_time') }}</p>
                     </div>
                 </article>
                 @endforeach

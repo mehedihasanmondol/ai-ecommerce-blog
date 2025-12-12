@@ -159,7 +159,6 @@ if (!function_exists('generate_slug')) {
         return $text;
     }
 }
-
 if (!function_exists('bengali_date')) {
     /**
      * Convert date to Bengali format
@@ -206,15 +205,43 @@ if (!function_exists('bengali_date')) {
         $dateNum = $date->format('d');
         $month = $bengaliMonths[$date->format('F')];
         $year = $date->format('Y');
+        $hour24 = (int) $date->format('H');
+        $minute = $date->format('i');
+
+        // Convert to 12-hour format
+        $hour12 = $hour24 % 12;
+        if ($hour12 == 0) {
+            $hour12 = 12;
+        }
+
+        // Determine Bengali time period based on hour
+        $timePeriod = '';
+        if ($hour24 >= 4 && $hour24 < 6) {
+            $timePeriod = 'ভোর'; // Dawn (4 AM - 6 AM)
+        } elseif ($hour24 >= 6 && $hour24 < 12) {
+            $timePeriod = 'সকাল'; // Morning (6 AM - 12 PM)
+        } elseif ($hour24 >= 12 && $hour24 < 15) {
+            $timePeriod = 'দুপুর'; // Noon/Afternoon (12 PM - 3 PM)
+        } elseif ($hour24 >= 15 && $hour24 < 18) {
+            $timePeriod = 'বিকেল'; // Evening (3 PM - 6 PM)
+        } elseif ($hour24 >= 18 && $hour24 < 20) {
+            $timePeriod = 'সন্ধ্যা'; // Dusk (6 PM - 8 PM)
+        } else {
+            $timePeriod = 'রাত'; // Night (8 PM - 4 AM)
+        }
 
         // Convert numbers to Bengali
         $dateNum = str_replace(range(0, 9), $bengaliNumbers, $dateNum);
         $year = str_replace(range(0, 9), $bengaliNumbers, $year);
+        $hour12Bengali = str_replace(range(0, 9), $bengaliNumbers, (string) $hour12);
+        $minute = str_replace(range(0, 9), $bengaliNumbers, $minute);
 
         // Return based on format
         switch ($format) {
             case 'short':
                 return "{$dateNum} {$month}, {$year}";
+            case 'short_time':
+                return "{$dateNum} {$month}, {$year} - {$timePeriod} {$hour12Bengali}:{$minute} মি.";
             case 'day_only':
                 return $day;
             case 'date_only':
