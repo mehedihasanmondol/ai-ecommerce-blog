@@ -354,6 +354,17 @@
                         @endforeach
                     </div>
                     @endif
+
+                    {{-- Read More Button --}}
+                    <div class="p-4 border-t border-gray-200 text-center">
+                        <a href="{{ url('/' . $section['category']->slug) }}"
+                            class="inline-flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition-colors">
+                            <span>{{ $section['category']->name }} - আরও পড়ুন</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    </div>
                 </div>
 
 
