@@ -400,8 +400,8 @@
                 :categorySlug="$category ? $category->slug : null" />
             @endif
 
-            @if($latestPosts && $popularPosts)
             {{-- Latest & Popular News Tabs (Reusable Component) --}}
+            @if($latestPosts && $popularPosts)
             <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
             @endif
 

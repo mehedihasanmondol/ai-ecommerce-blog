@@ -23,6 +23,7 @@
         :pageTitle="$category->name"
         :loadMoreEndpoint="'/api/category/' . $category->slug . '/posts'"
         :latestPosts="$latestPosts"
-        :popularPosts="$popularPosts" />
+        :popularPosts="$popularPosts"
+        :latestVideo="$latestVideo" />
 </div>
 @endsection
