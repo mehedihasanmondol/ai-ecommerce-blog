@@ -1,12 +1,12 @@
 {{-- Newspaper Header Component with Smart Sticky Navigation --}}
-<div x-data="{ isSticky: false, searchOpen: false }" @scroll.window="isSticky = (window.pageYOffset > 100)"
+<div x-data="{ isSticky: false, searchOpen: false }" @scroll.window="isSticky = (window.pageYOffset > 100 && window.innerWidth >= 768)"
     class="relative">
     {{-- Top Header Bar (Scrolls Away) --}}
     <div class="bg-white relative z-40">
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-3 border-b border-gray-300">
-                {{-- Bengali Date --}}
-                <div class="text-base md:text-lg font-medium text-gray-700">
+                {{-- Bengali Date (Hidden on mobile) --}}
+                <div class="hidden md:block text-base md:text-lg font-medium text-gray-700">
                     {{ bengali_date() }}
                 </div>
 
@@ -16,16 +16,16 @@
                     <a href="{{ route('home') }}">
                         <img src="{{ asset('storage/' . $siteLogo) }}"
                             alt="{{ \App\Models\SiteSetting::get('site_name', config('app.name')) }}"
-                            class="h-16 md:h-20 mx-auto object-contain">
+                            class="h-12 md:h-16 lg:h-20 mx-auto object-contain">
                     </a>
                     @else
-                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+                    <h1 class="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900">
                         {{ \App\Models\SiteSetting::get('site_name', config('app.name')) }}
                     </h1>
                     @endif
                 </div>
 
-                {{-- Social Media Icons --}}
+                {{-- Social Media Icons (Visible on mobile) --}}
                 <div class="flex items-center gap-2">
                     @if($facebookUrl = \App\Models\SiteSetting::get('facebook_url'))
                     <a href="{{ $facebookUrl }}" target="_blank"
@@ -86,13 +86,13 @@
     $interactionMode = \App\Models\HomepageSetting::get('newspaper_menu_interaction_mode', 'hover');
     @endphp
 
-    {{-- Navigation Menu - Becomes Sticky with Smart Logo --}}
+    {{-- Navigation Menu - Becomes Sticky with Smart Logo (Desktop Only) --}}
     <nav class="bg-red-600 text-white transition-all duration-300"
-        :class="{ 'fixed top-0 left-0 right-0 z-50 shadow-lg': isSticky, 'relative': !isSticky }"
+        :class="{ 'md:fixed top-0 left-0 right-0 z-50 shadow-lg': isSticky, 'relative': !isSticky }"
         x-data="{ activeMenu: null, closeTimeout: null, interactionMode: '{{ $interactionMode }}', clickedMenu: null }"
         @click.outside="if(interactionMode === 'click') clickedMenu = null">
         <div class="container mx-auto px-4">
-            <div class="flex items-center">
+            <div class="flex items-center overflow-x-auto md:overflow-x-visible scrollbar-hide">
                 {{-- Compact Logo (Only visible when sticky) --}}
                 <div x-show="isSticky" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 -translate-x-4"
@@ -115,8 +115,8 @@
                 </div>
 
                 <ul class="flex items-center flex-1">
-                    {{-- Home Icon --}}
-                    <li class="relative static flex-shrink-0">
+                    {{-- Home Icon (Hidden on mobile) --}}
+                    <li class="hidden md:block relative static flex-shrink-0">
                         <a href="{{ route('home') }}"
                             class="flex items-center px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap"
                             aria-label="Home">
@@ -128,8 +128,8 @@
                         </a>
                     </li>
 
-                    {{-- সর্বশেষ (Latest) --}}
-                    <li class="relative static flex-shrink-0">
+                    {{-- সর্বশেষ (Latest) - Hidden on mobile --}}
+                    <li class=" md:block relative static flex-shrink-0">
                         <a href="{{ route('blog.latest-news') }}"
                             class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                             সর্বশেষ
@@ -152,8 +152,8 @@
                     @endphp
 
                     @foreach($menuCategories as $category)
-                    {{-- Category Menu Item --}}
-                    <li class="relative flex-shrink-0"
+                    {{-- Category Menu Item (Hidden on mobile) --}}
+                    <li class="hidden md:block relative flex-shrink-0"
                         x-bind="interactionMode === 'hover' ? {
                                                                                                                                                 '@mouseenter': 'clearTimeout(closeTimeout); activeMenu = \'{{ $category->slug }}\'',
                                                                                                                                                 '@mouseleave': 'closeTimeout = setTimeout(() => { activeMenu = null }, 200)'
@@ -287,15 +287,15 @@
                     </li>
                     @endforeach
 
-                    {{-- Additional Menu Items --}}
-                    <li class="relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
+                    {{-- Additional Menu Items (Hidden on mobile) --}}
+                    <li class=" md:block relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
                         <a href="#"
                             class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                             ভিডিও গ্যালারি
                         </a>
                     </li>
 
-                    <li class="relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
+                    <li class=" md:block relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
                         <a href="#"
                             class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                             নির্বাচন
@@ -313,15 +313,15 @@
                         </button>
                     </li>
 
-                    <li class="relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
+                    <li class="hidden md:block relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
                         <a href="#"
                             class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                             ই-পেপার
                         </a>
                     </li>
 
-                    {{-- All Categories Menu --}}
-                    <li class="relative static flex-shrink-0 ml-auto" x-bind="interactionMode === 'hover' ? {
+                    {{-- All Categories Menu (Always visible) --}}
+                    <li class="relative static flex-shrink-0 md:ml-auto" x-bind="interactionMode === 'hover' ? {
                         '@mouseenter'() { clearTimeout(closeTimeout); activeMenu = 'all-categories'; },
                         '@mouseleave'() { closeTimeout = setTimeout(() => { activeMenu = null }, 200); }
                     } : {}">
@@ -449,8 +449,8 @@
 
 
 
-    {{-- Spacer to prevent content jump when nav becomes fixed --}}
-    <div x-show="isSticky" class="h-12" style="display: none;"></div>
+    {{-- Spacer to prevent content jump when nav becomes fixed (Desktop only) --}}
+    <div x-show="isSticky" class="hidden md:block h-12" style="display: none;"></div>
 </div>
 
 {{-- Custom CSS for scrollbar hiding and smooth transitions --}}
@@ -462,6 +462,19 @@
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
+    }
+
+    /* Mobile horizontal scroll with touch support */
+    @media (max-width: 767px) {
+        nav .flex.items-center.overflow-x-auto {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            scroll-snap-type: x proximity;
+        }
+
+        nav .flex.items-center.overflow-x-auto>ul>li {
+            scroll-snap-align: start;
+        }
     }
 
     /* Search Overlay Animations */
