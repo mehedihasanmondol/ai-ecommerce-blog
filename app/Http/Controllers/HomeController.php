@@ -257,9 +257,18 @@ class HomeController extends Controller
         $featuredCategorySections = [];
         foreach ($featuredCategories as $featured) {
             if ($featured->category) {
+                // Get latest video post for this category
+                $latestVideo = $featured->category->posts()
+                    ->where('status', 'published')
+                    ->whereNotNull('youtube_url')
+                    ->where('youtube_url', '!=', '')
+                    ->latest('published_at')
+                    ->first();
+
                 $featuredCategorySections[] = [
                     'category' => $featured->category,
-                    'posts' => $featured->category->posts
+                    'posts' => $featured->category->posts,
+                    'latestVideo' => $latestVideo
                 ];
             }
         }

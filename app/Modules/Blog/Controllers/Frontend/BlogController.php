@@ -459,6 +459,7 @@ class BlogController extends Controller
         $search = $request->input('search');
         $sort = $request->input('sort', 'latest');
         $subcategory = $request->input('subcategory');
+        $postType = $request->input('post_type'); // article, video, or null (all)
         // For newspaper layout, we display 6 main + 8 remaining = 14 initially, so we need to fetch enough for load more
         $initialLimit = 30; // Fetch 30 posts initially (6 main + 8 remaining + 16 for load more)
 
@@ -471,6 +472,15 @@ class BlogController extends Controller
         if ($subcategory) {
             $query->whereHas('categories', function ($q) use ($subcategory) {
                 $q->where('blog_categories.slug', $subcategory);
+            });
+        }
+
+        // Filter by post type
+        if ($postType === 'video') {
+            $query->whereNotNull('youtube_url')->where('youtube_url', '!=', '');
+        } elseif ($postType === 'article') {
+            $query->where(function ($q) {
+                $q->whereNull('youtube_url')->orWhere('youtube_url', '');
             });
         }
 
@@ -520,6 +530,14 @@ class BlogController extends Controller
             ->limit(10)
             ->get();
 
+        // Get latest video post for sidebar (from current category)
+        $latestVideo = $category->posts()
+            ->where('status', 'published')
+            ->whereNotNull('youtube_url')
+            ->where('youtube_url', '!=', '')
+            ->latest('published_at')
+            ->first();
+
         // Prepare SEO data
         $blogTitle = SiteSetting::get('blog_title', 'Blog');
 
@@ -559,6 +577,7 @@ class BlogController extends Controller
             'totalPosts',
             'latestPosts',
             'popularPosts',
+            'latestVideo',
             'breadcrumbs',
             'currentUrl',
             'seoData'
@@ -742,6 +761,7 @@ class BlogController extends Controller
         $search = $request->input('search');
         $sort = $request->input('sort', 'latest');
         $subcategory = $request->input('subcategory');
+        $postType = $request->input('post_type');
 
         // Build query for category posts
         $query = $category->posts()
@@ -752,6 +772,15 @@ class BlogController extends Controller
         if ($subcategory) {
             $query->whereHas('categories', function ($q) use ($subcategory) {
                 $q->where('blog_categories.slug', $subcategory);
+            });
+        }
+
+        // Filter by post type
+        if ($postType === 'video') {
+            $query->whereNotNull('youtube_url')->where('youtube_url', '!=', '');
+        } elseif ($postType === 'article') {
+            $query->where(function ($q) {
+                $q->whereNull('youtube_url')->orWhere('youtube_url', '');
             });
         }
 

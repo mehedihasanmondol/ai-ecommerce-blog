@@ -189,15 +189,14 @@
 
 
 
-    <div class="container mx-auto px-4 py-4">
-        {{-- Main Content Grid --}}
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 ">
+    <div class="container mx-auto px-4">
+        {{-- Featured Category Content Grid --}}
+        {{-- Featured Category Sections --}}
+        @if($featuredCategoriesEnabled == '1' && !empty($featuredCategorySections))
+        @foreach($featuredCategorySections as $section)
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 py-2">
             {{-- Left Column: Featured + News Grid (9 columns) --}}
             <div class="lg:col-span-9 space-y-6">
-
-                {{-- Featured Category Sections --}}
-                @if($featuredCategoriesEnabled == '1' && !empty($featuredCategorySections))
-                @foreach($featuredCategorySections as $section)
                 <div class="bg-white shadow-md overflow-hidden">
                     {{-- Category Header --}}
                     <div class="px-6 py-3 flex items-center justify-between bg-white">
@@ -356,8 +355,7 @@
                     </div>
                     @endif
                 </div>
-                @endforeach
-                @endif
+
 
             </div>
 
@@ -374,8 +372,17 @@
                     </div>
                 </div>
 
+                {{-- Latest Video Widget --}}
+                @if(isset($section['latestVideo']) && $section['latestVideo'])
+                <x-frontend.video-post-widget
+                    :videoPost="$section['latestVideo']"
+                    :categorySlug="$section['category']->slug" />
+                @endif
+
             </aside>
         </div>
+        @endforeach
+        @endif
     </div>
 
 

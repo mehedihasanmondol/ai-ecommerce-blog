@@ -8,6 +8,7 @@
 'loadMoreEndpoint' => null,
 'latestPosts' => null,
 'popularPosts' => null,
+'latestVideo' => null,
 ])
 <div class="bg-white">
     <div class="container mx-auto ">
@@ -58,6 +59,16 @@
                         </select>
                     </div>
 
+                    {{-- Post Type Filter --}}
+                    <div class="flex items-center gap-2">
+                        <label for="post_type" class="text-sm font-semibold text-gray-700 whitespace-nowrap">পোস্ট টাইপ:</label>
+                        <select name="post_type" id="post_type" class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <option value="" {{ request('post_type') == '' ? 'selected' : '' }}>সব</option>
+                            <option value="article" {{ request('post_type') == 'article' ? 'selected' : '' }}>আর্টিকেল</option>
+                            <option value="video" {{ request('post_type') == 'video' ? 'selected' : '' }}>ভিডিও</option>
+                        </select>
+                    </div>
+
                     {{-- Subcategory Filter (only if category has children) --}}
                     @if($category && $category->children()->where('is_active', true)->count() > 0)
                     <div class="flex items-center gap-2">
@@ -104,7 +115,7 @@
 <div class="container mx-auto px-4 ">
 
     {{-- Active Filters Display --}}
-    @if(request('sort') || request('search') || request('subcategory'))
+    @if(request('sort') || request('search') || request('subcategory') || request('post_type'))
     <div class="mb-4 px-4">
         <div class="flex flex-wrap items-center gap-2">
             <span class="text-sm font-semibold text-gray-700">সক্রিয় ফিল্টার:</span>
@@ -167,6 +178,26 @@
             </span>
             @endif
 
+            {{-- Post Type Filter Badge --}}
+            @if(request('post_type'))
+            <span class="inline-flex items-center gap-2 bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
+                <span>পোস্ট টাইপ:
+                    @if(request('post_type') == 'article') আর্টিকেল
+                    @elseif(request('post_type') == 'video') ভিডিও
+                    @endif
+                </span>
+                <a href="{{ url()->current() }}?{{ http_build_query(array_filter(request()->except('post_type'))) }}"
+                    class="hover:text-orange-900 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </a>
+            </span>
+            @endif
+
             {{-- Clear All Button --}}
             <a href="{{ url()->current() }}"
                 class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-sm font-semibold transition-colors">
@@ -191,9 +222,21 @@
                     {{-- Left 2/3: Main Featured Post --}}
                     @php $featuredPost = $posts->first(); @endphp
                     <article class="md:col-span-2 border-r border-gray-200">
-                        {{-- Featured Image --}}
+                        {{-- Featured Image or Video --}}
                         <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                            @if($featuredPost->media)
+                            @if(request('post_type') === 'video' && $featuredPost->youtube_embed_url)
+                            {{-- Show YouTube Video Embed --}}
+                            <iframe
+                                class="absolute inset-0 w-full h-full"
+                                src="{{ $featuredPost->youtube_embed_url }}"
+                                title="{{ $featuredPost->title }}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy">
+                            </iframe>
+                            @elseif($featuredPost->media)
+                            {{-- Show Featured Image --}}
                             <img src="{{ $featuredPost->media->large_url }}"
                                 alt="{{ $featuredPost->title }}"
                                 class="absolute inset-0 w-full h-full object-cover">
@@ -241,9 +284,19 @@
                         @if($posts->count() > 1)
                         @foreach($posts->skip(1)->take(2) as $index => $story)
                         <article class="flex-1 flex flex-col group bg-white">
-                            {{-- Thumbnail --}}
+                            {{-- Thumbnail or Video --}}
                             <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                                @if($story->media)
+                                @if(request('post_type') === 'video' && $story->youtube_embed_url)
+                                <iframe
+                                    class="absolute inset-0 w-full h-full"
+                                    src="{{ $story->youtube_embed_url }}"
+                                    title="{{ $story->title }}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    loading="lazy">
+                                </iframe>
+                                @elseif($story->media)
                                 <img src="{{ $story->media->medium_url }}"
                                     alt="{{ $story->title }}"
                                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -280,9 +333,19 @@
             <div class="grid md:grid-cols-3 gap-6">
                 @foreach($posts->skip(3)->take(3) as $story)
                 <article class="bg-white shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
-                    {{-- Image --}}
+                    {{-- Image or Video --}}
                     <div class="relative h-48 overflow-hidden">
-                        @if($story->media)
+                        @if(request('post_type') === 'video' && $story->youtube_embed_url)
+                        <iframe
+                            class="w-full h-full"
+                            src="{{ $story->youtube_embed_url }}"
+                            title="{{ $story->title }}"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                            loading="lazy">
+                        </iframe>
+                        @elseif($story->media)
                         <img src="{{ $story->media->medium_url }}"
                             alt="{{ $story->title }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -330,6 +393,13 @@
                 </div>
             </div>
 
+            {{-- Latest Video Widget --}}
+            @if($latestVideo)
+            <x-frontend.video-post-widget
+                :videoPost="$latestVideo"
+                :categorySlug="$category ? $category->slug : null" />
+            @endif
+
             @if($latestPosts && $popularPosts)
             {{-- Latest & Popular News Tabs (Reusable Component) --}}
             <x-news-tabs :latestPosts="$latestPosts" :popularPosts="$popularPosts" />
@@ -349,10 +419,20 @@
                 <div id="posts-container" class="bg-white shadow-md divide-y divide-gray-200">
                     @foreach($posts->skip(6)->take(8) as $post)
                     <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
-                        {{-- Image - 1/3 Width --}}
+                        {{-- Image or Video - 1/3 Width --}}
                         <div class="col-span-1">
                             <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
-                                @if($post->media)
+                                @if(request('post_type') === 'video' && $post->youtube_embed_url)
+                                <iframe
+                                    class="absolute inset-0 w-full h-full rounded"
+                                    src="{{ $post->youtube_embed_url }}"
+                                    title="{{ $post->title }}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    loading="lazy">
+                                </iframe>
+                                @elseif($post->media)
                                 <img src="{{ $post->media->medium_url }}"
                                     alt="{{ $post->title }}"
                                     class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -446,6 +526,7 @@
                 const sort = urlParams.get('sort') || 'latest';
                 const search = urlParams.get('search') || '';
                 const subcategory = urlParams.get('subcategory') || '';
+                const postType = urlParams.get('post_type') || '';
 
                 // Build API URL with all parameters
                 let apiUrl = `${endpoint}?page=${page}&offset=14&sort=${sort}`;
@@ -454,6 +535,9 @@
                 }
                 if (subcategory) {
                     apiUrl += `&subcategory=${encodeURIComponent(subcategory)}`;
+                }
+                if (postType) {
+                    apiUrl += `&post_type=${encodeURIComponent(postType)}`;
                 }
 
                 // Fetch more posts
