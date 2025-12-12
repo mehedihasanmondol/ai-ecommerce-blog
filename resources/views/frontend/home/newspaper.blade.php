@@ -308,13 +308,13 @@
                         @endif
                     </div>
 
-                    {{-- 3-Column News Grid (Posts 4, 5, 6) --}}
+                    {{-- 3-Column News Grid (Posts 4, 5, 6,) --}}
                     @if($section['posts']->count() > 3)
-                    <div class="grid md:grid-cols-2 gap-6 p-4 border-t border-gray-200">
+                    <div class="grid md:grid-cols-2 sm:grid-cols-1 gap-6 p-4 border-t border-gray-200">
                         @foreach($section['posts']->skip(3)->take(4) as $post)
 
                         <article class="bg-white overflow-hidden group ">
-                            <div class="grid md:grid-cols-2 gap-6 ">
+                            <div class="grid md:grid-cols-2 grid-cols-2 gap-6 ">
 
                                 {{-- Image --}}
                                 <div class="relative overflow-hidden">

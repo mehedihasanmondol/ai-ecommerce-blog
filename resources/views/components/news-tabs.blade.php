@@ -20,7 +20,7 @@
     {{-- Tab Content Container with Fixed Height and Scroll --}}
     <div class="relative">
         {{-- Latest News Tab --}}
-        <div id="news-content-latest" class="news-tab-content overflow-y-auto" style="max-height: 400px;">
+        <div id="news-content-latest" class="news-tab-content overflow-y-auto" style="max-height: 300px;">
             <div class="p-4 space-y-4">
                 @foreach($latestPosts as $index => $post)
                 <article class="group flex gap-3">
@@ -48,7 +48,7 @@
         </div>
 
         {{-- Popular News Tab --}}
-        <div id="news-content-popular" class="news-tab-content overflow-y-auto hidden" style="max-height: 400px;">
+        <div id="news-content-popular" class="news-tab-content overflow-y-auto hidden" style="max-height: 300px;">
             <div class="p-4 space-y-4">
                 @foreach($popularPosts as $index => $post)
                 <article class="flex gap-3 group">
