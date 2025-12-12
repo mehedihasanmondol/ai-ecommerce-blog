@@ -71,6 +71,18 @@ A feature-rich, modular ecommerce and blog platform designed for scalability, pe
 - ✅ **SEO Optimization** - Meta tags, structured data, sitemaps
 - ✅ **WordPress Migration** - One-click migration from WordPress/WooCommerce
 
+### 📰 **Advertisement System**
+- ✅ **Campaign Management** - Create, schedule, and manage ad campaigns
+- ✅ **Multiple Ad Types** - Image, Video, GIF, HTML, and Script ads
+- ✅ **Smart Targeting** - Category-based and slot-based targeting
+- ✅ **Ad Slots** - Predefined slots (header, sidebar, inline, native, popup)
+- ✅ **Performance Tracking** - Impressions, clicks, and CTR analytics
+- ✅ **Priority System** - Weighted ad rotation based on campaign priority
+- ✅ **Frequency Control** - Impression/click limits per campaign
+- ✅ **Lazy Loading** - Optimized ad loading for better performance
+- ✅ **Blade Components** - Easy integration with `<x-advertisement.ad-banner />`
+- ✅ **Newspaper Integration** - Ads display on newspaper homepage and article pages
+
 ### 🎨 **Frontend Features**
 - ✅ **Dynamic Theme System** - 6 pre-built themes, admin-customizable
 - ✅ **Responsive Design** - Mobile-first, tablet, desktop optimized
