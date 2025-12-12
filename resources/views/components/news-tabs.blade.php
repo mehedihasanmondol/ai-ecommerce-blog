@@ -46,7 +46,7 @@
                 @endforeach
 
                 {{-- Read More Button --}}
-                <a href="{{ url('/blog/latest-news') }}"
+                <a href="{{ url('/latest-news') }}"
                     class="inline-flex items-center gap-2 px-6 py-2.5 font-bold text-red-600 hover:text-red-700 transition-colors">
                     <span>আরও পড়ুন</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@
                 @endforeach
 
                 {{-- Read More Button --}}
-                <a href="{{ url('/blog/latest-news') }}"
+                <a href="{{ url('/popular-news') }}"
                     class="inline-flex items-center gap-2 px-6 py-2.5 font-bold text-red-600 hover:text-red-700 transition-colors ">
                     <span>আরও পড়ুন</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

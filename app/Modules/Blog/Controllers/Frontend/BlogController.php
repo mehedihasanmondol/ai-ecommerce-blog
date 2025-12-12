@@ -231,6 +231,95 @@ class BlogController extends Controller
         ));
     }
 
+    public function popularNews(Request $request)
+    {
+        // Build breadcrumbs
+        $breadcrumbs = [
+            ['name' => 'জনপ্রিয', 'url' => route('blog.popular-news')]
+        ];
+
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'popular');
+        // For newspaper layout, we display 6 main + 8 remaining = 14 initially
+        $initialLimit = 30; // Fetch 30 posts initially (6 main + 8 remaining + 16 for load more)
+
+        // Build query for all published posts
+        $query = Post::where('status', 'published')
+            ->where('published_at', '<=', now());
+
+        // Apply search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('published_at', 'desc');
+                break;
+            default:
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
+                break;
+        }
+
+        // Get total count before limiting
+        $totalPosts = $query->count();
+
+        // Get initial posts (not paginated for newspaper layout)
+        $posts = $query->with(['author', 'categories', 'tags', 'tickMarks', 'media'])
+            ->limit($initialLimit)
+            ->get();
+
+        // Get latest posts for sidebar
+        $latestPosts = Post::where('status', 'published')
+            ->latest('published_at')
+            ->limit(10)
+            ->get();
+
+        // Get popular posts for sidebar
+        $popularPosts = Post::where('status', 'published')
+            ->orderBy('views_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Prepare SEO data
+        $blogTitle = SiteSetting::get('blog_title', 'Blog');
+        $blogTagline = SiteSetting::get('blog_tagline', '');
+        $blogImage = SiteSetting::get('blog_image');
+
+        $seoData = [
+            'title' => $blogTagline ? $blogTitle . ' | ' . $blogTagline : $blogTitle,
+            'description' => SiteSetting::get('blog_description', 'Discover the latest articles and tips'),
+            'keywords' => SiteSetting::get('blog_keywords', 'blog, articles, tips'),
+            'og_image' => $blogImage ? asset('storage/' . $blogImage) : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => route('blog.popular-news'),
+        ];
+
+        $currentUrl = route('blog.popular-news');
+
+        return view('frontend.blog.popular-news', compact(
+            'posts',
+            'totalPosts',
+            'latestPosts',
+            'popularPosts',
+            'breadcrumbs',
+            'currentUrl',
+            'seoData'
+        ));
+    }
+
     /**
      * Single post page
      */
