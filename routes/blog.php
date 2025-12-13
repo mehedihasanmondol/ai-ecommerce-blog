@@ -170,6 +170,7 @@ Route::get('/author/{slug}', [BlogController::class, 'author'])->name('blog.auth
 
 // API Routes for AJAX load more
 Route::get('/api/latest/posts', [BlogController::class, 'latestPostsApi'])->name('api.latest.posts');
+Route::get('/api/video-gallery/posts', [BlogController::class, 'videoGalleryPostsApi'])->name('api.video-gallery.posts');
 Route::get('/api/category/{slug}/posts', [BlogController::class, 'categoryPostsApi'])->name('api.category.posts');
 
 // ============================================

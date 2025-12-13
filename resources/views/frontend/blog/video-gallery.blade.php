@@ -19,7 +19,7 @@
     :breadcrumbs="$breadcrumbs"
     :currentUrl="$currentUrl"
     pageTitle="ভিডিও গ্যালারি"
-    loadMoreEndpoint="{{ route('api.category.posts', ['slug' => 'video-gallery']) }}?post_type=video"
+    loadMoreEndpoint="{{ route('api.video-gallery.posts') }}"
     :latestPosts="$latestPosts"
     :popularPosts="$popularPosts"
     :showVideoThumbnails="true" />

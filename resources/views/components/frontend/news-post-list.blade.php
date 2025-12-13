@@ -547,15 +547,32 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.posts && data.posts.length > 0) {
+                            // Check if we should show video thumbnails
+                            const showVideoThumbnails = @json($showVideoThumbnails);
+
                             // Append new posts
                             data.posts.forEach(post => {
+                                // Determine if post should show video embed
+                                const shouldShowVideo = showVideoThumbnails && post.youtube_url;
+
                                 const postHtml = `
                                         <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
                                             <div class="col-span-1">
                                                 <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
-                                                    ${post.media_url ? 
-                                                        `<img src="${post.media_url}" alt="${post.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` :
-                                                        `<div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">ছবি নেই</span></div>`
+                                                    ${shouldShowVideo ? 
+                                                        `<iframe
+                                                            class="absolute inset-0 w-full h-full rounded"
+                                                            src="${post.youtube_url}"
+                                                            title="${post.title}"
+                                                            frameborder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowfullscreen
+                                                            loading="lazy">
+                                                        </iframe>` :
+                                                        (post.media_url ? 
+                                                            `<img src="${post.media_url}" alt="${post.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` :
+                                                            `<div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">ছবি নেই</span></div>`
+                                                        )
                                                     }
                                                 </div>
                                             </div>

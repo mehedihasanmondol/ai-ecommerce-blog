@@ -1023,4 +1023,164 @@ class BlogController extends Controller
             'currentCount' => $skip + $posts->count(),
         ]);
     }
+
+    /**
+     * API endpoint for loading more latest posts
+     */
+    public function latestPostsApi(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $offset = $request->input('offset', 14);
+        $perPage = 8;
+
+        // Calculate skip amount (same pattern as categoryPostsApi)
+        // Page 2 (first load more) should skip only offset (14 posts already shown)
+        // Page 3 (second load more) should skip offset + 8 (22 posts)
+        // Formula: offset + ((page - 2) * perPage)
+        $skip = $offset + (($page - 2) * $perPage);
+
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+
+        // Build query for all published posts
+        $query = Post::where('status', 'published')
+            ->where('published_at', '<=', now());
+
+        // Apply search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('published_at', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
+                break;
+        }
+
+        // Get total count BEFORE skip/take to check if there are more posts
+        $totalCount = $query->count();
+
+        // Get posts
+        $posts = $query->with(['media'])
+            ->skip($skip)
+            ->take($perPage)
+            ->get();
+
+        // Check if there are more posts after this batch
+        $hasMore = ($skip + $perPage) < $totalCount;
+
+        // Format posts for JSON (same format as categoryPostsApi)
+        $formattedPosts = $posts->map(function ($post) {
+            return [
+                'slug' => $post->slug,
+                'title' => $post->title,
+                'excerpt' => \Illuminate\Support\Str::limit($post->excerpt, 120),
+                'media_url' => $post->media ? $post->media->medium_url : null,
+                'date_bangla' => bengali_date($post->published_at, 'short'),
+            ];
+        });
+
+        return response()->json([
+            'posts' => $formattedPosts,
+            'hasMore' => $hasMore,
+            'total' => $totalCount,
+            'currentCount' => $skip + $posts->count(),
+        ]);
+    }
+
+    /**
+     * API endpoint for loading more video gallery posts
+     */
+    public function videoGalleryPostsApi(Request $request)
+    {
+        $page = $request->input('page', 1);
+        $offset = $request->input('offset', 14);
+        $perPage = 8;
+
+        // Calculate skip amount (same pattern as other APIs)
+        $skip = $offset + (($page - 2) * $perPage);
+
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+
+        // Build query for video posts only
+        $query = Post::where('status', 'published')
+            ->where('published_at', '<=', now())
+            ->whereNotNull('youtube_url')
+            ->where('youtube_url', '!=', '');
+
+        // Apply search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('published_at', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
+                break;
+        }
+
+        // Get total count BEFORE skip/take
+        $totalCount = $query->count();
+
+        // Get posts
+        $posts = $query->with(['media'])
+            ->skip($skip)
+            ->take($perPage)
+            ->get();
+
+        // Check if there are more posts
+        $hasMore = ($skip + $perPage) < $totalCount;
+
+        // Format posts for JSON
+        $formattedPosts = $posts->map(function ($post) {
+            return [
+                'slug' => $post->slug,
+                'title' => $post->title,
+                'excerpt' => \Illuminate\Support\Str::limit($post->excerpt, 120),
+                'media_url' => $post->media ? $post->media->medium_url : null,
+                'date_bangla' => bengali_date($post->published_at, 'short'),
+                'youtube_url' => $post->youtube_embed_url,
+            ];
+        });
+
+        return response()->json([
+            'posts' => $formattedPosts,
+            'hasMore' => $hasMore,
+            'total' => $totalCount,
+            'currentCount' => $skip + $posts->count(),
+        ]);
+    }
 }
