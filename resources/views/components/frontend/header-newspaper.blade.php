@@ -103,7 +103,7 @@
                     x-transition:leave-end="opacity-0 -translate-x-4" class="mr-2 md:mr-4 flex-shrink-0" style="display: none;">
                     @if($siteLogo = \App\Models\SiteSetting::get('site_logo'))
                     <a href="{{ route('home') }}"
-                        class="flex items-center bg-white px-2 py-1 md:px-3 md:py-2 -my-1 rounded-md shadow-sm hover:shadow-md transition">
+                        class="flex items-center bg-white px-2 py-1 md:px-3 md:py-2 -my-1  shadow-sm hover:shadow-md transition">
                         <img src="{{ asset('storage/' . $siteLogo) }}"
                             alt="{{ \App\Models\SiteSetting::get('site_name', config('app.name')) }}"
                             class="h-8 md:h-10 object-contain">
