@@ -483,13 +483,13 @@
                 @endif
             </div>
 
-            {{-- Right Sidebar (3 columns) --}}
-            <aside class="lg:col-span-3">
-                <div class="bg-white shadow-md p-6 text-center">
-                    <p class="text-gray-500 text-lg font-semibold">শীঘ্রই আসছে</p>
-                    <p class="text-gray-400 text-sm mt-2">Coming Soon</p>
-                </div>
-            </aside>
+            {{-- Advertisement --}}
+            <div class="lg:col-span-3">
+                <x-advertisement.ad-banner
+                    slot-slug="sidebar-middle"
+                    :category-id="$category?->id ?? null" />
+
+            </div>
         </div>
     </div>
     @endif
