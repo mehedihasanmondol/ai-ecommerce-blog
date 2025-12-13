@@ -10,11 +10,11 @@
 
     <!-- Favicon -->
     @php
-        $favicon = \App\Models\SiteSetting::get('site_favicon');
+    $favicon = \App\Models\SiteSetting::get('site_favicon');
     @endphp
     @if($favicon)
-        <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
-        <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
     @endif
 
     <!-- SEO Meta Tags -->
@@ -52,16 +52,16 @@
 
     <!-- Search Engine Verification -->
     @if(\App\Models\SiteSetting::get('google_verification'))
-        <meta name="google-site-verification" content="{{ \App\Models\SiteSetting::get('google_verification') }}">
+    <meta name="google-site-verification" content="{{ \App\Models\SiteSetting::get('google_verification') }}">
     @endif
     @if(\App\Models\SiteSetting::get('bing_verification'))
-        <meta name="msvalidate.01" content="{{ \App\Models\SiteSetting::get('bing_verification') }}">
+    <meta name="msvalidate.01" content="{{ \App\Models\SiteSetting::get('bing_verification') }}">
     @endif
     @if(\App\Models\SiteSetting::get('yandex_verification'))
-        <meta name="yandex-verification" content="{{ \App\Models\SiteSetting::get('yandex_verification') }}">
+    <meta name="yandex-verification" content="{{ \App\Models\SiteSetting::get('yandex_verification') }}">
     @endif
     @if(\App\Models\SiteSetting::get('pinterest_verification'))
-        <meta name="p:domain_verify" content="{{ \App\Models\SiteSetting::get('pinterest_verification') }}">
+    <meta name="p:domain_verify" content="{{ \App\Models\SiteSetting::get('pinterest_verification') }}">
     @endif
 
     <!-- Fonts -->
@@ -75,6 +75,14 @@
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <!-- Dynamic Typography CSS Variables -->
+    @php
+    echo '<style>
+        ' . \App\Models\SiteSetting::getTypographyCssVariables() . '
+    </style>';
+    @endphp
+
     @livewireStyles
 
     @stack('styles')
@@ -86,7 +94,7 @@
 
     <!-- Header -->
     @php
-        $headerType = \App\Models\SiteSetting::get('frontend_header_type', 'default');
+    $headerType = \App\Models\SiteSetting::get('frontend_header_type', 'default');
     @endphp
     <x-dynamic-component :component="'frontend.header-' . $headerType" />
 
@@ -97,7 +105,7 @@
 
     <!-- Footer -->
     @php
-        $footerType = \App\Models\SiteSetting::get('frontend_footer_type', 'default');
+    $footerType = \App\Models\SiteSetting::get('frontend_footer_type', 'default');
     @endphp
     <x-dynamic-component :component="'frontend.footer-' . $footerType" />
 
@@ -179,14 +187,20 @@
             const scrollAmount = 220; // Card width + gap
 
             if (direction === 'left') {
-                carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                carousel.scrollBy({
+                    left: -scrollAmount,
+                    behavior: 'smooth'
+                });
             } else {
-                carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                carousel.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
             }
         }
 
         // Hide scrollbar for webkit browsers
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const style = document.createElement('style');
             style.textContent = `
                 .scrollbar-hide::-webkit-scrollbar {
@@ -198,14 +212,14 @@
 
         // Refresh CSRF token periodically to prevent Livewire session expiry warnings
         // Refresh every 2 hours (before the 12-hour session expires)
-        setInterval(function () {
+        setInterval(function() {
             fetch('/refresh-csrf', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.token) {

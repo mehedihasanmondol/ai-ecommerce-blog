@@ -107,7 +107,7 @@ class SiteSetting extends Model
     public static function set(string $key, $value): bool
     {
         $setting = self::where('key', $key)->first();
-        
+
         if ($setting) {
             $setting->value = $value;
             return $setting->save();
@@ -138,7 +138,7 @@ class SiteSetting extends Model
             if (filter_var($this->value, FILTER_VALIDATE_URL)) {
                 return $this->value;
             }
-            
+
             // Return storage URL
             return Storage::url($this->value);
         }
@@ -158,5 +158,16 @@ class SiteSetting extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Get typography CSS variables
+     * 
+     * @return string
+     */
+    public static function getTypographyCssVariables(): string
+    {
+        $service = app(\App\Services\TypographyService::class);
+        return $service->generateCssVariables();
     }
 }

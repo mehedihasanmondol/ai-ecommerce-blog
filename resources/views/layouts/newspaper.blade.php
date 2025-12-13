@@ -26,6 +26,13 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Dynamic Typography CSS Variables -->
+    @php
+    echo '<style>
+        ' . \App\Models\SiteSetting::getTypographyCssVariables() . '
+    </style>';
+    @endphp
+
     <style>
         [x-cloak] {
             display: none !important;

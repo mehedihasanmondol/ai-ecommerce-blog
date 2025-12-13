@@ -321,12 +321,7 @@
                             </button>
                         </li>
 
-                        <li class="hidden md:block relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
-                            <a href="#"
-                                class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
-                                ই-পেপার
-                            </a>
-                        </li>
+
 
                         {{-- All Categories Menu (Always visible) --}}
                         <li class="relative static flex-shrink-0 md:ml-auto" x-bind="interactionMode === 'hover' ? {

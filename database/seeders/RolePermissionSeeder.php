@@ -222,6 +222,7 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Manage Site Homepage Settings', 'slug' => 'site-settings-homepage.manage', 'module' => 'content'],
             ['name' => 'Manage Site Product Features Settings', 'slug' => 'site-settings-product_features.manage', 'module' => 'content'],
             ['name' => 'Manage Site Stock Settings', 'slug' => 'site-settings-stock.manage', 'module' => 'content'],
+            ['name' => 'Manage Site Typography Settings', 'slug' => 'site-settings-typography.manage', 'module' => 'content'],
             ['name' => 'Manage Site Frontend Layout Settings', 'slug' => 'site-settings-frontend_layout.manage', 'module' => 'content'],
 
             ['name' => 'View Promotional Banners', 'slug' => 'banners.view', 'module' => 'content'],

@@ -37,7 +37,8 @@ class SiteSettingController extends Controller
             auth()->user()->hasPermission('site-settings-appointment.manage') ||
             auth()->user()->hasPermission('site-settings-homepage.manage') ||
             auth()->user()->hasPermission('site-settings-product_features.manage') ||
-            auth()->user()->hasPermission('site-settings-stock.manage');
+            auth()->user()->hasPermission('site-settings-stock.manage') ||
+            auth()->user()->hasPermission('site-settings-typography.manage');
 
         abort_if(!$hasAccess, 403, 'You do not have permission to access site settings.');
 
@@ -70,10 +71,30 @@ class SiteSettingController extends Controller
             'settings.*' => 'nullable',
         ]);
 
+        $typographyService = app(\App\Services\TypographyService::class);
+
         foreach ($validated['settings'] as $key => $value) {
             $setting = SiteSetting::where('key', $key)->first();
 
             if ($setting) {
+                // Validate typography multipliers
+                if (in_array($key, ['typography_base_multiplier', 'typography_heading_multiplier', 'typography_small_multiplier'])) {
+                    if (!$typographyService->validateMultiplier($value)) {
+                        return redirect()->back()
+                            ->withErrors([$key => 'Multiplier must be between 50 and 200'])
+                            ->withInput();
+                    }
+                }
+
+                // Validate line height adjustment
+                if ($key === 'typography_line_height_adjustment') {
+                    if (!$typographyService->validateLineHeightAdjustment($value)) {
+                        return redirect()->back()
+                            ->withErrors([$key => 'Line height adjustment must be between -5 and 10'])
+                            ->withInput();
+                    }
+                }
+
                 // Handle image uploads with WebP compression
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
                     // Delete old image
@@ -122,12 +143,44 @@ class SiteSettingController extends Controller
             'settings.*' => 'nullable',
         ]);
 
+        $typographyService = app(\App\Services\TypographyService::class);
+
         foreach ($validated['settings'] as $key => $value) {
             $setting = SiteSetting::where('key', $key)
                 ->where('group', $group)
                 ->first();
 
             if ($setting) {
+                // Validate typography multipliers
+                if (in_array($key, ['typography_base_multiplier', 'typography_heading_multiplier', 'typography_small_multiplier'])) {
+                    if (!$typographyService->validateMultiplier($value)) {
+                        if ($request->expectsJson()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Multiplier must be between 50 and 200'
+                            ], 422);
+                        }
+                        return redirect()->back()
+                            ->withErrors([$key => 'Multiplier must be between 50 and 200'])
+                            ->withInput();
+                    }
+                }
+
+                // Validate line height adjustment
+                if ($key === 'typography_line_height_adjustment') {
+                    if (!$typographyService->validateLineHeightAdjustment($value)) {
+                        if ($request->expectsJson()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Line height adjustment must be between -5 and 10'
+                            ], 422);
+                        }
+                        return redirect()->back()
+                            ->withErrors([$key => 'Line height adjustment must be between -5 and 10'])
+                            ->withInput();
+                    }
+                }
+
                 // Handle image uploads with WebP compression
                 if ($setting->type === 'image' && $request->hasFile("settings.{$key}")) {
                     // Delete old image

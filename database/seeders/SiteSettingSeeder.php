@@ -800,6 +800,50 @@ class SiteSettingSeeder extends Seeder
             $this->upsertSetting($setting);
         }
 
+        // Typography Settings
+        $typographySettings = [
+            [
+                'key' => 'typography_base_multiplier',
+                'value' => '100',
+                'type' => 'number',
+                'group' => 'typography',
+                'label' => 'Base Text Size (%)',
+                'description' => 'Multiplier for body text sizes (text-xs, text-sm, text-base). 100% is default, range: 50-200%',
+                'order' => 1,
+            ],
+            [
+                'key' => 'typography_heading_multiplier',
+                'value' => '100',
+                'type' => 'number',
+                'group' => 'typography',
+                'label' => 'Heading Size (%)',
+                'description' => 'Multiplier for heading sizes (text-lg, text-xl, text-2xl, etc.). 100% is default, range: 50-200%',
+                'order' => 2,
+            ],
+            [
+                'key' => 'typography_small_multiplier',
+                'value' => '100',
+                'type' => 'number',
+                'group' => 'typography',
+                'label' => 'Small Text Size (%)',
+                'description' => 'Multiplier for small text elements. 100% is default, range: 50-200%',
+                'order' => 3,
+            ],
+            [
+                'key' => 'typography_line_height_adjustment',
+                'value' => '0',
+                'type' => 'number',
+                'group' => 'typography',
+                'label' => 'Line Height Adjustment',
+                'description' => 'Adjustment to line height in pixels. 0 is default, range: -5 to 10',
+                'order' => 4,
+            ],
+        ];
+
+        foreach ($typographySettings as $setting) {
+            $this->upsertSetting($setting);
+        }
+
         // Search Engine Verification Settings
         $verificationSettings = [
             [
