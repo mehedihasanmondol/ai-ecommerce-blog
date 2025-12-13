@@ -8,6 +8,15 @@
 
     <title>@yield('title', config('app.name', 'Laravel'))</title>
 
+    <!-- Favicon -->
+    @php
+    $favicon = \App\Models\SiteSetting::get('site_favicon');
+    @endphp
+    @if($favicon)
+    <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $favicon) }}">
+    @endif
+
     @stack('meta')
 
     <!-- Fonts -->
@@ -31,13 +40,13 @@
     <div class="min-h-screen bg-white">
         {{-- Dynamic Header --}}
         @php
-            $headerType = \App\Models\SiteSetting::get('frontend_header_type', 'default');
+        $headerType = \App\Models\SiteSetting::get('frontend_header_type', 'default');
         @endphp
         <x-dynamic-component :component="'frontend.header-' . $headerType" />
 
         {{-- Headline Banner (Breaking News) --}}
         @if(isset($headlineBanner))
-            <x-blog.headline-banner :settings="$headlineBanner" />
+        <x-blog.headline-banner :settings="$headlineBanner" />
         @endif
 
         {{-- Main Content --}}
@@ -46,7 +55,7 @@
 
     {{-- Dynamic Footer --}}
     @php
-        $footerType = \App\Models\SiteSetting::get('frontend_footer_type', 'default');
+    $footerType = \App\Models\SiteSetting::get('frontend_footer_type', 'default');
     @endphp
     <x-dynamic-component :component="'frontend.footer-' . $footerType" />
 
