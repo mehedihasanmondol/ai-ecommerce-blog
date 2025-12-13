@@ -90,17 +90,19 @@
                                 <article class="flex gap-4 p-4 hover:bg-white transition-colors group">
                                     {{-- Thumbnail --}}
                                     <div class="flex-shrink-0">
-                                        <div class="w-28 h-20 overflow-hidden">
-                                            @if($story->media)
-                                            <img src="{{ $story->media->small_url }}"
-                                                alt="{{ $story->title }}"
-                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                            @else
-                                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                                <span class="text-gray-400 text-xs">ছবি নেই</span>
+                                        <a href="{{ url('/' . $story->slug) }}" class="block">
+                                            <div class="w-28 h-20 overflow-hidden">
+                                                @if($story->media)
+                                                <img src="{{ $story->media->small_url }}"
+                                                    alt="{{ $story->title }}"
+                                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                                @else
+                                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                    <span class="text-gray-400 text-xs">ছবি নেই</span>
+                                                </div>
+                                                @endif
                                             </div>
-                                            @endif
-                                        </div>
+                                        </a>
                                     </div>
 
                                     {{-- Content --}}

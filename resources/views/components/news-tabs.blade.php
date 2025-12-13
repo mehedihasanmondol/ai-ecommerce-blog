@@ -23,23 +23,23 @@
         <div id="news-content-latest" class="news-tab-content overflow-y-auto" style="max-height: 300px;">
             <div class="p-4 space-y-4">
                 @foreach($latestPosts as $index => $post)
-                <article class="group flex gap-3">
-                    <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-700 font-bold rounded text-base">
-                            {{ bengali_number($index + 1) }}
-                        </span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-sm mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            <a href="{{ url('/' . $post->slug) }}">
-                                {{ $post->title }}
-                            </a>
-                        </h4>
-                        <div class="text-xs text-gray-500">
-                            {{ bengali_date($post->published_at, 'short_time') }}
+                <a href="{{ url('/' . $post->slug) }}" class="block">
+                    <article class="group flex gap-3 hover:bg-gray-50 transition-colors p-2 -mx-2 rounded">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-700 font-bold rounded text-base">
+                                {{ bengali_number($index + 1) }}
+                            </span>
                         </div>
-                    </div>
-                </article>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                {{ $post->title }}
+                            </h4>
+                            <div class="text-xs text-gray-500">
+                                {{ bengali_date($post->published_at, 'short_time') }}
+                            </div>
+                        </div>
+                    </article>
+                </a>
                 @if(!$loop->last)
                 <hr class="border-gray-200">
                 @endif
@@ -60,29 +60,29 @@
         <div id="news-content-popular" class="news-tab-content overflow-y-auto hidden" style="max-height: 300px;">
             <div class="p-4 space-y-4">
                 @foreach($popularPosts as $index => $post)
-                <article class="flex gap-3 group">
-                    <div class="flex-shrink-0">
-                        <span class="inline-flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-600 font-bold rounded text-base">
-                            {{ bengali_number($index + 1) }}
-                        </span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-sm mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                            <a href="{{ url('/' . $post->slug) }}">
-                                {{ $post->title }}
-                            </a>
-                        </h4>
-                        <div class="text-xs text-gray-500">
-                            <span class="flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                {{ bengali_number(number_format($post->views_count)) }} বার পঠিত
+                <a href="{{ url('/' . $post->slug) }}" class="block">
+                    <article class="flex gap-3 group hover:bg-gray-50 transition-colors p-2 -mx-2 rounded">
+                        <div class="flex-shrink-0">
+                            <span class="inline-flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-600 font-bold rounded text-base">
+                                {{ bengali_number($index + 1) }}
                             </span>
                         </div>
-                    </div>
-                </article>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                {{ $post->title }}
+                            </h4>
+                            <div class="text-xs text-gray-500">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    {{ bengali_number(number_format($post->views_count)) }} বার পঠিত
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                </a>
                 @if(!$loop->last)
                 <hr class="border-gray-200">
                 @endif
