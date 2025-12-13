@@ -460,4 +460,40 @@ class HomeController extends Controller
     {
         return view('frontend.pages.contact');
     }
+
+    /**
+     * Load a single category section for lazy loading
+     *
+     * @param int $categoryId
+     * @return \Illuminate\Http\Response
+     */
+    public function loadCategorySection($categoryId)
+    {
+        // Find blog category with published posts
+        $category = \App\Modules\Blog\Models\BlogCategory::with(['posts' => function ($query) {
+            $query->where('status', 'published')
+                ->with(['author', 'categories', 'media'])
+                ->latest('published_at')
+                ->limit(7); // 1 main + 2 side + 4 grid posts
+        }])->findOrFail($categoryId);
+
+        // Get latest video post for this category
+        $latestVideo = \App\Modules\Blog\Models\Post::where('status', 'published')
+            ->whereHas('categories', function ($q) use ($categoryId) {
+                $q->where('blog_categories.id', $categoryId);
+            })
+            ->whereNotNull('youtube_url')
+            ->where('youtube_url', '!=', '')
+            ->latest('published_at')
+            ->first();
+
+        $section = [
+            'category' => $category,
+            'posts' => $category->posts,
+            'latestVideo' => $latestVideo
+        ];
+
+        // Return HTML partial
+        return view('frontend.home.partials.category-section', compact('section'))->render();
+    }
 }

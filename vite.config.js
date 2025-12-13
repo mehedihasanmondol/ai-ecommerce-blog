@@ -21,7 +21,8 @@ export default defineConfig({
                 'resources/js/blog-post-editor.js',  // Blog post editor
                 'resources/js/product-editor.js',  // Product editor
                 'resources/js/footer-settings-editor.js',  // Footer settings editor
-                'resources/js/site-settings-editor.js'  // Site settings editor
+                'resources/js/site-settings-editor.js',  // Site settings editor
+                'resources/js/lazy-category-loader.js',  // Lazy category loader
             ],
             refresh: true,
         }),
