@@ -884,6 +884,83 @@ php artisan db:seed --class=RolePermissionSeeder
 
 ---
 
+## 📰 Advertisement System
+
+A comprehensive advertisement management system for displaying targeted ads across your newspaper and blog pages with advanced tracking and analytics.
+
+### **Quick Start**
+
+```bash
+# 1. Seed ad slots
+php artisan db:seed --class=AdSlotSeeder
+
+# 2. Access admin panel
+# Navigate to: /admin/advertisements/campaigns
+
+# 3. Create your first campaign and add creatives
+```
+
+### **Features**
+
+- ✅ **Campaign Management** - Schedule, prioritize, and manage ad campaigns
+- ✅ **Multiple Ad Types** - Image, Video, GIF, HTML, Script
+- ✅ **Smart Targeting** - Category and slot-based targeting
+- ✅ **Performance Analytics** - Track impressions, clicks, CTR
+- ✅ **Priority System** - Weighted rotation (1-10 priority)
+- ✅ **Frequency Control** - Set impression/click limits
+- ✅ **Lazy Loading** - Optimized performance
+- ✅ **Easy Integration** - Simple Blade components
+
+### **Usage Examples**
+
+```blade
+<!-- Header Banner -->
+<x-advertisement.ad-banner slot-slug="header-banner" />
+
+<!-- Sidebar with Category Targeting -->
+<x-advertisement.ad-banner slot-slug="sidebar-top" :categoryId="$category->id" />
+
+<!-- Inline Content Ad -->
+<x-advertisement.ad-inline slot-slug="content-middle" />
+
+<!-- Native Feed Ad -->
+<x-advertisement.ad-native slot-slug="native-feed" :categoryId="$category->id" />
+
+<!-- Popup Ad -->
+<x-advertisement.ad-popup />
+```
+
+### **Available Ad Slots**
+
+| Slot | Size | Location |
+|------|------|----------|
+| `header-banner` | 728×90 | Top of page |
+| `sidebar-top` | 300×250 | Right sidebar |
+| `sidebar-middle` | 300×600 | Right sidebar |
+| `content-middle` | 728×90 | Within content |
+| `native-feed` | Responsive | Post listings |
+| `popup-interstitial` | Variable | Popup overlay |
+
+### **Targeting Options**
+
+**Universal Ads** (show everywhere):
+- Leave "Target Categories" empty
+- Displays on all pages
+
+**Category-Specific Ads**:
+- Select specific categories
+- Only shows on those category pages
+
+### **Admin Panel**
+
+- **Campaigns**: `/admin/advertisements/campaigns`
+- **Ad Slots**: `/admin/advertisements/slots`
+- **Analytics**: `/admin/advertisements/analytics`
+
+**Documentation**: `development-docs/ADVERTISEMENT_SYSTEM.md`
+
+---
+
 ## 🗄️ Database Schema
 
 ### **Core Tables**
