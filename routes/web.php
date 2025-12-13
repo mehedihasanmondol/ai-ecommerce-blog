@@ -348,6 +348,7 @@ Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerz
 
 // API Routes for AJAX
 Route::get('/api/category/{slug}/posts', [\App\Modules\Blog\Controllers\Frontend\BlogController::class, 'categoryPostsApi'])->name('api.category.posts');
+Route::get('/api/advertisement/render', [\App\Http\Controllers\Api\AdvertisementApiController::class, 'renderAd'])->name('api.advertisement.render');
 
 
 // Public Product and Blog Post Routes (must be last to avoid conflicts)

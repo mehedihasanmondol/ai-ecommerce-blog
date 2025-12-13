@@ -16,7 +16,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register ContentAdInjector as singleton
+        $this->app->singleton(\App\Services\ContentAdInjector::class, function ($app) {
+            return new \App\Services\ContentAdInjector();
+        });
     }
 
     /**

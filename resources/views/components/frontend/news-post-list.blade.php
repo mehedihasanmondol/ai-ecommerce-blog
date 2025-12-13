@@ -208,6 +208,7 @@
             </a>
         </div>
     </div>
+    @endif
 
     {{-- Category Header Advertisement --}}
     <div class="py-4">

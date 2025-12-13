@@ -96,3 +96,64 @@ $adTrackingService->trackImpression($campaign, $creative, $adSlot);
     }
 </style>
 @endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Lazy load ads using Intersection Observer
+        const lazyAds = document.querySelectorAll('.ad-container[data-lazy-load="true"]');
+
+        if ('IntersectionObserver' in window) {
+            const adObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const adContainer = entry.target;
+
+                        // Mark as loaded to remove skeleton
+                        adContainer.classList.add('loaded');
+
+                        // Find all media elements and wait for them to load
+                        const images = adContainer.querySelectorAll('img');
+                        const videos = adContainer.querySelectorAll('video');
+                        const iframes = adContainer.querySelectorAll('iframe');
+
+                        // Handle images
+                        images.forEach(img => {
+                            if (img.complete) {
+                                adContainer.classList.add('loaded');
+                            } else {
+                                img.addEventListener('load', () => {
+                                    adContainer.classList.add('loaded');
+                                });
+                            }
+                        });
+
+                        // Handle iframes (videos)
+                        if (iframes.length > 0) {
+                            // Add loaded class after a short delay for iframes
+                            setTimeout(() => {
+                                adContainer.classList.add('loaded');
+                            }, 500);
+                        }
+
+                        // If no media elements, mark as loaded immediately
+                        if (images.length === 0 && videos.length === 0 && iframes.length === 0) {
+                            adContainer.classList.add('loaded');
+                        }
+
+                        // Stop observing this ad
+                        observer.unobserve(adContainer);
+                    }
+                });
+            }, {
+                rootMargin: '50px' // Start loading 50px before entering viewport
+            });
+
+            lazyAds.forEach(ad => adObserver.observe(ad));
+        } else {
+            // Fallback for browsers without Intersection Observer
+            lazyAds.forEach(ad => ad.classList.add('loaded'));
+        }
+    });
+</script>
+@endpush

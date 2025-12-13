@@ -210,14 +210,9 @@
 
                     <!-- Content -->
                     <div class="px-8 pb-8">
-                        <div id="article-content" class="prose prose-lg max-w-none">
+                        <div id="article-content" class="prose prose-lg max-w-none" data-category-id="{{ $post->categories->first()?->id }}">
                             {!! $post->content !!}
                         </div>
-                    </div>
-
-                    {{-- Post Content Inline Advertisement --}}
-                    <div class="px-8 py-6">
-                        <x-advertisement.ad-banner slot-slug="post-content-inline" :categoryId="$post->categories->first()?->id" />
                     </div>
 
                     <!-- Tags -->
@@ -670,7 +665,131 @@
             currentFontSize = parseInt(savedFontSize);
             applyFontSize();
         }
+
+        // Inject in-content ads
+        injectInContentAds();
     });
+
+    // Function to inject ads into content
+    function injectInContentAds() {
+        const articleContent = document.getElementById('article-content');
+        if (!articleContent) return;
+
+        const categoryId = articleContent.dataset.categoryId || '';
+
+        // Define ad slots to inject
+        const adSlots = [{
+                slug: 'content-top',
+                class: 'content-ad-top'
+            },
+            {
+                slug: 'content-middle',
+                class: 'content-ad-middle'
+            },
+            {
+                slug: 'post-content-inline',
+                class: 'content-ad-inline'
+            }
+        ];
+
+        // Find all content elements (paragraphs, lists, headings)
+        const elements = articleContent.querySelectorAll('p, ul, ol, h2, h3');
+
+        if (elements.length < 3) {
+            // Not enough content, append ads at the end
+            adSlots.forEach(ad => {
+                const adContainer = createAdContainer(ad.slug, ad.class, categoryId);
+                articleContent.appendChild(adContainer);
+            });
+            return;
+        }
+
+        // Calculate strategic positions
+        const totalElements = elements.length;
+        const positions = calculateAdPositions(totalElements, adSlots.length);
+
+        // Insert ads at calculated positions
+        positions.forEach((position, index) => {
+            if (position >= totalElements || !elements[position]) return;
+
+            const targetElement = elements[position];
+            const ad = adSlots[index];
+            const adContainer = createAdContainer(ad.slug, ad.class, categoryId);
+
+            // Insert after the target element
+            targetElement.parentNode.insertBefore(adContainer, targetElement.nextSibling);
+        });
+    }
+
+    // Calculate positions for ad insertion
+    function calculateAdPositions(totalElements, adCount) {
+        const positions = [];
+
+        if (adCount === 1) {
+            // Single ad: middle
+            positions.push(Math.floor(totalElements / 2));
+        } else if (adCount === 2) {
+            // Two ads: 1/3 and 2/3
+            positions.push(Math.floor(totalElements / 3));
+            positions.push(Math.floor((totalElements / 3) * 2));
+        } else {
+            // Multiple ads: evenly distributed
+            const interval = Math.floor(totalElements / (adCount + 1));
+            for (let i = 1; i <= adCount; i++) {
+                const pos = interval * i;
+                if (pos < totalElements) {
+                    positions.push(pos);
+                }
+            }
+        }
+
+        return positions;
+    }
+
+    // Create ad container with proper structure
+    function createAdContainer(slotSlug, className, categoryId) {
+        const container = document.createElement('div');
+        container.className = `in-content-ad my-6 ${className}`;
+        container.setAttribute('data-ad-slot', slotSlug);
+
+        // Create a placeholder that will be replaced by Livewire/AJAX
+        container.innerHTML = `
+            <div class="ad-container ad-banner ad-slot-${slotSlug}" style="padding: 10px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; text-align: center;">
+                <div class="ad-label" style="font-size: 10px; color: #6c757d; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+                    <span>Advertisement</span>
+                </div>
+                <div class="ad-content" style="display: flex; justify-content: center; align-items: center; max-width: 100%; overflow: hidden; min-height: 90px;">
+                    <div class="ad-loading" style="color: #999;">Loading ad...</div>
+                </div>
+            </div>
+        `;
+
+        // Load the actual ad via AJAX
+        loadAdContent(container, slotSlug, categoryId);
+
+        return container;
+    }
+
+    // Load ad content via AJAX
+    function loadAdContent(container, slotSlug, categoryId) {
+        // Create URL for ad component
+        const url = `/api/advertisement/render?slot=${slotSlug}${categoryId ? '&category=' + categoryId : ''}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                if (html && html.trim()) {
+                    container.innerHTML = html;
+                } else {
+                    // No ad available, hide container
+                    container.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.log('Ad load error:', error);
+                container.style.display = 'none';
+            });
+    }
 </script>
 
 @endsection
