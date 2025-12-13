@@ -23,10 +23,6 @@ $adTrackingService->trackImpression($campaign, $creative, $adSlot);
     data-ad-slot="{{ $adSlot->id }}"
     @if($adSlot->lazy_load) data-lazy-load="true" @endif>
 
-    <div class="ad-label">
-        <span>Advertisement</span>
-    </div>
-
     <div class="ad-content">
         {!! $adDisplayService->renderAd($creative, $adSlot) !!}
     </div>
@@ -36,21 +32,7 @@ $adTrackingService->trackImpression($campaign, $creative, $adSlot);
 @push('styles')
 <style>
     .ad-inline {
-        margin: 30px auto;
         max-width: 728px;
-        padding: 15px;
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-    .ad-inline .ad-label {
-        font-size: 10px;
-        color: #999;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-        text-align: center;
     }
 
     .ad-inline .ad-content {
