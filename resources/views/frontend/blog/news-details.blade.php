@@ -173,7 +173,12 @@
 
                     </div>
 
-                    <!-- Featured Image -->
+                    {{-- Post Header Advertisement --}}
+                    <div class="px-4 py-3">
+                        <x-advertisement.ad-banner slot-slug="post-header" :categoryId="$post->categories->first()?->id" />
+                    </div>
+
+                    <!--  Featured Image -->
                     @if($post->media || $post->featured_image)
                     <div class="pb-4">
                         @if($post->media)
@@ -208,6 +213,11 @@
                         <div id="article-content" class="prose prose-lg max-w-none">
                             {!! $post->content !!}
                         </div>
+                    </div>
+
+                    {{-- Post Content Inline Advertisement --}}
+                    <div class="px-8 py-6">
+                        <x-advertisement.ad-banner slot-slug="post-content-inline" :categoryId="$post->categories->first()?->id" />
                     </div>
 
                     <!-- Tags -->
@@ -436,6 +446,11 @@
                 {{-- Sidebar Advertisement --}}
                 <x-advertisement.ad-banner slot-slug="sidebar-top" :categoryId="$post->categories->first()?->id" />
 
+                {{-- Sidebar Sticky Advertisement --}}
+                <div class="sticky top-20">
+                    <x-advertisement.ad-banner slot-slug="post-sidebar-sticky" :categoryId="$post->categories->first()?->id" />
+                </div>
+
                 <!-- Latest News Widget -->
                 @if(isset($latestPosts) && $latestPosts->count() > 0)
                 <div class="bg-white shadow-sm border border-gray-100 ">
@@ -529,7 +544,12 @@
 
         </div>
 
-        <!-- Related Posts -->
+        {{-- Post Related Section Advertisement --}}
+        <div class="py-6">
+            <x-advertisement.ad-banner slot-slug="post-related-section" :categoryId="$post->categories->first()?->id" />
+        </div>
+
+        {{-- Related Posts --}}
         @if($relatedPosts->count() > 0)
         <div class=" mt-8 p-8">
             <h2 class="text-2xl font-bold text-gray-900 mb-6"> আরো পড়ুন </h2>

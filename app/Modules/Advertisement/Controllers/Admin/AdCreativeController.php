@@ -21,10 +21,41 @@ class AdCreativeController extends Controller
 {
     /**
      * Display creatives for a campaign
+     * Returns JSON if requested via AJAX, otherwise returns view
      */
     public function index(AdCampaign $campaign)
     {
-        $campaign->load('creatives');
+        $campaign->load(['creatives.slots', 'creatives.categories']);
+
+        // Return JSON for AJAX requests
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'creatives' => $campaign->creatives->map(function ($creative) {
+                    return [
+                        'id' => $creative->id,
+                        'name' => $creative->name,
+                        'type' => $creative->type,
+                        'content' => $creative->content,
+                        'image_path' => $creative->image_path,
+                        'image_url' => $creative->image_path ? asset('storage/' . $creative->image_path) : null,
+                        'video_url' => $creative->video_url,
+                        'video_type' => $creative->video_type,
+                        'link_url' => $creative->link_url,
+                        'link_target' => $creative->link_target,
+                        'width' => $creative->width,
+                        'height' => $creative->height,
+                        'alt_text' => $creative->alt_text,
+                        'is_active' => $creative->is_active,
+                        'sort_order' => $creative->sort_order,
+                        'slots' => $creative->slots->pluck('id'),
+                        'categories' => $creative->categories->pluck('id'),
+                    ];
+                }),
+            ]);
+        }
+
+        // Return view for regular requests
         return view('admin.advertisements.creatives.index', compact('campaign'));
     }
 
@@ -118,6 +149,10 @@ class AdCreativeController extends Controller
             'alt_text' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'sort_order' => 'nullable|integer|min:0',
+            'slot_ids' => 'nullable|array',
+            'slot_ids.*' => 'exists:ad_slots,id',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:blog_categories,id',
         ]);
 
         try {
@@ -131,6 +166,16 @@ class AdCreativeController extends Controller
             }
 
             $creative->update($validated);
+
+            // Sync ad slots (creative-level targeting)
+            if (isset($validated['slot_ids'])) {
+                $creative->slots()->sync($validated['slot_ids']);
+            }
+
+            // Sync categories (creative-level targeting)
+            if (isset($validated['category_ids'])) {
+                $creative->categories()->sync($validated['category_ids']);
+            }
 
             return response()->json([
                 'success' => true,
@@ -192,6 +237,33 @@ class AdCreativeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to upload image: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Update sort order for creatives (drag-and-drop)
+     */
+    public function updateSortOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'creative_ids' => 'required|array',
+            'creative_ids.*' => 'exists:ad_creatives,id',
+        ]);
+
+        try {
+            foreach ($validated['creative_ids'] as $index => $creativeId) {
+                AdCreative::where('id', $creativeId)->update(['sort_order' => $index]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sort order updated successfully!',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update sort order: ' . $e->getMessage(),
             ], 500);
         }
     }

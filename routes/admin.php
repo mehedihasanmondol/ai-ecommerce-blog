@@ -515,9 +515,11 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::put('creatives/{creative}', [AdCreativeController::class, 'update'])->name('creatives.update');
         Route::delete('creatives/{creative}', [AdCreativeController::class, 'destroy'])->name('creatives.destroy');
         Route::post('creatives/upload-image', [AdCreativeController::class, 'uploadImage'])->name('creatives.upload-image');
+        Route::post('creatives/update-sort-order', [AdCreativeController::class, 'updateSortOrder'])->name('creatives.update-sort-order');
 
         // Ad Slots
         Route::get('slots', [AdSlotController::class, 'index'])->name('slots.index');
+        Route::get('slots/create', [AdSlotController::class, 'create'])->name('slots.create');
         Route::post('slots', [AdSlotController::class, 'store'])->name('slots.store');
         Route::put('slots/{slot}', [AdSlotController::class, 'update'])->name('slots.update');
         Route::delete('slots/{slot}', [AdSlotController::class, 'destroy'])->name('slots.destroy');

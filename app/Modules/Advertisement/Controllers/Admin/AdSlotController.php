@@ -26,6 +26,14 @@ class AdSlotController extends Controller
     }
 
     /**
+     * Show create form
+     */
+    public function create()
+    {
+        return view('admin.advertisements.slots.create');
+    }
+
+    /**
      * Store new ad slot
      */
     public function store(Request $request)

@@ -179,7 +179,10 @@
         </div>
     </div>
 
-
+    {{-- Homepage Mid Content Advertisement --}}
+    <div class="container mx-auto px-4 py-6">
+        <x-advertisement.ad-banner slot-slug="homepage-mid-content" />
+    </div>
 
     <div class="container mx-auto px-4">
         {{-- Featured Category Content Grid --}}
@@ -379,10 +382,25 @@
 
             </aside>
         </div>
+
+        {{-- Category Divider Advertisement --}}
+        <div class="py-6">
+            <x-advertisement.ad-banner slot-slug="homepage-category-divider" />
+        </div>
+
         @endforeach
         @endif
     </div>
 
+    {{-- Homepage Bottom Advertisement --}}
+    <div class="container mx-auto px-4 py-6">
+        <x-advertisement.ad-banner slot-slug="homepage-bottom" />
+    </div>
+
+    {{-- Mobile Sticky Footer Advertisement (Mobile Only) --}}
+    <div class="md:hidden">
+        <x-advertisement.ad-banner slot-slug="mobile-sticky-footer" />
+    </div>
 
 </div>
 @endsection
