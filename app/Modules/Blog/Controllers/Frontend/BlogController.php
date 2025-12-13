@@ -321,6 +321,100 @@ class BlogController extends Controller
     }
 
     /**
+     * Video gallery page - Shows only video posts
+     */
+    public function videoGallery(Request $request)
+    {
+        // Build breadcrumbs
+        $breadcrumbs = [
+            ['name' => 'ভিডিও গ্যালারি', 'url' => route('blog.video-gallery')]
+        ];
+
+        // Get filter parameters
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+        $initialLimit = 30; // Fetch 30 posts initially
+
+        // Build query for video posts only
+        $query = Post::where('status', 'published')
+            ->where('published_at', '<=', now())
+            ->whereNotNull('youtube_url')
+            ->where('youtube_url', '!=', '');
+
+        // Apply search
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('excerpt', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        switch ($sort) {
+            case 'oldest':
+                $query->orderBy('published_at', 'asc');
+                break;
+            case 'popular':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'featured':
+                $query->orderBy('is_featured', 'desc')->orderBy('published_at', 'desc');
+                break;
+            case 'latest':
+            default:
+                $query->orderBy('published_at', 'desc')->orderBy('id', 'desc');
+                break;
+        }
+
+        // Get total count before limiting
+        $totalPosts = $query->count();
+
+        // Get initial posts
+        $posts = $query->with(['author', 'categories', 'tags', 'tickMarks', 'media'])
+            ->limit($initialLimit)
+            ->get();
+
+        // Get latest posts for sidebar
+        $latestPosts = Post::where('status', 'published')
+            ->latest('published_at')
+            ->limit(10)
+            ->get();
+
+        // Get popular posts for sidebar
+        $popularPosts = Post::where('status', 'published')
+            ->orderBy('views_count', 'desc')
+            ->limit(10)
+            ->get();
+
+        // Prepare SEO data
+        $blogTitle = SiteSetting::get('blog_title', 'Blog');
+        $blogTagline = SiteSetting::get('blog_tagline', '');
+        $blogImage = SiteSetting::get('blog_image');
+
+        $seoData = [
+            'title' => 'ভিডিও গ্যালারি | ' . $blogTitle,
+            'description' => 'সকল ভিডিও সংবাদ এক জায়গায়। দেখুন সর্বশেষ এবং জনপ্রিয় ভিডিও সংবাদ।',
+            'keywords' => 'video, ভিডিও, video news, video gallery, ' . SiteSetting::get('blog_keywords', 'blog, news'),
+            'og_image' => $blogImage ? asset('storage/' . $blogImage) : asset('images/og-default.jpg'),
+            'og_type' => 'website',
+            'canonical' => route('blog.video-gallery'),
+        ];
+
+        $currentUrl = route('blog.video-gallery') . '?post_type=video';
+
+        return view('frontend.blog.video-gallery', compact(
+            'posts',
+            'totalPosts',
+            'latestPosts',
+            'popularPosts',
+            'breadcrumbs',
+            'currentUrl',
+            'seoData'
+        ));
+    }
+
+    /**
      * Single post page
      */
     public function show($slug)

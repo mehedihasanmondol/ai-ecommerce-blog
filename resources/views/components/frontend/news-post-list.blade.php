@@ -9,6 +9,7 @@
 'latestPosts' => null,
 'popularPosts' => null,
 'latestVideo' => null,
+'showVideoThumbnails' => false,
 ])
 <div class="bg-white">
     <div class="container mx-auto ">
@@ -229,7 +230,7 @@
                     <article class="md:col-span-2 border-r border-gray-200">
                         {{-- Featured Image or Video --}}
                         <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                            @if(request('post_type') === 'video' && $featuredPost->youtube_embed_url)
+                            @if(($showVideoThumbnails || request('post_type') === 'video') && $featuredPost->youtube_embed_url)
                             {{-- Show YouTube Video Embed --}}
                             <iframe
                                 class="absolute inset-0 w-full h-full"
@@ -291,7 +292,7 @@
                         <article class="flex-1 flex flex-col group bg-white">
                             {{-- Thumbnail or Video --}}
                             <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                                @if(request('post_type') === 'video' && $story->youtube_embed_url)
+                                @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
                                 <iframe
                                     class="absolute inset-0 w-full h-full"
                                     src="{{ $story->youtube_embed_url }}"
@@ -340,7 +341,7 @@
                 <article class="bg-white shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
                     {{-- Image or Video --}}
                     <div class="relative h-48 overflow-hidden">
-                        @if(request('post_type') === 'video' && $story->youtube_embed_url)
+                        @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
                         <iframe
                             class="w-full h-full"
                             src="{{ $story->youtube_embed_url }}"
@@ -423,7 +424,7 @@
                         {{-- Image or Video - 1/3 Width --}}
                         <div class="col-span-1">
                             <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
-                                @if(request('post_type') === 'video' && $post->youtube_embed_url)
+                                @if(($showVideoThumbnails || request('post_type') === 'video') && $post->youtube_embed_url)
                                 <iframe
                                     class="absolute inset-0 w-full h-full rounded"
                                     src="{{ $post->youtube_embed_url }}"

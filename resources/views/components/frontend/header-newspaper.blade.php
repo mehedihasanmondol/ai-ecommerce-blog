@@ -134,11 +134,15 @@
 
                         {{-- সর্বশেষ (Latest) - Hidden on mobile --}}
                         <li class=" md:block relative static flex-shrink-0">
-                            <a href="{{ route('blog.latest-news') }}"
-                                class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
-                                সর্বশেষ
-                            </a>
+                            <div class="relative group z-20">
+                                <a href="{{ route('blog.latest-news') }}"
+                                    class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
+                                    সর্বশেষ
+                                </a>
+                            </div>
                         </li>
+
+
 
                         {{-- Dynamic Categories with Mega Menu --}}
                         @php
@@ -293,7 +297,7 @@
 
                         {{-- Additional Menu Items (Hidden on mobile) --}}
                         <li class=" md:block relative static flex-shrink-0" x-show="!isSticky" style="display: none;">
-                            <a href="#"
+                            <a href="{{ route('blog.video-gallery') }}"
                                 class="block px-4 py-3 text-sm font-medium hover:bg-white hover:text-red-600 transition whitespace-nowrap">
                                 ভিডিও গ্যালারি
                             </a>

@@ -148,10 +148,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin.access'])->gr
 // Blog Index (listing page)
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 
-// Latest News (newspaper-style)
+// Latest News// Newspaper-style pages
 Route::get('/latest-news', [BlogController::class, 'latestNewsNewspaper'])->name('blog.latest-news');
-// popular posts
 Route::get('/popular-news', [BlogController::class, 'popularNews'])->name('blog.popular-news');
+Route::get('/video-gallery', [BlogController::class, 'videoGallery'])->name('blog.video-gallery');
 
 // Category Archive
 Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
