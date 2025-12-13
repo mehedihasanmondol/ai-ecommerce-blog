@@ -551,17 +551,19 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 @foreach($relatedPosts as $related)
                 <article class="border border-gray-200 bg-white shadow-sm  overflow-hidden hover:shadow-lg transition duration-300">
-                    @if($related->media || $related->featured_image)
-                    @if($related->media)
-                    <img src="{{ $related->media->medium_url }}"
-                        alt="{{ $related->title }}"
-                        class="w-full h-40 object-cover">
-                    @elseif($related->featured_image)
-                    <img src="{{ asset('storage/' . $related->featured_image) }}"
-                        alt="{{ $related->title }}"
-                        class="w-full h-40 object-cover">
-                    @endif
-                    @endif
+                    <a href="{{ route('products.show', $related->slug) }}" class="block">
+                        @if($related->media || $related->featured_image)
+                        @if($related->media)
+                        <img src="{{ $related->media->medium_url }}"
+                            alt="{{ $related->title }}"
+                            class="w-full h-40 object-cover">
+                        @elseif($related->featured_image)
+                        <img src="{{ asset('storage/' . $related->featured_image) }}"
+                            alt="{{ $related->title }}"
+                            class="w-full h-40 object-cover">
+                        @endif
+                        @endif
+                    </a>
                     <div class="p-4">
                         <h3 class="font-bold text-gray-900 mb-2 hover:text-blue-600">
                             <a href="{{ route('products.show', $related->slug) }}">

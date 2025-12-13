@@ -229,36 +229,38 @@
                     @php $featuredPost = $posts->first(); @endphp
                     <article class="md:col-span-2 border-r border-gray-200">
                         {{-- Featured Image or Video --}}
-                        <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                            @if(($showVideoThumbnails || request('post_type') === 'video') && $featuredPost->youtube_embed_url)
-                            {{-- Show YouTube Video Embed --}}
-                            <iframe
-                                class="absolute inset-0 w-full h-full"
-                                src="{{ $featuredPost->youtube_embed_url }}"
-                                title="{{ $featuredPost->title }}"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen
-                                loading="lazy">
-                            </iframe>
-                            @elseif($featuredPost->media)
-                            {{-- Show Featured Image --}}
-                            <img src="{{ $featuredPost->media->large_url }}"
-                                alt="{{ $featuredPost->title }}"
-                                class="absolute inset-0 w-full h-full object-cover">
-                            @else
-                            <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-400">ছবি নেই</span>
+                        <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                            <div class="relative overflow-hidden" style="padding-top: 66.67%;">
+                                @if(($showVideoThumbnails || request('post_type') === 'video') && $featuredPost->youtube_embed_url)
+                                {{-- Show YouTube Video Embed --}}
+                                <iframe
+                                    class="absolute inset-0 w-full h-full pointer-events-none"
+                                    src="{{ $featuredPost->youtube_embed_url }}"
+                                    title="{{ $featuredPost->title }}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    loading="lazy">
+                                </iframe>
+                                @elseif($featuredPost->media)
+                                {{-- Show Featured Image --}}
+                                <img src="{{ $featuredPost->media->large_url }}"
+                                    alt="{{ $featuredPost->title }}"
+                                    class="absolute inset-0 w-full h-full object-cover">
+                                @else
+                                <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-400">ছবি নেই</span>
+                                </div>
+                                @endif
+                                @if($featuredPost->is_featured)
+                                <div class="absolute bottom-4 left-4 right-4">
+                                    <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
+                                        ফিচারড
+                                    </span>
+                                </div>
+                                @endif
                             </div>
-                            @endif
-                            @if($featuredPost->is_featured)
-                            <div class="absolute bottom-4 left-4 right-4">
-                                <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
-                                    ফিচারড
-                                </span>
-                            </div>
-                            @endif
-                        </div>
+                        </a>
 
                         {{-- Featured Content --}}
                         <div class="p-6">
@@ -269,9 +271,11 @@
                             </h1>
 
                             {{-- Excerpt --}}
-                            <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3">
-                                {{ $featuredPost->excerpt }}
-                            </p>
+                            <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                                <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3 hover:text-gray-900 transition-colors">
+                                    {{ $featuredPost->excerpt }}
+                                </p>
+                            </a>
 
                             {{-- Meta Info --}}
                             <div class="flex items-center gap-4 text-xs text-gray-500">
@@ -291,27 +295,29 @@
                         @foreach($posts->skip(1)->take(2) as $index => $story)
                         <article class="flex-1 flex flex-col group bg-white">
                             {{-- Thumbnail or Video --}}
-                            <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                                @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
-                                <iframe
-                                    class="absolute inset-0 w-full h-full"
-                                    src="{{ $story->youtube_embed_url }}"
-                                    title="{{ $story->title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen
-                                    loading="lazy">
-                                </iframe>
-                                @elseif($story->media)
-                                <img src="{{ $story->media->medium_url }}"
-                                    alt="{{ $story->title }}"
-                                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                @else
-                                <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-400 text-sm">ছবি নেই</span>
+                            <a href="{{ url('/' . $story->slug) }}" class="block">
+                                <div class="relative overflow-hidden" style="padding-top: 66.67%;">
+                                    @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
+                                    <iframe
+                                        class="absolute inset-0 w-full h-full pointer-events-none"
+                                        src="{{ $story->youtube_embed_url }}"
+                                        title="{{ $story->title }}"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        loading="lazy">
+                                    </iframe>
+                                    @elseif($story->media)
+                                    <img src="{{ $story->media->medium_url }}"
+                                        alt="{{ $story->title }}"
+                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    @else
+                                    <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
-                            </div>
+                            </a>
 
                             {{-- Content --}}
                             <div class="p-4 flex-1">
@@ -340,27 +346,29 @@
                 @foreach($posts->skip(3)->take(3) as $story)
                 <article class="bg-white shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
                     {{-- Image or Video --}}
-                    <div class="relative h-48 overflow-hidden">
-                        @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
-                        <iframe
-                            class="w-full h-full"
-                            src="{{ $story->youtube_embed_url }}"
-                            title="{{ $story->title }}"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen
-                            loading="lazy">
-                        </iframe>
-                        @elseif($story->media)
-                        <img src="{{ $story->media->medium_url }}"
-                            alt="{{ $story->title }}"
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        @else
-                        <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400 text-sm">ছবি নেই</span>
+                    <a href="{{ url('/' . $story->slug) }}" class="block">
+                        <div class="relative h-48 overflow-hidden">
+                            @if(($showVideoThumbnails || request('post_type') === 'video') && $story->youtube_embed_url)
+                            <iframe
+                                class="w-full h-full pointer-events-none"
+                                src="{{ $story->youtube_embed_url }}"
+                                title="{{ $story->title }}"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy">
+                            </iframe>
+                            @elseif($story->media)
+                            <img src="{{ $story->media->medium_url }}"
+                                alt="{{ $story->title }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            @else
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <span class="text-gray-400 text-sm">ছবি নেই</span>
+                            </div>
+                            @endif
                         </div>
-                        @endif
-                    </div>
+                    </a>
 
                     {{-- Content --}}
                     <div class="p-4">
@@ -369,9 +377,11 @@
                                 {{ $story->title }}
                             </a>
                         </h3>
-                        <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed">
-                            {{ Str::limit($story->excerpt, 120) }}
-                        </p>
+                        <a href="{{ url('/' . $story->slug) }}" class="block">
+                            <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed hover:text-gray-900 transition-colors">
+                                {{ Str::limit($story->excerpt, 120) }}
+                            </p>
+                        </a>
                         <div class="text-xs text-gray-500 flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -423,27 +433,29 @@
                     <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
                         {{-- Image or Video - 1/3 Width --}}
                         <div class="col-span-1">
-                            <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
-                                @if(($showVideoThumbnails || request('post_type') === 'video') && $post->youtube_embed_url)
-                                <iframe
-                                    class="absolute inset-0 w-full h-full rounded"
-                                    src="{{ $post->youtube_embed_url }}"
-                                    title="{{ $post->title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen
-                                    loading="lazy">
-                                </iframe>
-                                @elseif($post->media)
-                                <img src="{{ $post->media->medium_url }}"
-                                    alt="{{ $post->title }}"
-                                    class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                @else
-                                <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-400 text-sm">ছবি নেই</span>
+                            <a href="{{ url('/' . $post->slug) }}" class="block">
+                                <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
+                                    @if(($showVideoThumbnails || request('post_type') === 'video') && $post->youtube_embed_url)
+                                    <iframe
+                                        class="absolute inset-0 w-full h-full rounded pointer-events-none"
+                                        src="{{ $post->youtube_embed_url }}"
+                                        title="{{ $post->title }}"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        loading="lazy">
+                                    </iframe>
+                                    @elseif($post->media)
+                                    <img src="{{ $post->media->medium_url }}"
+                                        alt="{{ $post->title }}"
+                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    @else
+                                    <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
-                            </div>
+                            </a>
                         </div>
 
                         {{-- Content - 2/3 Width --}}
@@ -453,9 +465,11 @@
                                     {{ $post->title }}
                                 </a>
                             </h3>
-                            <p class="text-sm text-gray-600 line-clamp-2 mb-3 leading-relaxed">
-                                {{ Str::limit($post->excerpt, 180) }}
-                            </p>
+                            <a href="{{ url('/' . $post->slug) }}" class="block">
+                                <p class="text-sm text-gray-600 line-clamp-2 mb-3 leading-relaxed hover:text-gray-900 transition-colors">
+                                    {{ Str::limit($post->excerpt, 180) }}
+                                </p>
+                            </a>
                             <div class="text-xs text-gray-500 flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -558,31 +572,35 @@
                                 const postHtml = `
                                         <article class="grid grid-cols-3 gap-4 p-4 hover:bg-gray-50 transition-colors group post-item">
                                             <div class="col-span-1">
-                                                <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
-                                                    ${shouldShowVideo ? 
-                                                        `<iframe
-                                                            class="absolute inset-0 w-full h-full rounded"
-                                                            src="${post.youtube_url}"
-                                                            title="${post.title}"
-                                                            frameborder="0"
-                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                            allowfullscreen
-                                                            loading="lazy">
-                                                        </iframe>` :
-                                                        (post.media_url ? 
-                                                            `<img src="${post.media_url}" alt="${post.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` :
-                                                            `<div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">ছবি নেই</span></div>`
-                                                        )
-                                                    }
-                                                </div>
+                                                <a href="/${post.slug}" class="block">
+                                                    <div class="relative overflow-hidden rounded" style="padding-top: 66.67%;">
+                                                        ${shouldShowVideo ? 
+                                                            `<iframe
+                                                                class="absolute inset-0 w-full h-full rounded pointer-events-none"
+                                                                src="${post.youtube_url}"
+                                                                title="${post.title}"
+                                                                frameborder="0"
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                allowfullscreen
+                                                                loading="lazy">
+                                                            </iframe>` :
+                                                            (post.media_url ? 
+                                                                `<img src="${post.media_url}" alt="${post.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">` :
+                                                                `<div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center"><span class="text-gray-400 text-sm">ছবি নেই</span></div>`
+                                                            )
+                                                        }
+                                                    </div>
+                                                </a>
                                             </div>
                                             <div class="col-span-2">
                                                 <h3 class="font-bold text-lg mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
                                                     <a href="/${post.slug}">${post.title}</a>
                                                 </h3>
-                                                <p class="text-sm text-gray-600 line-clamp-2 mb-3 leading-relaxed">
-                                                    ${post.excerpt}
-                                                </p>
+                                                <a href="/${post.slug}" class="block">
+                                                    <p class="text-sm text-gray-600 line-clamp-2 mb-3 leading-relaxed hover:text-gray-900 transition-colors">
+                                                        ${post.excerpt}
+                                                    </p>
+                                                </a>
                                                 <div class="text-xs text-gray-500 flex items-center gap-1">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>

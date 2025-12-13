@@ -33,24 +33,26 @@
                         @if($featuredPost)
                         <article class="border-r border-gray-200">
                             {{-- Featured Image --}}
-                            <div class="relative h-80 overflow-hidden">
-                                @if($featuredPost->media)
-                                <img src="{{ $featuredPost->media->large_url }}"
-                                    alt="{{ $featuredPost->title }}"
-                                    class="w-full h-full object-cover">
-                                @else
-                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-400">ছবি নেই</span>
+                            <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                                <div class="relative h-80 overflow-hidden">
+                                    @if($featuredPost->media)
+                                    <img src="{{ $featuredPost->media->large_url }}"
+                                        alt="{{ $featuredPost->title }}"
+                                        class="w-full h-full object-cover">
+                                    @else
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400">ছবি নেই</span>
+                                    </div>
+                                    @endif
+                                    @if($featuredPost->is_featured)
+                                    <div class="absolute bottom-4 left-4 right-4">
+                                        <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
+                                            প্রধান সংবাদ
+                                        </span>
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
-                                @if($featuredPost->is_featured)
-                                <div class="absolute bottom-4 left-4 right-4">
-                                    <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
-                                        প্রধান সংবাদ
-                                    </span>
-                                </div>
-                                @endif
-                            </div>
+                            </a>
 
                             {{-- Featured Content --}}
                             <div class="p-6">
@@ -61,9 +63,11 @@
                                 </h1>
 
                                 {{-- Excerpt --}}
-                                <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3">
-                                    {{ $featuredPost->excerpt }}
-                                </p>
+                                <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                                    <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3 hover:text-gray-900 transition-colors">
+                                        {{ $featuredPost->excerpt }}
+                                    </p>
+                                </a>
 
                                 {{-- Meta Info --}}
                                 <div class="flex items-center gap-4 text-xs text-gray-500">
@@ -127,17 +131,19 @@
                     @foreach($topStories->skip(5) as $story)
                     <article class="bg-white shadow-md overflow-hidden group hover:shadow-lg transition-shadow">
                         {{-- Image --}}
-                        <div class="relative h-48 overflow-hidden">
-                            @if($story->media)
-                            <img src="{{ $story->media->medium_url }}"
-                                alt="{{ $story->title }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            @else
-                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-400 text-sm">ছবি নেই</span>
+                        <a href="{{ url('/' . $story->slug) }}" class="block">
+                            <div class="relative h-48 overflow-hidden">
+                                @if($story->media)
+                                <img src="{{ $story->media->medium_url }}"
+                                    alt="{{ $story->title }}"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                    <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                </div>
+                                @endif
                             </div>
-                            @endif
-                        </div>
+                        </a>
 
                         {{-- Content --}}
                         <div class="p-4">
@@ -146,9 +152,11 @@
                                     {{ $story->title }}
                                 </a>
                             </h3>
-                            <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed">
-                                {{ Str::limit($story->excerpt, 120) }}
-                            </p>
+                            <a href="{{ url('/' . $story->slug) }}" class="block">
+                                <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed hover:text-gray-900 transition-colors">
+                                    {{ Str::limit($story->excerpt, 120) }}
+                                </p>
+                            </a>
                             <div class="text-xs text-gray-500 flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -218,24 +226,26 @@
                         @php $featuredPost = $section['posts']->first(); @endphp
                         <article class="md:col-span-2 border-r border-gray-200">
                             {{-- Featured Image --}}
-                            <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                                @if($featuredPost->media)
-                                <img src="{{ $featuredPost->media->large_url }}"
-                                    alt="{{ $featuredPost->title }}"
-                                    class="absolute inset-0 w-full h-full object-cover">
-                                @else
-                                <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
-                                    <span class="text-gray-400">ছবি নেই</span>
+                            <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                                <div class="relative overflow-hidden" style="padding-top: 66.67%;">
+                                    @if($featuredPost->media)
+                                    <img src="{{ $featuredPost->media->large_url }}"
+                                        alt="{{ $featuredPost->title }}"
+                                        class="absolute inset-0 w-full h-full object-cover">
+                                    @else
+                                    <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <span class="text-gray-400">ছবি নেই</span>
+                                    </div>
+                                    @endif
+                                    @if($featuredPost->is_featured)
+                                    <div class="absolute bottom-4 left-4 right-4">
+                                        <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
+                                            ফিচারড
+                                        </span>
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
-                                @if($featuredPost->is_featured)
-                                <div class="absolute bottom-4 left-4 right-4">
-                                    <span class="bg-red-600 text-white px-3 py-1 text-xs font-bold inline-block">
-                                        ফিচারড
-                                    </span>
-                                </div>
-                                @endif
-                            </div>
+                            </a>
 
                             {{-- Featured Content --}}
                             <div class="p-6">
@@ -247,9 +257,11 @@
 
                                 {{-- Excerpt --}}
                                 @if($featuredPost->excerpt)
-                                <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3">
-                                    {{ $featuredPost->excerpt }}
-                                </p>
+                                <a href="{{ url('/' . $featuredPost->slug) }}" class="block">
+                                    <p class="text-gray-700 mb-4 text-sm leading-relaxed line-clamp-3 hover:text-gray-900 transition-colors">
+                                        {{ $featuredPost->excerpt }}
+                                    </p>
+                                </a>
                                 @endif
 
                                 {{-- Meta Info --}}
@@ -270,17 +282,19 @@
                             @foreach($section['posts']->skip(1)->take(2) as $post)
                             <article class="flex-1 flex flex-col group bg-white">
                                 {{-- Thumbnail --}}
-                                <div class="relative overflow-hidden" style="padding-top: 66.67%;">
-                                    @if($post->media)
-                                    <img src="{{ $post->media->medium_url }}"
-                                        alt="{{ $post->title }}"
-                                        class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                    @else
-                                    <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                <a href="{{ url('/' . $post->slug) }}" class="block">
+                                    <div class="relative overflow-hidden" style="padding-top: 66.67%;">
+                                        @if($post->media)
+                                        <img src="{{ $post->media->medium_url }}"
+                                            alt="{{ $post->title }}"
+                                            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        @else
+                                        <div class="absolute inset-0 w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                        </div>
+                                        @endif
                                     </div>
-                                    @endif
-                                </div>
+                                </a>
 
                                 {{-- Content --}}
                                 <div class="p-4 flex-1">
@@ -312,17 +326,19 @@
                             <div class="grid md:grid-cols-2 grid-cols-2 gap-6 ">
 
                                 {{-- Image --}}
-                                <div class="relative overflow-hidden">
-                                    @if($post->media)
-                                    <img src="{{ $post->media->medium_url }}"
-                                        alt="{{ $post->title }}"
-                                        class="w-full  group-hover:scale-105 transition-transform duration-300">
-                                    @else
-                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                                        <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                <a href="{{ url('/' . $post->slug) }}" class="block">
+                                    <div class="relative overflow-hidden">
+                                        @if($post->media)
+                                        <img src="{{ $post->media->medium_url }}"
+                                            alt="{{ $post->title }}"
+                                            class="w-full  group-hover:scale-105 transition-transform duration-300">
+                                        @else
+                                        <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                            <span class="text-gray-400 text-sm">ছবি নেই</span>
+                                        </div>
+                                        @endif
                                     </div>
-                                    @endif
-                                </div>
+                                </a>
 
 
                                 {{-- Content --}}
@@ -333,9 +349,11 @@
                                         </a>
                                     </h4>
                                     @if($post->excerpt)
-                                    <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed">
-                                        {{ Str::limit($post->excerpt, 120) }}
-                                    </p>
+                                    <a href="{{ url('/' . $post->slug) }}" class="block">
+                                        <p class="text-sm text-gray-600 line-clamp-3 mb-3 leading-relaxed hover:text-gray-900 transition-colors">
+                                            {{ Str::limit($post->excerpt, 120) }}
+                                        </p>
+                                    </a>
                                     @endif
                                     <div class="text-xs text-gray-500 flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
