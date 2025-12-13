@@ -64,16 +64,42 @@
                                 </div>
                                 {{-- Left: Image/Icon + Basic Info --}}
                                 <div class="flex items-start space-x-4 flex-1">
-                                    {{-- Thumbnail/Icon --}}
-                                    @if($creative->type === 'image' && $creative->image_path)
-                                    <img src="{{ asset('storage/' . $creative->image_path) }}"
-                                        alt="{{ $creative->name }}"
-                                        class="w-20 h-20 object-cover rounded border border-gray-200">
-                                    @else
-                                    <div class="w-20 h-20 bg-gray-100 rounded border border-gray-200 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-{{ $creative->type === 'video' ? 'video' : ($creative->type === 'gif' ? 'file-image' : 'code') }} text-2xl text-gray-400"></i>
+                                    {{-- Preview/Thumbnail --}}
+                                    <div class="w-20 h-20 rounded border border-gray-200 flex-shrink-0 overflow-hidden">
+                                        @if($creative->type === 'image' && $creative->image_path)
+                                        <img src="{{ asset('storage/' . $creative->image_path) }}"
+                                            alt="{{ $creative->name }}"
+                                            class="w-full h-full object-cover">
+                                        @elseif($creative->type === 'video' && $creative->video_url)
+                                        <div class="relative w-full h-full bg-black">
+                                            <iframe
+                                                src="{{ str_contains($creative->video_url, 'youtube') ? str_replace('watch?v=', 'embed/', $creative->video_url) . '?controls=0&modestbranding=1' : $creative->video_url }}"
+                                                class="w-full h-full"
+                                                frameborder="0"
+                                                loading="lazy"></iframe>
+                                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center pointer-events-none">
+                                                <i class="fas fa-play text-white text-2xl"></i>
+                                            </div>
+                                        </div>
+                                        @elseif($creative->type === 'gif' && $creative->gif_url)
+                                        <img src="{{ $creative->gif_url }}"
+                                            alt="{{ $creative->name }}"
+                                            class="w-full h-full object-cover">
+                                        @elseif($creative->type === 'html' && $creative->html_content)
+                                        <div class="w-full h-full bg-white flex items-center justify-center relative overflow-hidden">
+                                            <div class="absolute inset-0 transform scale-[0.15] origin-top-left pointer-events-none">
+                                                {!! $creative->html_content !!}
+                                            </div>
+                                            <div class="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center">
+                                                <i class="fas fa-code text-gray-600 text-xl"></i>
+                                            </div>
+                                        </div>
+                                        @else
+                                        <div class="w-full h-full bg-gray-100 flex items-center justify-center">
+                                            <i class="fas fa-{{ $creative->type === 'video' ? 'video' : ($creative->type === 'gif' ? 'file-image' : 'code') }} text-2xl text-gray-400"></i>
+                                        </div>
+                                        @endif
                                     </div>
-                                    @endif
 
                                     {{-- Details --}}
                                     <div class="flex-1 min-w-0">

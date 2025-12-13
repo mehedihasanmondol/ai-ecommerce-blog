@@ -59,16 +59,22 @@ $adTrackingService->trackImpression($campaign, $creative, $adSlot);
         display: flex;
         justify-content: center;
         align-items: center;
+        max-width: 100%;
+        overflow: hidden;
     }
 
-    .ad-content img {
+    .ad-content img,
+    .ad-content video,
+    .ad-content iframe,
+    .ad-content>* {
         max-width: 100%;
-        height: auto;
         display: block;
+        margin: auto;
     }
 
     .ad-creative {
         width: 100%;
+        max-width: 100%;
     }
 
     /* Lazy loading placeholder */
