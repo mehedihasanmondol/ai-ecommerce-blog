@@ -277,6 +277,32 @@ class HomeController extends Controller
         $featuredCategoriesEnabled = \App\Models\SiteSetting::get('featured_categories_section_enabled', '1');
         $featuredCategoriesTitle = \App\Models\SiteSetting::get('featured_categories_section_title', 'গুরুত্বপুর্ন বিভাগ');
 
+        // Top Videos Section - Get all active top videos with their categories
+        $topVideos = \App\Models\TopVideo::with(['post.author', 'post.categories', 'post.media'])
+            ->active()
+            ->ordered()
+            ->get()
+            ->pluck('post')
+            ->filter(); // Remove any null posts
+
+        // Group top videos by category
+        $topVideosByCategory = [];
+        foreach ($topVideos as $video) {
+            foreach ($video->categories as $category) {
+                if (!isset($topVideosByCategory[$category->id])) {
+                    $topVideosByCategory[$category->id] = [
+                        'category' => $category,
+                        'videos' => collect()
+                    ];
+                }
+                $topVideosByCategory[$category->id]['videos']->push($video);
+            }
+        }
+
+        // Get section settings for top videos
+        $topVideosEnabled = \App\Models\SiteSetting::get('top_videos_section_enabled', '1');
+        $topVideosTitle = \App\Models\SiteSetting::get('top_videos_section_title', 'শীর্ষ ভিডিও');
+
         // Latest posts for sidebar
         $latestPosts = $posts->take(10);
 
@@ -307,6 +333,9 @@ class HomeController extends Controller
             'featuredCategorySections',
             'featuredCategoriesEnabled',
             'featuredCategoriesTitle',
+            'topVideosByCategory',
+            'topVideosEnabled',
+            'topVideosTitle',
             'latestPosts',
             'popularPosts',
             'headlineBanner',
@@ -495,5 +524,46 @@ class HomeController extends Controller
 
         // Return HTML partial
         return view('frontend.home.partials.category-section', compact('section'))->render();
+    }
+
+    /**
+     * Load top videos section for lazy loading
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function loadTopVideosSection()
+    {
+        // Get all active top videos with their categories
+        $topVideos = \App\Models\TopVideo::with(['post.author', 'post.categories', 'post.media'])
+            ->active()
+            ->ordered()
+            ->get()
+            ->pluck('post')
+            ->filter(); // Remove any null posts
+
+        // Group top videos by category
+        $topVideosByCategory = [];
+        foreach ($topVideos as $video) {
+            foreach ($video->categories as $category) {
+                if (!isset($topVideosByCategory[$category->id])) {
+                    $topVideosByCategory[$category->id] = [
+                        'category' => $category,
+                        'videos' => collect()
+                    ];
+                }
+                $topVideosByCategory[$category->id]['videos']->push($video);
+            }
+        }
+
+        // Get section settings
+        $topVideosEnabled = \App\Models\SiteSetting::get('top_videos_section_enabled', '1');
+        $topVideosTitle = \App\Models\SiteSetting::get('top_videos_section_title', 'শীর্ষ ভিডিও');
+
+        // Return HTML partial
+        return view('frontend.home.partials.top-videos-content', compact(
+            'topVideosByCategory',
+            'topVideosEnabled',
+            'topVideosTitle'
+        ))->render();
     }
 }

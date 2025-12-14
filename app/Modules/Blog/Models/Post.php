@@ -95,13 +95,13 @@ class Post extends Model
             if (empty($post->slug)) {
                 // Use Bangla-compatible slug generation
                 $post->slug = generate_slug($post->title);
-                
+
                 // Fallback to Laravel's Str::slug if generate_slug returns empty
                 if (empty($post->slug)) {
                     $post->slug = Str::slug($post->title);
                 }
             }
-            
+
             // Calculate reading time
             if ($post->content) {
                 $post->reading_time = $post->calculateReadingTime($post->content);
@@ -196,9 +196,9 @@ class Post extends Model
             'blog_post_id',
             'blog_tick_mark_id'
         )
-        ->withPivot(['added_by', 'notes'])
-        ->withTimestamps()
-        ->orderBy('sort_order');
+            ->withPivot(['added_by', 'notes'])
+            ->withTimestamps()
+            ->orderBy('sort_order');
     }
 
     /**
@@ -220,9 +220,9 @@ class Post extends Model
             'blog_post_id',
             'product_id'
         )
-        ->withPivot(['sort_order'])
-        ->withTimestamps()
-        ->orderBy('blog_post_product.sort_order');
+            ->withPivot(['sort_order'])
+            ->withTimestamps()
+            ->orderBy('blog_post_product.sort_order');
     }
 
     /**
@@ -231,6 +231,14 @@ class Post extends Model
     public function topStory(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(\App\Models\TopStory::class, 'post_id');
+    }
+
+    /**
+     * Get the top video associated with this post (if it's a top video)
+     */
+    public function topVideo(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\TopVideo::class, 'post_id');
     }
 
     /**
@@ -260,7 +268,7 @@ class Post extends Model
         if ($this->reading_time < 1) {
             return 'Less than a minute';
         }
-        
+
         return $this->reading_time . ' min read';
     }
 
@@ -275,7 +283,7 @@ class Post extends Model
 
         // Extract video ID from various YouTube URL formats
         $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i';
-        
+
         if (preg_match($pattern, $this->youtube_url, $matches)) {
             return $matches[1];
         }
@@ -289,7 +297,7 @@ class Post extends Model
     public function getYoutubeEmbedUrlAttribute(): ?string
     {
         $videoId = $this->youtube_video_id;
-        
+
         if (!$videoId) {
             return null;
         }
@@ -302,9 +310,9 @@ class Post extends Model
      */
     public function isPublished(): bool
     {
-        return $this->status === 'published' && 
-               $this->published_at && 
-               $this->published_at->isPast();
+        return $this->status === 'published' &&
+            $this->published_at &&
+            $this->published_at->isPast();
     }
 
     /**
@@ -312,9 +320,9 @@ class Post extends Model
      */
     public function isScheduled(): bool
     {
-        return $this->status === 'scheduled' && 
-               $this->scheduled_at && 
-               $this->scheduled_at->isFuture();
+        return $this->status === 'scheduled' &&
+            $this->scheduled_at &&
+            $this->scheduled_at->isFuture();
     }
 
     /**
@@ -386,8 +394,8 @@ class Post extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('title', 'like', "%{$search}%")
-              ->orWhere('excerpt', 'like', "%{$search}%")
-              ->orWhere('content', 'like', "%{$search}%");
+                ->orWhere('excerpt', 'like', "%{$search}%")
+                ->orWhere('content', 'like', "%{$search}%");
         });
     }
 
@@ -474,7 +482,7 @@ class Post extends Model
         if (is_numeric($tickMarkIdOrSlug)) {
             return $this->tickMarks()->where('blog_tick_marks.id', $tickMarkIdOrSlug)->exists();
         }
-        
+
         return $this->tickMarks()->where('blog_tick_marks.slug', $tickMarkIdOrSlug)->exists();
     }
 
@@ -514,7 +522,7 @@ class Post extends Model
                 'updated_at' => now(),
             ];
         }
-        
+
         $this->tickMarks()->sync($syncData);
     }
 }

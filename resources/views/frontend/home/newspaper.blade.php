@@ -173,6 +173,7 @@
 
 
 
+
             </div>
 
             {{-- Right Sidebar (3 columns) --}}
@@ -188,6 +189,9 @@
             </aside>
         </div>
     </div>
+
+    {{-- Top Videos Section --}}
+    @include('frontend.home.partials.top-videos-section')
 
     {{-- Homepage Mid Content Advertisement --}}
     <div class="container mx-auto px-4 py-6">
@@ -273,6 +277,7 @@
 
 @push('scripts')
 @vite('resources/js/lazy-category-loader.js')
+@vite('resources/js/lazy-top-videos-loader.js')
 @endpush
 
 @endsection

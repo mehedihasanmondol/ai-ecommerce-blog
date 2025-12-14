@@ -32,7 +32,7 @@ class TopStoryPostSelector extends Component
     {
         // Check if post already exists in top stories
         $exists = TopStory::where('post_id', $postId)->exists();
-        
+
         if ($exists) {
             // Post already exists, just return without action
             return;
@@ -48,24 +48,24 @@ class TopStoryPostSelector extends Component
         ]);
 
         $this->search = '';
-        
+
         // Set success message and reload the page
         session()->flash('success', 'Post added to top stories successfully!');
-        
+
         return redirect()->route('admin.top-stories.index');
     }
 
     public function getPostsProperty()
     {
-        $query = Post::with(['category', 'author'])
+        $query = Post::with(['category', 'author', 'media', 'categories'])
             ->where('status', 'published')
             ->whereDoesntHave('topStory');
 
         // If search is provided, filter by search term
         if (strlen($this->search) > 0) {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('title', 'like', '%' . $this->search . '%')
-                  ->orWhere('excerpt', 'like', '%' . $this->search .  '%');
+                    ->orWhere('excerpt', 'like', '%' . $this->search .  '%');
             });
         }
 

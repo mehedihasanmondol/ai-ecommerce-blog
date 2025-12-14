@@ -211,6 +211,17 @@ Route::middleware(['auth', 'admin.access'])->prefix('admin')->name('admin.')->gr
         Route::post('/top-stories/update-title', [\App\Http\Controllers\Admin\TopStoryController::class, 'updateSectionTitle'])->name('top-stories.update-title');
     });
 
+    // Top Videos Routes (Newspaper) - Requires top-videos.view permission
+    Route::middleware(['permission:top-videos.view'])->group(function () {
+        Route::get('/top-videos', [\App\Http\Controllers\Admin\TopVideoController::class, 'index'])->name('top-videos.index');
+        Route::post('/top-videos', [\App\Http\Controllers\Admin\TopVideoController::class, 'store'])->name('top-videos.store');
+        Route::delete('/top-videos/{topVideo}', [\App\Http\Controllers\Admin\TopVideoController::class, 'destroy'])->name('top-videos.destroy');
+        Route::post('/top-videos/reorder', [\App\Http\Controllers\Admin\TopVideoController::class, 'reorder'])->name('top-videos.reorder');
+        Route::post('/top-videos/{topVideo}/toggle-status', [\App\Http\Controllers\Admin\TopVideoController::class, 'toggleStatus'])->name('top-videos.toggle-status');
+        Route::post('/top-videos/toggle-section', [\App\Http\Controllers\Admin\TopVideoController::class, 'toggleSection'])->name('top-videos.toggle-section');
+        Route::post('/top-videos/update-title', [\App\Http\Controllers\Admin\TopVideoController::class, 'updateSectionTitle'])->name('top-videos.update-title');
+    });
+
     // Featured Categories Routes (Newspaper) - Requires featured-categories.view permission
     Route::middleware(['permission:featured-categories.view'])->group(function () {
         Route::get('/featured-categories', [\App\Http\Controllers\Admin\FeaturedCategoryController::class, 'index'])->name('featured-categories.index');
@@ -350,6 +361,7 @@ Route::post('/payment/sslcommerz/cancel', [PaymentController::class, 'sslcommerz
 Route::get('/api/category/{slug}/posts', [\App\Modules\Blog\Controllers\Frontend\BlogController::class, 'categoryPostsApi'])->name('api.category.posts');
 Route::get('/api/advertisement/render', [\App\Http\Controllers\Api\AdvertisementApiController::class, 'renderAd'])->name('api.advertisement.render');
 Route::get('/api/load-category-section/{categoryId}', [HomeController::class, 'loadCategorySection'])->name('api.load.category.section');
+Route::get('/api/load-top-videos-section', [HomeController::class, 'loadTopVideosSection'])->name('api.load.top.videos.section');
 
 
 // Public Product and Blog Post Routes (must be last to avoid conflicts)
