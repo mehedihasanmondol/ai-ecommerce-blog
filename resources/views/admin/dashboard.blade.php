@@ -11,18 +11,18 @@
                 <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
                 <p class="text-sm text-gray-600 mt-1">Welcome back, {{ auth()->user()->name }}!</p>
             </div>
-            
+
             {{-- Date Range Filter --}}
             <form method="GET" action="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
                 <div class="flex items-center gap-2">
                     <label class="text-sm text-gray-600">From:</label>
-                    <input type="date" name="start_date" value="{{ $startDate }}" 
-                           class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="date" name="start_date" value="{{ $startDate }}"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-sm text-gray-600">To:</label>
-                    <input type="date" name="end_date" value="{{ $endDate }}" 
-                           class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="date" name="end_date" value="{{ $endDate }}"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
                     <i class="fas fa-filter mr-1"></i> Filter
@@ -202,6 +202,41 @@
             <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalBrands }}</p>
         </a>
         @endisset
+
+        @isset($totalVideoPosts)
+        <a href="{{ route('admin.blog.posts.index') }}?post_type=video" class="bg-white rounded-lg shadow hover:shadow-md transition p-4 border-l-4 border-red-400">
+            <p class="text-xs font-medium text-gray-600">Video Posts</p>
+            <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalVideoPosts }}</p>
+        </a>
+        @endisset
+
+        @isset($totalBlogCategories)
+        <a href="{{ route('admin.blog.categories.index') }}" class="bg-white rounded-lg shadow hover:shadow-md transition p-4 border-l-4 border-green-400">
+            <p class="text-xs font-medium text-gray-600">Blog Categories</p>
+            <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalBlogCategories }}</p>
+        </a>
+        @endisset
+
+        @isset($totalTopStories)
+        <a href="{{ route('admin.top-stories.index') }}" class="bg-white rounded-lg shadow hover:shadow-md transition p-4 border-l-4 border-orange-400">
+            <p class="text-xs font-medium text-gray-600">Top Stories</p>
+            <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalTopStories }}</p>
+        </a>
+        @endisset
+
+        @isset($totalTopVideos)
+        <a href="{{ route('admin.top-videos.index') }}" class="bg-white rounded-lg shadow hover:shadow-md transition p-4 border-l-4 border-pink-400">
+            <p class="text-xs font-medium text-gray-600">Top Videos</p>
+            <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalTopVideos }}</p>
+        </a>
+        @endisset
+
+        @isset($totalComments)
+        <a href="{{ route('admin.blog.comments.index') }}" class="bg-white rounded-lg shadow hover:shadow-md transition p-4 border-l-4 border-blue-400">
+            <p class="text-xs font-medium text-gray-600">Comments</p>
+            <p class="text-xl font-bold text-gray-900 mt-1">{{ $totalComments }}</p>
+        </a>
+        @endisset
     </div>
 
     {{-- Charts and Tables Section --}}
@@ -272,16 +307,16 @@
             <div class="overflow-x-auto">
                 <div class="flex gap-2 items-end min-w-full" style="height: 200px;">
                     @php
-                        $maxRevenue = collect($salesChart)->max('revenue');
-                        $maxRevenue = $maxRevenue > 0 ? $maxRevenue : 1;
-                        $chartCount = count($salesChart);
-                        $barWidth = $chartCount > 15 ? 'w-6' : ($chartCount > 7 ? 'w-10' : 'w-12');
+                    $maxRevenue = collect($salesChart)->max('revenue');
+                    $maxRevenue = $maxRevenue > 0 ? $maxRevenue : 1;
+                    $chartCount = count($salesChart);
+                    $barWidth = $chartCount > 15 ? 'w-6' : ($chartCount > 7 ? 'w-10' : 'w-12');
                     @endphp
                     @foreach($salesChart as $day)
                     <div class="flex flex-col items-center {{ $barWidth }} flex-shrink-0">
-                        <div class="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg transition-all hover:from-blue-700 hover:to-blue-500 cursor-pointer" 
-                             style="height: {{ ($day['revenue'] / $maxRevenue * 180) }}px; min-height: 20px;"
-                             title="Date: {{ $day['date'] }}&#10;Revenue: ৳{{ number_format($day['revenue'], 2) }}&#10;Orders: {{ $day['orders'] }}">
+                        <div class="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg transition-all hover:from-blue-700 hover:to-blue-500 cursor-pointer"
+                            style="height: {{ ($day['revenue'] / $maxRevenue * 180) }}px; min-height: 20px;"
+                            title="Date: {{ $day['date'] }}&#10;Revenue: ৳{{ number_format($day['revenue'], 2) }}&#10;Orders: {{ $day['orders'] }}">
                         </div>
                         <p class="text-xs text-gray-600 mt-2 truncate w-full text-center">{{ $day['date'] }}</p>
                         <p class="text-xs font-semibold text-gray-900">{{ $day['orders'] }}</p>
@@ -303,7 +338,7 @@
                 @forelse($topProducts as $product)
                 <div class="flex items-center space-x-3 p-2 rounded hover:bg-gray-50">
                     @php
-                        $imageUrl = $product->getPrimaryThumbnailUrl();
+                    $imageUrl = $product->getPrimaryThumbnailUrl();
                     @endphp
                     @if($imageUrl)
                     <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="w-10 h-10 rounded object-cover">
@@ -319,6 +354,32 @@
                 </div>
                 @empty
                 <p class="text-sm text-gray-500 text-center py-4">No sales data in this date range</p>
+                @endforelse
+            </div>
+        </div>
+        @endisset
+
+        {{-- Most Read Articles --}}
+        @isset($mostReadArticles)
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Most Read Articles</h3>
+                <a href="{{ route('admin.blog.posts.index') }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">View All →</a>
+            </div>
+            <div class="space-y-3">
+                @forelse($mostReadArticles as $article)
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ $article->title }}</p>
+                        <p class="text-xs text-gray-600">{{ $article->published_at?->format('M d, Y') }}</p>
+                    </div>
+                    <div class="flex items-center space-x-1 text-gray-600">
+                        <i class="fas fa-eye text-xs"></i>
+                        <span class="text-sm font-bold">{{ number_format($article->views_count) }}</span>
+                    </div>
+                </div>
+                @empty
+                <p class="text-sm text-gray-500 text-center py-4">No articles yet</p>
                 @endforelse
             </div>
         </div>

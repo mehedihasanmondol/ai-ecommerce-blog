@@ -38,18 +38,18 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $data = [];
-        
+
         // Date Range Filter
         $startDate = $request->input('start_date', now()->subDays(30)->startOfDay());
         $endDate = $request->input('end_date', now()->endOfDay());
-        
+
         if (is_string($startDate)) {
             $startDate = Carbon::parse($startDate)->startOfDay();
         }
         if (is_string($endDate)) {
             $endDate = Carbon::parse($endDate)->endOfDay();
         }
-        
+
         $data['startDate'] = $startDate->format('Y-m-d');
         $data['endDate'] = $endDate->format('Y-m-d');
 
@@ -65,7 +65,7 @@ class DashboardController extends Controller
                 ->whereYear('created_at', now()->year)
                 ->count();
             $data['newUsersToday'] = User::whereDate('created_at', today())->count();
-            
+
             // Customer-specific statistics
             $data['totalCustomers'] = User::where('role', 'customer')->count();
             $data['newCustomersInRange'] = User::where('role', 'customer')
@@ -74,7 +74,7 @@ class DashboardController extends Controller
             $data['activeCustomers'] = User::where('role', 'customer')
                 ->where('is_active', true)
                 ->count();
-            
+
             // Recent Customers (last 10)
             $data['recentCustomers'] = User::where('role', 'customer')
                 ->latest()
@@ -104,7 +104,7 @@ class DashboardController extends Controller
             $data['monthOrders'] = Order::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count();
-            
+
             // Revenue Statistics (Only Delivered Orders in date range)
             $data['totalRevenue'] = Order::where('status', 'delivered')
                 ->whereBetween('created_at', [$startDate, $endDate])
@@ -116,7 +116,7 @@ class DashboardController extends Controller
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->sum('total_amount');
-            
+
             // Recent Orders
             $data['recentOrders'] = Order::with('user')
                 ->whereBetween('created_at', [$startDate, $endDate])
@@ -132,26 +132,26 @@ class DashboardController extends Controller
             $data['totalProducts'] = Product::count();
             $data['activeProducts'] = Product::where('status', 'published')->count();
             $data['draftProducts'] = Product::where('status', 'draft')->count();
-            
+
             // Out of stock: Products where ALL variants are out of stock
-            $data['outOfStockProducts'] = Product::whereHas('variants', function($q) {
+            $data['outOfStockProducts'] = Product::whereHas('variants', function ($q) {
                 $q->where('stock_status', 'out_of_stock');
-            })->whereDoesntHave('variants', function($q) {
+            })->whereDoesntHave('variants', function ($q) {
                 $q->where('stock_status', '!=', 'out_of_stock');
             })->count();
-            
+
             // Low stock: Products where ANY variant has low stock (quantity <= alert level)
-            $data['lowStockProducts'] = Product::whereHas('variants', function($q) {
+            $data['lowStockProducts'] = Product::whereHas('variants', function ($q) {
                 $q->whereColumn('stock_quantity', '<=', 'low_stock_alert')
-                  ->where('stock_quantity', '>', 0);
+                    ->where('stock_quantity', '>', 0);
             })->count();
-            
+
             $data['totalCategories'] = Category::count();
             $data['totalBrands'] = Brand::count();
         }
 
         // ===================================
-        // BLOG STATISTICS
+        // BLOG/NEWSPAPER STATISTICS
         // ===================================
         if ($user->hasPermission('posts.view')) {
             $data['totalPosts'] = Post::count();
@@ -159,6 +159,43 @@ class DashboardController extends Controller
             $data['draftPosts'] = Post::where('status', 'draft')->count();
             $data['scheduledPosts'] = Post::where('status', 'scheduled')->count();
             $data['totalBlogViews'] = Post::sum('views_count');
+
+            // Video posts count
+            $data['totalVideoPosts'] = Post::whereNotNull('youtube_url')
+                ->where('youtube_url', '!=', '')
+                ->where('status', 'published')
+                ->count();
+
+            // Most read articles (top 5)
+            $data['mostReadArticles'] = Post::where('status', 'published')
+                ->orderBy('views_count', 'desc')
+                ->limit(5)
+                ->get(['id', 'title', 'views_count', 'published_at']);
+
+            // Recent posts
+            $data['recentPosts'] = Post::where('status', 'published')
+                ->with('categories')
+                ->latest('published_at')
+                ->take(5)
+                ->get();
+        }
+
+        // Blog Categories
+        if ($user->hasPermission('blog-categories.view') || $user->hasPermission('posts.view')) {
+            $data['totalBlogCategories'] = \App\Modules\Blog\Models\BlogCategory::count();
+            $data['activeBlogCategories'] = \App\Modules\Blog\Models\BlogCategory::where('is_active', true)->count();
+        }
+
+        // Top Stories
+        if ($user->hasPermission('top-stories.view')) {
+            $data['totalTopStories'] = \App\Models\TopStory::count();
+            $data['activeTopStories'] = \App\Models\TopStory::active()->count();
+        }
+
+        // Top Videos
+        if ($user->hasPermission('top-videos.view')) {
+            $data['totalTopVideos'] = \App\Models\TopVideo::count();
+            $data['activeTopVideos'] = \App\Models\TopVideo::active()->count();
         }
 
         // ===================================
@@ -204,13 +241,13 @@ class DashboardController extends Controller
         if ($user->hasPermission('coupons.view')) {
             $data['totalCoupons'] = Coupon::count();
             $data['activeCoupons'] = Coupon::where('is_active', true)
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->whereNull('starts_at')
-                      ->orWhere('starts_at', '<=', now());
+                        ->orWhere('starts_at', '<=', now());
                 })
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->whereNull('expires_at')
-                      ->orWhere('expires_at', '>=', now());
+                        ->orWhere('expires_at', '>=', now());
                 })
                 ->count();
             $data['expiredCoupons'] = Coupon::where('expires_at', '<', now())->count();
@@ -238,12 +275,12 @@ class DashboardController extends Controller
         // ===================================
         // CHARTS DATA
         // ===================================
-        
+
         // Sales Chart (Date Range Based)
         if ($user->hasPermission('orders.view')) {
             $salesChart = [];
             $rangeDays = $startDate->diffInDays($endDate);
-            
+
             // If range is more than 30 days, group by week; otherwise by day
             if ($rangeDays > 30) {
                 // Group by week
@@ -251,10 +288,10 @@ class DashboardController extends Controller
                 for ($i = $weeks - 1; $i >= 0; $i--) {
                     $weekStart = $endDate->copy()->subWeeks($i)->startOfWeek();
                     $weekEnd = $weekStart->copy()->endOfWeek();
-                    
+
                     if ($weekEnd->gt($endDate)) $weekEnd = $endDate->copy();
                     if ($weekStart->lt($startDate)) $weekStart = $startDate->copy();
-                    
+
                     $salesChart[] = [
                         'date' => $weekStart->format('M d') . '-' . $weekEnd->format('d'),
                         'orders' => Order::whereBetween('created_at', [$weekStart, $weekEnd])->count(),
@@ -277,7 +314,7 @@ class DashboardController extends Controller
                     $currentDate->addDay();
                 }
             }
-            
+
             $data['salesChart'] = $salesChart;
         }
 
@@ -315,18 +352,18 @@ class DashboardController extends Controller
                 ->orderBy('sales_count', 'desc')
                 ->limit(5)
                 ->pluck('sales_count', 'product_id');
-            
+
             if ($topProductIds->isNotEmpty()) {
-                $data['topProducts'] = Product::with(['images' => function($query) {
-                        $query->where('is_primary', true)
-                              ->orWhere('sort_order', 1)
-                              ->with('media')
-                              ->orderBy('is_primary', 'desc')
-                              ->orderBy('sort_order');
-                    }])
+                $data['topProducts'] = Product::with(['images' => function ($query) {
+                    $query->where('is_primary', true)
+                        ->orWhere('sort_order', 1)
+                        ->with('media')
+                        ->orderBy('is_primary', 'desc')
+                        ->orderBy('sort_order');
+                }])
                     ->whereIn('id', $topProductIds->keys())
                     ->get()
-                    ->map(function($product) use ($topProductIds) {
+                    ->map(function ($product) use ($topProductIds) {
                         $product->sales_count = $topProductIds[$product->id];
                         return $product;
                     })
